@@ -1,0 +1,24 @@
+{
+  "name": "autolinks",
+  "description": "autolinks application",
+  "main": "index.js",
+  "authors": [
+    "alvinrindra <alvinrindra@gmail.com>"
+  ],
+  "license": "GNU General Public License v3",
+  "homepage": "https://github.com/uhh-lt/autolinks",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "app/assets/javascripts/libs/",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "^1.6.6",
+    "vis": "^4.20.1",
+    "requirejs": "^2.3.5",
+    "angular-material": "^1.1.5"
+  }
+}
