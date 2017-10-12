@@ -142,6 +142,11 @@ define([
                         // Create the graph2d object
                         network = new vis.Network(element[0], scope.data, scope.options);
 
+                        network.once('stabilized', function() {
+                            var scaleOption = { scale : 2.0 };
+                            network.moveTo(scaleOption);
+                        })
+
                         // Attach an event handler if defined
                         angular.forEach(scope.events, function (callback, event) {
                             if (networkEvents.indexOf(String(event)) >= 0) {

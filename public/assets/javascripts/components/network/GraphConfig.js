@@ -21,16 +21,18 @@ define([
             }
         })
         .constant('generalOptions', {
+                height: '100%',
+                width: '100%',
                 nodes : {
-                    shape: 'dot',
-                    size: 10,
-                    shadow: true,
-                    scaling: {
-                        label: {
-                            min: 30,
-                            max: 45
-                        }
-                    }
+                    shape: 'hexagon'
+                    // size: 10,
+                    // shadow: true,
+                    // scaling: {
+                    //     label: {
+                    //         min: 30,
+                    //         max: 45
+                    //     }
+                    // }
                 },
                 edges: {
                     color: {
