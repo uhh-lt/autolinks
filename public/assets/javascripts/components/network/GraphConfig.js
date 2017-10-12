@@ -37,10 +37,17 @@ define([
                         color: 'rgb(169,169,169)',
                         highlight: 'blue'
                     },
-                    smooth: { type:'continuous' }
+                    smooth: {
+                      type:'cubicBezier',
+                      forceDirection: 'vertical',
+                      roundness: 0.4
+                    }
                 },
                 layout: {
-                    improvedLayout: false
+                    improvedLayout: false,
+                    hierarchical: {
+                      direction: 'DU'
+                    }
                 },
                 interaction: {
                     tooltipDelay: 200,

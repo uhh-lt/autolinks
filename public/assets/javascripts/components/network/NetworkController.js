@@ -106,6 +106,41 @@ define([
                   {source: 12, dest: 15, occurrence: 1}
                 ];
 
+                var nodes = [
+                  {id: 0, label: "0", level: 0},
+                  {id: 1, label: "1", level: 1},
+                  {id: 2, label: "2", level: 3},
+                  {id: 3, label: "3", level: 4},
+                  {id: 4, label: "4", level: 4},
+                  {id: 5, label: "5", level: 5},
+                  {id: 6, label: "6", level: 1},
+                  {id: 7, label: "7", level: 2},
+                  {id: 8, label: "8", level: 4},
+                  {id: 9, label: "9", level: 4},
+                  {id: 10, label: "10", level: 2},
+                  {id: 11, label: "11", level: 1},
+                  {id: 12, label: "12", level: 2},
+                  {id: 13, label: "13", level: 1},
+                  {id: 14, label: "14", level: 5}
+                ];
+
+                var edges = [
+                  {from: 0, to: 1, arrows:'to'},
+                  {from: 0, to: 6, arrows:'to'},
+                  {from: 0, to: 13, arrows:'to'},
+                  {from: 0, to: 11, arrows:'to'},
+                  {from: 1, to: 2, arrows:'to'},
+                  {from: 2, to: 3, arrows:'to'},
+                  {from: 2, to: 4, arrows:'to'},
+                  {from: 3, to: 5, arrows:'to'},
+                  {from: 1, to: 10, arrows:'to'},
+                  {from: 1, to: 7, arrows:'to'},
+                  {from: 2, to: 8, arrows:'to'},
+                  {from: 2, to: 9, arrows:'to'},
+                  {from: 3, to: 14, arrows:'to'},
+                  {from: 1, to: 12, arrows:'to'}
+                ];
+
                 var response = {data: {entities: entities, relations: relations}};
                 // Enable physics for new graph data when network is initialized
                 if(!_.isUndefined(self.network)) {
@@ -131,10 +166,12 @@ define([
                 self.edgesDataset.clear();
                 self.edgesDataset.add($scope.resultRelations);
 
+                debugger;
+
                 // Initialize the graph
                 $scope.graphData = {
-                    nodes: self.nodesDataset,
-                    edges: self.edgesDataset
+                    nodes: nodes,
+                    edges: edges
                 };
                 return promise.promise;
             };
