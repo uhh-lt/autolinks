@@ -138,9 +138,77 @@ define([
                         if (network != null) {
                             network.destroy();
                         }
+                        //
+                        // function getNode(nodeId) {
+                        //   var item;
+                        //   for (var n in data.nodes) {
+                        //     var tmp = data.nodes[n];
+                        //     if (tmp.id === nodeId) {
+                        //       item = tmp;
+                        //       break;
+                        //     }
+                        //   }
+                        //
+                        //   return item;
+                        // }
+                        //
+                        //
+                        // function hideNode(nodeId) {
+                        //   var item = getNode(nodeId);
+                        //   if (item === undefined) return;
+                        //
+                        //   // Make the actual node invisible
+                        //   item.color = {
+                        //     border: 'RGBA(0,0,0,0)',
+                        //     background: 'RGBA(0,0,0,0)',
+                        //     highlight: {
+                        //       border: 'RGBA(0,0,0,0)',
+                        //       background: 'RGBA(0,0,0,0)'
+                        //     },
+                        //   }
+                        // }
+
+
+                        // function initSizes(elementId, nodeId) {
+                        //   var element = document.getElementById(elementId);
+                        //   var item = getNode(nodeId);
+                        //   if (item === undefined) return;
+                        //
+                        //   item.widthConstraint = element.clientWidth;
+                        //   item.heightConstraint = element.clientHeight;
+                        //   hideNode(nodeId);
+                        // }
+                        //
+                        //
+                        // function placeOverlay(elementId, nodeId) {
+                        //   var pos = network.getPositions([nodeId]);
+                        //   var dom_coords = network.canvasToDOM({x:pos[nodeId].x,y:pos[nodeId].y});
+                        //   var element = document.getElementById(elementId);
+                        //   element.style.left = '' + (dom_coords.x - element.clientWidth/2 ) + 'px';
+                        //   element.style.top  = '' + (dom_coords.y - element.clientHeight/2) + 'px';
+                        // }
+                        //
+                        // initSizes('html', 2);
 
                         // Create the graph2d object
                         network = new vis.Network(element[0], scope.data, scope.options);
+
+                        // network.on("afterDrawing", function (ctx) {
+                        //   placeOverlay('html', 2);
+                        // });
+
+                        var imageObj = new Image();
+                        imageObj.src = 'http://www.rd.com/wp-content/uploads/sites/2/2016/02/03-train-cat-come-on-command.jpg';
+
+                        network.on("beforeDrawing", function (ctx) {
+                          // debugger;
+                          var nodeId = '8';
+                          var nodePosition = network.getPositions([nodeId]);
+
+                          ctx.drawImage(imageObj, nodePosition[nodeId].x - 20, nodePosition[nodeId].y - 20, 40, 40);
+
+                        });
+
 
                         network.once('stabilized', function() {
                             var scaleOption = { scale : 2.0 };

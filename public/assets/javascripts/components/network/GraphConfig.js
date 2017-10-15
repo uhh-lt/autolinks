@@ -24,7 +24,7 @@ define([
                 height: '100%',
                 width: '100%',
                 nodes : {
-                    shape: 'hexagon'
+                    shape: 'box'
                     // size: 10,
                     // shadow: true,
                     // scaling: {
@@ -48,6 +48,8 @@ define([
                 layout: {
                     improvedLayout: false,
                     hierarchical: {
+                      enabled: true,
+                      sortMethod: 'directed',
                       direction: 'DU'
                     }
                 },

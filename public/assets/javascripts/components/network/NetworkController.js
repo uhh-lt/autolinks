@@ -47,6 +47,22 @@ define([
             $scope.resultNodes = [];
             $scope.resultRelations = [];
 
+            var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="390" height="365">' +
+                       '<rect x="0" y="0" width="100%" height="100%" fill="#7890A7" stroke-width="20" stroke="#ffffff" ></rect>' +
+                       '<foreignObject x="15" y="10" width="100%" height="100%">' +
+                      //  '<div xmlns="http://www.w3.org/1999/xhtml" style="font-size:40px">' +
+                      //  '<em>I</em> am' +
+                      //  '<span style="color:white; text-shadow:0 0 20px #000000;">' +
+                      //  ' HTML in SVG!</span>' +
+                      //  '</div>' +
+                       '<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Blausen_0624_Lymphocyte_B_cell_%28crop%29.png/1024px-Blausen_0624_Lymphocyte_B_cell_%28crop%29.png"/>'+
+                       '</foreignObject>' +
+                       '</svg>';
+
+
+            var url = "data:image/svg+xml;charset=utf-8,"+ encodeURIComponent(svg);
+            // var url=[];
+
             $scope.buildGraph = function() {
 
                 var promise = $q.defer();
@@ -107,14 +123,15 @@ define([
                 ];
 
                 var nodes = [
-                  {id: 0, label: "IgVH Mutation", level: 0},
-                  {id: 1, label: "V(D)J recombination", level: 1},
+                  {id: 0, label: "IgVH Mutation", level: 0, image: url, shape: 'image'},
+                  {id: 1, 'label': "0x00405a62:\nmov    eax, 0x00000002\nmov    ecx, DWORD PTR ss:[esp + 0x000000a8]\nmov    DWORD PTR fs:[0x00000000], ecx\npop    ecx\npop    esi\npop    ebp\npop    ebx\nadd    esp, 0x000000a4\nret\n", 'color': "#FFCFCF", 'shape': 'box', 'font': {'face': 'monospace', 'align': 'left'}, level: 1},
                   {id: 2, label: "B-cell receptor", level: 1},
                   {id: 3, label: "Antigen", level: 0},
                   {id: 4, label: "B Cell", level: 3},
                   {id: 5, label: "B-CLL", level: 2},
                   {id: 6, label: "Caucasian race", level: 0},
                   {id: 7, label: "Disease", level: 3},
+                  {id: 8, widthConstraint: { maximum: 170 }, label: 'This node has a maximum width and breaks have been automatically inserted into the label', x: -150, y: -150, level: 1 },
                   // {id: 7, label: "Label 7", level: 2},
                   // {id: 8, label: "Label 8", level: 4},
                   // {id: 9, label: "Label 9", level: 4},
