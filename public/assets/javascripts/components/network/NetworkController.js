@@ -124,7 +124,8 @@ define([
 
                 var nodes = [
                   {id: 0, label: "IgVH Mutation", level: 0, image: url, shape: 'image'},
-                  {id: 1, 'label': "0x00405a62:\nmov    eax, 0x00000002\nmov    ecx, DWORD PTR ss:[esp + 0x000000a8]\nmov    DWORD PTR fs:[0x00000000], ecx\npop    ecx\npop    esi\npop    ebp\npop    ebx\nadd    esp, 0x000000a4\nret\n", 'color': "#FFCFCF", 'shape': 'box', 'font': {'face': 'monospace', 'align': 'left'}, level: 1},
+                  // {id: 1, 'label': "0x00405a62:\nmov    eax, 0x00000002\nmov    ecx, DWORD PTR ss:[esp + 0x000000a8]\nmov    DWORD PTR fs:[0x00000000], ecx\npop    ecx\npop    esi\npop    ebp\npop    ebx\nadd    esp, 0x000000a4\nret\n", 'color': "#FFCFCF", 'shape': 'box', 'font': {'face': 'monospace', 'align': 'left'}, level: 1},
+                  {id: 1, 'label': "V(D)J recombination", level: 1},
                   {id: 2, label: "B-cell receptor", level: 1},
                   {id: 3, label: "Antigen", level: 0},
                   {id: 4, label: "B Cell", level: 3},
