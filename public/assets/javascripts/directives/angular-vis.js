@@ -190,13 +190,15 @@ define([
                         }
 
                         initSizes('html-node-1', 8);
-                        initSizes('html-node-2', 2);
+                        initSizes('html-node-2', 4);
+                        initSizes('html-node-3', 3);
                         // Create the graph2d object
                         network = new vis.Network(element[0], scope.data, scope.options);
 
                         network.on("afterDrawing", function (ctx) {
                           placeOverlay('html-node-1', 2);
-                          placeOverlay('html-node-2', 3);
+                          placeOverlay('html-node-2', 4);
+                          placeOverlay('html-node-3', 3);
                         });
 
                         var imageObj = new Image();
@@ -210,6 +212,20 @@ define([
                           ctx.drawImage(imageObj, nodePosition[nodeId].x - 20, nodePosition[nodeId].y - 20, 40, 40);
 
                         });
+
+                        function clusterByCid() {
+                            debugger;
+                            network.setData(data);
+                            var clusterOptionsByData = {
+                                joinCondition:function(childOptions) {
+                                    return childOptions.cid == 1;
+                                },
+                                clusterNodeProperties: {id:'cidCluster', borderWidth:3, shape:'database'}
+                            };
+                            network.cluster(clusterOptionsByData);
+                        }
+
+                        // clusterByCid()
 
 
                         network.once('stabilized', function() {

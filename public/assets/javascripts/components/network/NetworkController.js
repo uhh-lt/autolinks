@@ -55,7 +55,8 @@ define([
                       //  '<span style="color:white; text-shadow:0 0 20px #000000;">' +
                       //  ' HTML in SVG!</span>' +
                       //  '</div>' +
-                       '<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Blausen_0624_Lymphocyte_B_cell_%28crop%29.png/1024px-Blausen_0624_Lymphocyte_B_cell_%28crop%29.png"/>'+
+                      //  '<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Blausen_0624_Lymphocyte_B_cell_%28crop%29.png/1024px-Blausen_0624_Lymphocyte_B_cell_%28crop%29.png"/>'+
+                       '<iframe src="http://bing.com"></iframe>'+
                        '</foreignObject>' +
                        '</svg>';
 
@@ -126,7 +127,7 @@ define([
                   {id: 0, label: "IgVH Mutation", level: 0, image: url, shape: 'image'},
                   // {id: 1, 'label': "0x00405a62:\nmov    eax, 0x00000002\nmov    ecx, DWORD PTR ss:[esp + 0x000000a8]\nmov    DWORD PTR fs:[0x00000000], ecx\npop    ecx\npop    esi\npop    ebp\npop    ebx\nadd    esp, 0x000000a4\nret\n", 'color': "#FFCFCF", 'shape': 'box', 'font': {'face': 'monospace', 'align': 'left'}, level: 1},
                   {id: 1, 'label': "V(D)J recombination", level: 1},
-                  {id: 2, label: "B-cell receptor", level: 1},
+                  {id: 2, label: "B-cell receptor", cid: 1, level: 1},
                   {id: 3, label: "Antigen", level: 0},
                   {id: 4, label: "B Cell", level: 3},
                   {id: 5, label: "B-CLL", level: 2},
