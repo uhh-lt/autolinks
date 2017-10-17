@@ -26,7 +26,8 @@ html, body {
     position: relative;
     overflow-y: hidden;
     width: 100%;
-    height: calc(100% - 74px);
+    height: 100%;
+    height: calc(100% - 64px);
     background-color: #d1d1d1;
 }
 

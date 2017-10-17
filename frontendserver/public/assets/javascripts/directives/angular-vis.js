@@ -185,12 +185,23 @@ define([
                           var dom_coords = network.canvasToDOM({x:pos[nodeId].x,y:pos[nodeId].y});
                           var element = document.getElementById(elementId);
                           // debugger;
-                          // var node = network.body.nodes.forEach((e) => {
+                          var nodes = network.body.nodes;
+                          // debugger;
+                          // var node = network.body.nodes.forEach(function(e) {
                           //   debugger;
                           // });
+                          var node = {};
+                          for (var x in nodes) {
+                            if (nodes[x].id === nodeId) {
+                              node = nodes[x];
+                            }
+                          }
+
                           element.style.left = '' + (dom_coords.x - element.clientWidth/2 ) + 'px';
                           element.style.top  = '' + (dom_coords.y - element.clientHeight/2) + 'px';
-                          debugger;
+
+                          node.shape.height = element.offsetHeight;
+                          node.shape.width = element.offsetWidth;
                         }
 
                         initSizes('html-node-1', 1);

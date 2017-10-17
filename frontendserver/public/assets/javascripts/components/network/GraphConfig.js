@@ -24,7 +24,10 @@ define([
                 height: '100%',
                 width: '100%',
                 nodes : {
-                    shape: 'box'
+                    shape: 'box',
+                    // font: {
+                    //   color: 'rgba(66,66,66,0)'
+                    // }
                     // size: 10,
                     // shadow: true,
                     // scaling: {
