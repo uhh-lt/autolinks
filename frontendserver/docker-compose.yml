@@ -12,7 +12,7 @@ networks:
 
 services:
   frontendserver:
-    image: node:5.3.0
+    image: node:8.7.0
     container_name: autolinks-dev
     volumes:
       - ${PWD}:/usr/src/app

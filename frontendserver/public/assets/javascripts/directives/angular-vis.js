@@ -172,7 +172,6 @@ define([
                         function initSizes(elementId, nodeId) {
                           var element = document.getElementById(elementId);
                           var item = getNode(nodeId);
-                          debugger;
                           if (item === undefined) return;
 
                           item.widthConstraint = element.clientWidth;
@@ -185,37 +184,45 @@ define([
                           var pos = network.getPositions([nodeId]);
                           var dom_coords = network.canvasToDOM({x:pos[nodeId].x,y:pos[nodeId].y});
                           var element = document.getElementById(elementId);
+                          // debugger;
+                          // var node = network.body.nodes.forEach((e) => {
+                          //   debugger;
+                          // });
                           element.style.left = '' + (dom_coords.x - element.clientWidth/2 ) + 'px';
                           element.style.top  = '' + (dom_coords.y - element.clientHeight/2) + 'px';
+                          debugger;
                         }
 
-                        initSizes('html-node-1', 8);
-                        initSizes('html-node-2', 4);
+                        initSizes('html-node-1', 1);
+                        initSizes('html-node-2', 2);
                         initSizes('html-node-3', 3);
+                        initSizes('html-node-4', 4);
+                        initSizes('html-node-5', 5);
                         // Create the graph2d object
                         network = new vis.Network(element[0], scope.data, scope.options);
 
                         network.on("afterDrawing", function (ctx) {
-                          placeOverlay('html-node-1', 2);
-                          placeOverlay('html-node-2', 4);
+                          placeOverlay('html-node-1', 1);
+                          placeOverlay('html-node-2', 2);
                           placeOverlay('html-node-3', 3);
+                          placeOverlay('html-node-4', 4);
+                          placeOverlay('html-node-5', 5);
                         });
 
                         var imageObj = new Image();
                         imageObj.src = 'http://www.rd.com/wp-content/uploads/sites/2/2016/02/03-train-cat-come-on-command.jpg';
 
-                        network.on("beforeDrawing", function (ctx) {
-                          // debugger;
-                          var nodeId = '8';
-                          var nodePosition = network.getPositions([nodeId]);
-
-                          ctx.drawImage(imageObj, nodePosition[nodeId].x - 20, nodePosition[nodeId].y - 20, 40, 40);
-
-                        });
+                        // network.on("beforeDrawing", function (ctx) {
+                        //   // debugger;} else if (undefined == node.parentEdgeId) {
+                        //   var nodeId = '8';
+                        //   var nodePosition = network.getPositions([nodeId]);
+                        //
+                        //   ctx.drawImage(imageObj, nodePosition[nodeId].x - 20, nodePosition[nodeId].y - 20, 40, 40);
+                        //
+                        // });
 
                         function clusterByCid() {
-                            debugger;
-                            network.setData(data);
+                            network.setData(scope.data);
                             var clusterOptionsByData = {
                                 joinCondition:function(childOptions) {
                                     return childOptions.cid == 1;
@@ -225,7 +232,7 @@ define([
                             network.cluster(clusterOptionsByData);
                         }
 
-                        // clusterByCid()
+                        // clusterByCid();
 
 
                         network.once('stabilized', function() {

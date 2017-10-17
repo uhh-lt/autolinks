@@ -9,7 +9,7 @@ define([
                 gravitationalConstant: -220,
                 centralGravity: 0.01,
                 springConstant: 0.02,
-                springLength: 110,
+                springLength: 510,
                 damping: 0.4,
                 avoidOverlap: 0
             },
@@ -35,23 +35,27 @@ define([
                     // }
                 },
                 edges: {
+                    length: 200,
                     color: {
                         color: 'rgb(169,169,169)',
                         highlight: 'blue'
-                    },
-                    smooth: {
-                      type:'cubicBezier',
-                      forceDirection: 'vertical',
-                      roundness: 0.4
                     }
+                    // smooth: {
+                    //   type:'cubicBezier',
+                    //   forceDirection: 'vertical',
+                    //   roundness: 0.4
+                    // }
                 },
                 layout: {
                     improvedLayout: false,
                     hierarchical: {
+                      levelSeparation: 150,
+                      // layout: "hubsize",
                       enabled: true,
                       sortMethod: 'directed',
                       direction: 'DU'
                     }
+
                 },
                 interaction: {
                     tooltipDelay: 200,
@@ -83,9 +87,9 @@ define([
             }
         )
         // Constants can't have dependencies. Inject 'graphProperties' and use options to obtain complete graph config
-        .service('graphProperties', function(generalOptions, physicOptions, _) {
+        .service('graphProperties', function(generalOptions, _) {
             // General options with additional physic configuration
-            this.options = _.extend(generalOptions, { physics: physicOptions });
+            this.options = _.extend(generalOptions);
             // Network options for the static node legend
             this.legendOptions = _.extend({}, generalOptions, { interaction: { dragNodes: false, dragView: false, selectable: false, zoomView: false, hover: false, navigationButtons: false } });
 

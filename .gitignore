@@ -1,6 +1,6 @@
 # Manual exclude
-node_modules/*
-public/assets/javascripts/libs/*
+fronendserver/node_modules/*
+frontendserver/public/assets/javascripts/libs/*
 
 # Created by https://www.gitignore.io/api/node,bower,webstorm,intellij+all
 
