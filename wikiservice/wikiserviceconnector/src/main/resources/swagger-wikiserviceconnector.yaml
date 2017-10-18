@@ -1,0 +1,114 @@
+##
+#
+# API description of wikipedia service
+#
+# ---
+# dev note: edit with https://editor.swagger.io//#/ to check validity
+# ---
+##
+
+swagger: '2.0'
+
+info:
+  version: '0.0.1'
+  title: Autolinks Wikipedia Service Connector API
+  description: Lorem Ipsum
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+# the domain of the service
+host: SERVER_URL
+
+# array of all schemes that your API supports
+schemes:
+  - https
+  - http
+
+# will be prefixed to all paths (comment for no prefix)
+basePath: /api
+
+# default: return json
+produces:
+  - application/json
+  
+tags:
+  - name: Search
+    description: Everything about your search
+    
+definitions:
+  RDFtriple:
+    type: object
+    properties:
+      subject:
+        type: string
+        description: the subject of the rdf triple
+      predicate:
+        type: string
+        description: the predicate of the the rdf triple
+      object:
+        type: string
+        description: the object of the rdf triple
+      properties:
+        type: array
+        description: additional properties are also rdf triples
+        items: 
+          $ref: '#/definitions/RDFtriple'
+        
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
+
+paths:
+  /find:
+    post:
+      tags:
+        - Search
+      summary: Search results as triples
+      description: |
+        Lorem Ipsum
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: wiki
+          description: |
+            Which wiki to use: 
+              - enwiki
+              - simplewiki
+              - wikidata
+              - enwiktionary
+            default: *
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+        - in: body
+          name: query
+          description: Forwarded elasticsearch query dsl
+          schema:
+            type: string
+            default: "{ 'query': { 'match_all': { } } }"
+      
+      responses:
+        200:
+          description: A list of result triples
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/RDFtriple'
+        405:
+          description: "Invalid query input"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
