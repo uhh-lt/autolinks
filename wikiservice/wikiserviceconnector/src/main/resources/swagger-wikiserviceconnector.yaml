@@ -20,22 +20,14 @@ info:
 # the domain of the service
 host: SERVER_URL
 
-# array of all schemes that your API supports
+# array of all schemes that the API supports
 schemes:
   - https
   - http
 
 # will be prefixed to all paths (comment for no prefix)
-basePath: /api
+basePath: /
 
-# default: return json
-produces:
-  - application/json
-  
-tags:
-  - name: Search
-    description: Everything about your search
-    
 definitions:
   RDFtriple:
     type: object
@@ -52,9 +44,9 @@ definitions:
       properties:
         type: array
         description: additional properties are also rdf triples
-        items: 
+        items:
           $ref: '#/definitions/RDFtriple'
-        
+
   Error:
     type: object
     properties:
@@ -66,6 +58,17 @@ definitions:
       fields:
         type: string
 
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+
+tags:
+  - name: Search
+    description: Everything about your search
+
 paths:
   /find:
     post:
@@ -73,32 +76,33 @@ paths:
         - Search
       summary: Search results as triples
       description: |
-        Lorem Ipsum
+        Search a wikipedia index and retrieve results as RDF triples
       consumes:
       - "application/json"
       produces:
       - "application/json"
       parameters:
-        - in: query
-          name: wiki
-          description: |
-            Which wiki to use: 
-              - enwiki
-              - simplewiki
-              - wikidata
-              - enwiktionary
-            default: *
-          type: array
-          items:
-            type: string
-          collectionFormat: csv
         - in: body
           name: query
           description: Forwarded elasticsearch query dsl
           schema:
-            type: string
-            default: "{ 'query': { 'match_all': { } } }"
-      
+            type: object
+            properties:
+              wiki:
+                description: |
+                  Which wiki to use:
+                    - enwiki
+                    - simplewiki
+                    - wikidata
+                    - enwiktionary
+                  default: *
+                type: array
+                items:
+                  type: string
+              query:
+                type: object
+                default: { "query": { "match_all": { } } }
+
       responses:
         200:
           description: A list of result triples

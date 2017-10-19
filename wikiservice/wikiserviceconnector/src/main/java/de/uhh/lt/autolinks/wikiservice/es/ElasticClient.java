@@ -115,6 +115,7 @@ public class ElasticClient {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
 		SearchResponse response = get()._client.prepareSearch()
 				.setIndices(indices)
 				.setSource(searchSourceBuilder).get();

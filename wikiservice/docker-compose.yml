@@ -12,9 +12,9 @@ services:
     build:
       context: es
       dockerfile: Dockerfile
-      args:
-        CUSTOM_UID: 39000
-        CUSTOM_GID: 390
+#      args:
+#        CUSTOM_UID: 39000
+#        CUSTOM_GID: 390
     environment:
       - cluster.name=escluster
       - bootstrap.memory_lock=true
@@ -30,9 +30,9 @@ services:
       nofile:
         soft: 131072
         hard: 131072
-      noproc:
-        soft: -1
-        hard: -1
+      nproc:
+        soft: 8192
+        hard: 8192
     # mem_limit: 1372m
     # memswap_limit: 1372m
     # mem_swappiness: 0

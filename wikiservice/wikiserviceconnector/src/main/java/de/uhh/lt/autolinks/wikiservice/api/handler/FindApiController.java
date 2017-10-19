@@ -1,6 +1,7 @@
 package de.uhh.lt.autolinks.wikiservice.api.handler;
 
 import de.uhh.lt.autolinks.wikiservice.api.model.Error;
+import de.uhh.lt.autolinks.wikiservice.api.model.Query;
 import de.uhh.lt.autolinks.wikiservice.api.model.RDFtriple;
 import de.uhh.lt.autolinks.wikiservice.es.ElasticClient;
 import io.swagger.annotations.*;
@@ -24,16 +25,15 @@ import java.util.stream.StreamSupport;
 
 import javax.validation.constraints.*;
 import javax.validation.Valid;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-18T08:06:37.619+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-19T16:54:32.234+02:00")
 
 @Controller
 public class FindApiController implements FindApi {
 
 
 
-    public ResponseEntity<List<RDFtriple>> findPost(@ApiParam(value = "Which wiki to use:    - enwiki   - simplewiki   - wikidata   - enwiktionary default: * ") @RequestParam(value = "wiki", required = false) List<String> wiki,
-        @ApiParam(value = "Forwarded elasticsearch query dsl"  )  @Valid @RequestBody String query) {
-SearchResponse response = ElasticClient.searchByJsonQuery(query, wiki);
+    public ResponseEntity<List<RDFtriple>> findPost(@ApiParam(value = "Forwarded elasticsearch query dsl"  )  @Valid @RequestBody Query query) {
+    	SearchResponse response = ElasticClient.searchByJsonQuery(query.getQuery().toString(), query.getWiki());
     	
     	List<RDFtriple> triples = StreamSupport.stream(response.getHits().spliterator(), false)
     		.map(hit -> 
@@ -65,7 +65,6 @@ SearchResponse response = ElasticClient.searchByJsonQuery(query, wiki);
         		.ok()
         		.contentType(MediaType.APPLICATION_JSON)
         		.body(triples);
-   	 
     }
 
 }
