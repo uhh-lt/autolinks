@@ -2,21 +2,31 @@ package de.uhh.lt.autolinks.wikiservice.es;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
+import org.apache.http.entity.ContentType;
+import org.apache.http.nio.entity.NStringEntity;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
-import org.elasticsearch.common.settings.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ElasticRestClient {
 	
 	private static String[] __empty_string_array = {};
+	
+	private static Map<String, String> _empty_map = Collections.emptyMap();
 	
 	private static Logger LOG = LoggerFactory.getLogger(ElasticRestClient.class);
 	
@@ -24,26 +34,14 @@ public class ElasticRestClient {
 	
 	private RestClient _client;
 	
+	private static ObjectMapper _om = new ObjectMapper();
+	
 	private ElasticRestClient() {
 		connectServer();
 	}
 	
 	private void connectServer() {
-//		Settings.Builder settings = Settings.builder()
-//		        .put("client.transport.sniff", false);
-//		
-//		// set cluster name if present as environment variable
-//		Optional.ofNullable(System.getenv("CLUSTER_NAME")).map(name -> {
-//			LOG.info("using cluster '{}' ", name);
-//			settings.put("cluster.name", name);
-//			return name;
-//		}).orElseGet(() -> {
-//			LOG.warn("no cluster name provided, please provide a cluster name as environment variable with CLUSTER_NAME=myclustername.");
-//			return null;
-//		});
-//		
-//		 
-		
+
 		// add servers if present 
 		HttpHost[] servers = 
 				Optional
@@ -91,25 +89,59 @@ public class ElasticRestClient {
 		return _instance = new ElasticRestClient();
 	}
 	
-	public static SearchResponse searchByJsonQuery(String json, String... indices){
-//		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-//		SearchModule searchModule = new SearchModule(Settings.EMPTY, false, Collections.emptyList());
-//		try (XContentParser parser = XContentFactory.xContent(XContentType.JSON)
-//				.createParser(new NamedXContentRegistry(searchModule.getNamedXContents()), json)) {
-//			searchSourceBuilder.parseXContent(new QueryParseContext(parser));
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		SearchResponse response = get()._client.prepareSearch()
-//				.setIndices(indices)
-//				.setSource(searchSourceBuilder).get();
-//		Searc
-		return null;
+	Map<String, String> m = Collections.emptyMap();
+	
+	public static SearchResponseREST searchByJsonQuery(String json, String... indices) throws IOException{
+		String endpoint = "/_search";
+		if(indices.length > 0)
+			endpoint = "/" + String.join(",", indices) + "/_search";
+		HttpEntity body = new NStringEntity(json, ContentType.APPLICATION_JSON);
+		Response r = get()._client.performRequest("POST", endpoint, _empty_map, body);
+		SearchResponseREST sr = _om.readValue(r.getEntity().getContent(), SearchResponseREST.class);
+		return sr;
 	}
 		
-	public static SearchResponse searchByJsonQuery(String json, List<String> indices){
+	public static SearchResponseREST searchByJsonQuery(String json, List<String> indices) throws IOException{
 		return indices == null ? searchByJsonQuery(json) : searchByJsonQuery(json, indices.toArray(__empty_string_array));
+	}
+	
+	@JsonIgnoreProperties(ignoreUnknown = true)
+	public static class SearchResponseREST {
+	    @JsonProperty
+		public SearchResponseHitsREST hits;
+	}
+	@JsonIgnoreProperties(ignoreUnknown = true)
+	public static class SearchResponseHitsREST {
+	    @JsonProperty
+	    public int total;
+	    @JsonProperty
+	    public List<SearchResponseHitREST> hits;
+	}
+	public static class SearchResponseHitREST {
+	    @JsonProperty(value = "_index")
+	    public String index;
+	 
+	    @JsonProperty(value = "_type")
+	    public String type;
+	 
+	    @JsonProperty(value = "_id")
+	    public String id;
+	 
+	    @JsonProperty(value = "_score")
+	    public Double score;
+	 
+	    @JsonProperty(value = "_source")
+	    public LinkedHashMap<String, Object> source;
+	    
+	    public String getSourceAsString(){
+	    	try {
+				return _om.writeValueAsString(source);
+			} catch (JsonProcessingException e) {
+				/* this should be a safe method, nothing should happen here */
+				e.printStackTrace();
+				return "{}";
+			}
+	    }
 	}
 	
 }
