@@ -3,6 +3,7 @@ package de.uhh.lt.autolinks.wikiservice.es;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,6 +104,14 @@ public class ElasticRestClient {
 		
 	public static SearchResponseREST searchByJsonQuery(String json, List<String> indices) throws IOException{
 		return indices == null ? searchByJsonQuery(json) : searchByJsonQuery(json, indices.toArray(__empty_string_array));
+	}
+	
+	public static boolean ping() throws IOException{
+		String endpoint = "/_cluster/health";
+		Response r = get()._client.performRequest("GET", endpoint, _empty_map);
+		HashMap<?,?> sr = _om.readValue(r.getEntity().getContent(), HashMap.class);
+		Object status = sr.get("status");
+		return status != null && !"red".equals(status.toString());
 	}
 	
 	@JsonIgnoreProperties(ignoreUnknown = true)

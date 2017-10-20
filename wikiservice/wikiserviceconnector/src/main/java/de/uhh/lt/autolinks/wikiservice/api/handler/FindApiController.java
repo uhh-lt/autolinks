@@ -10,6 +10,8 @@ import java.util.stream.StreamSupport;
 import javax.validation.Valid;
 
 import org.elasticsearch.action.search.SearchResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,11 +25,16 @@ import de.uhh.lt.autolinks.wikiservice.api.model.RDFtriple;
 import de.uhh.lt.autolinks.wikiservice.es.ElasticClient;
 import de.uhh.lt.autolinks.wikiservice.es.ElasticRestClient;
 import de.uhh.lt.autolinks.wikiservice.es.ElasticRestClient.SearchResponseREST;
+
+import static de.uhh.lt.autolinks.wikiservice.api.handler.ErrorUtils.*;
+
 import io.swagger.annotations.ApiParam;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-19T16:54:32.234+02:00")
 
 @Controller
 public class FindApiController implements FindApi {
+	
+	private static Logger LOG = LoggerFactory.getLogger(FindApi.class); 
 
 	private static boolean _use_rest_client = true;
 	
@@ -36,7 +43,7 @@ public class FindApiController implements FindApi {
 	private static String _default_query = "{\"query\":{\"match_all\":{}}}";
 	private static String[] _default_wiki = {};
 
-    public ResponseEntity<List<RDFtriple>> findPost(@ApiParam(value = "Forwarded elasticsearch query dsl"  )  @Valid @RequestBody Query query) {
+    public ResponseEntity<?> findPost(@ApiParam(value = "Forwarded elasticsearch query dsl"  )  @Valid @RequestBody Query query) {
     	
     	String query_as_json = _default_query;
     	String[] wiki = _default_wiki;
@@ -47,9 +54,9 @@ public class FindApiController implements FindApi {
 					try {
 						query_as_json = _om.writeValueAsString(query.getQuery());
 					} catch (JsonProcessingException e) {
-						// TODO: LOG proper error
-						e.printStackTrace();
-						return ResponseEntity.badRequest().build();
+						String m = "Malformed elasticsearch query.";
+						LOG.warn(m, e);
+						return error(e, m);
 					}
     		if(query.getWiki() != null)
     			wiki = query.getWiki().toArray(_default_wiki);
@@ -64,9 +71,9 @@ public class FindApiController implements FindApi {
 			try {
 				response = ElasticRestClient.searchByJsonQuery(query_as_json, wiki);
 			} catch (IOException e) {
-				// TODO log proper error
-				e.printStackTrace();
-				return ResponseEntity.badRequest().build();
+				String m = "Elasticsearch query failed.";
+				LOG.warn(m, e);
+				return error(e, m);
 			}
     		triples = prepareResultTriplesFromSearchResponseREST(response);
     	}
@@ -76,6 +83,8 @@ public class FindApiController implements FindApi {
         		.contentType(MediaType.APPLICATION_JSON)
         		.body(triples);
     }
+    
+   
 
 	private List<RDFtriple> prepareResultTriplesFromSearchResponseTC(SearchResponse response) {
 	  	List<RDFtriple> triples = StreamSupport.stream(response.getHits().spliterator(), false)
