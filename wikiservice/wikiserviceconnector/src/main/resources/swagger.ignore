@@ -1,3 +1,4 @@
 **/FindApi*.java
 **/PingApi*.java
 **/RegisterAtBrokerApi*.java
+**/Swagger2SpringBoot.java
