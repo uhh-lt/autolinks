@@ -29,6 +29,38 @@ schemes:
 basePath: /
 
 definitions:
+
+  Service:
+    type: object
+    properties:
+      name:
+        type: string
+        description: the name of the service
+      location:
+        type: string
+        description: where to find the service
+      description:
+        type: string
+        description: summray fo the service
+      endpoints:
+        type: array
+        description: the endpoints a service offers
+        items:
+          $ref: '#/definitions/Endpoint'
+          
+  Endpoint:
+    type: object
+    properties:
+      name: 
+        type: string
+        description: the name of the endpoint
+      servicename:
+        type: string
+        description: the name of the service
+      requireslogin:
+        type: boolean
+        description: does the service require a user to be logged in?
+
   RDFtriple:
     type: object
     properties:
@@ -90,6 +122,35 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+            
+  /registerAtBroker:
+    post:
+      tags:
+        - Admin
+      summary: manually register this service and its endpoints at autolinks broker service
+      description: |
+        returns OK if service was registered
+      consumes:
+        - "application/json"
+      parameters:
+        - in: body
+          name: broker
+          description: object holding the location
+          schema:
+            type: object
+            properties:
+              location:
+                description: where to find the broker
+                type: string
+                default: { "location": "http://BROKER_SERVER:BROKER_PORT/BROKER_BASE_PATH" }
+      responses:
+        200:
+          description: empty ok message if registered
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+            
   /find:
     post:
       tags:
