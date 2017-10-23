@@ -1,60 +1,144 @@
-swagger: "2.0"
+swagger: '2.0'
 info:
-  version: "0.0.1"
-  title: Hello World App
-# during dev, should point to your local machine
-host: 0.0.0.0:10010
-# basePath prefixes all resource paths 
-basePath: /
-# 
+  version: '0.0.1'
+  title: Autolinks Broker Service
+
+# the domain of the service
+host: 127.0.0.1:10010
+
+# array of all schemes that the API supports
 schemes:
-  # tip: remove http to make production-grade
+  # - https
   - http
-  - https
+
+# will be prefixed to all paths (comment for no prefix)
+basePath: /
+
 # format of bodies a client can send (Content-Type)
 consumes:
   - application/json
 # format of the responses to the client (Accepts)
 produces:
   - application/json
+  
+# define complex objects which can be references with $ref: "#/definitions/X"
+definitions:
+
+  Service:
+    type: object
+    properties:
+      name:
+        type: string
+        description: the name of the service
+      endpoints:
+        type: array
+        description: the endpoints a service offers
+        items:
+          $ref: '#/definitions/Endpoint'
+      requireslogin:
+        type: boolean
+        description: does the service require a user to be logged in?
+          
+  Endpoint:
+    type: object
+    properties:
+      name: 
+        type: string
+        description: the name of the endpoint
+      servicename:
+        type: string
+        description: the name of the service
+      params:
+        type: array
+        description: the endpoints a service offers
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+              description: name of the parameter
+            type:
+              type: string
+              description: type of the parameter
+
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
+  
+tags:
+  - name: Service
+    description: Everything about connected services
+  
 paths:
-  /hello:
-    # binds a127 app logic to a route
-    x-swagger-router-controller: hello_world
-    get:
-      description: Returns 'Hello' to the caller
+  /registerService:
+    # tell nodejs where to find the code for this path
+    x-swagger-router-controller: services
+    post:
+      tags:
+        - Service
+      description: Register a service
       # used as the method name of the controller
-      operationId: hello
+      operationId: register_service
       parameters:
-        - name: name
-          in: query
+        - name: service
+          in: body
           description: The name of the person to whom to say hello
-          required: false
-          type: string
+          schema:
+            type: object
+            example: 
+              service: 
+                name: "hi"
       responses:
-        "200":
+        200:
           description: Success
           schema:
-            # a pointer to a definition
-            $ref: "#/definitions/HelloWorldResponse"
-        # responses may fall through to errors
+            type: object
         default:
           description: Error
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
+            
+  /listServices:
+    x-swagger-router-controller: services
+    get:
+      tags:
+        - Service
+      description: List registered services
+      # used as the method name of the controller
+      operationId: list_services
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items: 
+              $ref: "#/definitions/Service"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+            
+  /pingServices:
+    x-swagger-router-controller: services
+    get:
+      tags:
+        - Service
+      description: Ping registered services
+      # used as the method name of the controller
+      operationId: ping_services
+      responses:
+        200:
+          description: Success
+        default:
+          description: Error
+          
+     
   /swagger:
     x-swagger-pipe: swagger_raw
-# complex objects have schema definitions
-definitions:
-  HelloWorldResponse:
-    required:
-      - message
-    properties:
-      message:
-        type: string
-  ErrorResponse:
-    required:
-      - message
-    properties:
-      message:
-        type: string
