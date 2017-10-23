@@ -17,24 +17,18 @@ module.exports = {
   Param 1: a handle to the request object
   Param 2: a handle to the response object
  */
-function register_service(req, res, next) {
+function register_service(req, res) {
   // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
-  const svc = req.swagger.params.service.value || { "name": "not a service" };
-  // this sends back a JSON response which is a single string
-  // console.log(res);
+  const service = req.swagger.params.service.value;
+  console.log(`adding service ${service}.`);
 
-  // if(error) {
-  //   return next(err.message);
-  // }
+  db.add_service(
+    service.name,
+    service.location,
+    service.description,
+    service.endpoints);
 
-  res.setHeader('Content-Type', 'application/json');
-  //res.end(JSON.stringify(result[0] || {}, null, 2));
-  res.end(svc);
-
-
-}
-
-function install_service(service) {
+  res.end();
 
 }
 
@@ -53,10 +47,12 @@ function ping_service(service) {
     //   active: false
     // });
 
-    console.log('error:', error); // Print the error if one occurred
-    console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-  });
+    // console.log('error:', error); // Print the error if one occurred
+    // console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
 
+
+
+  });
 
 }
 

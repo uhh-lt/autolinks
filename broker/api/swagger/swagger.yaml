@@ -20,7 +20,7 @@ consumes:
 # format of the responses to the client (Accepts)
 produces:
   - application/json
-  
+
 # define complex objects which can be references with $ref: "#/definitions/X"
 definitions:
 
@@ -30,36 +30,30 @@ definitions:
       name:
         type: string
         description: the name of the service
+      location:
+        type: string
+        description: where to find the service
+      description:
+        type: string
+        description: summray fo the service
       endpoints:
         type: array
         description: the endpoints a service offers
         items:
           $ref: '#/definitions/Endpoint'
-      requireslogin:
-        type: boolean
-        description: does the service require a user to be logged in?
-          
+
   Endpoint:
     type: object
     properties:
-      name: 
+      name:
         type: string
         description: the name of the endpoint
       servicename:
         type: string
         description: the name of the service
-      params:
-        type: array
-        description: the endpoints a service offers
-        items:
-          type: object
-          properties:
-            name:
-              type: string
-              description: name of the parameter
-            type:
-              type: string
-              description: type of the parameter
+      requireslogin:
+        type: boolean
+        description: does the service require a user to be logged in?
 
   Error:
     type: object
@@ -71,11 +65,11 @@ definitions:
         type: string
       fields:
         type: string
-  
+
 tags:
   - name: Service
     description: Everything about connected services
-  
+
 paths:
   /registerService:
     # tell nodejs where to find the code for this path
@@ -91,10 +85,8 @@ paths:
           in: body
           description: The name of the person to whom to say hello
           schema:
-            type: object
-            example: 
-              service: 
-                name: "hi"
+            $ref: "#/definitions/Service"
+
       responses:
         200:
           description: Success
@@ -104,7 +96,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
-            
+
   /listServices:
     x-swagger-router-controller: services
     get:
@@ -118,13 +110,13 @@ paths:
           description: Success
           schema:
             type: array
-            items: 
+            items:
               $ref: "#/definitions/Service"
         default:
           description: Error
           schema:
             $ref: "#/definitions/Error"
-            
+
   /pingServices:
     x-swagger-router-controller: services
     get:
@@ -138,7 +130,7 @@ paths:
           description: Success
         default:
           description: Error
-          
-     
+
+
   /swagger:
     x-swagger-pipe: swagger_raw

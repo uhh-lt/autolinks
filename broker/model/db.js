@@ -5,7 +5,9 @@ module.exports = {
   init: initdb,
   add_service: add_service,
   get_services: get_services,
+  get_service: get_service,
   update_service: update_service,
+  update_endpoint: update_endpoint,
   delete_service: delete_service
 };
 
@@ -77,10 +79,37 @@ function update_service(name, serviceobj){
   let keys = [];
   let vals = [];
   Object.keys(serviceobj).forEach(function (key) {
-    keys.push(`${key} = ?`);
-    vals.push(serviceobj[key]);
+    if(!Array.isArray(endpointobj[key])){
+      keys.push(`${key} = ?`);
+      vals.push(serviceobj[key]);
+    }
   });
   let sql = `update services set ${keys.join(', ')} where name = ?`;
+  vals.push(name);
+
+  //run sql statement
+  dbconn.run(sql, vals, function(err) {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log(`Updated ${this.changes} service(s).`);
+  });
+  
+}
+
+// update a service in the database, set key-value pairs from the service obj
+function update_endpoint(servicename, name, endpointobj){
+  // prepare sql statement and values
+  let keys = [];
+  let vals = [];
+  Object.keys(endpointobj).forEach(function (key) {
+    if(!Array.isArray(endpointobj[key])){
+      keys.push(`${key} = ?`);
+      vals.push(endpointobj[key]);
+    }
+  });
+  let sql = `update endpoints set ${keys.join(', ')} where service = ? and name = ?`;
+  vals.push(servicename);
   vals.push(name);
 
   //run sql statement
@@ -92,14 +121,32 @@ function update_service(name, serviceobj){
   });
 }
 
+// get a service from the database
+function get_service(name, callback){
+  //run sql statement
+  dbconn.get('select * from services where name = ?', [name], (err, row) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    callback(row);
+  });
+}
+
 // delete a service from the database
 function delete_service(name){
-  //run sql statement
+  // delete service
   dbconn.run('delete from services where name = ?', [name], function(err) {
     if (err) {
       return console.error(err.message);
     }
     console.log(`Deleted ${this.changes} services.`);
+    // on success, delete endpoints associated with that service
+    dbconn.run('delete from endpoints where service = ?', [name], function(err) {
+      if (err) {
+        return console.error(err.message);
+      }
+      console.log(`Deleted ${this.changes} endpoints.`);
+    });
   });
 }
 

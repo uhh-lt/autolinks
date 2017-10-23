@@ -7,13 +7,7 @@
 
 -- Note: rowid is implicitly accessible, e.g. "select rowid,* from users"
 
-create table if not exists users (
-  name text primary key not null,
-  password text,
-  lastlogin integer,
-  registeredsince integer
-);
-
+-- services and their endpoints
 create table if not exists services (
   name text primary key not null,
   location text not null,
@@ -22,7 +16,6 @@ create table if not exists services (
   active boolean default false,
   lastseenactive integer not null default -1
 );
-
 create table if not exists endpoints (
   service text not null,
   name text not null,
@@ -30,4 +23,12 @@ create table if not exists endpoints (
   requireslogin boolean default false,
   lastcalled integer not null default -1,
   primary key(service, name)
+);
+
+-- user
+create table if not exists users (
+  name text primary key not null,
+  password text,
+  lastlogin integer,
+  registeredsince integer
 );
