@@ -83,10 +83,9 @@ paths:
       parameters:
         - name: service
           in: body
-          description: The name of the person to whom to say hello
+          description: The service which wants to be added
           schema:
             $ref: "#/definitions/Service"
-
       responses:
         200:
           description: Success
@@ -125,6 +124,29 @@ paths:
       description: Ping registered services
       # used as the method name of the controller
       operationId: ping_services
+      responses:
+        200:
+          description: Success
+        default:
+          description: Error
+
+  /pingService:
+    x-swagger-router-controller: services
+    post:
+      tags:
+        - Service
+      description: Ping registered service
+      # used as the method name of the controller
+      operationId: ping_service
+      parameters:
+        - name: service
+          in: body
+          description: The name of the of the service to ping
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
       responses:
         200:
           description: Success

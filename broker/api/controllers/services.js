@@ -1,8 +1,8 @@
 'use strict';
 
 const util = require('util')
-  , request = require('request')
-  , db = require('../../model/db')
+  , db = require('../helpers/db')
+  , mx = require('../helpers/maintenance')
   , async = require('async')
   ;
 
@@ -32,33 +32,14 @@ function register_service(req, res) {
 
 }
 
-function ping_service(service) {
-
-  request(`${service.location}/ping`, function (error, response, body) {
-    // TODO:
-    // // on success
-    // db.update_service('asadsasd', {
-    //   lastseenactive: new Date().getTime(),
-    //   active: true
-    // });
-    //
-    // // on failure
-    // db.update_service('asadsasd', {
-    //   active: false
-    // });
-
-    // console.log('error:', error); // Print the error if one occurred
-    // console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-
-
-
-  });
-
+function ping_service(req, res) {
+  mx.ping_service(req.swagger.params.service.value);
+  res.end();
 }
 
-function ping_services() {
+function ping_services(req, res) {
   // get all services and apply ping_service as callback for each of the services
-  db.get_services(ping_service);
+  db.get_services(mx.ping_service, () => res.end());
 }
 
 function list_services(req, res, next) {

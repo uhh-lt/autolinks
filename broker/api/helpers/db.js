@@ -25,7 +25,7 @@ let dbconn = new sqlite3.Database(`${__dirname}/broker.db`, (err) => {
   if (err) {
     console.error(err.message);
   }
-  console.log('Connected to the broker database.');
+  console.log('Connected to broker database.');
 });
 
 // close database connection on exit
@@ -52,7 +52,7 @@ function initdb() {
 function add_service(name, location, description, endpoints) {
   let now = new Date().getTime();
   // add the service
-  dbconn.run('insert into services(name, location, description, registeredsince) values(?,?,?,?)', [name, location, description, now], function(err) {
+  dbconn.run('insert or replace into services(name, location, description, registeredsince) values(?,?,?,?)', [name, location, description, now], function(err) {
     if (err) {
       return console.log(err.message);
     }
@@ -60,7 +60,7 @@ function add_service(name, location, description, endpoints) {
 
     // add the endpoints only after successfully added the service
     endpoints.forEach(function (endpoint) {
-      dbconn.run('insert into endpoints(service, name, description) values(?,?,?)', [name, endpoint.name, endpoint.description], function(err) {
+      dbconn.run('insert or replace into endpoints(service, name, description) values(?,?,?)', [name, endpoint.name, endpoint.description], function(err) {
         if (err) {
           return console.log(err.message);
         }
@@ -157,6 +157,6 @@ function get_services(callback_service, callback_done) {
       throw err;
     }
     callback_service(service);
-  }, callback_done);
+  }, () => callback_done());
 }
 //select s.name, s.location, e.name from services as s join endpoints as e on (s.name=e.service) where s.rowid=4;

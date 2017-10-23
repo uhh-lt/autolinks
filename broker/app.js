@@ -4,7 +4,7 @@ const SwaggerExpress = require('swagger-express-mw'),
   app = require('express')(),
   swaggerUi = require('swagger-ui-express'),
   yaml = require('yamljs'),
-  db = require('./model/db'),
+  db = require('./api/helpers/db'),
   nodeCleanup = require('node-cleanup'),
   async = require('async')
   // , User = new (require('./models/User.js'))(connection)
@@ -42,10 +42,11 @@ app.get('/', function(req, res){
 
 app.get('/test', function(req, res){
   //db.add_service('asadsasd','adasdan', null, [{'name':'asd'}, {'name':'asdad'}]);
-  db.update_service('wikiservice', {
-    lastseenactive: new Date().getTime(),
-    active: true
-  });
+  // db.update_service('wikiservice', {
+  //   lastseenactive: new Date().getTime(),
+  //   active: true
+  // });
+
 
   // db.delete_service('asadsasd');
 
