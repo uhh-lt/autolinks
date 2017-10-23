@@ -78,11 +78,11 @@ function update_service(name, serviceobj){
   // prepare sql statement and values
   let keys = [];
   let vals = [];
-  Object.keys(serviceobj).forEach(function (key) {
-    if(!Array.isArray(endpointobj[key])){
+  Object.keys(serviceobj)
+    .filter( key => !Array.isArray(serviceobj[key]))
+    .forEach( key => {
       keys.push(`${key} = ?`);
       vals.push(serviceobj[key]);
-    }
   });
   let sql = `update services set ${keys.join(', ')} where name = ?`;
   vals.push(name);
@@ -94,7 +94,7 @@ function update_service(name, serviceobj){
     }
     console.log(`Updated ${this.changes} service(s).`);
   });
-  
+
 }
 
 // update a service in the database, set key-value pairs from the service obj
@@ -102,11 +102,11 @@ function update_endpoint(servicename, name, endpointobj){
   // prepare sql statement and values
   let keys = [];
   let vals = [];
-  Object.keys(endpointobj).forEach(function (key) {
-    if(!Array.isArray(endpointobj[key])){
+  Object.keys(endpointobj)
+    .filter( key => !Array.isArray(endpointobj[key]))
+    .forEach( key => {
       keys.push(`${key} = ?`);
       vals.push(endpointobj[key]);
-    }
   });
   let sql = `update endpoints set ${keys.join(', ')} where service = ? and name = ?`;
   vals.push(servicename);
@@ -152,11 +152,11 @@ function delete_service(name){
 
 // get all registered services
 function get_services(callback_service, callback_done) {
-  dbconn.each('select * from services;', [], (err, service) => {
+  dbconn.each('select * from services;', [], function(err, service) {
     if (err) {
       throw err;
     }
     callback_service(service);
-  }, () => callback_done());
+  }, callback_done);
 }
 //select s.name, s.location, e.name from services as s join endpoints as e on (s.name=e.service) where s.rowid=4;

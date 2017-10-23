@@ -42,12 +42,12 @@ app.get('/', function(req, res){
 
 app.get('/test', function(req, res){
   //db.add_service('asadsasd','adasdan', null, [{'name':'asd'}, {'name':'asdad'}]);
-  // db.update_service('asadsasd', {
-  //   lastseenactive: new Date().getTime()
-  //   // active: true
-  // });
+  db.update_service('wikiservice', {
+    lastseenactive: new Date().getTime(),
+    active: true
+  });
 
-  db.delete_service('asadsasd');
+  // db.delete_service('asadsasd');
 
   //() => { db.get_services((service) => {
   //   //console.log(`${service.name} ${service.location} ${service.lastseenactive}`);
