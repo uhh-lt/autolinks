@@ -56,7 +56,7 @@ define([
                       // layout: "hubsize",
                       enabled: true,
                       sortMethod: 'directed',
-                      direction: 'DU'
+                      direction: 'LR'
                     }
 
                 },

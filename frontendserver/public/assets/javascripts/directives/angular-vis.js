@@ -236,14 +236,27 @@ define([
                             network.setData(scope.data);
                             var clusterOptionsByData = {
                                 joinCondition:function(childOptions) {
-                                    return childOptions.cid == 1;
+                                  if (childOptions.cid == 1) {
+                                    // document.getElementById('html-node-' + childOptions.id).style.opacity = 0;
+                                  }
+                                  return childOptions.cid == 1;
                                 },
                                 clusterNodeProperties: {id:'cidCluster', borderWidth:3, shape:'database'}
                             };
                             network.cluster(clusterOptionsByData);
                         }
 
-                        // clusterByCid();
+                        clusterByCid();
+
+                        network.on('click', function (params) {
+                          debugger;
+                            if (params.nodes.length == 1) {
+                                if (network.isCluster(params.nodes[0]) == true) {
+                                  debugger;
+                                    network.openCluster(params.nodes[0]);
+                                }
+                            }
+                        });
 
 
                         network.once('stabilized', function() {

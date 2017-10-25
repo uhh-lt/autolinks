@@ -123,18 +123,63 @@ define([
                   {source: 12, dest: 15, occurrence: 1}
                 ];
 
+                // var nodes = [
+                //   {id: 0, label: "Disease", level: 3},
+                //   {id: 1, label: "Caucasian race", widthConstraint: { maximum: 170 }, level: 0},
+                //   {id: 2, label: "B-CLL", level: 2},
+                //
+                //
+                //   // {id: 1, 'label': "0x00405a62:\nmov    eax, 0x00000002\nmov    ecx, DWORD PTR ss:[esp + 0x000000a8]\nmov    DWORD PTR fs:[0x00000000], ecx\npop    ecx\npop    esi\npop    ebp\npop    ebx\nadd    esp, 0x000000a4\nret\n", 'color': "#FFCFCF", 'shape': 'box', 'font': {'face': 'monospace', 'align': 'left'}, level: 1},
+                //   {id: 3, label: "B Cell", level: 3},
+                //   {id: 4, label: "Antigen", cid: 1, level: 0},
+                //   {id: 5, label: "B-cell receptor", cid: 1, level: 1},
+                //   {id: 6, 'label': "V(D)J recombination", level: 1},
+                //   {id: 7, label: "IgVH Mutation", level: 0, image: url, shape: 'image'},
+                //   // {id: 8, widthConstraint: { maximum: 170 }, label: 'This node has a maximum width and breaks have been automatically inserted into the label', x: -150, y: -150, level: 1 },
+                //   // {id: 7, label: "Label 7", level: 2},
+                //   // {id: 8, label: "Label 8", level: 4},
+                //   // {id: 9, label: "Label 9", level: 4},
+                //   // {id: 10, label: "Label 10", level: 2},
+                //   // {id: 11, label: "Label 11", level: 1},
+                //   // {id: 12, label: "Label 12", level: 2},
+                //   // {id: 13, label: "Label 13", level: 1},
+                //   // {id: 14, label: "Label 14", level: 5}
+                // ];
+                //
+                // var edges = [
+                //   {from: 2, to: 0, arrows:'to', label: 'is-a'},
+                //   {from: 2, to: 1, arrows:'to', label: 'affects'},
+                //   {from: 2, to: 3, arrows:'to', label: 'affects'},
+                //   {from: 5, to: 3, arrows:'to', label: 'part-of'},
+                //   {from: 5, to: 4, arrows:'to', label: 'binds'},
+                //   {from: 7, to: 6, arrows:'to', label: 'causes'},
+                //   {from: 6, to: 5, arrows:'to', label: 'affects'},
+                //   // {from: 0, to: 13, arrows:'to'},
+                //   // {from: 0, to: 11, arrows:'to'},
+                //   // {from: 1, to: 2, arrows:'to'},
+                //   // {from: 2, to: 3, arrows:'to'},
+                //   // {from: 2, to: 4, arrows:'to'},
+                //   // {from: 3, to: 5, arrows:'to'},
+                //   // {from: 1, to: 10, arrows:'to'},
+                //   // {from: 1, to: 7, arrows:'to'},
+                //   // {from: 2, to: 8, arrows:'to'},
+                //   // {from: 2, to: 9, arrows:'to'},
+                //   // {from: 3, to: 14, arrows:'to'},
+                //   // {from: 1, to: 12, arrows:'to'}
+                // ];
+
                 var nodes = [
-                  {id: 0, label: "Disease", level: 3},
-                  {id: 1, label: "Caucasian race", widthConstraint: { maximum: 170 }, level: 0},
-                  {id: 2, label: "B-CLL", level: 2},
+                  {id: 0, label: "Disease"},
+                  {id: 1, label: "Caucasian race", widthConstraint: { maximum: 170 }},
+                  {id: 2, label: "B-CLL"},
 
 
                   // {id: 1, 'label': "0x00405a62:\nmov    eax, 0x00000002\nmov    ecx, DWORD PTR ss:[esp + 0x000000a8]\nmov    DWORD PTR fs:[0x00000000], ecx\npop    ecx\npop    esi\npop    ebp\npop    ebx\nadd    esp, 0x000000a4\nret\n", 'color': "#FFCFCF", 'shape': 'box', 'font': {'face': 'monospace', 'align': 'left'}, level: 1},
-                  {id: 3, label: "B Cell", level: 3},
-                  {id: 4, label: "Antigen", cid: 1, level: 0},
-                  {id: 5, label: "B-cell receptor", cid: 1, level: 1},
-                  {id: 6, 'label': "V(D)J recombination", level: 1},
-                  {id: 7, label: "IgVH Mutation", level: 0, image: url, shape: 'image'},
+                  {id: 3, label: "B Cell"},
+                  {id: 4, label: "Antigen", cid: 1},
+                  {id: 5, label: "B-cell receptor", cid: 1},
+                  {id: 6, 'label': "V(D)J recombination"},
+                  {id: 7, label: "IgVH Mutation", image: url, shape: 'image'},
                   // {id: 8, widthConstraint: { maximum: 170 }, label: 'This node has a maximum width and breaks have been automatically inserted into the label', x: -150, y: -150, level: 1 },
                   // {id: 7, label: "Label 7", level: 2},
                   // {id: 8, label: "Label 8", level: 4},
