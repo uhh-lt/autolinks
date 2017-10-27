@@ -21,6 +21,10 @@ define([
                 'network': {
                     templateUrl: 'assets/partials/network.html',
                     controller: 'NetworkController'
+                },
+                'input': {
+                  templateUrl: 'assets/partials/input.html',
+                  controller: 'InputController'
                 }
             }
         });
