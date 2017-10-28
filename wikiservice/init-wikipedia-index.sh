@@ -50,7 +50,7 @@ mkdir -p temp/
 # curl -s 'https://dumps.wikimedia.org/other/cirrussearch/20171009/'$dump > temp/$dump
 
 # extract the dump and prepare data chunks (chunks/u will contain unindexed files, chunks/f will contain finished files)
-mkdir -p temp/chunks/u && mkdir -p temp/chunks/f && gzcat temp/$dump | split -a 10 -l 500 - temp/chunks/u/${index}_
+mkdir -p temp/chunks/u && mkdir -p temp/chunks/f && cat temp/$dump | gzip -c -d | split -a 10 -l 500 - temp/chunks/u/${index}_
 
 # delete index (just to be sure it doesn't exist)
 curl -s -XDELETE $es/$index?pretty
