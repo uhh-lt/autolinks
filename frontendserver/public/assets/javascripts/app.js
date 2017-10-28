@@ -1,5 +1,6 @@
 define([
     'angular',
+    './components/input/InputController',
     './components/network/NetworkController',
     './components/network/GraphConfig',
     './services/underscore-module',
@@ -11,7 +12,7 @@ define([
     'use strict';
 
     var app = angular.module('myApp', [
-            'ui.layout', 'ui.router', 'ui.bootstrap', 'underscore',  'myApp.graphConfig', 'myApp.network'
+            'ui.layout', 'ui.router', 'ui.bootstrap', 'underscore',  'myApp.graphConfig', 'myApp.network', 'myApp.input'
           ]);
 
     app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
