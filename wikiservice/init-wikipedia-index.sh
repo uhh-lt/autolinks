@@ -85,7 +85,7 @@ cat temp/mappings.json |
   curl -H 'Content-Type: application/json' -XPUT $es/$index/_mapping/page?pretty -d @-
 
 # import the data
-for file in temp/chunks/${index}_*; do
+for file in temp/chunks/u/${index}_*; do
   echo -n "${file}:  "
   took=$(curl -H 'Content-Type: application/json' -s -XPOST $es/$index/_bulk?pretty --data-binary @$file |
     grep took | cut -d':' -f 2 | cut -d',' -f 1)
