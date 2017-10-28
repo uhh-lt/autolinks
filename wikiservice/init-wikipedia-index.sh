@@ -44,7 +44,8 @@ dump=$wikiname-20171023-cirrussearch-content.json.gz
 mkdir -p temp/
 
 # download index (https://dumps.wikimedia.org/other/cirrussearch/)
-[ ! -e temp/$dump ] && curl 'https://dumps.wikimedia.org/other/cirrussearch/current/'$dump > temp/$dump
+# https://dumps.wikimedia.org/other/cirrussearch/current/
+[ ! -e temp/$dump ] && curl 'https://dumps.wikimedia.org/other/cirrussearch/20171023/'$dump > temp/$dump
 
 # use dump from the creation of this script
 # curl -s 'https://dumps.wikimedia.org/other/cirrussearch/20171009/'$dump > temp/$dump
