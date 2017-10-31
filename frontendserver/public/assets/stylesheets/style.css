@@ -37,6 +37,10 @@ html, body {
   height: 200px;
 }
 
+.magnify-glass {
+  margin-left: 200px;
+}
+
 #input-query {
   /*z-index: 2;*/
   background: rgba(255, 255, 255, 0.5);
