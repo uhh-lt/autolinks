@@ -37,12 +37,13 @@
 
     <body ng-controller="AppController as app" ngsf-fullscreen>
       <div id="wrapper" layout="column" ng-cloak layout-fill>
+        <div id="viewer" ui-view="viewer"></div>
         <span class="graphs">
             <main id="center-box-entity" resizable r-directions="['right']" r-flex="true" flex="none">
                 <div id="network" ui-view="network"></div>
-                <div id="input" ui-view="input"></div>
             </main>
         </span>
+        <div id="input" ui-view="input"></div>
       </div>
     </body>
 </html>

@@ -12,12 +12,39 @@ html, body {
   background-color: rgba(255, 255, 255, 0);
 }
 
+#viewer-region {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  height: 181px;
+  background-color: rgba(255, 255, 255, 0);
+}
+
+.outer-canvas {
+  z-index: 2;
+}
+
+.magnify-container {
+  top: 0px;
+  position: absolute;
+}
+
+.magnify-image {
+  top: 0px;
+  position: absolute;
+  width: 200px;
+  height: 200px;
+}
+
 #input-query {
+  /*z-index: 2;*/
   background: rgba(255, 255, 255, 0.5);
   border: 1px;
 }
 
 #network {
+    z-index: 1;
     position: relative;
     overflow-y: hidden;
     width: 100%;

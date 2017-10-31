@@ -249,7 +249,7 @@ define([
                         clusterByCid();
 
                         network.on('click', function (params) {
-                          debugger;
+                          // debugger;
                             if (params.nodes.length == 1) {
                                 if (network.isCluster(params.nodes[0]) == true) {
                                   debugger;

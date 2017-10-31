@@ -29,7 +29,8 @@
     "jquery-json": "^2.6.0",
     "angular-bootstrap": "^2.5.0",
     "angular-ui-router": "^1.0.8",
-    "angular-ui-bootstrap": "^2.5.1"
+    "angular-ui-bootstrap": "^2.5.1",
+    "ng-magnify": "*"
   },
   "resolutions": {
     "angular": "1.6.6"

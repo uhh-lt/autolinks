@@ -1,6 +1,7 @@
 define([
     'angular',
     './components/input/InputController',
+    './components/viewer/ViewerController',
     './components/network/NetworkController',
     './components/network/GraphConfig',
     './services/underscore-module',
@@ -12,7 +13,7 @@ define([
     'use strict';
 
     var app = angular.module('myApp', [
-            'ui.layout', 'ui.router', 'ui.bootstrap', 'underscore',  'myApp.graphConfig', 'myApp.network', 'myApp.input'
+            'ui.layout', 'ui.router', 'ui.bootstrap', 'underscore',  'myApp.graphConfig', 'myApp.network', 'myApp.input', 'myApp.viewer'
           ]);
 
     app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
@@ -26,6 +27,10 @@ define([
                 'input': {
                   templateUrl: 'assets/partials/input.html',
                   controller: 'InputController'
+                },
+                'viewer': {
+                  templateUrl: 'assets/partials/viewer.html',
+                  controller: 'ViewerController'
                 }
             }
         });

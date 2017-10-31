@@ -17,7 +17,8 @@
 			'ui-router': 'libs/angular-ui-router/release/angular-ui-router.min',
 			'underscore': 'libs/underscore/underscore-min',
 			'vis': 'libs/vis/dist/vis.min',
-			'ngVis': 'directives/angular-vis'
+			'ngVis': 'directives/angular-vis',
+      'ngMagnify': 'libs/ng-magnify/src/js/ng-magnify'
 		},
 		shim: {
 			'jquery': {
@@ -57,7 +58,10 @@
 			},
 			'ngVis': {
 				deps: ['angular', 'vis']
-			}
+			},
+      'ngMagnify': {
+        deps: ['angular']
+      }
 		},
 		priority: [
 			'jquery',
