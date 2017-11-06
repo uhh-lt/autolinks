@@ -169,17 +169,58 @@ define([
                 // ];
 
                 var nodes = [
-                  {id: 0, label: "Disease"},
-                  {id: 1, label: "Caucasian race", widthConstraint: { maximum: 170 }},
-                  {id: 2, label: "B-CLL"},
-
-
+                  {
+                    id: 0,
+                    label: "Disease",
+                    desc: "",
+                    url: ""
+                  },
+                  {
+                    id: 1,
+                    label: "Caucasian race",
+                    desc: "grouping of human beings historically regarded as a biological taxon [..], including populations of Europe, the Caucasus, Asia Minor, North Africa, the Horn of Africa, Western Asia, Central Asia and South Asia.[3]",
+                    url: "https://upload.wikimedia.org/wikipedia/commons/8/89/Caucasoid_skull.jpg",
+                    widthConstraint: { maximum: 170 }
+                  },
+                  {
+                    id: 2,
+                    label: "B-CLL",
+                    desc: "type of leukemia (a type of cancer of the white blood cells)",
+                    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Chronic_lymphocytic_leukemia.jpg/1280px-Chronic_lymphocytic_leukemia.jpg"
+                  },
                   // {id: 1, 'label': "0x00405a62:\nmov    eax, 0x00000002\nmov    ecx, DWORD PTR ss:[esp + 0x000000a8]\nmov    DWORD PTR fs:[0x00000000], ecx\npop    ecx\npop    esi\npop    ebp\npop    ebx\nadd    esp, 0x000000a4\nret\n", 'color': "#FFCFCF", 'shape': 'box', 'font': {'face': 'monospace', 'align': 'left'}, level: 1},
-                  {id: 3, label: "B Cell"},
-                  {id: 4, label: "Antigen", cid: 1},
-                  {id: 5, label: "B-cell receptor", cid: 1},
-                  {id: 6, 'label': "V(D)J recombination"},
-                  {id: 7, label: "IgVH Mutation", image: url, shape: 'image'},
+                  {
+                    id: 3,
+                    label: "B Cell",
+                    desc: "also known as B lymphocytes, are a type of white blood cell of the lymphocyte subtype.",
+                    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Blausen_0624_Lymphocyte_B_cell_%28crop%29.png/1024px-Blausen_0624_Lymphocyte_B_cell_%28crop%29.png"
+                  },
+                  {
+                    id: 4,
+                    label: "Antigen",
+                    cid: 1,
+                    desc: "In immunology, an antigen is a molecule capable of inducing an immune response on the part of the host organism,",
+                    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Antibody.svg/255px-Antibody.svg.png"
+                  },
+                  {
+                    id: 5,
+                    label: "B-cell receptor",
+                    cid: 1,
+                    desc: " is a transmembrane receptor protein located on the outer surface of B cells",
+                    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Bcellreceptor.svg/251px-Bcellreceptor.svg.png"
+                  },
+                  {
+                    id: 6,
+                    label: "V(D)J recombination",
+                    desc: ""
+                  },
+                  {
+                    id: 7,
+                    label: "IgVH Mutation",
+                    image: url,
+                    shape: 'image',
+                    desc: ""
+                  },
                   // {id: 8, widthConstraint: { maximum: 170 }, label: 'This node has a maximum width and breaks have been automatically inserted into the label', x: -150, y: -150, level: 1 },
                   // {id: 7, label: "Label 7", level: 2},
                   // {id: 8, label: "Label 8", level: 4},

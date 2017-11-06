@@ -234,10 +234,12 @@ define([
 
                         function clusterByCid() {
                             network.setData(scope.data);
+                            // debugger;
                             var clusterOptionsByData = {
                                 joinCondition:function(childOptions) {
-                                  if (childOptions.cid == 1) {
-                                    // document.getElementById('html-node-' + childOptions.id).style.opacity = 0;
+                                  if (childOptions.cid) {
+                                    debugger;
+                                    document.getElementById('html-node-' + childOptions.id).style.opacity = 0;
                                   }
                                   return childOptions.cid == 1;
                                 },
@@ -254,6 +256,7 @@ define([
                                 if (network.isCluster(params.nodes[0]) == true) {
                                   debugger;
                                     network.openCluster(params.nodes[0]);
+                                    document.getElementById('html-node-4').style.opacity = 100;
                                 }
                             }
                         });
