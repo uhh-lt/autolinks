@@ -173,7 +173,6 @@ define([
                           var element = document.getElementById(elementId);
                           var item = getNode(nodeId);
                           if (item === undefined) return;
-
                           item.widthConstraint = element.clientWidth;
                           item.heightConstraint = element.clientHeight;
                           hideNode(nodeId);
@@ -204,15 +203,16 @@ define([
                           node.shape.width = element.offsetWidth;
                         }
 
-                        initSizes('html-node-1', 1);
-                        initSizes('html-node-2', 2);
-                        initSizes('html-node-3', 3);
-                        initSizes('html-node-4', 4);
-                        initSizes('html-node-5', 5);
                         // Create the graph2d object
                         network = new vis.Network(element[0], scope.data, scope.options);
 
                         network.on("afterDrawing", function (ctx) {
+                          initSizes('html-node-1', 1);
+                          initSizes('html-node-2', 2);
+                          initSizes('html-node-3', 3);
+                          initSizes('html-node-4', 4);
+                          initSizes('html-node-5', 5);
+
                           placeOverlay('html-node-1', 1);
                           placeOverlay('html-node-2', 2);
                           placeOverlay('html-node-3', 3);

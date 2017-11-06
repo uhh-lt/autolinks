@@ -212,14 +212,16 @@ define([
                   {
                     id: 6,
                     label: "V(D)J recombination",
-                    desc: ""
+                    desc: "",
+                    url: ""
                   },
                   {
                     id: 7,
                     label: "IgVH Mutation",
                     image: url,
                     shape: 'image',
-                    desc: ""
+                    desc: "",
+                    url: ""
                   },
                   // {id: 8, widthConstraint: { maximum: 170 }, label: 'This node has a maximum width and breaks have been automatically inserted into the label', x: -150, y: -150, level: 1 },
                   // {id: 7, label: "Label 7", level: 2},
@@ -232,6 +234,7 @@ define([
                   // {id: 14, label: "Label 14", level: 5}
                 ];
 
+                $scope.nodes = nodes;
                 var edges = [
                   {from: 2, to: 0, arrows:'to', label: 'is-a'},
                   {from: 2, to: 1, arrows:'to', label: 'affects'},
