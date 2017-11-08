@@ -85,3 +85,20 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
     background-color: rgba(181, 63, 63, 0.2);
     color: rgba(255,255,255,0.87);
 }
+
+/* Node card */
+
+.overlay {
+  position: absolute;
+  pointer-events: none;
+}
+
+.html-node {
+  font-family: sans-serif;
+  color: #424242;
+  background-color: #d1d1d1;
+}
+
+.html-node img {
+  width: 100px;
+}

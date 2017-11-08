@@ -25,6 +25,9 @@ define([
                 width: '100%',
                 nodes : {
                     shape: 'box',
+                    color: '#ffffff'
+
+
                     // font: {
                     //   color: 'rgba(66,66,66,0)'
                     // }
@@ -38,7 +41,7 @@ define([
                     // }
                 },
                 edges: {
-                    length: 200,
+                    length: 400,
                     color: {
                         color: 'rgb(169,169,169)',
                         highlight: 'blue'
@@ -50,10 +53,10 @@ define([
                     // }
                 },
                 layout: {
-                    improvedLayout: false,
+                    improvedLayout: true,
                     hierarchical: {
                       levelSeparation: 150,
-                      // layout: "hubsize",
+                      layout: "hubsize",
                       enabled: true,
                       sortMethod: 'directed',
                       direction: 'LR'

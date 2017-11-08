@@ -5,17 +5,23 @@
 <div id="mynetwork" ng-controller="NetworkController as ctrl">
   <vis-network data="graphData" options="graphOptions" layout-fill events="graphEvents"></vis-network>
   <!-- <div ng-repeat="n in nodes"> -->
-    <div id='html-node-{{n.id}}' draggable='true' class='overlay html-node' ng-repeat="n in nodes">
+    <div
+      id='html-node-{{n.id}}'
+      draggable='true'
+      class='overlay html-node'
+      ng-repeat="n in nodes"
+      style="width: 300px;padding: 10px; word-break: keep-all"
+    >
       <table><tr><td>
       <img src="{{n.url}}">
       </td><td>
         {{n.label}}
         <br>
       </tr></table>
-      <div style="width: 200px;padding: 10px; word-break: keep-all">
-        {{n.desc}}
+      <div>
+        <!-- {{n.desc}} -->
       </div>
-    <!-- </div> -->
+    </div>
 
     <!-- <div id='html-node-1' draggable='true' class='overlay html-node' style="width: 200px;padding: 10px; word-break: keep-all">
       <table><tr><td>

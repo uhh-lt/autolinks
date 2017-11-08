@@ -47,16 +47,16 @@ define([
             $scope.resultNodes = [];
             $scope.resultRelations = [];
 
-            var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="390" height="365">' +
+            var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="890" height="650">' +
                        '<rect x="0" y="0" width="100%" height="100%" fill="#7890A7" stroke-width="20" stroke="#ffffff" ></rect>' +
                        '<foreignObject x="15" y="10" width="100%" height="100%">' +
-                      //  '<div xmlns="http://www.w3.org/1999/xhtml" style="font-size:40px">' +
-                      //  '<em>I</em> am' +
-                      //  '<span style="color:white; text-shadow:0 0 20px #000000;">' +
-                      //  ' HTML in SVG!</span>' +
-                      //  '</div>' +
-                      //  '<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Blausen_0624_Lymphocyte_B_cell_%28crop%29.png/1024px-Blausen_0624_Lymphocyte_B_cell_%28crop%29.png"/>'+
-                       '<iframe src="http://bing.com"></iframe>'+
+                       '<div xmlns="http://www.w3.org/1999/xhtml" style="font-size:40px">' +
+                       '<em>I</em> am' +
+                       '<span style="color:white; text-shadow:0 0 20px #000000;">' +
+                       ' Disease!</span>' +
+                       '</div>' +
+                       '<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Bcellreceptor.svg/251px-Bcellreceptor.svg.png">'+
+                      //  '<iframe src="http://bing.com"></iframe>'+
                        '</foreignObject>' +
                        '</svg>';
 
@@ -173,40 +173,46 @@ define([
                     id: 0,
                     label: "Disease",
                     desc: "",
-                    url: ""
+                    url: "",
+                    image: url,
+                    x: -101, y: -300
                   },
                   {
                     id: 1,
-                    label: "Caucasian race",
-                    desc: "grouping of human beings historically regarded as a biological taxon [..], including populations of Europe, the Caucasus, Asia Minor, North Africa, the Horn of Africa, Western Asia, Central Asia and South Asia.[3]",
+                    // label: "Caucasian race",
+                    label: "grouping of human beings historically regarded as a biological taxon [..], including populations of Europe, the Caucasus, Asia Minor, North Africa, the Horn of Africa, Western Asia, Central Asia and South Asia.[3]",
+                    widthConstraint: { maximum: 170 },
                     url: "https://upload.wikimedia.org/wikipedia/commons/8/89/Caucasoid_skull.jpg",
-                    widthConstraint: { maximum: 170 }
                   },
                   {
                     id: 2,
-                    label: "B-CLL",
-                    desc: "type of leukemia (a type of cancer of the white blood cells)",
+                    // label: "B-CLL",
+                    label: "type of leukemia (a type of cancer of the white blood cells)",
+                    widthConstraint: { maximum: 170 },
                     url: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Chronic_lymphocytic_leukemia.jpg/1280px-Chronic_lymphocytic_leukemia.jpg"
                   },
                   // {id: 1, 'label': "0x00405a62:\nmov    eax, 0x00000002\nmov    ecx, DWORD PTR ss:[esp + 0x000000a8]\nmov    DWORD PTR fs:[0x00000000], ecx\npop    ecx\npop    esi\npop    ebp\npop    ebx\nadd    esp, 0x000000a4\nret\n", 'color': "#FFCFCF", 'shape': 'box', 'font': {'face': 'monospace', 'align': 'left'}, level: 1},
                   {
                     id: 3,
-                    label: "B Cell",
-                    desc: "also known as B lymphocytes, are a type of white blood cell of the lymphocyte subtype.",
+                    // label: "B Cell",
+                    label: "also known as B lymphocytes, are a type of white blood cell of the lymphocyte subtype.",
+                    widthConstraint: { maximum: 170 },
                     url: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Blausen_0624_Lymphocyte_B_cell_%28crop%29.png/1024px-Blausen_0624_Lymphocyte_B_cell_%28crop%29.png"
                   },
                   {
                     id: 4,
-                    label: "Antigen",
+                    // label: "Antigen",
                     cid: 1,
-                    desc: "In immunology, an antigen is a molecule capable of inducing an immune response on the part of the host organism,",
+                    label: "In immunology, an antigen is a molecule capable of inducing an immune response on the part of the host organism,",
+                    widthConstraint: { maximum: 170 },
                     url: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Antibody.svg/255px-Antibody.svg.png"
                   },
                   {
                     id: 5,
-                    label: "B-cell receptor",
+                    // label: "B-cell receptor",
                     cid: 1,
-                    desc: " is a transmembrane receptor protein located on the outer surface of B cells",
+                    label: " is a transmembrane receptor protein located on the outer surface of B cells",
+                    widthConstraint: { maximum: 170 },
                     url: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Bcellreceptor.svg/251px-Bcellreceptor.svg.png"
                   },
                   {
