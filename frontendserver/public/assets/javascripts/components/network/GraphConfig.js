@@ -41,7 +41,7 @@ define([
                     // }
                 },
                 edges: {
-                    length: 400,
+                    length: 500,
                     color: {
                         color: 'rgb(169,169,169)',
                         highlight: 'blue'
@@ -52,19 +52,19 @@ define([
                     //   roundness: 0.4
                     // }
                 },
-                layout: {
-                    improvedLayout: true,
-                    hierarchical: {
-                      levelSeparation: 150,
-                      layout: "hubsize",
-                      enabled: true,
-                      sortMethod: 'directed',
-                      direction: 'LR'
-                    }
-
-                },
+                // layout: {
+                //     // improvedLayout: true,
+                //     hierarchical: {
+                //       levelSeparation: 250,
+                //       // layout: "hubsize",
+                //       // enabled: true,
+                //       // sortMethod: 'directed',
+                //       // direction: 'LR'
+                //     }
+                //
+                // },
                 interaction: {
-                    tooltipDelay: 200,
+                    tooltipDelay: 100,
                     hover: true,
                     hideEdgesOnDrag: true,
                     navigationButtons: true,

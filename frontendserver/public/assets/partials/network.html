@@ -12,15 +12,40 @@
       ng-repeat="n in nodes"
       style="width: 300px;padding: 10px; word-break: keep-all"
     >
-      <table><tr><td>
+    <md-card>
+      <img ng-src="{{n.url}}" class="md-card-image" alt="Washed Out">
+      <md-card-title>
+        <md-card-title-text>
+          <span class="md-headline">{{n.title}}</span>
+        </md-card-title-text>
+      </md-card-title>
+      <!-- <md-card-actions layout="row" layout-align="start center">
+        <md-card-icon-actions>
+          <md-button class="md-icon-button" aria-label="Favorite">
+            <md-icon md-svg-icon="img/icons/favorite.svg"></md-icon>
+          </md-button>
+          <md-button class="md-icon-button" aria-label="Share">
+            <md-icon md-svg-icon="img/icons/share-arrow.svg"></md-icon>
+          </md-button>
+        </md-card-icon-actions>
+        <md-button>Action 1</md-button>
+        <md-button>Action 2</md-button>
+      </md-card-actions> -->
+      <md-card-content>
+        <p>
+          {{n.label}}
+        </p>
+      </md-card-content>
+    </md-card>
+      <!-- <table><tr><td>
       <img src="{{n.url}}">
       </td><td>
-        {{n.label}}
+        {{n.title}}
         <br>
       </tr></table>
       <div>
-        <!-- {{n.desc}} -->
-      </div>
+        {{n.label}}
+      </div> -->
     </div>
 
     <!-- <div id='html-node-1' draggable='true' class='overlay html-node' style="width: 200px;padding: 10px; word-break: keep-all">
