@@ -11,7 +11,8 @@ define([
     angular.module('myApp.network', ['ngMaterial', 'ngVis']);
     angular.module('myApp.network')
         // Network Controller
-        .controller('NetworkController', ['$scope', '$q', '$timeout', '$compile', '$mdDialog', 'VisDataSet', '_', 'graphProperties', function ($scope, $q, $timeout, $compile, $mdDialog, VisDataSet, _, graphProperties) {
+        .controller('NetworkController', ['$scope', '$q', '$timeout', '$compile', '$mdDialog', 'VisDataSet', '_', 'graphProperties', 'EntityService', '$mdSidenav',
+         function ($scope, $q, $timeout, $compile, $mdDialog, VisDataSet, _, graphProperties, EntityService, $mdSidenav) {
 
             var self = this;
 
@@ -33,6 +34,7 @@ define([
                 // "dragEnd": dragNodeDone,
                 "oncontext": onContext,
                 "click": clickEvent,
+                "selectNode": selectNodeEvent,
                 "dragging": dragEvent,
                 "hoverEdge": hoverEdge,
                 "hoverNode": hoverNode
@@ -57,36 +59,6 @@ define([
 
             // var url=[];
 
-            $scope.title = "<div class='panel panel-success' style='margin-bottom:0px'>"+
-                          "<div class='panel-heading'>"+
-                            "<h3 class='panel-title'>Agent</h3>"+
-                          "</div>"+
-                          "<div class='panel-body' style='height: 145px; padding-top: 0px; padding-bottom: 0px'>"+
-                            "<table class='table' style='border: none; margin-bottom:1px'>"+
-                              "<tr>"+
-                                "<td>Agent</td>"+
-                                "<td>true</td>"+
-                                "<td>2015-04-02 16:02</td>"+
-                              "</tr>"+
-                              "<tr>"+
-                                "<td>CPU</td>"+
-                                "<td>1%</td>"+
-                                "<td>2015-04-02 16:02</td>"+
-                              "</tr>"+
-                              "<tr>"+
-                                "<td>Memory</td>"+
-                                "<td>2%</td>"+
-                                "<td>2015-04-02 16:02</td>"+
-                              "</tr>"+
-                              "<tr>"+
-                                "<td>Disk</td>"+
-                                "<td>10%</td>"+
-                                "<td>2015-04-02 16:02</td>"+
-                              "</tr>"+
-                            "</table>"+
-                          "</div>"+
-                        "</div>";
-
             // Context menu for single node selection
             self.singleNodeMenu = [
                 {
@@ -109,42 +81,46 @@ define([
                   },
                   {
                     id: 1,
-                    // title: "Caucasian race",
-                    title: $scope.title,
-                    label: "grouping of human beings historically regarded as a biological taxon [..], including populations of Europe, the Caucasus, Asia Minor, North Africa, the Horn of Africa, Western Asia, Central Asia and South Asia.[3]",
+                    label: "Caucasian race",
+                    desc: "grouping of human beings historically regarded as a biological taxon [..], including populations of Europe, the Caucasus, Asia Minor, North Africa, the Horn of Africa, Western Asia, Central Asia and South Asia.[3]",
                     widthConstraint: { maximum: 170 },
-                    url: "https://upload.wikimedia.org/wikipedia/commons/8/89/Caucasoid_skull.jpg",
+                    image: "https://upload.wikimedia.org/wikipedia/commons/8/89/Caucasoid_skull.jpg",
+                    shape: 'image'
                   },
                   {
                     id: 2,
-                    title: "B-CLL",
-                    label: "type of leukemia (a type of cancer of the white blood cells)",
+                    label: "B-CLL",
+                    desc: "type of leukemia (a type of cancer of the white blood cells)",
                     widthConstraint: { maximum: 170 },
-                    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Chronic_lymphocytic_leukemia.jpg/1280px-Chronic_lymphocytic_leukemia.jpg"
+                    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Chronic_lymphocytic_leukemia.jpg/1280px-Chronic_lymphocytic_leukemia.jpg",
+                    shape: 'image'
                   },
                   // {id: 1, 'label': "0x00405a62:\nmov    eax, 0x00000002\nmov    ecx, DWORD PTR ss:[esp + 0x000000a8]\nmov    DWORD PTR fs:[0x00000000], ecx\npop    ecx\npop    esi\npop    ebp\npop    ebx\nadd    esp, 0x000000a4\nret\n", 'color': "#FFCFCF", 'shape': 'box', 'font': {'face': 'monospace', 'align': 'left'}, level: 1},
                   {
                     id: 3,
-                    title: "B Cell",
-                    label: "also known as B lymphocytes, are a type of white blood cell of the lymphocyte subtype.",
+                    label: "B Cell",
+                    desc: "also known as B lymphocytes, are a type of white blood cell of the lymphocyte subtype.",
                     widthConstraint: { maximum: 170 },
-                    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Blausen_0624_Lymphocyte_B_cell_%28crop%29.png/1024px-Blausen_0624_Lymphocyte_B_cell_%28crop%29.png"
+                    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Blausen_0624_Lymphocyte_B_cell_%28crop%29.png/1024px-Blausen_0624_Lymphocyte_B_cell_%28crop%29.png",
+                    shape: 'image'
                   },
                   {
                     id: 4,
-                    title: "Antigen",
+                    label: "Antigen",
                     cid: 1,
-                    label: "In immunology, an antigen is a molecule capable of inducing an immune response on the part of the host organism,",
+                    desc: "In immunology, an antigen is a molecule capable of inducing an immune response on the part of the host organism,",
                     widthConstraint: { maximum: 170 },
-                    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Antibody.svg/255px-Antibody.svg.png"
+                    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Antibody.svg/255px-Antibody.svg.png",
+                    shape: 'image'
                   },
                   {
                     id: 5,
-                    title: "B-cell receptor",
+                    label: "B-cell receptor",
                     cid: 1,
-                    label: " is a transmembrane receptor protein located on the outer surface of B cells",
+                    desc: " is a transmembrane receptor protein located on the outer surface of B cells",
                     widthConstraint: { maximum: 170 },
-                    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Bcellreceptor.svg/251px-Bcellreceptor.svg.png"
+                    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Bcellreceptor.svg/251px-Bcellreceptor.svg.png",
+                    shape: 'image'
                   },
                   {
                     id: 6,
@@ -155,8 +131,6 @@ define([
                   {
                     id: 7,
                     label: "IgVH Mutation",
-                    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Bcellreceptor.svg/251px-Bcellreceptor.svg.png",
-                    shape: 'image',
                     desc: "",
                     url: ""
                   }
@@ -181,8 +155,13 @@ define([
                 $scope.loading = true;
 
                 $scope.resultNodes = response.data.entities.map(function(n) {
-                    // See css property div.network-tooltip for custom tooltip styling
-                    return { id: n.id, label: n.label, type: n.type, value: n.count, group: n.group };
+                    var result = {};
+                    if (n.image) {
+                      result = { id: n.id, label: n.label, widthConstraint: { maximum: 170 }, desc: n.desc, image: n.image, shape: 'image' };
+                    } else {
+                      result = { id: n.id, label: n.label, widthConstraint: { maximum: 170 }};
+                    }
+                    return result;
                 });
 
                 self.nodesDataset.clear();
@@ -191,7 +170,7 @@ define([
                 self.nodes.clear();
 
                 $scope.resultRelations = response.data.relations.map(function(n) {
-                    return { from: n.source, to: n.dest, value: n.occurrence };
+                    return { from: n.from, to: n.to, label: n.label };
                 });
 
                 self.edges.clear();
@@ -200,8 +179,8 @@ define([
 
                 // Initialize the graph
                 $scope.graphData = {
-                    nodes: nodes,
-                    edges: edges
+                    nodes: self.nodesDataset,
+                    edges: self.edgesDataset
                 };
                 return promise.promise;
             };
@@ -217,16 +196,13 @@ define([
             function hoverNode(event) {
                 var node = self.nodesDataset.get(event.node);
                 var nodeLabel = '' + node.label;
-                // var filters = currentFilter();
-                // playRoutes.controllers.NetworkController.getNeighborCounts(filters.fulltext, filters.facets, filters.entities, filters.timeRange, filters.timeRangeX, node.id).get().then(function(response) {
-                    // var formattedTerms = response.data.map(function(t) { return '' +  t.type + ': ' + t.count; });
-//
-                    var docTip = '<p>Occurs in <b> </b>documents</p><p>Type: <b> </b></p>';
-                    var neighborTip = '<p><b>Neighbors</b></p><ul><li>test</li><li></li></ul>';
-                    var tooltip = docTip + neighborTip;
-                    // debugger;
-                    self.nodesDataset.update({ id: node.id, title: tooltip });
-                // });
+                var docTip = '<md-card class="tooltip-card"><img src="' + node.image +'" class="md-card-image">' +
+                            '<md-card-title><md-card-title-text><span class="md-headline">' + node.label + '</span></md-card-title-text></md-card-title>'+
+                            '<md-card-content>' + (node.desc ? node.desc : '') + '</md-card-content>' +
+                            '</md-card>';
+                var tooltip = docTip;
+                self.nodesDataset.update({ id: node.id, title: tooltip });
+                document.getElementsByClassName('vis-tooltip')[0].style.opacity = 100;
             }
 
 
@@ -315,10 +291,26 @@ define([
             //     network.moveTo(scaleOption);
             // })
 
+            $scope.toggleRight = buildToggler('right');
+            $scope.isOpenRight = function(){
+              return $mdSidenav('right').isOpen();
+            };
+
             $scope.reloadGraph = function () {
                 clearGraph();
                 $scope.buildGraph();
             };
+
+            function buildToggler(navID) {
+              return function() {
+                // Component lookup should always be available since we are not using `ng-if`
+                $mdSidenav(navID)
+                  .toggle()
+                  .then(function () {
+                    $log.debug("toggle " + navID + " is done");
+                  });
+              };
+            }
 
             function init() {
                 $scope.reloadGraph();
@@ -331,8 +323,18 @@ define([
             }
 
             function clickEvent(event) {
-                closeContextMenu();
+              var node = self.nodesDataset.get(event.node);
+              debugger;
+              closeContextMenu();
             }
+
+            function selectNodeEvent(event) {
+              document.getElementsByClassName('vis-tooltip')[0].style.opacity = 0;
+              closeContextMenu();
+              var node = self.nodesDataset.get(event.nodes[0]);
+              EntityService.openSideNav(node);
+            }
+
 
             function dragEvent(event) {
                 closeContextMenu();
@@ -349,18 +351,10 @@ define([
 
                 var selection = self.network.getSelectedNodes();
 
-                // Multiple nodes selected and the right-clicked node is in this selection
-                if(!_.isUndefined(nodeIdOpt) && selection.length > 1 && _.contains(selection, nodeIdOpt)) {
-                    showContextMenu(_.extend(position, { id: selection }), self.multiNodeMenu);
-                }
                 // Single node selected
-                else if(!_.isUndefined(nodeIdOpt)) {
+                if(!_.isUndefined(nodeIdOpt)) {
                     self.network.selectNodes([nodeIdOpt]);
                     showContextMenu(_.extend(position, { id: nodeIdOpt }), self.singleNodeMenu);
-                // Edge selected
-                } else if(!_.isUndefined(edgeIdOpt)) {
-                    self.network.selectEdges([edgeIdOpt]);
-                    showContextMenu(_.extend(position, { id: edgeIdOpt }), self.edgeMenu);
                 }
                 else {
                     // Nop

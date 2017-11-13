@@ -81,10 +81,10 @@ html, body {
     height: 100%;
 }
 
-md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolbar) {
+/*md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolbar) {
     background-color: rgba(181, 63, 63, 0.2);
     color: rgba(255,255,255,0.87);
-}
+}*/
 
 /* Node card */
 
@@ -101,6 +101,12 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
 
 .html-node img {
   width: 100px;
+}
+
+.tooltip-card {
+  width: 270px;
+  padding: 10px 5px;
+  white-space: normal;
 }
 
 div.popupMenu {
