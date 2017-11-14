@@ -1,9 +1,11 @@
 define([
     'angular',
+    './components/sidenav/SidenavController',
     './components/input/InputController',
     './components/viewer/ViewerController',
     './components/network/NetworkController',
     './components/network/GraphConfig',
+    './services/EntityService',
     './services/underscore-module',
     'ui-layout',
     'ui-router',
@@ -13,7 +15,8 @@ define([
     'use strict';
 
     var app = angular.module('myApp', [
-            'ui.layout', 'ui.router', 'ui.bootstrap', 'underscore',  'myApp.graphConfig', 'myApp.network', 'myApp.input', 'myApp.viewer'
+            'ui.layout', 'ui.router', 'ui.bootstrap', 'underscore',  'myApp.graphConfig', 'myApp.network',
+            'myApp.input', 'myApp.viewer', 'ngMaterial', 'myApp.entityservice', 'myApp.sidenav'
           ]);
 
     app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
@@ -31,20 +34,40 @@ define([
                 'viewer': {
                   templateUrl: 'assets/partials/viewer.html',
                   controller: 'ViewerController'
+                },
+                'sidenav': {
+                  templateUrl: 'assets/partials/sidenav.html',
+                  controller: 'SidenavController'
                 }
             }
         });
         $urlRouterProvider.otherwise('/');
     }]);
 
-    app.controller('AppController', ['$scope', '$state',
-        function ($scope, $state) {
+    app.controller('AppController', ['$scope', '$state', '$mdSidenav', 'EntityService',
+        function ($scope, $state, $mdSidenav, EntityService) {
 
             init();
 
             function init() {
-                $state.go('layout');
+              $state.go('layout');
             }
+
+            function buildToggler(navID) {
+              return function() {
+                // Component lookup should always be available since we are not using `ng-if`
+                $mdSidenav(navID)
+                  .toggle()
+                  .then(function () {
+                    $log.debug("toggle " + navID + " is done");
+                  });
+              };
+            }
+            $scope.toggleRight = buildToggler('right');
+            $scope.isOpenRight = function(){
+              debugger;
+              return $mdSidenav('right').isOpen();
+            };
 
             $scope.getDisplayEntityGraph = function () {
                 return true;
