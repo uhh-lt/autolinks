@@ -304,7 +304,6 @@ define([
             };
 
             function hoverNode(event) {
-                debugger;
                 var node = self.nodesDataset.get(event.node);
                 var nodeLabel = '' + node.label;
                 var filters = currentFilter();

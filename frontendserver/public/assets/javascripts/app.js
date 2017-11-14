@@ -65,7 +65,6 @@ define([
             }
             $scope.toggleRight = buildToggler('right');
             $scope.isOpenRight = function(){
-              debugger;
               return $mdSidenav('right').isOpen();
             };
 

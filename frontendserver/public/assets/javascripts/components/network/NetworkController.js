@@ -324,7 +324,7 @@ define([
 
             function clickEvent(event) {
               var node = self.nodesDataset.get(event.node);
-              debugger;
+              // debugger;
               closeContextMenu();
             }
 

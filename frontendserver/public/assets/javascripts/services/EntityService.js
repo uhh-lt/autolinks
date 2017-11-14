@@ -9,20 +9,18 @@ define([
             $rootScope.entity = {};
             return {
               openSideNav: function(scope) {
-                debugger;
                 $rootScope.entity = scope;
                 // console.log($rootScope);
                 $timeout(function () {
                 // $mdComponentRegistry.when('right', true).then(function() {
-                  debugger;
                   // Now you can use $mdSidenav('left') or $mdSidenav('left', true) without getting an error.
+                  $rootScope.$emit('sidenavReinit', 'waw');
                   $mdSidenav('right').toggle();
                 // });
               }, 1000);
               },
 
               getRootScopeEntity: function() {
-                debugger;
                 return $rootScope.entity;
               }
             };
