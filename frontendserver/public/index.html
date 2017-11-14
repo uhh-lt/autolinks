@@ -21,6 +21,7 @@
 
     <body ng-controller="AppController as app" ngsf-fullscreen>
       <div id="wrapper" layout="column" ng-cloak layout-fill>
+        <div id="sidenav" ui-view="sidenav"></div>
         <!-- <div id="viewer" ui-view="viewer"></div> -->
         <span class="graphs">
             <main id="center-box-entity" resizable r-directions="['right']" r-flex="true" flex="none">

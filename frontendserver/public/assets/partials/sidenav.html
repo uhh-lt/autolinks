@@ -1,0 +1,21 @@
+<md-sidenav class="md-sidenav-right md-whiteframe-4dp" md-component-id="right">
+  <div ng-controller="SidenavController">
+     <md-toolbar class="md-theme-light">
+       <h1 class="md-toolbar-tools">{{selectedEntity.label}}</h1>
+     </md-toolbar>
+     <md-content layout-padding>
+       <form>
+         <md-input-container>
+           <img ng-src="{{selectedEntity.image}}" />
+           {{selectedEntity.desc}}
+           <label for="testInput">Test input</label>
+           <input type="text" id="testInput"
+                  ng-model="data" md-autofocus>
+         </md-input-container>
+       </form>
+       <md-button ng-click="close()" class="md-primary">
+         Close
+       </md-button>
+     </md-content>
+   </div>
+</md-sidenav>
