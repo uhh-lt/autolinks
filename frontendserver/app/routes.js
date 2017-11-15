@@ -4,21 +4,7 @@ module.exports = function (app) {
     debugger;
     app.get('/api/data/', function (req, res) {
 
-
-      // var dataObj = {
-      //   "query": {
-      //      "query": {
-      //        "match_all": {}
-      //      }
-      //    },
-      //    "wiki": [
-      //      "simplewiki"
-      //    ]
-      //  };
-      // var res = $http.post('http://localhost:8080/find', dataObj, { headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}});
-      // res.success(function(data, status, headers, config) {
-      //   $scope.message = data;
-      // });
+      var resp = [];
 
       var options = {
             url: 'http://localhost:8080/find',
@@ -29,24 +15,29 @@ module.exports = function (app) {
              },
             json: true,
             body: {
-                  'query': {
-                    'query': {
-                      'match_all': {}
-                    }
-                },
-                  'wiki': [
-                    'simplewiki'
-                  ]
-                }
-            }
+              "query": {
+                  "query": {
+                      "match": {
+                          "title": "Germany"
+              }
+                  }
+              },
+                'wiki': [
+                  'simplewiki'
+                ]
+             }
+          }
 
         //res.send('{"hello":"world"}');
         console.log('hello world call');
-        request(options, function (error, response, body) {
-          console.log('error:', error); // Print the error if one occurred
-          console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-          console.log('body:', body); // Print the HTML for the Google homepage.
+        var req = request(options, function (error, response, body) {
+          // console.log('error:', error); // Print the error if one occurred
+          // console.log('statusCode:', response && response.statusCode); // Print  the response status code if a response was received
+          // console.log('body:', body); // Print the HTML for the Google homepage.
+          // console.log(body);
+          res.send(body);
         });
+        // console.log(req);
     });
 
     // application -------------------------------------------------------------
