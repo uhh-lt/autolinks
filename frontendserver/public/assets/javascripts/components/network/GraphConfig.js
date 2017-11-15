@@ -3,7 +3,7 @@ define([
 ], function(angular) {
     'use strict';
 
-    angular.module('myApp.graphConfig', [])
+    angular.module('autolinks.graphConfig', [])
         .constant('physicOptions', {
             forceAtlas2Based: {
                 gravitationalConstant: -220,

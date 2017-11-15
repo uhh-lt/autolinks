@@ -79,7 +79,7 @@
 			'angular',
 			'app'
 		], function(angular, app) {
-			angular.bootstrap(document, ['myApp']);
+			angular.bootstrap(document, ['autolinks']);
 		}
 	);
 })(requirejs);

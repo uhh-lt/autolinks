@@ -6,8 +6,8 @@ define([
      * input module:
      * Input form for the text query
      */
-    angular.module('myApp.input', []);
-    angular.module('myApp.input')
+    angular.module('autolinks.input', []);
+    angular.module('autolinks.input')
         // Network Controller
         .controller('InputController', ['$scope', function ($scope) {
 

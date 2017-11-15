@@ -3,7 +3,7 @@ define([
     'ngMaterial'
 ], function (angular) {
     'use strict';
-    angular.module('myApp.entityservice', ['ngMaterial'])
+    angular.module('autolinks.entityservice', ['ngMaterial'])
         .factory('EntityService', ['$rootScope', '$mdSidenav', '$mdComponentRegistry', '$timeout', function ($rootScope, $mdSidenav, $mdComponentRegistry, $timeout) {
             var entityScope = null;
             $rootScope.entity = {};
@@ -17,7 +17,7 @@ define([
                   $rootScope.$emit('sidenavReinit', 'waw');
                   $mdSidenav('right').toggle();
                 // });
-              }, 1000);
+              }, 100);
               },
 
               getRootScopeEntity: function() {

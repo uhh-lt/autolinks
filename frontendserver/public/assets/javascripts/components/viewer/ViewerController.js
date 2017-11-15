@@ -6,8 +6,8 @@ define([
     /**
      * viewer module:
      */
-    angular.module('myApp.viewer', ['ngMagnify']);
-    angular.module('myApp.viewer')
+    angular.module('autolinks.viewer', ['ngMagnify']);
+    angular.module('autolinks.viewer')
         // Viewer Controller
         .controller('ViewerController', ['$scope', function ($scope) {
 

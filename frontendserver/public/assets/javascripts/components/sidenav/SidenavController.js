@@ -5,11 +5,11 @@ define([
     /**
      * viewer module:
      */
-    angular.module('myApp.sidenav', []);
-    angular.module('myApp.sidenav')
+    angular.module('autolinks.sidenav', []);
+    angular.module('autolinks.sidenav')
         // Viewer Controller
-        .controller('SidenavController', ['$scope', '$rootScope', '$timeout', '$mdSidenav', '$log', 'EntityService',
-        function ($scope, $rootScope, $timeout, $mdSidenav, $log, EntityService) {
+        .controller('SidenavController', ['$scope', '$rootScope', '$timeout', '$mdSidenav', '$log', 'EntityService', 'EndPointService',
+        function ($scope, $rootScope, $timeout, $mdSidenav, $log, EntityService, EndPointService) {
 
           $scope.init = function() {
             // $timeout( function(){
@@ -29,6 +29,7 @@ define([
           $scope.close = function () {
             // Component lookup should always be available since we are not using `ng-if`
             // $route.reload();
+            EndPointService.fetchData();
             $mdSidenav('right').close()
               .then(function () {
                 $log.debug("close RIGHT is done");

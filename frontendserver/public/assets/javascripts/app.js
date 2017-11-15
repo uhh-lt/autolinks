@@ -6,6 +6,7 @@ define([
     './components/network/NetworkController',
     './components/network/GraphConfig',
     './services/EntityService',
+    './services/EndPointService',
     './services/underscore-module',
     'ui-layout',
     'ui-router',
@@ -14,9 +15,9 @@ define([
 ], function (angular) {
     'use strict';
 
-    var app = angular.module('myApp', [
-            'ui.layout', 'ui.router', 'ui.bootstrap', 'underscore',  'myApp.graphConfig', 'myApp.network',
-            'myApp.input', 'myApp.viewer', 'ngMaterial', 'myApp.entityservice', 'myApp.sidenav'
+    var app = angular.module('autolinks', [
+            'ui.layout', 'ui.router', 'ui.bootstrap', 'underscore',  'autolinks.graphConfig', 'autolinks.network',
+            'autolinks.input', 'autolinks.viewer', 'ngMaterial', 'autolinks.entityservice', 'autolinks.sidenav', 'autolinks.endpointservice'
           ]);
 
     app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {

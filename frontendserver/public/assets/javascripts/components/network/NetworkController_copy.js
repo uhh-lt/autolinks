@@ -8,8 +8,8 @@ define([
      * network module:
      * visualization and interaction of network graph
      */
-    angular.module('myApp.network', ['ngMaterial', 'ngVis']);
-    angular.module('myApp.network')
+    angular.module('autolinks.network', ['ngMaterial', 'ngVis']);
+    angular.module('autolinks.network')
         // Network Controller
         .controller('NetworkControllerCopy', ['$scope', '$q', '$timeout', '$compile', '$mdDialog', 'VisDataSet', '_', 'graphProperties', function ($scope, $q, $timeout, $compile, $mdDialog, VisDataSet, _, graphProperties) {
 
