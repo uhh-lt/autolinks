@@ -9,3 +9,6 @@ app.use('/assets', express.static(__dirname + '/assets/'));
 
 app.listen(port);
 console.log("App listening on port " + port);
+
+// routes ==================================================
+require('./app/routes')(app); // pass our application into our routes

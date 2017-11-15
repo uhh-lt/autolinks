@@ -17,7 +17,7 @@ services:
     volumes:
       - ${PWD}:/usr/src/app
     ports:
-      - 9000:9000
+      - 9090:9090
     networks:
       - alnet
     stdin_open: true
