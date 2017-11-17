@@ -14,7 +14,7 @@ module.exports = {
 const fs = require('fs')
   , nodeCleanup = require('node-cleanup')
   , sqlite3 = require('sqlite3').verbose()
-  , log = require('./log')(module)
+  , logger = require('./log')(module)
   // , _ = require('lodash')
 	// , async = require('async')
 	// , bcrypt = require('bcrypt')
@@ -23,17 +23,17 @@ const fs = require('fs')
 // init database connection
 let dbconn = new sqlite3.Database(`${__dirname}/user.db`, (err) => {
   if (err) {
-    log.error(err.message);
+    logger.error(err.message);
   }
-  log.info('Connected to user database.');
+  logger.info('Connected user database.');
 });
 
 // close database connection on exit
 nodeCleanup(function (exitCode, signal) {
   // release resources here before node exits
-  log.debug(`About to exit with code: ${signal}`);
+  logger.debug(`About to exit with code: ${signal}`);
   dbconn.close();
-  log.debug('Closed the database connection.');
+  logger.debug('Closed user database connection.');
 });
 
 // init db with schema
@@ -41,7 +41,7 @@ function initdb() {
   // init db schema
   fs.readFile('config/userdb-schema.sql', 'utf8', function (err,data) {
     if (err) {
-      log.warn(err.message);
+      logger.warn(err.message);
       return err;
     }
     dbconn.exec(data);

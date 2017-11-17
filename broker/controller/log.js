@@ -2,11 +2,12 @@
 
 const winston = require('winston');
 
+const loglevel = process.env.LOGLEVEL || 'info';
 
-var getLabel = function(callingModule) {
-  var parts = callingModule.filename.split('/');
+function getLabel(callingModule) {
+  const parts = callingModule.filename.split('/');
   return parts[parts.length - 2] + '/' + parts.pop();
-};
+}
 
 
 module.exports = function(callingModule){
@@ -18,7 +19,7 @@ module.exports = function(callingModule){
     transports: [
 
       new (winston.transports.Console)({
-        level: 'info',
+        level: loglevel,
         prettyPrint: true,
         colorize: true,
         timestamp: true,

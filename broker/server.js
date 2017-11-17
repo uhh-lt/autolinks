@@ -6,11 +6,9 @@ const SwaggerExpress = require('swagger-express-mw'),
   swaggerUi = require('swagger-ui-express'),
   yaml = require('yamljs'),
   nodeCleanup = require('node-cleanup'),
-  log = require('./model/log')(module),
-  servicedb = require('./model/service_db'),
-  userdb = require('./model/user_db')
-  // , async = require('async')
-  // , User = new (require('./models/User.js'))(connection)
+  logger = require('./controller/log')(module),
+  servicedb = require('./controller/service_db'),
+  userdb = require('./controller/user_db')
   ;
 
 
@@ -19,12 +17,12 @@ const SwaggerExpress = require('swagger-express-mw'),
  */
 let err = servicedb.init();
 if(err){
-  log.error(err);
+  logger.error(err);
   process.exit(1);
 }
 err = userdb.init();
 if(err){
-  log.error(err);
+  logger.error(err);
   process.exit(1);
 }
 
@@ -55,8 +53,8 @@ SwaggerExpress.create(config, function(err, swaggerExpress) {
   swaggerExpress.register(app);
   const port = process.env.PORT || 10010;
   app.listen(port);
-  log.info('server running on port %d.', port);
-  // console.log(swaggerExpress.runner.swagger.paths);
+  logger.info('server running on port %d.', port);
+  logger.log('silly', swaggerExpress.runner.swagger.paths);
 });
 
 // redirect root to swaggers api docs
@@ -105,5 +103,5 @@ app.get('/test', function(req, res){
 });
 
 nodeCleanup(function (exitCode, signal) {
-  log.info('Shutdown server.');
+  logger.info('Shutdown server.');
 });

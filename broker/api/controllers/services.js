@@ -1,8 +1,9 @@
 'use strict';
 
 const util = require('util')
-  , db = require('../../model/service_db')
-  , mx = require('../../model/service_utils')
+  , service_db = require('../../controller/service_db')
+  , service_utils = require('../../controller/service_utils')
+  , logger = require('../../controller/log')
   // , async = require('async')
   ;
 
@@ -20,39 +21,46 @@ module.exports = {
 function register_service(req, res) {
   // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
   const service = req.swagger.params.service.value;
-  console.log(`adding service ${service}.`);
 
-  db.add_service(
+
+  const err = service_db.add_service(
     service.name,
     service.location,
     service.description,
     service.endpoints);
+
+  if(err) {
+    logger.warn(`adding service ${service.name} failed.`, service, err, {} );
+    res.status(500);
+    res.write(JSON.stringify({ message: err.message, fields: { service: service, error: err } }));
+  } else {
+    logger.info(`added service ${service.name}.`, service);
+  }
 
   res.end();
 
 }
 
 function ping_service(req, res) {
-  mx.ping_service(req.swagger.params.service.value);
+  service_utils.ping_service(req.swagger.params.service.value);
   res.end();
 }
 
 function ping_services(req, res) {
   // get all services and apply ping_service as callback for each of the services
-  db.get_services(mx.ping_service, () => res.end());
+  service_db.get_services(service_utils.ping_service, () => res.end());
 }
 
 function list_services(req, res, next) {
   res.write('[');
   let startedwriting = false;
-  db.get_services(
+  service_db.get_services(
     (service) => {
       startedwriting && res.write(',');
       res.write(JSON.stringify(service));
       startedwriting = true;
     },
     () => {
-      // console.log('OK');
       res.write(']');
       res.end();
     }

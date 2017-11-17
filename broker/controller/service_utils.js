@@ -9,7 +9,7 @@ module.exports = {
 // imports
 const db = require('./service_db')
   , request = require('request')
-  , log = require('./log')(module)
+  , logger = require('./log')(module)
 	;
 
 // ping a service
@@ -33,10 +33,10 @@ function ping_service(service) {
     if(error || response.statusCode != 200){
       // if service was active before print a warning, otherwise ignore it
       if(service.active) {
-        log.warn(`Cannot reach service ${service.name}`, { service : service , error: error || response }, {});
-        log.warn(`Setting service ${service.name} to defunct.`);
+        logger.warn(`Cannot reach service ${service.name}`, { service : service , error: error || response }, {});
+        logger.warn(`Setting service ${service.name} to defunct.`);
       }
-      log.debug(`ping service ${service.name} failed.`);
+      logger.debug(`ping service ${service.name} failed.`);
       return db.update_service(service.name, {
         lastcheck: now,
         active: false
@@ -44,9 +44,9 @@ function ping_service(service) {
     }else{
       // if service was not active before print an info, otherwise ignore it
       if(!service.active) {
-        log.debug(`Service ${service.name} is now available.`);
+        logger.debug(`Service ${service.name} is now available.`);
       }
-      log.debug(`ping service ${service.name} success.`);
+      logger.debug(`ping service ${service.name} success.`);
       return db.update_service(service.name, {
         lastseenactive: now,
         lastcheck: now,
@@ -60,7 +60,7 @@ function ping_service(service) {
 function ping_services(){
   const err = db.get_services(ping_service, () => {});
   if(err){
-    log.warn('Ping services failed.', { error: err }, {});
+    logger.warn('Ping services failed.', { error: err }, {});
   }
 }
 
