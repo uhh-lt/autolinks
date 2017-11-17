@@ -15,6 +15,7 @@ module.exports = {
 const fs = require('fs')
   , nodeCleanup = require('node-cleanup')
   , sqlite3 = require('sqlite3').verbose()
+  , log = require('./log')(module)
   // , _ = require('lodash')
 	// , async = require('async')
 	// , bcrypt = require('bcrypt')
@@ -23,17 +24,17 @@ const fs = require('fs')
 // init database connection
 let dbconn = new sqlite3.Database(`${__dirname}/service.db`, (err) => {
   if (err) {
-    console.error(err.message);
+    log.error(err.message);
   }
-  console.log('Connected to broker database.');
+  log.info('Connected to service database.');
 });
 
 // close database connection on exit
 nodeCleanup(function (exitCode, signal) {
   // release resources here before node exits
-  console.log(`About to exit with code: ${signal}`);
+  log.debug(`About to exit with code: ${signal}`);
   dbconn.close();
-  console.log('Closed the database connection.');
+  log.debug('Closed the database connection.');
 });
 
 // init db with schema
@@ -41,7 +42,7 @@ function initdb() {
   // init db schema
   fs.readFile('config/servicedb-schema.sql', 'utf8', function (err,data) {
     if (err) {
-      console.log(err);
+      log.error(err);
       return;
     }
     dbconn.exec(data);
@@ -54,17 +55,19 @@ function add_service(name, location, description, endpoints) {
   // add the service
   dbconn.run('insert or replace into services(name, location, description, registeredsince) values(?,?,?,?)', [name, location, description, now], function(err) {
     if (err) {
-      return console.log(err.message);
+      log.warn(err.message);
+      return err;
     }
-    console.log(`A service has been added: ${this.lastID}`);
+    log.info(`A service has been added: ${this.lastID}`);
 
     // add the endpoints only after successfully added the service
     endpoints.forEach(function (endpoint) {
       dbconn.run('insert or replace into endpoints(service, name, description) values(?,?,?)', [name, endpoint.name, endpoint.description], function(err) {
         if (err) {
-          return console.log(err.message);
+          log.warn(err.message);
+          return err;
         }
-        console.log(`A service endpoint has been added: ${this.lastID}`);
+        log.info(`A service endpoint has been added: ${this.lastID}`);
       });
     });
   });
@@ -90,9 +93,10 @@ function update_service(name, serviceobj){
   //run sql statement
   dbconn.run(sql, vals, function(err) {
     if (err) {
-      return console.error(err.message);
+      log.warn(err.message);
+      return err;
     }
-    console.log(`Updated ${this.changes} service(s).`);
+    log.info(`Updated ${this.changes} service(s).`);
   });
 
 }
@@ -115,9 +119,10 @@ function update_endpoint(servicename, name, endpointobj){
   //run sql statement
   dbconn.run(sql, vals, function(err) {
     if (err) {
-      return console.error(err.message);
+      log.warn(err.message);
+      return err;
     }
-    console.log(`Written ${this.changes} changes.`);
+    log.info(`Written ${this.changes} changes.`);
   });
 }
 
@@ -126,7 +131,8 @@ function get_service(name, callback){
   //run sql statement
   dbconn.get('select * from services where name = ?', [name], (err, row) => {
     if (err) {
-      return console.error(err.message);
+      log.warn(err.message);
+      return err;
     }
     callback(row);
   });
@@ -137,15 +143,17 @@ function delete_service(name){
   // delete service
   dbconn.run('delete from services where name = ?', [name], function(err) {
     if (err) {
-      return console.error(err.message);
+      log.warn(err.message);
+      return err;
     }
     console.log(`Deleted ${this.changes} services.`);
     // on success, delete endpoints associated with that service
     dbconn.run('delete from endpoints where service = ?', [name], function(err) {
       if (err) {
-        return console.error(err.message);
+        log.warn(err.message);
+        return err;
       }
-      console.log(`Deleted ${this.changes} endpoints.`);
+      log.info(`Deleted ${this.changes} endpoints.`);
     });
   });
 }

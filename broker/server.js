@@ -1,19 +1,28 @@
 'use strict';
 
 const SwaggerExpress = require('swagger-express-mw'),
-  logger = require('winston'),
+
   app = require('express')(),
   swaggerUi = require('swagger-ui-express'),
   yaml = require('yamljs'),
-  db = require('./model/service_db'),
-  nodeCleanup = require('node-cleanup')
+  nodeCleanup = require('node-cleanup'),
+  log = require('./model/log')(module),
+  servicedb = require('./model/service_db'),
+  userdb = require('./model/user_db')
   // , async = require('async')
   // , User = new (require('./models/User.js'))(connection)
   ;
 
-db.init();
 
-// swagger variables
+/*
+ * init databases
+ */
+servicedb.init();
+userdb.init();
+
+/*
+ * swagger variables
+ */
 const swaggerDocument = yaml.load('api/swagger/swagger.yaml');
 const showSwaggerExplorer = true;
 
@@ -37,6 +46,7 @@ SwaggerExpress.create(config, function(err, swaggerExpress) {
   swaggerExpress.register(app);
   const port = process.env.PORT || 10010;
   app.listen(port);
+  log.info('server running on port %d.', port);
   // console.log(swaggerExpress.runner.swagger.paths);
 });
 
@@ -46,16 +56,16 @@ app.get('/', function(req, res){
 });
 
 app.get('/test', function(req, res){
-  //db.add_service('asadsasd','adasdan', null, [{'name':'asd'}, {'name':'asdad'}]);
-  // db.update_service('wikiservice', {
+  //servicedb.add_service('asadsasd','adasdan', null, [{'name':'asd'}, {'name':'asdad'}]);
+  // servicedb.update_service('wikiservice', {
   //   lastseenactive: new Date().getTime(),
   //   active: true
   // });
 
 
-  // db.delete_service('asadsasd');
+  // servicedb.delete_service('asadsasd');
 
-  //() => { db.get_services((service) => {
+  //() => { servicedb.get_services((service) => {
   //   //console.log(`${service.name} ${service.location} ${service.lastseenactive}`);
   //   res.write(JSON.stringify(service));
   // }}
@@ -64,7 +74,7 @@ app.get('/test', function(req, res){
   //   function(callback) {
   //     res.write('[');
   //     let startedwriting = false;
-  //     db.get_services(
+  //     servicedb.get_services(
   //       (service) => {
   //         startedwriting && res.write(',');
   //         res.write(JSON.stringify(service));
@@ -86,5 +96,5 @@ app.get('/test', function(req, res){
 });
 
 nodeCleanup(function (exitCode, signal) {
-  console.log('Release resources.');
+  log.info('Shutdown server.');
 });
