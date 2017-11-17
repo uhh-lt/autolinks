@@ -40,34 +40,33 @@ nodeCleanup(function (exitCode, signal) {
 // init db with schema
 function initdb() {
   // init db schema
-  fs.readFile('config/servicedb-schema.sql', 'utf8', function (err,data) {
+  fs.readFile('config/servicedb-schema.sql', 'utf8', function (err, data) {
     if (err) {
-      log.error(err);
-      return;
+      return err;
     }
-    dbconn.exec(data);
+    dbconn.exec(data, function(err){
+      if (err) {
+        return err;
+      }
+    });
   });
 };
 
 // add service to db
 function add_service(name, location, description, endpoints) {
-  let now = new Date().getTime();
+  const now = new Date().getTime();
   // add the service
   dbconn.run('insert or replace into services(name, location, description, registeredsince) values(?,?,?,?)', [name, location, description, now], function(err) {
     if (err) {
-      log.warn(err.message);
       return err;
     }
-    log.info(`A service has been added: ${this.lastID}`);
 
     // add the endpoints only after successfully added the service
     endpoints.forEach(function (endpoint) {
       dbconn.run('insert or replace into endpoints(service, name, description) values(?,?,?)', [name, endpoint.name, endpoint.description], function(err) {
         if (err) {
-          log.warn(err.message);
           return err;
         }
-        log.info(`A service endpoint has been added: ${this.lastID}`);
       });
     });
   });
@@ -79,24 +78,22 @@ function add_service(name, location, description, endpoints) {
 // update a service in the database, set key-value pairs from the service obj
 function update_service(name, serviceobj){
   // prepare sql statement and values
-  let keys = [];
-  let vals = [];
+  const keys = [];
+  const vals = [];
   Object.keys(serviceobj)
     .filter( key => !Array.isArray(serviceobj[key]))
     .forEach( key => {
       keys.push(`${key} = ?`);
       vals.push(serviceobj[key]);
   });
-  let sql = `update services set ${keys.join(', ')} where name = ?`;
+  const sql = `update services set ${keys.join(', ')} where name = ?`;
   vals.push(name);
 
   //run sql statement
   dbconn.run(sql, vals, function(err) {
     if (err) {
-      log.warn(err.message);
       return err;
     }
-    log.info(`Updated ${this.changes} service(s).`);
   });
 
 }
@@ -104,25 +101,23 @@ function update_service(name, serviceobj){
 // update a service in the database, set key-value pairs from the service obj
 function update_endpoint(servicename, name, endpointobj){
   // prepare sql statement and values
-  let keys = [];
-  let vals = [];
+  const keys = [];
+  const vals = [];
   Object.keys(endpointobj)
     .filter( key => !Array.isArray(endpointobj[key]))
     .forEach( key => {
       keys.push(`${key} = ?`);
       vals.push(endpointobj[key]);
   });
-  let sql = `update endpoints set ${keys.join(', ')} where service = ? and name = ?`;
+  const sql = `update endpoints set ${keys.join(', ')} where service = ? and name = ?`;
   vals.push(servicename);
   vals.push(name);
 
   //run sql statement
   dbconn.run(sql, vals, function(err) {
     if (err) {
-      log.warn(err.message);
       return err;
     }
-    log.info(`Written ${this.changes} changes.`);
   });
 }
 
@@ -131,10 +126,9 @@ function get_service(name, callback){
   //run sql statement
   dbconn.get('select * from services where name = ?', [name], (err, row) => {
     if (err) {
-      log.warn(err.message);
       return err;
     }
-    callback(row);
+    return callback(row);
   });
 }
 
@@ -143,17 +137,13 @@ function delete_service(name){
   // delete service
   dbconn.run('delete from services where name = ?', [name], function(err) {
     if (err) {
-      log.warn(err.message);
       return err;
     }
-    console.log(`Deleted ${this.changes} services.`);
     // on success, delete endpoints associated with that service
     dbconn.run('delete from endpoints where service = ?', [name], function(err) {
       if (err) {
-        log.warn(err.message);
         return err;
       }
-      log.info(`Deleted ${this.changes} endpoints.`);
     });
   });
 }
@@ -162,9 +152,9 @@ function delete_service(name){
 function get_services(callback_service, callback_done) {
   dbconn.each('select * from services;', [], function(err, service) {
     if (err) {
-      throw err;
+      return err;
     }
-    callback_service(service);
-  }, () => callback_done());
+    return callback_service(service);
+  }, () => { return callback_done() } );
 }
 //select s.name, s.location, e.name from services as s join endpoints as e on (s.name=e.service) where s.rowid=4;

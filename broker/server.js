@@ -15,10 +15,19 @@ const SwaggerExpress = require('swagger-express-mw'),
 
 
 /*
- * init databases
+ * init databases, exit on error
  */
-servicedb.init();
-userdb.init();
+let err = servicedb.init();
+if(err){
+  log.error(err);
+  process.exit(1);
+}
+err = userdb.init();
+if(err){
+  log.error(err);
+  process.exit(1);
+}
+
 
 /*
  * swagger variables
