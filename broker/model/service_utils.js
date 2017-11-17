@@ -7,7 +7,7 @@ module.exports = {
 };
 
 // imports
-const db = require('./db')
+const db = require('./service_db')
   , request = require('request')
 	;
 

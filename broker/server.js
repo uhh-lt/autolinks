@@ -1,12 +1,13 @@
 'use strict';
 
 const SwaggerExpress = require('swagger-express-mw'),
+  logger = require('winston'),
   app = require('express')(),
   swaggerUi = require('swagger-ui-express'),
   yaml = require('yamljs'),
-  db = require('./api/helpers/db'),
-  nodeCleanup = require('node-cleanup'),
-  async = require('async')
+  db = require('./model/service_db'),
+  nodeCleanup = require('node-cleanup')
+  // , async = require('async')
   // , User = new (require('./models/User.js'))(connection)
   ;
 
@@ -16,7 +17,9 @@ db.init();
 const swaggerDocument = yaml.load('api/swagger/swagger.yaml');
 const showSwaggerExplorer = true;
 
-// init swagger ui
+/*
+ * init swagger ui
+ */
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, showSwaggerExplorer));
 
 // module.exports = app; // for testing
@@ -25,7 +28,9 @@ const config = {
   appRoot: __dirname // required config
 };
 
-// start api with swagger-express
+/*
+ * start api with swagger-express
+ */
 SwaggerExpress.create(config, function(err, swaggerExpress) {
   if (err) { throw err; }
   // install middleware

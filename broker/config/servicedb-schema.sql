@@ -5,7 +5,7 @@
 --   show tables: .tables
 --   show schema: .schema
 
--- Note: rowid is implicitly accessible, e.g. "select rowid,* from users"
+-- Note: rowid is implicitly accessible, e.g. "select rowid,* from services"
 
 -- services and their endpoints
 create table if not exists services (
@@ -23,12 +23,4 @@ create table if not exists endpoints (
   requireslogin boolean default false,
   lastcalled integer not null default -1,
   primary key(service, name)
-);
-
--- user
-create table if not exists users (
-  name text primary key not null,
-  password text,
-  lastlogin integer,
-  registeredsince integer
 );

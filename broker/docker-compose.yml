@@ -1,26 +1,27 @@
-
+######
 ##
 # 1) start: docker-compose up -d
 # 2) attach: docker attach autolinksbrokerdev
 # 3) detach: detach with <CTRL-p> <CTRL-q>
 # 4) stop: docker-compose down
 ##
+######
 version: '2.3'
 
 networks:
-  alnet:
+  anet:
 
 services:
   frontendserver:
-    image: node:8.7.0
+    image: node:9.2
     container_name: autolinksbrokerdev
     volumes:
-      - ${PWD}:/usr/src/app
+      - ${PWD}:/opt/project
     ports:
       - 10010:10010
       - 3001:3001
     networks:
-      - alnet
+      - anet
     stdin_open: true
     tty: true
     working_dir: /usr/src/app

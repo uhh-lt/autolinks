@@ -1,9 +1,9 @@
 'use strict';
 
 const util = require('util')
-  , db = require('../helpers/db')
-  , mx = require('../helpers/maintenance')
-  , async = require('async')
+  , db = require('../../model/service_db')
+  , mx = require('../../model/service_utils')
+  // , async = require('async')
   ;
 
 module.exports = {

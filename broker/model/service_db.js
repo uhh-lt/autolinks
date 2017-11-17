@@ -21,7 +21,7 @@ const fs = require('fs')
 	;
 
 // init database connection
-let dbconn = new sqlite3.Database(`${__dirname}/broker.db`, (err) => {
+let dbconn = new sqlite3.Database(`${__dirname}/service.db`, (err) => {
   if (err) {
     console.error(err.message);
   }
@@ -39,7 +39,7 @@ nodeCleanup(function (exitCode, signal) {
 // init db with schema
 function initdb() {
   // init db schema
-  fs.readFile('config/schema.sql', 'utf8', function (err,data) {
+  fs.readFile('config/servicedb-schema.sql', 'utf8', function (err,data) {
     if (err) {
       console.log(err);
       return;
