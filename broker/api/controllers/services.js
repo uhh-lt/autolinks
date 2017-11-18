@@ -3,12 +3,13 @@
 const util = require('util')
   , service_db = require('../../controller/service_db')
   , service_utils = require('../../controller/service_utils')
-  , logger = require('../../controller/log')
+  , logger = require('../../controller/log')(module)
   // , async = require('async')
   ;
 
 module.exports = {
   register_service: register_service,
+  deregister_service: deregister_service,
   list_services: list_services,
   ping_services: ping_services,
   ping_service: ping_service
@@ -22,12 +23,12 @@ function register_service(req, res) {
   // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
   const service = req.swagger.params.service.value;
 
-
   const err = service_db.add_service(
     service.name,
     service.location,
     service.description,
-    service.endpoints);
+    service.endpoints
+  );
 
   if(err) {
     logger.warn(`adding service ${service.name} failed.`, service, err, {} );
@@ -41,14 +42,43 @@ function register_service(req, res) {
 
 }
 
-function ping_service(req, res) {
-  service_utils.ping_service(req.swagger.params.service.value);
+function deregister_service (req, res) {
+  const service = req.swagger.params.service.value;
+  const err = service_db.delete_service(service.name);
+  if(err){
+    logger.warn(`De-register service ${service.name} failed.`, service, err, {} );
+    res.status(500);
+    res.write(JSON.stringify({ message: err.message, fields: { service: service, error: err } }));
+  } else {
+    logger.info(`removed service ${service.name}.`, service);
+  }
   res.end();
 }
 
+function ping_service(req, res) {
+  const service = req.swagger.params.service.value;
+  const err = service_utils.ping_service(service);
+  if(err){
+    logger.warn(`ping service ${service.name} failed.`, service, err, {} );
+    res.status(500);
+    res.write(JSON.stringify({ message: err.message, fields: { service: service, error: err } }));
+  }
+  res.end();
+}
+
+
 function ping_services(req, res) {
   // get all services and apply ping_service as callback for each of the services
-  service_db.get_services(service_utils.ping_service, () => res.end());
+
+  const err = service_db.get_services(service_utils.ping_service, () => res.end());
+
+  if(err){
+    logger.warn('ping all services failed.', err, {} );
+    res.status(500);
+    res.write(JSON.stringify({ message: err.message, fields: { error: err } }));
+    res.end();
+  }
+
 }
 
 function list_services(req, res, next) {

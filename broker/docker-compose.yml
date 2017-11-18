@@ -24,10 +24,9 @@ services:
       - anet
     stdin_open: true
     tty: true
-    working_dir: /usr/src/app
+    working_dir: /opt/project
     entrypoint: bash
     environment:
       - NODE_ENV=development
       - COOKIE_SECRET=YOUR_COOKIE_SECRET
-    mem_limit: 1g
-    memswap_limit: 1g
+      - LOGLEVEL=debug

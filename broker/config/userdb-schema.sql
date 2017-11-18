@@ -8,9 +8,11 @@
 -- Note: rowid is implicitly accessible, e.g. "select rowid,* from users"
 
 -- user
+-- insert or replace into users(name, password) values ('john','doe');
 create table if not exists users (
   name text primary key not null,
   password text,
-  lastlogin integer,
-  registeredsince integer
+  active boolean default true,
+  registeredsince integer not null default -1,
+  lastseenactive integer not null default -1
 );

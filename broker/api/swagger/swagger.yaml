@@ -54,6 +54,22 @@ definitions:
       requireslogin:
         type: boolean
         description: does the service require a user to be logged in?
+        
+  User:
+    type: object
+    properties:
+      name:
+        type: string
+        description: the name of the user
+      password:
+        type: string
+        description: the password of the user
+      lastseen:
+        type: integer
+        description: the point in time when the user was last seen, i.e. the time of the last login
+      registeredsince:
+        type: integer
+        description: the point in time when the user registered
 
   Error:
     type: object
@@ -62,25 +78,61 @@ definitions:
         type: string
       fields:
         type: string
+        
+securityDefinitions:
+#  broker_auth:
+#    type: "oauth2"
+#    authorizationUrl: "/oauth/dialog"
+#    flow: "implicit"
+#    scopes:
+#      write:data: "modify data in your account"
+#      read:data: "read your data"
+  # api_key:
+  #   type: "apiKey"
+  #   name: "api_key"
+  #   in: "header"
+  broker_auth:
+    type: "basic"
 
 tags:
   - name: Service
     description: Everything about connected services
+  - name: User
+    description: Everything about a user
 
 paths:
+  /userinfo:
+    x-swagger-router-controller: users
+    get:
+      tags:
+        - User
+      description: Get info about currently logged in user
+      # used as the method name of the controller
+      operationId: get_user_info
+      security:
+        - broker_auth: []
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/User"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+
   /registerService:
     # tell nodejs where to find the code for this path
     x-swagger-router-controller: services
     post:
+      operationId: register_service
       tags:
         - Service
       description: Register a service
-      # used as the method name of the controller
-      operationId: register_service
       parameters:
         - name: service
           in: body
-          description: The service which wants to be added
+          description: The service to be added
           schema:
             $ref: "#/definitions/Service"
       responses:
@@ -88,6 +140,30 @@ paths:
           description: Success
           schema:
             type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+            
+  /deregisterService:
+    x-swagger-router-controller: services
+    post:
+      operationId: deregister_service
+      tags:
+        - Service
+      description: De-register a service, i.e. delete it from the broker
+      parameters:
+        - name: service
+          in: body
+          description: The name of the of the service to delete
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+      responses:
+        200:
+          description: Success
         default:
           description: Error
           schema:
@@ -116,11 +192,10 @@ paths:
   /pingServices:
     x-swagger-router-controller: services
     get:
+      operationId: ping_services
       tags:
         - Service
       description: Ping registered services
-      # used as the method name of the controller
-      operationId: ping_services
       responses:
         200:
           description: Success
@@ -130,11 +205,10 @@ paths:
   /pingService:
     x-swagger-router-controller: services
     post:
+      operationId: ping_service
       tags:
         - Service
       description: Ping registered service
-      # used as the method name of the controller
-      operationId: ping_service
       parameters:
         - name: service
           in: body

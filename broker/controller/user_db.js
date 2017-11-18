@@ -49,29 +49,68 @@ function initdb() {
 };
 
 // add user to db
-function add_user(name, location, description, endpoints) {
-  return;
+function add_user(name, password) {
+  const now = new Date().getTime();
+  // add user
+  dbconn.run('insert or replace into users(name, password, lastseen, registeredsince) values(?,?,?,?)', [name, password, now, now], function(err) {
+    if (err) {
+      return err;
+    }
+  });
 }
 
 
 // update a user in the database, set key-value pairs from the user obj
-function update_user(name, serviceobj){
-  return;
+function update_user(name, userobj){
+  // prepare sql statement and values
+  const keys = [];
+  const vals = [];
+  Object.keys(userobj)
+    .filter( key => !Array.isArray(userobj[key]))
+    .forEach( key => {
+      keys.push(`${key} = ?`);
+      vals.push(userobj[key]);
+    });
+  const sql = `update users set ${keys.join(', ')} where name = ?`;
+  vals.push(name);
+
+  //run sql statement
+  dbconn.run(sql, vals, function(err) {
+    if (err) {
+      return err;
+    }
+  });
 }
 
 
 // get a user from the database
-function get_user(name, callback){
-  return;
+/**
+ *
+ * @param name username
+ * @param next function(err, row)
+ */
+function get_user(name, next){
+  //run sql statement
+  dbconn.get('select * from users where name = ?', [name], next);
 }
 
 // delete a service from the database
 function delete_user(name){
-  return;
+  // delete user
+  dbconn.run('delete from users where name = ?', [name], function(err) {
+    if (err) {
+      return err;
+    }
+  });
 }
 
-// get all registered services
+// get all registered users
 function get_users(callback_service, callback_done) {
-  return;
+  dbconn.each('select * from users;', [], function(err, service) {
+    if (err) {
+      return err;
+    }
+    callback_service(service);
+  }, () => { return callback_done() } );
 }
 

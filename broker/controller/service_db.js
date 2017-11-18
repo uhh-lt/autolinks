@@ -128,6 +128,9 @@ function get_service(name, callback){
     if (err) {
       return err;
     }
+    if(!row) {
+      return new Error(`Service ${name} not found.`);
+    }
     return callback(row);
   });
 }
@@ -154,7 +157,7 @@ function get_services(callback_service, callback_done) {
     if (err) {
       return err;
     }
-    return callback_service(service);
+    callback_service(service);
   }, () => { return callback_done() } );
 }
 //select s.name, s.location, e.name from services as s join endpoints as e on (s.name=e.service) where s.rowid=4;
