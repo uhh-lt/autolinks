@@ -25,8 +25,17 @@ passport.serializeUser(function(user, done) {
 
 // used to deserialize the user
 passport.deserializeUser(function(username, done) {
-  user_db.get_user(name, done);
-  // user_db.get_user(name, (err, user) => done(err, user) );
+  user_db.get_user(name, (err, user) => {
+    if(err){
+      logger.error('Could not get user.', err, {});
+      return done(err, null);
+    }
+    if(!user){
+      logger.error(`User ${username} not found.`, err, {});
+      return done(err, null);
+    }
+    return done(null, user);
+  } );
 });
 
 function verifyUser(username, password, done){
@@ -72,7 +81,7 @@ function authenticated_request(strategy, req, res, next) {
       return next(err, null);
     }
     if (!user) {
-      logger.debug('No user provided.', {info: info, error: err}, {});
+      logger.debug('Unknown user or wrong password.', {info: info, error: err}, {});
       return next(new Error('Authentication required!'), null);
     }
     req.logIn(user, function(err) {
