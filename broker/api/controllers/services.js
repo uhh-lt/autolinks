@@ -30,6 +30,7 @@ function register_service(req, res) {
     service.endpoints
   );
 
+  res.header('Content-Type', 'application/json; charset=utf-8');
   if(err) {
     logger.warn(`adding service ${service.name} failed.`, service, err, {} );
     res.status(500);
@@ -37,7 +38,6 @@ function register_service(req, res) {
   } else {
     logger.info(`added service ${service.name}.`, service);
   }
-
   res.end();
 
 }
@@ -45,6 +45,7 @@ function register_service(req, res) {
 function deregister_service (req, res) {
   const service = req.swagger.params.service.value;
   const err = service_db.delete_service(service.name);
+  res.header('Content-Type', 'application/json; charset=utf-8');
   if(err){
     logger.warn(`De-register service ${service.name} failed.`, service, err, {} );
     res.status(500);
@@ -58,6 +59,7 @@ function deregister_service (req, res) {
 function ping_service(req, res) {
   const service = req.swagger.params.service.value;
   const err = service_utils.ping_service(service);
+  res.header('Content-Type', 'application/json; charset=utf-8');
   if(err){
     logger.warn(`ping service ${service.name} failed.`, service, err, {} );
     res.status(500);
@@ -71,17 +73,18 @@ function ping_services(req, res) {
   // get all services and apply ping_service as callback for each of the services
 
   const err = service_db.get_services(service_utils.ping_service, () => res.end());
-
+  res.header('Content-Type', 'application/json; charset=utf-8');
   if(err){
     logger.warn('ping all services failed.', err, {} );
     res.status(500);
     res.write(JSON.stringify({ message: err.message, fields: { error: err } }));
-    res.end();
   }
+  res.end();
 
 }
 
 function list_services(req, res) {
+  res.header('Content-Type', 'application/json; charset=utf-8');
   res.write('[');
   let startedwriting = false;
   service_db.get_services(
@@ -91,8 +94,7 @@ function list_services(req, res) {
       startedwriting = true;
     },
     () => {
-      res.write(']');
-      res.end();
+      res.end(']');
     }
   );
 }

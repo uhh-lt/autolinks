@@ -10,17 +10,18 @@ module.exports = {
 
 
 function get_user_info(req, res) {
-  auth.authenticated_request(
-    'basic',
-    req,
-    res,
-    function(err, user) {
-      res.header('Content-Type', 'application/json');
-      if(err){
-        res.status(401);
-        return res.end(JSON.stringify({ message: err.message, fields: { error: err } }));
+  auth.authenticated_request({
+      strategy: 'basic',
+      req: req,
+      res: res,
+      next: function (err, user) {
+        res.header('Content-Type', 'application/json; charset=utf-8');
+        if (err) {
+          res.status(401);
+          return res.end(JSON.stringify({message: err.message, fields: {error: err}}));
+        }
+        res.end(JSON.stringify(user));
       }
-      res.end(JSON.stringify(user));
     }
   );
 }

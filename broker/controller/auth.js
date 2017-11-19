@@ -45,11 +45,13 @@ function verifyUser(username, password, done){
       return done(err, null);
     }
     if (!user) {
-      return done(new Error('Incorrect username.'), false);
+      return done(new Error('Unknown username.'), false);
     }
     if (user.password !== password) {
+      // TODO: check if user active
       return done(new Error('Incorrect password.'), false);
     }
+    // TODO: update user (lastseen)
     return done(null, user);
   });
 }
@@ -74,14 +76,14 @@ function init(app){
  * @param res
  * @param next
  */
-function authenticate_request(strategy, req, res, next) {
+function authenticate_request( { strategy, req, res, next } ) {
   passport.authenticate(strategy ? strategy : 'local', function(err, user, info) {
     if (err) {
       logger.warn('Authentication failed.', {user: user, info: info, error: err}, {});
       return next(err, null);
     }
     if (!user) {
-      logger.debug('Unknown user.', {info: info, error: err}, {});
+      logger.debug('Unauthenticated access attempt.', {info: info, error: err}, {});
       return next(new Error(`Authentication required!`), null);
     }
     req.logIn(user, function(err) {
