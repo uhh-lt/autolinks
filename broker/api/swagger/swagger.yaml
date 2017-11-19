@@ -54,7 +54,7 @@ definitions:
       requireslogin:
         type: boolean
         description: does the service require a user to be logged in?
-        
+
   User:
     type: object
     properties:
@@ -64,12 +64,15 @@ definitions:
       password:
         type: string
         description: the password of the user
-      lastseen:
-        type: integer
-        description: the point in time when the user was last seen, i.e. the time of the last login
+      active:
+        type: boolean
+        description: is the user activated or deactivated
       registeredsince:
         type: integer
         description: the point in time when the user registered
+      lastseenactive:
+        type: integer
+        description: the point in time when the user was last seen, i.e. the time of the last login
 
   Error:
     type: object

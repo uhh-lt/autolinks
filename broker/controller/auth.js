@@ -4,7 +4,7 @@
 // exports
 module.exports = {
   init: init,
-  authenticated_request: authenticated_request
+  authenticated_request: authenticate_request
 };
 
 
@@ -42,13 +42,13 @@ function verifyUser(username, password, done){
   user_db.get_user(username, function(err, user){
     if (err) {
       logger.warn(`Error while retrieving user ${username}.`, {error: err}, {});
-      return done(err);
+      return done(err, null);
     }
     if (!user) {
-      return done(null, false, { message: 'Incorrect username.' });
+      return done(new Error('Incorrect username.'), false);
     }
     if (user.password !== password) {
-      return done(null, false, { message: 'Incorrect password.' });
+      return done(new Error('Incorrect password.'), false);
     }
     return done(null, user);
   });
@@ -74,22 +74,22 @@ function init(app){
  * @param res
  * @param next
  */
-function authenticated_request(strategy, req, res, next) {
+function authenticate_request(strategy, req, res, next) {
   passport.authenticate(strategy ? strategy : 'local', function(err, user, info) {
     if (err) {
       logger.warn('Authentication failed.', {user: user, info: info, error: err}, {});
       return next(err, null);
     }
     if (!user) {
-      logger.debug('Unknown user or wrong password.', {info: info, error: err}, {});
-      return next(new Error('Authentication required!'), null);
+      logger.debug('Unknown user.', {info: info, error: err}, {});
+      return next(new Error(`Authentication required!`), null);
     }
     req.logIn(user, function(err) {
       if (err) {
         logger.debug(`Authentication failed for user ${user.name}.`, {user: user, info: info, error: err}, {});
         return next(err, null);
       }
-      logger.debug(`Access granted ${user.name}.`, {user: user, error: err}, {});
+      logger.debug(`Access granted ${user.name}.`, { user: user, info: info } );
       return next(null, user);
     });
   })(req, res, next);

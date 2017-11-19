@@ -81,7 +81,7 @@ function ping_services(req, res) {
 
 }
 
-function list_services(req, res, next) {
+function list_services(req, res) {
   res.write('[');
   let startedwriting = false;
   service_db.get_services(

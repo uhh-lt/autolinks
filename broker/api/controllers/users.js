@@ -9,18 +9,18 @@ module.exports = {
 };
 
 
-function get_user_info(req, res, next) {
+function get_user_info(req, res) {
   auth.authenticated_request(
     'basic',
     req,
     res,
     function(err, user) {
+      res.header('Content-Type', 'application/json');
       if(err){
         res.status(401);
-        res.write(JSON.stringify({ message: err.message, fields: { error: err } }));
+        return res.end(JSON.stringify({ message: err.message, fields: { error: err } }));
       }
-      res.write(JSON.stringify(user));
-      res.end();
+      res.end(JSON.stringify(user));
     }
   );
 }
