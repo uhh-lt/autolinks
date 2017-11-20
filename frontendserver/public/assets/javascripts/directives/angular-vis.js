@@ -54,7 +54,9 @@ define([
                         'initRedraw',
                         'beforeDrawing',
                         'afterDrawing',
-                        'animationFinished'
+                        'animationFinished',
+                        'clearPopUp',
+                        'cancelEdit'
                     ];
 
                     var network = null;
@@ -71,8 +73,67 @@ define([
                             network.destroy();
                         }
 
+                        var manipulation = {
+                          manipulation: {
+                            addNode: function (data, callback) {
+                              // filling in the popup DOM elements
+                              document.getElementById('operation').innerHTML = "Add Node";
+                              document.getElementById('node-id').value = data.id;
+                              document.getElementById('node-label').value = data.label;
+                              debugger;
+                              // document.getElementById('saveButton').onclick = saveData.bind(this, data, callback);
+                              document.getElementById('cancelButton').onclick = clearPopUp();
+                              document.getElementById('network-popUp').style.display = 'block';
+                            },
+                            editNode: function (data, callback) {
+                              // filling in the popup DOM elements
+                              document.getElementById('operation').innerHTML = "Edit Node";
+                              document.getElementById('node-id').value = data.id;
+                              document.getElementById('node-label').value = data.label;
+                              document.getElementById('saveButton').onclick = saveData.bind(this, data, callback);
+                              document.getElementById('cancelButton').onclick = cancelEdit.bind(this,callback);
+                              document.getElementById('network-popUp').style.display = 'block';
+                            },
+                            addEdge: function (data, callback) {
+                              if (data.from == data.to) {
+                                var r = confirm("Do you want to connect the node to itself?");
+                                if (r == true) {
+                                  callback(data);
+                                }
+                              }
+                              else {
+                                callback(data);
+                              }
+                            }
+                          }
+                        }
+
+                        var options = {
+                          options: scope.options,
+                        }
+                        debugger;
                         // Create the graph2d object
-                        network = new vis.Network(element[0], scope.data, scope.options);
+                        network = new vis.Network(element[0], scope.data, options);
+
+                        function clearPopUp() {
+                          debugger;
+                          document.getElementById('saveButton').onclick = null;
+                          document.getElementById('cancelButton').onclick = null;
+                          document.getElementById('network-popUp').style.display = 'none';
+                        }
+
+                        function cancelEdit(callback) {
+                          clearPopUp();
+                          callback(null);
+                        }
+
+                        function saveData(data,callback) {
+                          data.id = document.getElementById('node-id').value;
+                          data.label = document.getElementById('node-label').value;
+                          clearPopUp();
+                          callback(data);
+                        }
+
 
                         // Attach an event handler if defined
                         angular.forEach(scope.events, function (callback, event) {

@@ -37,7 +37,8 @@ define([
                 "selectNode": selectNodeEvent,
                 "dragging": dragEvent,
                 "hoverEdge": hoverEdge,
-                "hoverNode": hoverNode
+                "hoverNode": hoverNode,
+                "clearPopUp": clearPopUp
                 // "blurNode": blurNode
             };
 
@@ -191,6 +192,12 @@ define([
 
             function clickEvent(event) {
               // debugger;
+            }
+
+            function clearPopUp() {
+              document.getElementById('saveButton').onclick = null;
+              document.getElementById('cancelButton').onclick = null;
+              document.getElementById('network-popUp').style.display = 'none';
             }
 
             function hoverNode(event) {
