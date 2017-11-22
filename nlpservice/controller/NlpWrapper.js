@@ -1,13 +1,6 @@
 'use strict';
 
-const logger = require('./log')
-  , stupidNER = require('./nlp-components/StupidNER')
-  , corenlp = require('./nlp-components/CoreNLP')({
-
-  })
-  , germaner = require('./nlp-components/GermaNER')({
-
-  })
+const logger = require('./log')(module)
 // , async = require('async')
   ;
 
@@ -16,19 +9,24 @@ module.exports = {
   analyze : analyze
 }
 
-const explicitNLP = () => {
-  switch(process.env.NER){
+const explicitNLP = (() => {
+  switch (process.env.NER) {
     case 'corenlp':
       logger.info('Using CoreNLP');
-      return corenlp;
+      return require('./nlp-components/CoreNLP')({
+
+      });
     case 'germaner':
       logger.info('Using GermaNER');
-      return germaner;
+      return require('./nlp-components/GermaNER')({
+
+      });
     case 'stupid':
     default:
       logger.info('Using StupidNER');
-      return stupidNER;
-}();
+      return require('./nlp-components/StupidNER');
+  }
+})();
 
 
 /**
@@ -37,7 +35,7 @@ const explicitNLP = () => {
  * @param callbackIter = function(err, entities)
  * @param callbackDone = function(err)
  */
-function analyze(params) {
-  return explicitNLP(params);
+function analyze(document, callbackStart, callbackIter, callbackDone) {
+  return explicitNLP.analyze(document, callbackStart, callbackIter, callbackDone);
 }
 

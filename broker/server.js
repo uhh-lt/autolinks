@@ -52,29 +52,9 @@ const config = {
 
     broker_auth: function (req, authOrSecDef, scopesOrApiKey, next) {
       logger.info('auth:' + req.headers.authorization);
-      // const prefix = 'Basic ';
-      // if (req.headers.authorization && req.headers.authorization.startsWith(prefix)) {
-      //   const b64string = req.headers.authorization.substr(prefix.length);
-      //   const user_pass = Buffer.from(b64string, 'base64').toString();
-      // }
-      // // put your validation somewhere here
-      // auth.authenticated_request( {
-      //   strategy: 'basic',
-      //   req : req,
-      //   res: res,
-      //   next: function(err, user) {
-      //     if(err){
-      //       logger.error('mad world');
-      //       // 403 is the default error code, feel free to override with, e.g 401
-      //       next({code: 'Custom_application_error_code', statusCode: 401});
-      //       return;
-      //     }
-      //     logger.info('hello world');
-      //   }
-      // });
       next(null);
-
     }
+
   }
 };
 

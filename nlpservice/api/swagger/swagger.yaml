@@ -3,6 +3,10 @@ info:
   version: '0.0.1'
   title: Autolinks NLP Service
 
+# where to find the service
+# host: nlpservice:10010
+# basePath: /
+
 consumes:
   - application/json
 produces:
@@ -24,12 +28,15 @@ definitions:
   NamedEntity:
     type: object
     properties:
+      text:
+        type: string
       type:
         type: string
       offset:
         $ref: "#/definitions/Offset"
-      text:
+      analyzer:
         type: string
+
 
   Offset:
     type: object
@@ -73,7 +80,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: "#/definitions/NamedEntities"
+              $ref: "#/definitions/NamedEntity"
         default:
           description: Error
           schema:

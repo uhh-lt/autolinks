@@ -19,7 +19,7 @@ module.exports = function(){
   function analyze(document, callbackStart, callbackIter, callbackDone) {
 
   // function parse(data){
-    
+
     var properties = {};
 
     if(arguments.length == 3)

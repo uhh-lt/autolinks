@@ -12,14 +12,14 @@ networks:
   anet:
 
 services:
-  frontendserver:
+  nplservice:
     image: node:9.2
     container_name: nlpservicedev
     volumes:
       - ${PWD}:/opt/project
     ports:
-      - 10010:10010
-      - 3001:3001
+      - 10012:10010
+      - 3002:3001
     networks:
       - anet
     stdin_open: true
