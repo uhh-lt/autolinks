@@ -1,0 +1,86 @@
+######
+##
+# 1) start: docker-compose up -d
+# 2) attach: docker attach ...
+# 3) detach: detach with <CTRL-p> <CTRL-q>
+# 4) stop: docker-compose down
+##
+######
+version: '2.3'
+
+networks:
+  anet:
+
+services:
+
+  frontend:
+    image: node:9.2
+    volumes:
+      - ${PWD}/frontendserver:/opt/project
+    ports:
+      - 10010:10010
+      - 3000:3001
+    networks:
+      - anet
+    stdin_open: true
+    tty: true
+    working_dir: /opt/project
+    entrypoint: bash
+    environment:
+      - NODE_ENV=development
+      - COOKIE_SECRET=YOUR_COOKIE_SECRET
+      - LOGLEVEL=debug
+
+  broker:
+    image: node:9.2
+    volumes:
+      - ${PWD}/broker:/opt/project
+    ports:
+      - 10011:10010
+      - 3001:3001
+    networks:
+      - anet
+    stdin_open: true
+    tty: true
+    working_dir: /opt/project
+    entrypoint: bash
+    environment:
+      - NODE_ENV=development
+      - COOKIE_SECRET=YOUR_COOKIE_SECRET
+      - LOGLEVEL=debug
+
+  userdata:
+    image: node:9.2
+    volumes:
+      - ${PWD}/userdataservice:/opt/project
+    ports:
+      - 10012:10010
+      - 3002:3001
+    networks:
+      - anet
+    stdin_open: true
+    tty: true
+    working_dir: /opt/project
+    entrypoint: bash
+    environment:
+      - NODE_ENV=development
+      - COOKIE_SECRET=YOUR_COOKIE_SECRET
+      - LOGLEVEL=debug
+
+  nlp:
+    image: node:9.2
+    volumes:
+      - ${PWD}/nlpservice:/opt/project
+    ports:
+      - 10013:10010
+      - 3003:3001
+    networks:
+      - anet
+    stdin_open: true
+    tty: true
+    working_dir: /opt/project
+    entrypoint: bash
+    environment:
+      - NODE_ENV=development
+      - COOKIE_SECRET=YOUR_COOKIE_SECRET
+      - LOGLEVEL=debug
