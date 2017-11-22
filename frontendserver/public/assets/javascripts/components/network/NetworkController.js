@@ -39,6 +39,8 @@ define([
                 "hoverEdge": hoverEdge,
                 "hoverNode": hoverNode,
                 "clearPopUp": clearPopUp
+                // "afterDrawing": afterDrawing,
+                // "beforeDrawing": beforeDrawing
                 // "blurNode": blurNode
             };
 
@@ -57,8 +59,6 @@ define([
 
             $scope.resultNodes = [];
             $scope.resultRelations = [];
-
-            // var url=[];
 
             // Context menu for single node selection
             self.singleNodeMenu = [
@@ -158,9 +158,9 @@ define([
                 $scope.resultNodes = response.data.entities.map(function(n) {
                     var result = {};
                     if (n.image) {
-                      result = { id: n.id, label: n.label, widthConstraint: { maximum: 170 }, desc: n.desc, image: n.image, shape: 'image' };
+                      result = { id: n.id, label: n.label, widthConstraint: { maximum: 170 }, desc: n.desc, image: n.image, shape: 'image', cid: (n.cid ? n.cid : null) };
                     } else {
-                      result = { id: n.id, label: n.label, widthConstraint: { maximum: 170 }};
+                      result = { id: n.id, label: n.label, widthConstraint: { maximum: 170 }, cid: (n.cid ? n.cid : null)};
                     }
                     return result;
                 });
@@ -171,7 +171,7 @@ define([
                 self.nodes.clear();
 
                 $scope.resultRelations = response.data.relations.map(function(n) {
-                    return { from: n.from, to: n.to, label: n.label };
+                    return { from: n.from, to: n.to, arrows: n.arrows, label: n.label };
                 });
 
                 self.edges.clear();
@@ -183,6 +183,7 @@ define([
                     nodes: self.nodesDataset,
                     edges: self.edgesDataset
                 };
+
                 return promise.promise;
             };
 
@@ -240,6 +241,26 @@ define([
             imageObj.src = 'http://www.rd.com/wp-content/uploads/sites/2/2016/02/03-train-cat-come-on-command.jpg';
 
 
+            function afterDrawing(ctx) {
+              initSizes('html-node-1', 1);
+              initSizes('html-node-2', 2);
+              initSizes('html-node-3', 3);
+              initSizes('html-node-4', 4);
+              initSizes('html-node-5', 5);
+
+              placeOverlay('html-node-1', 1);
+              placeOverlay('html-node-2', 2);
+              placeOverlay('html-node-3', 3);
+              placeOverlay('html-node-4', 4);
+              placeOverlay('html-node-5', 5);
+            }
+
+            function beforeDrawing(ctx) {
+              var nodeId = '8';
+              var nodePosition = network.getPositions([nodeId]);
+
+              ctx.drawImage(imageObj, nodePosition[nodeId].x - 20, nodePosition[nodeId].y - 20, 40, 40);
+            }
             // network.on("afterDrawing", function (ctx) {
             //   initSizes('html-node-1', 1);
             //   initSizes('html-node-2', 2);
@@ -263,23 +284,23 @@ define([
             //
             // });
 
-            // function clusterByCid() {
-            //     network.setData(scope.data);
-            //     // debugger;
-            //     var clusterOptionsByData = {
-            //         joinCondition:function(childOptions) {
-            //           if (childOptions.cid) {
-            //             debugger;
-            //             document.getElementById('html-node-' + childOptions.id).style.opacity = 0;
-            //           }
-            //           return childOptions.cid == 1;
-            //         },
-            //         clusterNodeProperties: {id:'cidCluster', borderWidth:3, shape:'database'}
-            //     };
-            //     network.cluster(clusterOptionsByData);
-            // }
+            function clusterByCid() {
+                // data = {}
+                self.network.setData($scope.graphData);
+                var clusterOptionsByData = {
+                    joinCondition:function(childOptions) {
+                      if (childOptions.cid == 1) {
+                        debugger;
+                        // document.getElementById('html-node-' + childOptions.id).style.opacity = 0;
+                      }
+                      return childOptions.cid == 1;
+                    },
+                    clusterNodeProperties: {id:'cidCluster', borderWidth:3, shape:'database'}
+                };
+                self.network.cluster(clusterOptionsByData);
+            }
 
-            // clusterByCid();
+
 
             // network.on('click', function (params) {
             //   // debugger;
@@ -321,12 +342,14 @@ define([
 
             function init() {
                 $scope.reloadGraph();
+                //
             }
             // Init the network modulegit
             init();
 
             function onNetworkLoad(network) {
                 self.network = network;
+                clusterByCid();
             }
 
             function clickEvent(event) {
@@ -350,6 +373,7 @@ define([
             function onContext(params) {
                 params.event.preventDefault();
                 closeContextMenu();
+                debugger;
 
                 var position = { x: params.pointer.DOM.x, y: params.pointer.DOM.y };
 

@@ -111,9 +111,9 @@ define([
                         var options = {
                           options: scope.options,
                         }
-                        debugger;
+
                         // Create the graph2d object
-                        network = new vis.Network(element[0], scope.data, options);
+                        network = new vis.Network(element[0], scope.data, scope.options);
 
                         function clearPopUp() {
                           debugger;

@@ -56,10 +56,10 @@ define([
                 //     // improvedLayout: true,
                 //     hierarchical: {
                 //       levelSeparation: 250,
-                //       // layout: "hubsize",
-                //       // enabled: true,
-                //       // sortMethod: 'directed',
-                //       // direction: 'LR'
+                //       layout: "hubsize",
+                //       enabled: true,
+                //       sortMethod: 'directed',
+                //       direction: 'LR'
                 //     }
                 //
                 // },

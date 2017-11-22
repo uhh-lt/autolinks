@@ -18,7 +18,6 @@ define([
           }
 
           $rootScope.$on('sidenavReinit', function (event, args) {
-            debugger;
             $scope.init();
             console.log('sidenavReinit');
           });
