@@ -3,10 +3,6 @@ info:
   version: '0.0.1'
   title: Autolinks NLP Service
 
-# where to find the service
-# host: nlpservice:10010
-# basePath: /
-
 consumes:
   - application/json
 produces:
