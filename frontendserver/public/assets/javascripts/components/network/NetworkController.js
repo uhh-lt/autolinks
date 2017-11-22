@@ -15,7 +15,6 @@ define([
          function ($scope, $q, $timeout, $compile, $mdDialog, VisDataSet, _, graphProperties, EntityService, $mdSidenav) {
 
             var self = this;
-
             /* Background collection */
             self.nodes = new VisDataSet([]);
             self.edges = new VisDataSet([]);
@@ -191,7 +190,7 @@ define([
               // debugger;
             }
 
-            function clickEvent(event) {
+            function clickEvent(event, params) {
               // debugger;
             }
 
@@ -240,27 +239,28 @@ define([
             var imageObj = new Image();
             imageObj.src = 'http://www.rd.com/wp-content/uploads/sites/2/2016/02/03-train-cat-come-on-command.jpg';
 
+            // ========== HTML Nodes after Drawing ============
 
-            function afterDrawing(ctx) {
-              initSizes('html-node-1', 1);
-              initSizes('html-node-2', 2);
-              initSizes('html-node-3', 3);
-              initSizes('html-node-4', 4);
-              initSizes('html-node-5', 5);
-
-              placeOverlay('html-node-1', 1);
-              placeOverlay('html-node-2', 2);
-              placeOverlay('html-node-3', 3);
-              placeOverlay('html-node-4', 4);
-              placeOverlay('html-node-5', 5);
-            }
-
-            function beforeDrawing(ctx) {
-              var nodeId = '8';
-              var nodePosition = network.getPositions([nodeId]);
-
-              ctx.drawImage(imageObj, nodePosition[nodeId].x - 20, nodePosition[nodeId].y - 20, 40, 40);
-            }
+            // function afterDrawing(ctx) {
+            //   initSizes('html-node-1', 1);
+            //   initSizes('html-node-2', 2);
+            //   initSizes('html-node-3', 3);
+            //   initSizes('html-node-4', 4);
+            //   initSizes('html-node-5', 5);
+            //
+            //   placeOverlay('html-node-1', 1);
+            //   placeOverlay('html-node-2', 2);
+            //   placeOverlay('html-node-3', 3);
+            //   placeOverlay('html-node-4', 4);
+            //   placeOverlay('html-node-5', 5);
+            // }
+            //
+            // function beforeDrawing(ctx) {
+            //   var nodeId = '8';
+            //   var nodePosition = network.getPositions([nodeId]);
+            //
+            //   ctx.drawImage(imageObj, nodePosition[nodeId].x - 20, nodePosition[nodeId].y - 20, 40, 40);
+            // }
             // network.on("afterDrawing", function (ctx) {
             //   initSizes('html-node-1', 1);
             //   initSizes('html-node-2', 2);
@@ -285,7 +285,6 @@ define([
             // });
 
             function clusterByCid() {
-                // data = {}
                 self.network.setData($scope.graphData);
                 var clusterOptionsByData = {
                     joinCondition:function(childOptions) {
@@ -299,25 +298,6 @@ define([
                 };
                 self.network.cluster(clusterOptionsByData);
             }
-
-
-
-            // network.on('click', function (params) {
-            //   // debugger;
-            //     if (params.nodes.length == 1) {
-            //         if (network.isCluster(params.nodes[0]) == true) {
-            //           debugger;
-            //             network.openCluster(params.nodes[0]);
-            //             document.getElementById('html-node-4').style.opacity = 100;
-            //         }
-            //     }
-            // });
-
-
-            // network.once('stabilized', function() {
-            //     var scaleOption = { scale : 2.0 };
-            //     network.moveTo(scaleOption);
-            // })
 
             $scope.toggleRight = buildToggler('right');
             $scope.isOpenRight = function(){
@@ -342,23 +322,32 @@ define([
 
             function init() {
                 $scope.reloadGraph();
-                //
             }
+
             // Init the network modulegit
             init();
 
             function onNetworkLoad(network) {
                 self.network = network;
                 clusterByCid();
+                self.network.once('stabilized', function() {
+                    var scaleOption = { scale : 2.0 };
+                    self.network.moveTo(scaleOption);
+                });
             }
 
             function clickEvent(event) {
               var node = self.nodesDataset.get(event.node);
-              // debugger;
               closeContextMenu();
             }
 
             function selectNodeEvent(event) {
+              if (event.nodes.length == 1) {
+                  if (self.network.isCluster(event.nodes[0]) == true) {
+                      self.network.openCluster(event.nodes[0]);
+                      // document.getElementById('html-node-4').style.opacity = 100;
+                  }
+              }
               document.getElementsByClassName('vis-tooltip')[0].style.opacity = 0;
               closeContextMenu();
               var node = self.nodesDataset.get(event.nodes[0]);
@@ -388,7 +377,7 @@ define([
                     showContextMenu(_.extend(position, { id: nodeIdOpt }), self.singleNodeMenu);
                 }
                 else {
-                    // Nop
+                    // Nope
                 }
             }
 
