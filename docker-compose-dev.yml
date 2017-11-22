@@ -32,7 +32,7 @@ services:
       - LOGLEVEL=debug
 
   broker:
-    image: node:9.2
+    image: remstef/node-swagger:9.2
     volumes:
       - ${PWD}/broker:/opt/project
     ports:
@@ -50,7 +50,7 @@ services:
       - LOGLEVEL=debug
 
   userdata:
-    image: node:9.2
+    image: remstef/node-swagger:9.2
     volumes:
       - ${PWD}/userdataservice:/opt/project
     ports:
@@ -68,7 +68,7 @@ services:
       - LOGLEVEL=debug
 
   nlp:
-    image: node:9.2
+    image: remstef/node-swagger:9.2
     volumes:
       - ${PWD}/nlpservice:/opt/project
     ports:
