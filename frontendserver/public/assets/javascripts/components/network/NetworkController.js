@@ -333,25 +333,27 @@ define([
 
             function reCluster(clusterId) {
                 self.network.setData($scope.graphData);
-                for (var i = 0; i < 39; i++) {
+                var cluster = $scope.nodesInOpenClusters[clusterId];
+                var nodesInCluster = cluster.nodes;
+                var cid = self.nodesDataset.get(nodesInCluster[0]).cid;
+
                   var clusterOptionsByData = {
-                      joinCondition:function(childOptions) {
-                        if (childOptions.cid == i && $scope.nodesInOpenClusters[clusterId].nodes) {
-                          var index = $scope.nodesInOpenClusters[clusterId].nodes.indexOf(childOptions.id);
-                          if ( index > -1 ) {
+                    joinCondition:function(childOptions) {
+                      if (nodesInCluster.includes(childOptions.id)) {
 
-                            $scope.nodesInOpenClusters[clusterId].nodes.splice(index, 1);
-                          }
+                        var index = nodesInCluster.indexOf(childOptions.id);
 
-                          console.log(clusterId + 'is reclustered');
-                          // document.getElementById('html-node-' + childOptions.id).style.opacity = 0;
+                        if ( index > -1 ) {
+                          nodesInCluster.splice(index, 1);
                         }
-                        return childOptions.cid == i;
-                      },
-                      clusterNodeProperties: {id:'cidCluster' + i, label: 'cluster: ' + i, borderWidth:3, shape:'database'}
-                  };
-                  self.network.cluster(clusterOptionsByData);
-              }
+                        console.log(clusterId + 'is reclustered');
+                        // document.getElementById('html-node-' + childOptions.id).style.opacity = 0;
+                      }
+                      return childOptions.cid === cid;
+                    },
+                    clusterNodeProperties: {id:clusterId, label: clusterId, borderWidth:3, shape:'database', color: 'rgba(80, 225, 223, 0.4)'}
+                };
+                self.network.cluster(clusterOptionsByData);
             };
 
             function clusterByCid() {
@@ -359,7 +361,7 @@ define([
                 for (var i = 0; i < 39; i++) {
                   var clusterOptionsByData = {
                       joinCondition:function(childOptions) {
-                        if (childOptions.cid == i && $scope.nodesInOpenClusters) {
+                        if (childOptions.cid == 1 && $scope.nodesInOpenClusters) {
                           // var index = $scope.nodesInOpenClusters.cidCluster1.indexOf(childOptions.id);
                           // if ( index > -1 ) {
                           //   $scope.nodesInOpenClusters.cidCluster1.splice(index, 1);
@@ -368,9 +370,9 @@ define([
                           // console.log($scope.nodesInOpenClusters.cidCluster1);
                           // document.getElementById('html-node-' + childOptions.id).style.opacity = 0;
                         }
-                        return childOptions.cid == i;
+                        return childOptions.cid == 1;
                       },
-                      clusterNodeProperties: {id:'cidCluster' + i, label: 'cluster: ' + i, borderWidth:3, shape:'database'}
+                      clusterNodeProperties: {id:'cidCluster' + 1, label: 'cluster: ' + 1, borderWidth:3, shape:'database', color: 'rgba(80, 225, 223, 0.4)' }
                   };
                   self.network.cluster(clusterOptionsByData);
               }
@@ -506,7 +508,9 @@ define([
               // var node = self.nodesDataset.get(event.node);
               if (self.network.isCluster(event.nodes[0]) != true) {
                 var cluster = whichOpenCluster(event.pointer.canvas);
-                reCluster(cluster);
+                if (cluster.length > 0) {
+                  reCluster(cluster);
+                }
               }
               closeContextMenu();
             }
@@ -519,16 +523,14 @@ define([
                       self.network.openCluster(event.nodes[0]);
                       // debugger;
                       // document.getElementById('html-node-4').style.opacity = 100;
+                  } else {
+                    var node = self.nodesDataset.get(event.nodes[0]);
+                    EntityService.openSideNav(node);
                   }
-              }
-              if (document.getElementsByClassName('vis-tooltip')[0].style) {
-                document.getElementsByClassName('vis-tooltip')[0].style.opacity = 0;
-              }
-              closeContextMenu();
-              var node = self.nodesDataset.get(event.nodes[0]);
-              if (self.network.isCluster(event.nodes[0]) != true) {
-                // debugger;
-                EntityService.openSideNav(node);
+                  // if (document.getElementsByClassName('vis-tooltip')[0].style) {
+                  //   document.getElementsByClassName('vis-tooltip')[0].style.opacity = 0;
+                  // }
+                  closeContextMenu();
               }
             }
 
