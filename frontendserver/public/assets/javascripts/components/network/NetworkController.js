@@ -37,9 +37,9 @@ define([
                 "dragging": dragEvent,
                 "hoverEdge": hoverEdge,
                 "hoverNode": hoverNode,
-                "clearPopUp": clearPopUp
+                "clearPopUp": clearPopUp,
                 // "afterDrawing": afterDrawing,
-                // "beforeDrawing": beforeDrawing
+                "beforeDrawing": beforeDrawing
                 // "blurNode": blurNode
             };
 
@@ -58,6 +58,8 @@ define([
 
             $scope.resultNodes = [];
             $scope.resultRelations = [];
+
+            $scope.nodesInOpenClusters = {};
 
             // Context menu for single node selection
             self.singleNodeMenu = [
@@ -186,6 +188,53 @@ define([
                 return promise.promise;
             };
 
+            function beforeDrawing(ctx) {
+                for (var clusterId in $scope.nodesInOpenClusters) {
+                    if ($scope.nodesInOpenClusters.hasOwnProperty(clusterId)) {
+                        var nodesInCluster = $scope.nodesInOpenClusters[clusterId];
+                        var positions = self.network.getPositions(nodesInCluster);
+                        var points = new Array();
+                        nodesInCluster.forEach(function(nodeId) {
+                            points.push(new Point(positions[nodeId].x,positions[nodeId].y))
+                        });
+                        var convexHull = new ConvexHull(points);
+                        convexHull.calculate();
+                        var p1 = convexHull.hull[0];
+                        var p2 = convexHull.hull[1];
+
+                        var xPoints = new Array(p1.x, p2.x);
+                        var yPoints = new Array(p1.y, p2.y);
+
+                        for(var i = 2; i < convexHull.hull.length; i++){
+                            p1 = convexHull.hull[i-1];
+                            p2 = convexHull.hull[i];
+
+                            xPoints.push(p1.x, p2.x);
+                            yPoints.push(p1.y, p2.y);
+                        }
+
+                        var minXPoint = Math.min(...xPoints);
+                        var maxXPoint = Math.max(...xPoints);
+
+                        var minYPoint = Math.min(...yPoints);
+                        var maxYPoint = Math.max(...yPoints);
+
+                        ctx.beginPath();
+                        ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+                        ctx.fillStyle = "#294475";
+
+                        ctx.moveTo(minXPoint, minYPoint);
+                        ctx.lineTo(maxXPoint, minYPoint);
+                        ctx.lineTo(maxXPoint, maxYPoint);
+                        ctx.lineTo(minXPoint, maxYPoint);
+
+                        ctx.stroke();
+                        ctx.fill();
+                        ctx.closePath();
+                    }
+                }
+            };
+
             function hoverEdge(event) {
               // debugger;
             }
@@ -275,29 +324,89 @@ define([
             //   placeOverlay('html-node-5', 5);
             // });
 
-            // network.on("beforeDrawing", function (ctx) {
-            //   // debugger;} else if (undefined == node.parentEdgeId) {
-            //   var nodeId = '8';
-            //   var nodePosition = network.getPositions([nodeId]);
-            //
-            //   ctx.drawImage(imageObj, nodePosition[nodeId].x - 20, nodePosition[nodeId].y - 20, 40, 40);
-            //
-            // });
-
             function clusterByCid() {
                 self.network.setData($scope.graphData);
-                var clusterOptionsByData = {
-                    joinCondition:function(childOptions) {
-                      if (childOptions.cid == 1) {
-                        debugger;
-                        // document.getElementById('html-node-' + childOptions.id).style.opacity = 0;
-                      }
-                      return childOptions.cid == 1;
-                    },
-                    clusterNodeProperties: {id:'cidCluster', borderWidth:3, shape:'database'}
+                for (var i = 0; i < 39; i++) {
+                  var clusterOptionsByData = {
+                      joinCondition:function(childOptions) {
+                        if (childOptions.cid == 1) {
+                          // document.getElementById('html-node-' + childOptions.id).style.opacity = 0;
+                        }
+                        return childOptions.cid == 1;
+                      },
+                      clusterNodeProperties: {id:'cidCluster', borderWidth:3, shape:'database'}
+                  };
+                  self.network.cluster(clusterOptionsByData);
+              }
+            };
+
+            /**
+            Algorithm taken from: https://blog.cedric.ws/draw-the-convex-hull-with-canvas-and-javascript
+            **/
+
+            // Point class
+            function Point(x,y){
+                this.x = x;
+                this.y = y;
+                this.toString = function(){
+                    return "x: " + x + ", y: " + y;
                 };
-                self.network.cluster(clusterOptionsByData);
-            }
+                this.rotateRight = function(p1, p2){
+                    // cross product, + is counterclockwise, - is clockwise
+                    return ((p2.x*y-p2.y*x) - (p1.x*y-p1.y*x) + (p1.x*p2.y-p1.y*p2.x))<0;
+                };
+            };
+
+            // ConvexHull class
+            function ConvexHull(points){
+                this.hull;
+                this.calculate = function(){
+                    this.hull = new Array();
+                    points.sort(function compare(p1,p2) {return p1.x - p2.x;});
+
+                    var upperHull = new Array();
+                    this.calcUpperhull(upperHull);
+                    for(var i = 0; i < upperHull.length; i++)
+                        this.hull.push(upperHull[i]);
+
+                    var lowerHull = new Array();
+                    this.calcLowerhull(lowerHull);
+                    for(var i = 0; i < lowerHull.length; i++)
+                        this.hull.push(lowerHull[i]);
+                };
+                this.calcUpperhull = function(upperHull){
+                    var i = 0;
+                    upperHull.push(points[i]);
+                    i++;
+                    upperHull.push(points[i]);
+                    i++;
+                    // Start upperHull scan
+                    for(i; i < points.length; i++){
+                        upperHull.push(points[i]);
+                        while(
+                            upperHull.length>2 && // more than 2 points
+                            !upperHull[upperHull.length-3].rotateRight(upperHull[upperHull.length-1],upperHull[upperHull.length-2]) // last 3 points make left turn
+                        )
+                            upperHull.splice(upperHull.indexOf(upperHull[upperHull.length-2]), 1); // remove middle point
+                    }
+                };
+                this.calcLowerhull = function(lowerHull){
+                    var i = points.length-1;
+                    lowerHull.push(points[i]);
+                    i--;
+                    lowerHull.push(points[i]);
+                    i--;
+                    // Start lowerHull scan
+                    for(i; i >= 0; i--){
+                        lowerHull.push(points[i]);
+                        while(
+                            lowerHull.length>2 && // more than 2 points
+                            !lowerHull[lowerHull.length-3].rotateRight(lowerHull[lowerHull.length-1],lowerHull[lowerHull.length-2]) // last 3 points make left turn
+                        )
+                            lowerHull.splice(lowerHull.indexOf(lowerHull[lowerHull.length-2]), 1); // remove middle point
+                    }
+                };
+            };
 
             $scope.toggleRight = buildToggler('right');
             $scope.isOpenRight = function(){
@@ -331,7 +440,7 @@ define([
                 self.network = network;
                 clusterByCid();
                 self.network.once('stabilized', function() {
-                    var scaleOption = { scale : 2.0 };
+                    var scaleOption = { scale : 1.5 };
                     self.network.moveTo(scaleOption);
                 });
             }
@@ -344,6 +453,8 @@ define([
             function selectNodeEvent(event) {
               if (event.nodes.length == 1) {
                   if (self.network.isCluster(event.nodes[0]) == true) {
+                      var nodesInCluster = self.network.getNodesInCluster(event.nodes[0]);
+                      $scope.nodesInOpenClusters[event.nodes[0]] = nodesInCluster;
                       self.network.openCluster(event.nodes[0]);
                       // document.getElementById('html-node-4').style.opacity = 100;
                   }
