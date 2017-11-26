@@ -203,7 +203,7 @@ define([
             function hoverNode(event) {
                 var node = self.nodesDataset.get(event.node);
                 var nodeLabel = '' + node.label;
-                var docTip = '<md-card class="tooltip-card"><img src="' + node.image +'" class="md-card-image">' +
+                var docTip = '<md-card class="tooltip-card"><img src="' + node.image +'" class="md-card-image img-tip">' +
                             '<md-card-title><md-card-title-text><span class="md-headline">' + node.label + '</span></md-card-title-text></md-card-title>'+
                             '<md-card-content>' + (node.desc ? node.desc : '') + '</md-card-content>' +
                             '</md-card>';

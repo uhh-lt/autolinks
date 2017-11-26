@@ -5,7 +5,11 @@
      </md-toolbar>
      <md-content layout-padding>
        <form>
-         <img ng-src="{{selectedEntity.image ? selectedEntity.image : ''}}" style="width:200px;"/>
+        <img
+          ng-show="selectedEntity.image"
+          ng-src="{{selectedEntity.image === undefined ? '' : selectedEntity.image}}"
+          style="width:200px;"
+        />
          <md-input-container>
            <label for="testInput">Description</label>
            <textarea
