@@ -191,55 +191,62 @@ define([
             function beforeDrawing(ctx) {
                 for (var clusterId in $scope.nodesInOpenClusters) {
                     if ($scope.nodesInOpenClusters.hasOwnProperty(clusterId)) {
-                        var nodesInCluster = $scope.nodesInOpenClusters[clusterId];
+                        var cluster = $scope.nodesInOpenClusters[clusterId];
+                        var nodesInCluster = cluster.nodes;
                         var positions = self.network.getPositions(nodesInCluster);
                         var points = new Array();
                         nodesInCluster.forEach(function(nodeId) {
                             points.push(new Point(positions[nodeId].x,positions[nodeId].y))
                         });
                         var convexHull = new ConvexHull(points);
+                        // console.log($scope.nodesInOpenClusters);
                         convexHull.calculate();
                         var p1 = convexHull.hull[0];
                         var p2 = convexHull.hull[1];
 
-                        var xPoints = new Array(p1.x, p2.x);
-                        var yPoints = new Array(p1.y, p2.y);
+                        if (nodesInCluster.length > 0) {
+                          var xPoints = new Array(p1.x, p2.x);
+                          var yPoints = new Array(p1.y, p2.y);
 
-                        for(var i = 2; i < convexHull.hull.length; i++){
-                            p1 = convexHull.hull[i-1];
-                            p2 = convexHull.hull[i];
+                          for(var i = 2; i < convexHull.hull.length; i++){
+                              p1 = convexHull.hull[i-1];
+                              p2 = convexHull.hull[i];
 
-                            xPoints.push(p1.x, p2.x);
-                            yPoints.push(p1.y, p2.y);
+                              xPoints.push(p1.x, p2.x);
+                              yPoints.push(p1.y, p2.y);
+                          }
+
+                          var minXPoint = Math.min(...xPoints) - 50;
+                          var maxXPoint = Math.max(...xPoints) + 50;
+
+                          var minYPoint = Math.min(...yPoints) - 50;
+                          var maxYPoint = Math.max(...yPoints) + 50;
+
+                          cluster.position = {minXPoint, maxXPoint, minYPoint, maxYPoint};
+                          console.log(cluster);
+
+                          // console.log(ctx);
+                          // console.log(minYPoint);
+
+                          ctx.beginPath();
+                          ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+                          ctx.fillStyle = "rgba(80, 225, 223, 0.4)";
+
+                          ctx.moveTo(minXPoint, minYPoint);
+                          ctx.lineTo(maxXPoint, minYPoint);
+                          ctx.lineTo(maxXPoint, maxYPoint);
+                          ctx.lineTo(minXPoint, maxYPoint);
+
+                          ctx.stroke();
+                          ctx.fill();
+                          ctx.closePath();
                         }
-
-                        var minXPoint = Math.min(...xPoints);
-                        var maxXPoint = Math.max(...xPoints);
-
-                        var minYPoint = Math.min(...yPoints);
-                        var maxYPoint = Math.max(...yPoints);
-
-                        ctx.beginPath();
-                        ctx.strokeStyle = "rgba(0, 0, 0, 0)";
-                        ctx.fillStyle = "#294475";
-
-                        ctx.moveTo(minXPoint, minYPoint);
-                        ctx.lineTo(maxXPoint, minYPoint);
-                        ctx.lineTo(maxXPoint, maxYPoint);
-                        ctx.lineTo(minXPoint, maxYPoint);
-
-                        ctx.stroke();
-                        ctx.fill();
-                        ctx.closePath();
+                        // ctx.fillStyle = "rgba(0, 0, 0, 0)";
                     }
                 }
             };
 
             function hoverEdge(event) {
-              // debugger;
-            }
-
-            function clickEvent(event, params) {
               // debugger;
             }
 
@@ -324,17 +331,46 @@ define([
             //   placeOverlay('html-node-5', 5);
             // });
 
+            function reCluster(clusterId) {
+                self.network.setData($scope.graphData);
+                for (var i = 0; i < 39; i++) {
+                  var clusterOptionsByData = {
+                      joinCondition:function(childOptions) {
+                        if (childOptions.cid == i && $scope.nodesInOpenClusters[clusterId].nodes) {
+                          var index = $scope.nodesInOpenClusters[clusterId].nodes.indexOf(childOptions.id);
+                          if ( index > -1 ) {
+
+                            $scope.nodesInOpenClusters[clusterId].nodes.splice(index, 1);
+                          }
+
+                          console.log(clusterId + 'is reclustered');
+                          // document.getElementById('html-node-' + childOptions.id).style.opacity = 0;
+                        }
+                        return childOptions.cid == i;
+                      },
+                      clusterNodeProperties: {id:'cidCluster' + i, label: 'cluster: ' + i, borderWidth:3, shape:'database'}
+                  };
+                  self.network.cluster(clusterOptionsByData);
+              }
+            };
+
             function clusterByCid() {
                 self.network.setData($scope.graphData);
                 for (var i = 0; i < 39; i++) {
                   var clusterOptionsByData = {
                       joinCondition:function(childOptions) {
-                        if (childOptions.cid == 1) {
+                        if (childOptions.cid == i && $scope.nodesInOpenClusters) {
+                          // var index = $scope.nodesInOpenClusters.cidCluster1.indexOf(childOptions.id);
+                          // if ( index > -1 ) {
+                          //   $scope.nodesInOpenClusters.cidCluster1.splice(index, 1);
+                          // }
+                          //
+                          // console.log($scope.nodesInOpenClusters.cidCluster1);
                           // document.getElementById('html-node-' + childOptions.id).style.opacity = 0;
                         }
-                        return childOptions.cid == 1;
+                        return childOptions.cid == i;
                       },
-                      clusterNodeProperties: {id:'cidCluster', borderWidth:3, shape:'database'}
+                      clusterNodeProperties: {id:'cidCluster' + i, label: 'cluster: ' + i, borderWidth:3, shape:'database'}
                   };
                   self.network.cluster(clusterOptionsByData);
               }
@@ -445,8 +481,33 @@ define([
                 });
             }
 
+            function whichOpenCluster(pointer) {
+              var x = pointer.x;
+              var y = pointer.y;
+              var selectedCluster = '';
+              for (var clusterId in $scope.nodesInOpenClusters) {
+                if ($scope.nodesInOpenClusters.hasOwnProperty(clusterId)) {
+                  var cluster = $scope.nodesInOpenClusters[clusterId];
+
+                  var minXPoint = cluster.position.minXPoint;
+                  var maxXPoint = cluster.position.maxXPoint;
+                  var minYPoint = cluster.position.minYPoint;
+                  var maxYPoint = cluster.position.maxYPoint;
+
+                  if (y > minYPoint && y < maxYPoint && x > minXPoint && x < maxXPoint) {
+                    selectedCluster = clusterId;
+                  }
+                }
+              };
+              return selectedCluster;
+            }
+
             function clickEvent(event) {
-              var node = self.nodesDataset.get(event.node);
+              // var node = self.nodesDataset.get(event.node);
+              if (self.network.isCluster(event.nodes[0]) != true) {
+                var cluster = whichOpenCluster(event.pointer.canvas);
+                reCluster(cluster);
+              }
               closeContextMenu();
             }
 
@@ -454,15 +515,21 @@ define([
               if (event.nodes.length == 1) {
                   if (self.network.isCluster(event.nodes[0]) == true) {
                       var nodesInCluster = self.network.getNodesInCluster(event.nodes[0]);
-                      $scope.nodesInOpenClusters[event.nodes[0]] = nodesInCluster;
+                      $scope.nodesInOpenClusters[event.nodes[0]] = { nodes: nodesInCluster, position: {} };
                       self.network.openCluster(event.nodes[0]);
+                      // debugger;
                       // document.getElementById('html-node-4').style.opacity = 100;
                   }
               }
-              document.getElementsByClassName('vis-tooltip')[0].style.opacity = 0;
+              if (document.getElementsByClassName('vis-tooltip')[0].style) {
+                document.getElementsByClassName('vis-tooltip')[0].style.opacity = 0;
+              }
               closeContextMenu();
               var node = self.nodesDataset.get(event.nodes[0]);
-              EntityService.openSideNav(node);
+              if (self.network.isCluster(event.nodes[0]) != true) {
+                // debugger;
+                EntityService.openSideNav(node);
+              }
             }
 
 
@@ -473,7 +540,7 @@ define([
             function onContext(params) {
                 params.event.preventDefault();
                 closeContextMenu();
-                debugger;
+                // debugger;
 
                 var position = { x: params.pointer.DOM.x, y: params.pointer.DOM.y };
 
