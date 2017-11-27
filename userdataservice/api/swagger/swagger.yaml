@@ -1,0 +1,112 @@
+swagger: '2.0'
+info:
+  version: '0.0.1'
+  title: Autolinks Userdata Service
+
+consumes:
+  - application/json
+produces:
+  - application/json
+
+definitions:
+
+  KeyValuePair:
+    type: object
+    properties:
+      key:
+        $ref: "#/definitions/Key"
+      value:
+        $ref: "#/definitions/Value"
+
+  Key:
+    type: object
+    properties:
+      username:
+        type: string
+      servicename:
+        type: string
+      endpointname:
+        type: string
+      parameters:
+        type: object
+        
+  Value:
+    type: object
+
+  Error:
+    type: object
+    properties:
+      message:
+        type: string
+      fields:
+        type: string
+        
+tags:
+  - name: Userdata
+    description: Everything about reading and writing of user data
+
+paths:
+
+  /readdata:
+    x-swagger-router-controller: userdata
+    post:
+      operationId: read
+      tags:
+        - Userdata
+      description: Get the data for a particular key
+      parameters:
+        - name: key
+          in: body
+          description: The key of the data to read
+          schema:
+            $ref: "#/definitions/Key"
+      responses:
+        200:
+          description: Success, user data was found and will be returned
+        204:
+          description: Success, user data was not found
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+            
+  /writedata:
+    x-swagger-router-controller: userdata
+    post:
+      operationId: write
+      tags:
+        - Userdata
+      description: Write data for a particular key
+      parameters:
+        - name: kvp
+          in: body
+          description: The key and value of the data to be written
+          schema:
+            $ref: "#/definitions/KeyValuePair"
+      responses:
+        200:
+          description: Success
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+
+  /info:
+    x-swagger-router-controller: userdata
+    get:
+      tags:
+        - Userdata
+      description: Get general information about currently stored userdata
+      operationId: info
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+
+  /swagger:
+    x-swagger-pipe: swagger_raw
