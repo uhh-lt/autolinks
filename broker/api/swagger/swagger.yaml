@@ -3,16 +3,16 @@ info:
   version: '0.0.1'
   title: Autolinks Broker Service
 
-# the domain of the service
-host: 127.0.0.1:10010
-
-# array of all schemes that the API supports
-schemes:
-  # - https
-  - http
-
-# will be prefixed to all paths (comment for no prefix)
-basePath: /
+## the domain of the service
+#host: 127.0.0.1:10010
+#
+## array of all schemes that the API supports
+#schemes:
+#  # - https
+#  - http
+#
+## will be prefixed to all paths (comment for no prefix)
+#basePath: /
 
 # format of bodies a client can send (Content-Type)
 consumes:

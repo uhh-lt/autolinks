@@ -33,7 +33,6 @@ definitions:
       analyzer:
         type: string
 
-
   Offset:
     type: object
     properties:
