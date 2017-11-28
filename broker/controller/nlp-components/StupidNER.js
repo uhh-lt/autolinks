@@ -1,7 +1,7 @@
 'use strict';
 
-const logger = require('../../controller/log')(module)
-  , utils = require('./utils');
+const logger = require('../log')(module)
+  , utils = require('../utils/utils');
 
 const label = utils.getLabel(__filename);
 

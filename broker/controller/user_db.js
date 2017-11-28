@@ -39,7 +39,7 @@ nodeCleanup(function (exitCode, signal) {
 // init db with schema
 function initdb() {
   // init db schema
-  fs.readFile('config/userdb-schema.sql', 'utf8', function (err,data) {
+  fs.readFile('config/userdb-schema.sqlite3.sql', 'utf8', function (err,data) {
     if (err) {
       logger.warn(err.message);
       return err;

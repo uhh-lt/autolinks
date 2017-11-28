@@ -24,6 +24,7 @@ produces:
 # define complex objects which can be references with $ref: "#/definitions/X"
 definitions:
 
+  # objects related for service maintenance
   Service:
     type: object
     properties:
@@ -55,7 +56,8 @@ definitions:
         type: boolean
         description: does the service require a user to be logged in?
 
-  User:
+  # objects related to user management
+  UserInfo:
     type: object
     properties:
       name:
@@ -74,6 +76,7 @@ definitions:
         type: integer
         description: the point in time when the user was last seen, i.e. the time of the last login
 
+  # objects related to NLP
   Document:
     type: object
     properties:
@@ -104,6 +107,34 @@ definitions:
       to:
         type: integer
 
+  # objects related to storage
+  StorageKVP:
+    type: object
+    properties:
+      key:
+        $ref: "#/definitions/StorageKey"
+      value:
+        $ref: "#/definitions/StorageValue"
+
+  StorageKey:
+    type: object
+    properties:
+      username:
+        type: string
+      servicename:
+        type: string
+      endpointname:
+        type: string
+      parameters:
+        type: object
+
+  StorageValue:
+    type: object
+
+  StorageInfo:
+    type: object
+
+  # in case of error return this object schema
   Error:
     type: object
     properties:
@@ -134,29 +165,12 @@ tags:
     description: Everything about a user
   - name: NLP
     description: Everything about nlp
+  - name: Storage
+    description: Everything about reading and writing of user data
 
 paths:
-  /userinfo:
-    x-swagger-router-controller: users
-    get:
-      tags:
-        - User
-      description: Get info about currently logged in user
-      # used as the method name of the controller
-      operationId: get_user_info
-      security:
-        - broker_auth: []
-      responses:
-        200:
-          description: Success
-          schema:
-            $ref: "#/definitions/User"
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/Error"
 
-  /registerService:
+  /service/registerService:
     # tell nodejs where to find the code for this path
     x-swagger-router-controller: services
     post:
@@ -180,7 +194,7 @@ paths:
           schema:
             $ref: "#/definitions/Error"
             
-  /deregisterService:
+  /service/deregisterService:
     x-swagger-router-controller: services
     post:
       operationId: deregister_service
@@ -204,7 +218,7 @@ paths:
           schema:
             $ref: "#/definitions/Error"
 
-  /listServices:
+  /service/listServices:
     x-swagger-router-controller: services
     get:
       tags:
@@ -224,7 +238,7 @@ paths:
           schema:
             $ref: "#/definitions/Error"
 
-  /pingServices:
+  /service/pingServices:
     x-swagger-router-controller: services
     get:
       operationId: ping_services
@@ -237,7 +251,7 @@ paths:
         default:
           description: Error
 
-  /pingService:
+  /service/pingService:
     x-swagger-router-controller: services
     post:
       operationId: ping_service
@@ -286,6 +300,96 @@ paths:
           schema:
             $ref: "#/definitions/Error"
 
+  /user/info:
+    x-swagger-router-controller: users
+    get:
+      tags:
+        - User
+      description: Get info about currently logged in user
+      # used as the method name of the controller
+      operationId: get_user_info
+      security:
+        - broker_auth: []
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/UserInfo"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+
+  /storage/read:
+    x-swagger-router-controller: storage
+    post:
+      operationId: read
+      tags:
+        - Storage
+        - User
+      description: Get the data for a particular key
+      parameters:
+        - name: key
+          in: body
+          description: The key of the data to read
+          schema:
+            $ref: "#/definitions/StorageKey"
+      security:
+        - broker_auth: []
+      responses:
+        200:
+          description: Success, user data was found and will be returned
+        204:
+          description: Success, user data was not found
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+
+  /storage/write:
+    x-swagger-router-controller: storage
+    post:
+      operationId: write
+      tags:
+        - Storage
+        - User
+      description: Write data for a particular key
+      parameters:
+        - name: kvp
+          in: body
+          description: The key and value of the data to be written
+          schema:
+            $ref: "#/definitions/StorageKVP"
+      security:
+        - broker_auth: []
+      responses:
+        200:
+          description: Success
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+
+  /storage/info:
+    x-swagger-router-controller: storage
+    get:
+      tags:
+        - Storage
+        - User
+      description: Get info about the storage of the currently logged in user
+      # used as the method name of the controller
+      operationId: get_userstorage_info
+      security:
+        - broker_auth: []
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/StorageInfo"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
 
   /swagger:
     x-swagger-pipe: swagger_raw

@@ -40,7 +40,7 @@ nodeCleanup(function (exitCode, signal) {
 // init db with schema
 function initdb() {
   // init db schema
-  fs.readFile('config/servicedb-schema.sql', 'utf8', function (err, data) {
+  fs.readFile('config/servicedb-schema.sqlite3.sql', 'utf8', function (err, data) {
     if (err) {
       return err;
     }

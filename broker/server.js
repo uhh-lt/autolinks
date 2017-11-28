@@ -1,7 +1,10 @@
 'use strict';
 
-const SwaggerExpress = require('swagger-express-mw'),
+/* some global settings */
+process.setMaxListeners(0); // prevent: (node:308) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 uncaughtException listeners added. Use emitter.setMaxListeners() to increase limit
 
+/* imports */
+const SwaggerExpress = require('swagger-express-mw'),
   app = require('express')(),
   swaggerUi = require('swagger-ui-express'),
   yaml = require('yamljs'),
@@ -21,6 +24,7 @@ if(err){
   logger.error(err);
   process.exit(1);
 }
+
 err = userdb.init();
 if(err){
   logger.error(err);

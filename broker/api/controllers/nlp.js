@@ -1,7 +1,7 @@
 'use strict';
 
 const logger = require('../../controller/log')(module)
-  , NLP = require('../../controller/NlpWrapper')
+  , NLP = require('../../controller/nlp_wrapper')
   ;
 
 module.exports = {

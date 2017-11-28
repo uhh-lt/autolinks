@@ -1,6 +1,6 @@
 'use strict';
 
-const logger = require('../../controller/log')(module);
+const logger = require('../log')(module);
 
 module.exports = {
 
