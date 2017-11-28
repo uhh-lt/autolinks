@@ -4,7 +4,8 @@
 // exports
 module.exports = {
   init: init,
-  authenticated_request: authenticate_request
+  authenticate_request: authenticate_request,
+  handle_authenticated_request: handle_authenticated_request,
 };
 
 
@@ -62,7 +63,7 @@ passport.use(new LocalStrategy(verifyUser));
 // authenticate with BasicStrategy
 passport.use(new BasicStrategy(verifyUser));
 
-
+// initialize passport
 function init(app){
   app.use(passport.initialize());
   app.use(passport.session());
@@ -71,13 +72,13 @@ function init(app){
 
 /**
  *
- * @param strategy
  * @param req
  * @param res
  * @param next
+ * @param strategy
  */
-function authenticate_request( { strategy, req, res, next } ) {
-  passport.authenticate(strategy ? strategy : 'local', function(err, user, info) {
+function authenticate_request( { req, res, next, strategy } ) {
+  passport.authenticate(strategy ? strategy : 'basic', function(err, user, info) {
     if (err) {
       logger.warn('Authentication failed.', {user: user, info: info, error: err}, {});
       return next(err, null);
@@ -95,4 +96,27 @@ function authenticate_request( { strategy, req, res, next } ) {
       return next(null, user);
     });
   })(req, res, next);
+}
+
+/**
+ *
+ * @param req
+ * @param res
+ * @param next
+ * @param strategy (optional)
+ */
+function handle_authenticated_request(req, res, next, strategy) {
+  return authenticate_request({
+    req: req,
+    res: res,
+    next: function (err, user) {
+      if (err) {
+        res.header('Content-Type', 'application/json; charset=utf-8');
+        res.status(401);
+        return res.end(JSON.stringify({message: err.message, fields: {error: err}}));
+      }
+      next(user);
+    },
+    strategy: strategy
+  });
 }

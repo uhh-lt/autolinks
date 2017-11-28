@@ -340,7 +340,7 @@ paths:
         200:
           description: Success, user data was found and will be returned
         204:
-          description: Success, user data was not found
+          description: Success, no data not found
         default:
           description: Error
           schema:
@@ -378,7 +378,7 @@ paths:
         - User
       description: Get info about the storage of the currently logged in user
       # used as the method name of the controller
-      operationId: get_userstorage_info
+      operationId: info
       security:
         - broker_auth: []
       responses:

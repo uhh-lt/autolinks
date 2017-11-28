@@ -10,7 +10,7 @@ module.exports = {
 
 
 function get_user_info(req, res) {
-  auth.authenticated_request({
+  auth.authenticate_request({
       strategy: 'basic',
       req: req,
       res: res,

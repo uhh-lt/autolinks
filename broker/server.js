@@ -55,7 +55,7 @@ const config = {
   swaggerSecurityHandlers: {
 
     broker_auth: function (req, authOrSecDef, scopesOrApiKey, next) {
-      logger.info('auth:' + req.headers.authorization);
+      logger.debug(`basic auth: ${req.headers.authorization}.`);
       next(null);
     }
 
