@@ -74,6 +74,36 @@ definitions:
         type: integer
         description: the point in time when the user was last seen, i.e. the time of the last login
 
+  Document:
+    type: object
+    properties:
+      text:
+        type: string
+      source:
+        type: string
+      language:
+        type: string
+
+  NamedEntity:
+    type: object
+    properties:
+      text:
+        type: string
+      type:
+        type: string
+      offset:
+        $ref: "#/definitions/Offset"
+      analyzer:
+        type: string
+
+  Offset:
+    type: object
+    properties:
+      from:
+        type: integer
+      to:
+        type: integer
+
   Error:
     type: object
     properties:
@@ -102,6 +132,8 @@ tags:
     description: Everything about connected services
   - name: User
     description: Everything about a user
+  - name: NLP
+    description: Everything about nlp
 
 paths:
   /userinfo:
@@ -226,6 +258,33 @@ paths:
           description: Success
         default:
           description: Error
+
+  /nlp/findentities:
+    x-swagger-router-controller: nlp
+    post:
+      operationId: find_named_entities
+      tags:
+        - NLP
+      description: Find named entites in the provided text
+      parameters:
+        - name: document
+          in: body
+          description: |
+            The document object which contains the plain text and some
+            configuration parameters, e.g. the desired language of analyis.
+          schema:
+            $ref: "#/definitions/Document"
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/NamedEntity"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
 
 
   /swagger:
