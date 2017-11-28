@@ -113,7 +113,7 @@ define([
                         }
                         console.log(element);
                         // Create the graph2d object
-                        network = new vis.Network(element[0], scope.data, scope.options);
+                        // network = new vis.Network(element[0], scope.data, scope.options);
 
                         function clearPopUp() {
                           debugger;

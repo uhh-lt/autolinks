@@ -18,6 +18,8 @@
 			'underscore': 'libs/underscore/underscore-min',
 			'vis': 'libs/vis/dist/vis.min',
 			'ngVis': 'directives/angular-vis',
+      'cytoscape': 'libs/cytoscape/dist/cytoscape.min',
+      'ngCyt':'directives/cytoscapeDirective',
       'ngMagnify': 'libs/ng-magnify/src/js/ng-magnify'
 		},
 		shim: {
@@ -59,6 +61,9 @@
 			'ngVis': {
 				deps: ['angular', 'vis']
 			},
+      'ngCyt': {
+        deps: ['angular', 'cytoscape']
+      },
       'ngMagnify': {
         deps: ['angular']
       }

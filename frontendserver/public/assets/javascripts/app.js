@@ -4,6 +4,7 @@ define([
     './components/input/InputController',
     './components/viewer/ViewerController',
     './components/network/NetworkController',
+    './components/network/GraphController',
     './components/network/GraphConfig',
     './services/EntityService',
     './services/EndPointService',
@@ -16,7 +17,7 @@ define([
     'use strict';
 
     var app = angular.module('autolinks', [
-            'ui.layout', 'ui.router', 'ui.bootstrap', 'underscore',  'autolinks.graphConfig', 'autolinks.network',
+            'ui.layout', 'ui.router', 'ui.bootstrap', 'underscore',  'autolinks.graphConfig', 'autolinks.network', 'autolinks.graph',
             'autolinks.input', 'autolinks.viewer', 'ngMaterial', 'autolinks.entityservice', 'autolinks.sidenav', 'autolinks.endpointservice'
           ]);
 
@@ -27,6 +28,10 @@ define([
                 'network': {
                     templateUrl: 'assets/partials/network.html',
                     controller: 'NetworkController'
+                },
+                'network2': {
+                    templateUrl: 'assets/partials/network2.html',
+                    controller: 'GraphController'
                 },
                 'input': {
                   templateUrl: 'assets/partials/input.html',

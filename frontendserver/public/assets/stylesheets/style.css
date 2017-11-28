@@ -47,6 +47,14 @@ html, body {
   border: 1px;
 }
 
+#cy {
+    height: 800px;
+    width: 80%;
+    border: 2px solid #662244;
+    position: relative;
+    clear: both;
+}
+
 #network {
     z-index: 1;
     position: relative;
