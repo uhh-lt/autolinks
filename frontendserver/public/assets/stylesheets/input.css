@@ -2,7 +2,14 @@
   box-sizing: border-box;
 }
 
+.submit-button {
+  z-index: 2;
+}
+
 .commafield {
+  width: 50%;
+  background-color: #ffffff;
+  z-index: 2;
   display: flex;
   flex-wrap: wrap;
 

@@ -336,6 +336,7 @@ define([
                 var cluster = $scope.nodesInOpenClusters[clusterId];
                 var nodesInCluster = cluster.nodes;
                 var cid = self.nodesDataset.get(nodesInCluster[0]).cid;
+                debugger;
 
                   var clusterOptionsByData = {
                     joinCondition:function(childOptions) {
@@ -361,7 +362,7 @@ define([
                 for (var i = 0; i < 39; i++) {
                   var clusterOptionsByData = {
                       joinCondition:function(childOptions) {
-                        if (childOptions.cid == 1 && $scope.nodesInOpenClusters) {
+                        if (childOptions.cid == i && $scope.nodesInOpenClusters) {
                           // var index = $scope.nodesInOpenClusters.cidCluster1.indexOf(childOptions.id);
                           // if ( index > -1 ) {
                           //   $scope.nodesInOpenClusters.cidCluster1.splice(index, 1);
@@ -370,9 +371,19 @@ define([
                           // console.log($scope.nodesInOpenClusters.cidCluster1);
                           // document.getElementById('html-node-' + childOptions.id).style.opacity = 0;
                         }
-                        return childOptions.cid == 1;
+                        return childOptions.cid == i;
                       },
-                      clusterNodeProperties: {id:'cidCluster' + 1, label: 'cluster: ' + 1, borderWidth:3, shape:'database', color: 'rgba(80, 225, 223, 0.4)' }
+                      clusterNodeProperties: {
+                        id:'cidCluster' + 1,
+                        label: 'cluster: ' + 1,
+                        borderWidth:3, shape:'icon',
+                        icon: {
+                          face: 'FontAwesome',
+                          code: '\uf247',
+                          size: 100,
+                          color: 'rgba(80, 225, 223, 1)'
+                        }
+                      }
                   };
                   self.network.cluster(clusterOptionsByData);
               }

@@ -63,14 +63,14 @@ define([
                 //     }
                 //
                 // },
-                // interaction: {
-                //     tooltipDelay: 100,
-                //     hover: true,
-                //     hideEdgesOnDrag: true,
-                //     navigationButtons: true,
-                //     keyboard: false,
-                //     multiselect: true
-                // },
+                interaction: {
+                    tooltipDelay: 100,
+                    hover: true,
+                    // hideEdgesOnDrag: true,
+                    navigationButtons: true,
+                    keyboard: false,
+                    multiselect: true
+                },
                 manipulation: {
                   enabled: true
                 },

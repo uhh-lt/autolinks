@@ -111,7 +111,7 @@ define([
                         var options = {
                           options: scope.options,
                         }
-
+                        console.log(element);
                         // Create the graph2d object
                         network = new vis.Network(element[0], scope.data, scope.options);
 
