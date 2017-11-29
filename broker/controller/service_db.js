@@ -71,8 +71,8 @@ function add_service(name, location, description, endpoints) {
     }
 
     // add the endpoints only after successfully added the service
-    endpoints.forEach(function (endpoint) {
-      dbconn.run('insert or replace into endpoints(service, name, description) values(?,?,?)', [name, endpoint.name, endpoint.description], function(err) {
+    endpoints.forEach(function (ep) {
+      dbconn.run('insert or replace into endpoints(service, name, requireslogin) values(?,?,?)', [name, ep.name, ep.requireslogin], function(err) {
         if (err) {
           return err;
         }
@@ -167,6 +167,6 @@ function get_services(callback_service, callback_done) {
       return err;
     }
     callback_service(service);
-  }, () => { return callback_done() } );
+  }, () => { return callback_done(); } );
 }
 //select s.name, s.location, e.name from services as s join endpoints as e on (s.name=e.service) where s.rowid=4;

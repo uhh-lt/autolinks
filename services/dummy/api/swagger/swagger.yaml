@@ -1,0 +1,221 @@
+##
+#
+# API description of autolinks dummy service
+#
+##
+swagger: '2.0'
+info:
+  version: '0.0.1'
+  title: Autolinks Dummy Service
+  description: |
+    This service is only here for demonstration
+    and testing purposes
+
+consumes:
+  - application/json
+produces:
+  - application/json
+
+definitions:
+
+  # Objects used as parameters
+  NamedEntity:
+    type: object
+    properties:
+      text:
+        type: string
+      type:
+        type: string
+      context:
+        type: string
+
+  # Objects related to required return types
+  RDFtriple:
+    type: object
+    properties:
+      subject:
+        type: string
+        description: the subject of the rdf triple
+      predicate:
+        type: string
+        description: the predicate of the the rdf triple
+      object:
+        type: string
+        description: the object of the rdf triple
+      properties:
+        type: array
+        description: additional properties are also rdf triples
+        items:
+          $ref: '#/definitions/RDFtriple'
+
+  # In case of error return this object schema
+  Error:
+    type: object
+    properties:
+      message:
+        type: string
+      fields:
+        type: string
+
+tags:
+  - name: Dummy
+    description: Everything about the service
+  - name: Restricted
+    description: Mark paths to require a user to be logged in
+  - name: Maintenance
+    description: Everything about the service maintenance and its connection to the autolinks broker
+
+paths:
+  # here are the endpoints to what the service does
+  /dosomething:
+    x-swagger-router-controller: dummy
+    post:
+      operationId: dosomething
+      tags:
+        - Dummy
+      description: Do something
+      parameters:
+        - name: entity
+          in: body
+          description: The entity object to do something with
+          schema:
+            $ref: '#/definitions/NamedEntity'
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/RDFtriple'
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+
+  /foo:
+    x-swagger-router-controller: foobar
+    post:
+      operationId: foo
+      tags:
+        - Dummy
+        - Restricted
+      description: Do something
+      parameters:
+        - name: entity
+          in: body
+          description: The entity object to do something with
+          schema:
+            $ref: '#/definitions/NamedEntity'
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/RDFtriple'
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+    get:
+      operationId: bar
+      tags:
+        - Dummy
+        - Restricted
+      description: Do something
+      parameters: []
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/RDFtriple'
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+
+  /baz/{username}:
+    x-swagger-router-controller: dummy
+    post:
+      operationId: baz
+      tags:
+        - Dummy
+        - Restricted
+      description: Do something
+      parameters:
+        - name: username
+          required: true
+          in: path
+          description: The username
+          type: string
+        - name: entity
+          in: body
+          description: The entity object to do something with
+          schema:
+            $ref: '#/definitions/NamedEntity'
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/RDFtriple'
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+
+  # here are service related endpoints
+  /service/ping:
+    x-swagger-router-controller: maintenance
+    get:
+      operationId: ping
+      tags:
+        - Maintenance
+      summary: check availability
+      description: |
+        returns 'OK' if service is fully available or ERROR if service partly fails
+      consumes: []
+      produces:
+        - text/plain
+      parameters: []
+      responses:
+        200:
+          description: single string with ok message if registered
+          schema:
+            type: string
+            default: 'OK'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /service/registerAtBroker:
+    x-swagger-router-controller: maintenance
+    post:
+      operationId: register_at_broker
+      tags:
+        - Maintenance
+      summary: manually register this service and its endpoints at autolinks broker service
+      description: |
+        returns 'OK' if service was registered
+      produces:
+        - 'text/plain'
+      parameters:
+        - in: body
+          name: data
+          description: object holding the location
+          schema:
+            type: object
+            properties:
+              location:
+                description: where to find the broker
+                type: string
+                default: 'http://BROKER_SERVER:BROKER_PORT/BROKER_BASE_PATH'
+      responses:
+        200:
+          description: single string with ok message if registered
+          schema:
+            type: string
+            default: 'OK'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /swagger:
+    x-swagger-pipe: swagger_raw

@@ -49,9 +49,6 @@ definitions:
       name:
         type: string
         description: the name of the endpoint
-      servicename:
-        type: string
-        description: the name of the service
       requireslogin:
         type: boolean
         description: does the service require a user to be logged in?

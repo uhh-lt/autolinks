@@ -13,12 +13,16 @@ networks:
 
 services:
 
+  ##
+  # Main components and their dependencies
+  ##
+  # BEGIN: frontend
   frontend:
     image: node:9.2
     volumes:
       - ${PWD}/frontendserver:/opt/project
     ports:
-      - 10010:10010
+      - 10000:10010
       - 3000:3001
     networks:
       - anet
@@ -30,13 +34,15 @@ services:
       - NODE_ENV=development
       - COOKIE_SECRET=YOUR_COOKIE_SECRET
       - LOGLEVEL=debug
+  # END: frontend
 
+  # BEGIN: broker
   broker:
     image: remstef/node-swagger:latest
     volumes:
       - ${PWD}/broker:/opt/project
     ports:
-      - 10011:10010
+      - 10001:10010
       - 3001:3001
     networks:
       - anet
@@ -48,3 +54,47 @@ services:
       - NODE_ENV=development
       - COOKIE_SECRET=YOUR_COOKIE_SECRET
       - LOGLEVEL=debug
+
+  brokermysqlserver:
+    image: "mysql:5.7"
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+      - MYSQL_DATABASE=autolinks
+      - MYSQL_USER=autolinks
+      - MYSQL_PORT=3306
+      - MYSQL_PASSWORD=autolinks
+    volumes:
+      - ${PWD}/broker-mysql-data:/var/lib/mysql
+    command: ["--character-set-server=utf8", "--collation-server=utf8_bin"]
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-pautolinks", "-uautolinks"]
+      interval: 20s
+      timeout: 10s
+      retries: 3
+    networks:
+      anet:
+        aliases:
+          - mysql
+  # END: broker
+
+  ##
+  # Services and their dependencies
+  ##
+  # BEGIN: dummy service
+  dummy:
+    image: remstef/node-swagger:latest
+    volumes:
+      - ${PWD}/services/dummy:/opt/project
+    ports:
+      - 10010:10010
+      - 3010:3001
+    networks:
+      - anet
+    stdin_open: true
+    tty: true
+    working_dir: /opt/project
+    entrypoint: bash
+    environment:
+      - NODE_ENV=development
+      - COOKIE_SECRET=YOUR_COOKIE_SECRET
+  # END: dummy service

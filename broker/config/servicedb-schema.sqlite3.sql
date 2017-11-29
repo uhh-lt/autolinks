@@ -18,10 +18,10 @@ create table if not exists services (
   lastseenactive integer not null default -1,
   lastcheck integer not null default -1
 );
+-- endpoint
 create table if not exists endpoints (
   service text not null,
   name text not null,
-  description text,
   requireslogin boolean default false,
   lastcalled integer not null default -1,
   primary key(service, name)
