@@ -71,7 +71,6 @@ function ping_service(req, res) {
 
 function ping_services(req, res) {
   // get all services and apply ping_service as callback for each of the services
-
   const err = service_db.get_services(service_utils.ping_service, () => res.end());
   res.header('Content-Type', 'application/json; charset=utf-8');
   if(err){
