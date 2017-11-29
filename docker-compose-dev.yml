@@ -32,7 +32,7 @@ services:
       - LOGLEVEL=debug
 
   broker:
-    image: remstef/node-swagger:9.2
+    image: remstef/node-swagger:latest
     volumes:
       - ${PWD}/broker:/opt/project
     ports:

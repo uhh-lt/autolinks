@@ -10,9 +10,9 @@ function getLabel(callingModule) {
 }
 
 
-module.exports = function(callingModule){
+module.exports = function(callingModule) {
 
-  let label = getLabel(callingModule);
+  let aModulesLabel = getLabel(callingModule);
 
   return new (winston.Logger)({
 
@@ -23,20 +23,22 @@ module.exports = function(callingModule){
         prettyPrint: true,
         colorize: true,
         timestamp: true,
-        label: label
+        label: aModulesLabel,
       }),
 
       new (winston.transports.File)({
         level: 'debug',
-        filename: 'server.log',
+        filename: 'data/server.log', // uses the base path
         handleExceptions: true,
         humanReadableUnhandledException: true,
         timestamp: true,
         json: false,
-        label: label
+        prettyPrint: false,
+        label: aModulesLabel,
       })
 
     ]
 
   });
-}
+
+};

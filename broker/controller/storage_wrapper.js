@@ -3,6 +3,7 @@
 const logger = require('./log')(module);
 
 module.exports = {
+  init : init,
   read : read,
   write : write,
   info : info,
@@ -22,6 +23,14 @@ const explicitStorage  = (() => {
       return require('./storage-components/devnull-storage');
   }
 })();
+
+/**
+ *
+ * @param callback = function(err)
+ */
+function init(callback) {
+  return explicitStorage.init(callback);
+}
 
 /**
  *

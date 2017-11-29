@@ -2,13 +2,13 @@
 
 // exports
 module.exports = {
-  init: initdb,
-  add_service: add_service,
-  get_services: get_services,
-  get_service: get_service,
-  update_service: update_service,
-  update_endpoint: update_endpoint,
-  delete_service: delete_service
+  init : initdb,
+  add_service : add_service,
+  get_services : get_services,
+  get_service : get_service,
+  update_service : update_service,
+  update_endpoint : update_endpoint,
+  delete_service : delete_service
 };
 
 // requires
@@ -21,36 +21,45 @@ const fs = require('fs')
 	// , bcrypt = require('bcrypt')
 	;
 
-// init database connection
-let dbconn = new sqlite3.Database(`${__dirname}/service.db`, (err) => {
-  if (err) {
-    logger.error(err.message);
-  }
-  logger.info('Connected service database.');
-});
+// database connection variable
+let dbconn;
+
+/**
+ * init db with schema
+ * @param callback = function(err)
+ */
+function initdb(callback) {
+  dbconn = new sqlite3.Database(`${__dirname}/../data/service.sqlite3.db`, (err) => {
+    if (err) {
+      return callback(err);
+    }
+    logger.info('Connected service database.');
+
+    // init db schema
+    fs.readFile('config/servicedb-schema.sqlite3.sql', 'utf8', function (err, data) {
+      if (err) {
+        return callback(err);
+      }
+      dbconn.exec(data, function(err){
+        if (err) {
+          return callback(err);
+        }
+        logger.info('Initialized database schema.');
+      });
+    });
+  });
+
+}
 
 // close database connection on exit
 nodeCleanup(function (exitCode, signal) {
   // release resources here before node exits
   logger.debug(`About to exit with code: ${signal}`);
-  dbconn.close();
-  logger.debug('Closed service database connection.');
+  if(dbconn) {
+    dbconn.close();
+    logger.debug('Closed service database connection.');
+  }
 });
-
-// init db with schema
-function initdb() {
-  // init db schema
-  fs.readFile('config/servicedb-schema.sqlite3.sql', 'utf8', function (err, data) {
-    if (err) {
-      return err;
-    }
-    dbconn.exec(data, function(err){
-      if (err) {
-        return err;
-      }
-    });
-  });
-};
 
 // add service to db
 function add_service(name, location, description, endpoints) {
@@ -129,7 +138,7 @@ function get_service(name, callback){
       return err;
     }
     if(!row) {
-      return new Error(`Service ${name} not found.`);
+      return new Error(`Service '${name}' not found.`);
     }
     return callback(row);
   });

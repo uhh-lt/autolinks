@@ -32,11 +32,11 @@ function register_service(req, res) {
 
   res.header('Content-Type', 'application/json; charset=utf-8');
   if(err) {
-    logger.warn(`adding service ${service.name} failed.`, service, err, {} );
+    logger.warn(`Adding service '${service.name}' failed.`, service, err, {} );
     res.status(500);
     res.write(JSON.stringify({ message: err.message, fields: { service: service, error: err } }));
   } else {
-    logger.info(`added service ${service.name}.`, service);
+    logger.info(`Sucessfully added service '${service.name}'.`, service);
   }
   res.end();
 
@@ -47,11 +47,11 @@ function deregister_service (req, res) {
   const err = service_db.delete_service(service.name);
   res.header('Content-Type', 'application/json; charset=utf-8');
   if(err){
-    logger.warn(`De-register service ${service.name} failed.`, service, err, {} );
+    logger.warn(`De-register service '${service.name}' failed.`, service, err, {} );
     res.status(500);
-    res.write(JSON.stringify({ message: err.message, fields: { service: service, error: err } }));
+    res.json({ message: err.message, fields: { service: service, error: err } });
   } else {
-    logger.info(`removed service ${service.name}.`, service);
+    logger.info(`Sucessfully removed service '${service.name}'.`, service);
   }
   res.end();
 }
@@ -61,9 +61,9 @@ function ping_service(req, res) {
   const err = service_utils.ping_service(service);
   res.header('Content-Type', 'application/json; charset=utf-8');
   if(err){
-    logger.warn(`ping service ${service.name} failed.`, service, err, {} );
+    logger.warn(`Ping service '${service.name}' failed.`, service, err, {} );
     res.status(500);
-    res.write(JSON.stringify({ message: err.message, fields: { service: service, error: err } }));
+    res.json({ message: err.message, fields: { service: service, error: err } });
   }
   res.end();
 }
@@ -75,9 +75,9 @@ function ping_services(req, res) {
   const err = service_db.get_services(service_utils.ping_service, () => res.end());
   res.header('Content-Type', 'application/json; charset=utf-8');
   if(err){
-    logger.warn('ping all services failed.', err, {} );
+    logger.warn('Ping all services failed.', err, {} );
     res.status(500);
-    res.write(JSON.stringify({ message: err.message, fields: { error: err } }));
+    res.json({ message: err.message, fields: { error: err } });
   }
   res.end();
 

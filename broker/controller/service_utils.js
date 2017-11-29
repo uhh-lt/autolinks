@@ -30,23 +30,23 @@ function ping_service(service) {
   const url = `${location}/ping`;
   request(url, function (error, response, body) {
     const now = new Date().getTime();
-    if(error || response.statusCode != 200){
+    if(error || response.statusCode !== 200){
       // if service was active before print a warning, otherwise ignore it
       if(service.active) {
         logger.warn(`Cannot reach service ${service.name}`, { service : service , error: error || response }, {});
         logger.warn(`Setting service ${service.name} to defunct.`);
       }
-      logger.debug(`ping service ${service.name} failed.`);
+      logger.warn(`ping service '${service.name}' failed.`);
       return db.update_service(service.name, {
         lastcheck: now,
         active: false
       });
     }else{
+      logger.debug(`ping service '${service.name}' success.`);
       // if service was not active before print an info, otherwise ignore it
       if(!service.active) {
-        logger.debug(`Service ${service.name} is now available.`);
+        logger.info(`Service '${service.name}' is now available.`);
       }
-      logger.debug(`ping service ${service.name} success.`);
       return db.update_service(service.name, {
         lastseenactive: now,
         lastcheck: now,

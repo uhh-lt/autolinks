@@ -6,7 +6,8 @@ const logger = require('./log')(module)
 
 
 module.exports = {
-  analyze : analyze
+  init : init,
+  analyze : analyze,
 }
 
 const explicitNLP = (() => {
@@ -28,6 +29,13 @@ const explicitNLP = (() => {
   }
 })();
 
+/**
+ *
+ * @param callback
+ */
+function init(callback) {
+  return explicitNLP.init(callback);
+}
 
 /**
  *

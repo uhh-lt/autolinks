@@ -2,12 +2,12 @@
 
 // exports
 module.exports = {
-  init: initdb,
-  add_user: add_user,
-  get_users: get_users,
-  get_user: get_user,
-  update_user: update_user,
-  delete_user: delete_user
+  init : initdb,
+  add_user : add_user,
+  get_users : get_users,
+  get_user : get_user,
+  update_user : update_user,
+  delete_user : delete_user
 };
 
 // requires
@@ -20,13 +20,34 @@ const fs = require('fs')
 	// , bcrypt = require('bcrypt')
 	;
 
-// init database connection
-let dbconn = new sqlite3.Database(`${__dirname}/user.db`, (err) => {
-  if (err) {
-    logger.error(err.message);
-  }
-  logger.info('Connected user database.');
-});
+// database connection variable
+let dbconn;
+
+/**
+ * init db with schema
+ * @param callback = function(err)
+ */
+function initdb(callback) {
+  dbconn = new sqlite3.Database(`${__dirname}/../data/user.sqlite3.db`, (err) => {
+    if (err) {
+      return callback(err);
+    }
+    logger.info('Connected user database.');
+
+    // init db schema
+    fs.readFile('config/userdb-schema.sqlite3.sql', 'utf8', function (err,data) {
+      if (err) {
+        return callback(err);
+      }
+      dbconn.exec(data, function(err){
+        if (err) {
+          return callback(err);
+        }
+        logger.info('Initialized database schema.');
+      });
+    });
+  });
+}
 
 // close database connection on exit
 nodeCleanup(function (exitCode, signal) {
@@ -35,18 +56,6 @@ nodeCleanup(function (exitCode, signal) {
   dbconn.close();
   logger.debug('Closed user database connection.');
 });
-
-// init db with schema
-function initdb() {
-  // init db schema
-  fs.readFile('config/userdb-schema.sqlite3.sql', 'utf8', function (err,data) {
-    if (err) {
-      logger.warn(err.message);
-      return err;
-    }
-    dbconn.exec(data);
-  });
-};
 
 // add user to db
 function add_user(name, password) {

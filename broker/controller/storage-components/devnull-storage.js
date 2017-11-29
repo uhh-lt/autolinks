@@ -1,19 +1,23 @@
 'use strict';
 
 const logger = require('../log')(module)
-  , rw = require('random-words')
+  , randowords = require('random-words')
   ;
 
 
 
 // exports
 module.exports = {
+  init : function(callback){
+    logger.info('Initializing /dev/null storage.');
+    callback(null);
+  },
   read : function read(username, storagekey, callback) {
     // generate some random data
     const triple = {
-      subject: rw(),
-      predicate: rw(),
-      object: rw()
+      subject: randowords(1),
+      predicate: randowords(1),
+      object: randowords(1)
     };
     logger.info(`cowsay ( ${username}, ${JSON.stringify(storagekey)} ) : ${JSON.stringify(triple)}`);
     return callback(null, triple);

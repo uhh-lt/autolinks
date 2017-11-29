@@ -1,6 +1,6 @@
 'use strict';
 
-/* some global settings */
+/* some global settings and requirements */
 process.setMaxListeners(0); // prevent: (node:308) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 uncaughtException listeners added. Use emitter.setMaxListeners() to increase limit
 
 /* imports */
@@ -9,27 +9,50 @@ const SwaggerExpress = require('swagger-express-mw'),
   swaggerUi = require('swagger-ui-express'),
   yaml = require('yamljs'),
   nodeCleanup = require('node-cleanup'),
+  fs = require('fs'),
   logger = require('./controller/log')(module),
   servicedb = require('./controller/service_db'),
   userdb = require('./controller/user_db'),
+  storage = require('./controller/storage_wrapper'),
+  nlp = require('./controller/nlp_wrapper'),
   auth = require('./controller/auth')
   ;
 
+/* make sure the data directory exists */
+const datadir = './data';
+if (!fs.existsSync(datadir)) { fs.mkdirSync(datadir); }
 
 /*
  * init databases, exit on error
  */
-let err = servicedb.init();
-if(err){
-  logger.error(err);
-  process.exit(1);
-}
+servicedb.init(function(err){
+  if(err){
+    logger.error(err);
+    process.exit(1);
+  }
+});
 
-err = userdb.init();
-if(err){
-  logger.error(err);
-  process.exit(1);
-}
+
+userdb.init(function(err){
+  if(err){
+    logger.error(err);
+    process.exit(1);
+  }
+});
+
+storage.init(function(err){
+  if(err){
+    logger.error(err);
+    process.exit(1);
+  }
+});
+
+nlp.init(function(err){
+  if(err){
+    logger.error(err);
+    process.exit(1);
+  }
+});
 
 /*
  * init authentication

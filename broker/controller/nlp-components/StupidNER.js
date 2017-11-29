@@ -7,6 +7,11 @@ const label = utils.getLabel(__filename);
 
 module.exports = {
 
+  init : function(callback) {
+    /* nothing to do */
+    callback(null);
+  },
+
   /**
    *
    * Returns capitalized words as entities.
