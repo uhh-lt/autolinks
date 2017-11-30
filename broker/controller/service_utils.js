@@ -67,6 +67,7 @@ function ping_services(){
   }
 }
 
+// get the services + endpoints
 function get_services_and_endpoints(callback_service, callback_done){
   db.get_joined_services_and_endpoints(function(err, rows){
     if(err) {
