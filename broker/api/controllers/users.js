@@ -1,7 +1,8 @@
 'use strict';
 
-const logger = require('../../controller/log')(module)
-  , auth = require('../../controller/auth')
+const
+  auth = require('../../controller/auth'),
+  logger = require('../../controller/log')(module)
   ;
 
 module.exports = {
@@ -18,7 +19,7 @@ function get_user_info(req, res) {
         res.header('Content-Type', 'application/json; charset=utf-8');
         if (err) {
           res.status(401);
-          return res.end(JSON.stringify({message: err.message, fields: {error: err}}));
+          return res.end(JSON.stringify({message: err.message, fields: { error: err.message }}));
         }
         res.end(JSON.stringify(user));
       }

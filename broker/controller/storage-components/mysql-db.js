@@ -11,10 +11,11 @@ module.exports = {
 };
 
 // requires
-const logger = require('./log')(module)
-  , fs = require('fs')
-  , nodeCleanup = require('node-cleanup')
-  , mysql = require('mysql')
+const
+  fs = require('fs'),
+  nodeCleanup = require('node-cleanup'),
+  mysql = require('mysql'),
+  logger = require('./log')(module)
 	;
 
 // try connectiontring: 'mysql://user:pass@host/db?debug=true&charset=BIG5_CHINESE_CI&timezone=-0700&connectionlimit=100'

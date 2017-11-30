@@ -46,7 +46,7 @@ function registerAtBroker(req, res, next) {
       'accept' : 'application/json',
       'Content-Type' : 'application/json',
     },
-    body : global.serviceDefinition,
+    body : JSON.stringify(global.serviceDefinition),
   };
   request(options, function (error, response, body) {
     if(error || response.statusCode !== 200){
@@ -58,8 +58,7 @@ function registerAtBroker(req, res, next) {
       res.send(JSON.stringify({ message: msg, fields: error.message || response }));
       return res.end(next);
     }
-    // response.statuscode === 200
-    console.debuglog(`Sucessfully registered service at '${location}'.`);
+    util.debuglog(`Sucessfully registered service at '${location}'.`);
     res.header('Content-Type', 'text/plain; charset=utf-8');
     res.end('OK\n', next);
   });

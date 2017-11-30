@@ -7,9 +7,10 @@ module.exports = {
 };
 
 // imports
-const db = require('./service_db')
-  , request = require('request')
-  , logger = require('./log')(module)
+const
+  db = require('./service_db'),
+  request = require('request'),
+  logger = require('./log')(module)
 	;
 
 // ping a service
@@ -27,7 +28,7 @@ function ping_service(service) {
     });
   }
 
-  const url = `${location}/ping`;
+  const url = `${location}/service/ping`;
   request(url, function (error, response, body) {
     const now = new Date().getTime();
     if(error || response.statusCode !== 200){

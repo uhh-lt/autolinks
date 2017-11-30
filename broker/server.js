@@ -4,18 +4,19 @@
 process.setMaxListeners(0); // prevent: (node:308) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 uncaughtException listeners added. Use emitter.setMaxListeners() to increase limit
 
 /* imports */
-const SwaggerExpress = require('swagger-express-mw'),
+const
+  SwaggerExpress = require('swagger-express-mw'),
   app = require('express')(),
   swaggerUi = require('swagger-ui-express'),
   yaml = require('yamljs'),
   nodeCleanup = require('node-cleanup'),
   fs = require('fs'),
-  logger = require('./controller/log')(module),
   servicedb = require('./controller/service_db'),
   userdb = require('./controller/user_db'),
   storage = require('./controller/storage_wrapper'),
   nlp = require('./controller/nlp_wrapper'),
-  auth = require('./controller/auth')
+  auth = require('./controller/auth'),
+  logger = require('./controller/log')(module)
   ;
 
 /* make sure the data directory exists */
@@ -31,7 +32,6 @@ servicedb.init(function(err){
     process.exit(1);
   }
 });
-
 
 userdb.init(function(err){
   if(err){
@@ -104,6 +104,11 @@ app.get('/', function(req, res){
   res.redirect('api-docs');
 });
 
+// cleanup stuff at the end
+nodeCleanup(function (exitCode, signal) {
+  logger.info('Shutdown server.');
+});
+
 app.get('/test', function(req, res){
   //servicedb.add_service('asadsasd','adasdan', null, [{'name':'asd'}, {'name':'asdad'}]);
   // servicedb.update_service('wikiservice', {
@@ -144,6 +149,4 @@ app.get('/test', function(req, res){
 
 });
 
-nodeCleanup(function (exitCode, signal) {
-  logger.info('Shutdown server.');
-});
+

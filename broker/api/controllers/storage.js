@@ -1,8 +1,9 @@
 'use strict';
 
-const logger = require('../../controller/log')(module)
-  , auth = require('../../controller/auth')
-  , storage = require('../../controller/storage_wrapper')
+const
+  auth = require('../../controller/auth'),
+  storage = require('../../controller/storage_wrapper'),
+  logger = require('../../controller/log')(module)
   ;
 
 module.exports = {

@@ -1,10 +1,9 @@
 'use strict';
 
-const util = require('util')
-  , service_db = require('../../controller/service_db')
-  , service_utils = require('../../controller/service_utils')
-  , logger = require('../../controller/log')(module)
-  // , async = require('async')
+const
+  service_db = require('../../controller/service_db'),
+  service_utils = require('../../controller/service_utils'),
+  logger = require('../../controller/log')(module)
   ;
 
 module.exports = {

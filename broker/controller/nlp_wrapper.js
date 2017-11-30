@@ -1,10 +1,13 @@
 'use strict';
 
-const logger = require('./log')(module)
-// , async = require('async')
-  ;
+/**
+ * imports
+ */
+const logger = require('./log')(module);
 
-
+/**
+ * exports
+ */
 module.exports = {
   init : init,
   analyze : analyze,

@@ -12,13 +12,11 @@ module.exports = {
 };
 
 // requires
-const fs = require('fs')
-  , nodeCleanup = require('node-cleanup')
-  , sqlite3 = require('sqlite3').verbose()
-  , logger = require('./log')(module)
-  // , _ = require('lodash')
-	// , async = require('async')
-	// , bcrypt = require('bcrypt')
+const
+  fs = require('fs'),
+  nodeCleanup = require('node-cleanup'),
+  sqlite3 = require('sqlite3').verbose(),
+  logger = require('./log')(module)
 	;
 
 // database connection variable

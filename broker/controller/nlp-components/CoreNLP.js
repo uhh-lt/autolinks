@@ -1,9 +1,11 @@
 'use strict';
 
 
-const request = require('request')
-  , _ = require('lodash')
-  , async = require('async')
+const
+  request = require('request'),
+  _ = require('lodash'),
+  async = require('async'),
+  logger = require('../log')
 ;
 
 module.exports = function(){

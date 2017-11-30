@@ -1,10 +1,9 @@
 'use strict';
 
-const logger = require('../log')(module)
-  , randowords = require('random-words')
+const
+  randowords = require('random-words'),
+  logger = require('../log')(module)
   ;
-
-
 
 // exports
 module.exports = {

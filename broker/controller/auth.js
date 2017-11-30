@@ -10,10 +10,10 @@ module.exports = {
 
 
 // requires
-const passport = require('passport')
-  , user_db = require('./user_db')
-  , logger = require('./log')(module)
-  // , bcrypt = require('bcrypt')
+const
+  passport = require('passport'),
+  user_db = require('./user_db'),
+  logger = require('./log')(module)
 ;
 
 const LocalStrategy = require('passport-local').Strategy;
