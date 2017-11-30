@@ -85,9 +85,9 @@ function list_services(req, res) {
   res.header('Content-Type', 'application/json; charset=utf-8');
   res.write('[');
   let startedwriting = false;
-  service_db.get_services(
+  service_utils.get_services_and_endpoints(
     (service) => {
-      startedwriting && res.write(',');
+      if(startedwriting) { res.write(','); };
       res.write(JSON.stringify(service));
       startedwriting = true;
     },

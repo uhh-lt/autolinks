@@ -5,6 +5,7 @@ module.exports = {
   init : initdb,
   add_service : add_service,
   get_services : get_services,
+  get_joined_services_and_endpoints : get_joined_services_and_endpoints,
   get_service : get_service,
   update_service : update_service,
   update_endpoint : update_endpoint,
@@ -167,4 +168,19 @@ function get_services(callback_service, callback_done) {
     callback_service(service);
   }, () => { return callback_done(); } );
 }
-//select s.name, s.location, e.name from services as s join endpoints as e on (s.name=e.service) where s.rowid=4;
+
+
+// get all registered services and their endpoints
+function get_joined_services_and_endpoints(callback_endpointdef, callback_done) {
+  const sqlstmnt = 'select * from services as s join endpoints as e on (s.name=e.service);';
+  if(callback_done){
+    dbconn.each(sqlstmnt, [], function(err, row) {
+      if (err) {
+        return err;
+      }
+      callback_endpointdef(row);
+    }, () => { return callback_done(); } );
+    return;
+  }
+  dbconn.all(sqlstmnt, [], callback_endpointdef);
+}

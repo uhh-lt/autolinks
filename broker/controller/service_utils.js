@@ -3,11 +3,13 @@
 // exports
 module.exports = {
   ping_service: ping_service,
-  ping_services: ping_services
+  ping_services: ping_services,
+  get_services_and_endpoints : get_services_and_endpoints,
 };
 
 // imports
 const
+  _ = require('lodash'),
   db = require('./service_db'),
   request = require('request'),
   logger = require('./log')(module)
@@ -63,6 +65,40 @@ function ping_services(){
   if(err){
     logger.warn('Ping services failed.', { error: err }, {});
   }
+}
+
+function get_services_and_endpoints(callback_service, callback_done){
+  db.get_joined_services_and_endpoints(function(err, rows){
+    if(err) {
+      const newerr = new Error('Could not query service-endpoint joins.');
+      newerr.cause = err;
+      logger.warn(newerr.message, err);
+      return callback_done(newerr);
+    }
+    _(rows)
+      .groupBy(r => r.service) // group by service name
+      .map((v,k) => { // reformat row
+        return {
+          name : k,
+          location : v[0].location,
+          description : v[0].description,
+          registeredsince : v[0].registeredsince,
+          lastseenactive : v[0].lastseenactive,
+          lastcheck : v[0].lastcheck,
+          active : v[0].active,
+          endpoints : _(v).map(e => {
+            return {
+              name : e.name,
+              url : `${v[0].location}${e.name}`,
+              requireslogin : e.requireslogin,
+              lastcalled : e.lastcalled,
+            };
+          }).value(),
+        };
+      })
+      .forEach(s => callback_service(s));
+    callback_done();
+  });
 }
 
 // execute ping_services function every 10 seconds
