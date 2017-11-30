@@ -53,7 +53,7 @@ app.get('/', function(req, res){
  * provide the service description in a global variable
  * reuse the swaggerDocument to create the service definition
  */
-global.serviceDefinition = (() =>{
+global.serviceDefinition = (() => {
   // console.log(swaggerDocument);
   return {
     name : swaggerDocument.info.title,
@@ -63,8 +63,9 @@ global.serviceDefinition = (() =>{
       .filter(p => !p.startsWith('/service/'))
       .map(p => {
       return {
-        name : p,
+        path : p,
         requireslogin : p.endsWith('{username}'),
+        method: swaggerDocument.paths[p].post && 'post' || 'get'
       };
     })
   };

@@ -47,7 +47,6 @@ function initdb(callback) {
       });
     });
   });
-
 }
 
 // close database connection on exit
@@ -71,7 +70,7 @@ function add_service(name, location, description, endpoints) {
 
     // add the endpoints only after successfully added the service
     endpoints.forEach(function (ep) {
-      dbconn.run('insert or replace into endpoints(service, name, requireslogin) values(?,?,?)', [name, ep.name, ep.requireslogin], function(err) {
+      dbconn.run('insert or replace into endpoints(service, path, method, requireslogin) values(?,?,?,?)', [name, ep.path, ep.method, ep.requireslogin], function(err) {
         if (err) {
           return err;
         }
@@ -107,7 +106,7 @@ function update_service(name, serviceobj){
 }
 
 // update a service in the database, set key-value pairs from the service obj
-function update_endpoint(servicename, name, endpointobj){
+function update_endpoint(servicename, path, endpointobj){
   // prepare sql statement and values
   const keys = [];
   const vals = [];
@@ -117,9 +116,9 @@ function update_endpoint(servicename, name, endpointobj){
       keys.push(`${key} = ?`);
       vals.push(endpointobj[key]);
   });
-  const sql = `update endpoints set ${keys.join(', ')} where service = ? and name = ?`;
+  const sql = `update endpoints set ${keys.join(', ')} where service = ? and path = ?`;
   vals.push(servicename);
-  vals.push(name);
+  vals.push(path);
 
   //run sql statement
   dbconn.run(sql, vals, function(err) {
@@ -172,7 +171,7 @@ function get_services(callback_service, callback_done) {
 
 // get all registered services and their endpoints
 function get_joined_services_and_endpoints(callback_endpointdef, callback_done) {
-  const sqlstmnt = 'select * from services as s join endpoints as e on (s.name=e.service);';
+  const sqlstmnt = 'select * from services as s left join endpoints as e on (s.name=e.service);';
   if(callback_done){
     dbconn.each(sqlstmnt, [], function(err, row) {
       if (err) {

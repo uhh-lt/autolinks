@@ -113,6 +113,9 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
+
+  /bar:
+    x-swagger-router-controller: foobar
     get:
       operationId: bar
       tags:

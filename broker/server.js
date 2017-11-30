@@ -29,7 +29,7 @@ if (!fs.existsSync(datadir)) { fs.mkdirSync(datadir); }
 servicedb.init(function(err){
   if(err){
     logger.error(err);
-    process.exit(1);
+    throw err;
   }
 });
 

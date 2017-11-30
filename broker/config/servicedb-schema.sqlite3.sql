@@ -21,8 +21,9 @@ create table if not exists services (
 -- endpoint
 create table if not exists endpoints (
   service text not null,
-  name text not null,
+  path text not null,
+  method text not null,
   requireslogin boolean default false,
   lastcalled integer not null default -1,
-  primary key(service, name)
+  primary key(service, path)
 );

@@ -49,6 +49,9 @@ definitions:
       name:
         type: string
         description: the name of the endpoint
+      method:
+        type: string
+        description: the name of the endpoint
       requireslogin:
         type: boolean
         description: does the service require a user to be logged in?
@@ -166,6 +169,37 @@ tags:
     description: Everything about reading and writing of user data
 
 paths:
+
+  /service/call:
+    # tell nodejs where to find the code for this path
+    x-swagger-router-controller: services
+    post:
+      operationId: call_service
+      tags:
+        - Service
+      description: Call a service and get its response
+      parameters:
+        - name: data
+          in: body
+          description: The service + endpoint + parameter to be called
+          schema:
+            type: object
+            properties: 
+              service: 
+                type: string
+              endpoint:
+                type: string
+              data:
+                type: object
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
 
   /service/registerService:
     # tell nodejs where to find the code for this path

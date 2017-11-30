@@ -77,7 +77,7 @@ function get_services_and_endpoints(callback_service, callback_done){
       return callback_done(newerr);
     }
     _(rows)
-      .groupBy(r => r.service) // group by service name
+      .groupBy(r => r.name) // group by service name
       .map((v,k) => { // reformat row
         return {
           name : k,
@@ -87,10 +87,11 @@ function get_services_and_endpoints(callback_service, callback_done){
           lastseenactive : v[0].lastseenactive,
           lastcheck : v[0].lastcheck,
           active : v[0].active,
-          endpoints : _(v).map(e => {
+          endpoints : _(v).filter(e => e.path).map(e => {
             return {
-              name : e.name,
+              path : e.path,
               url : `${v[0].location}${e.name}`,
+              method: e.method,
               requireslogin : e.requireslogin,
               lastcalled : e.lastcalled,
             };
