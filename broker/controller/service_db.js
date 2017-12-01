@@ -7,6 +7,7 @@ module.exports = {
   get_services : get_services,
   get_joined_services_and_endpoints : get_joined_services_and_endpoints,
   get_service : get_service,
+  get_service_endpoint : get_service_endpoint,
   update_service : update_service,
   update_endpoint : update_endpoint,
   delete_service : delete_service
@@ -79,9 +80,6 @@ function add_service(name, location, description, endpoints) {
   });
 }
 
-// get all service endpoints
-//select s.name, s.location, e.name from services as s join endpoints as e on (s.name=e.service) where s.rowid=4;
-
 // update a service in the database, set key-value pairs from the service obj
 function update_service(name, serviceobj){
   // prepare sql statement and values
@@ -140,6 +138,30 @@ function get_service(name, callback){
     }
     return callback(row);
   });
+}
+
+
+// get a service from the database
+function get_service_endpoint(serviceref, endpointref, callback){
+  // prepare sql statement and values
+  const keys = [];
+  const vals = [];
+  Object.keys(serviceref)
+    .filter( key => !Array.isArray(serviceref[key]))
+    .forEach( key => {
+      keys.push(`s.${key} = ?`);
+      vals.push(serviceref[key]);
+    });
+  Object.keys(endpointref)
+    .filter( key => !Array.isArray(endpointref[key]))
+    .forEach( key => {
+      keys.push(`e.${key} = ?`);
+      vals.push(endpointref[key]);
+    });
+
+  //run sql statement
+  const sqlstmnt = `select * from services as s left join endpoints as e on (s.name=e.service) where ${keys.join(' AND ')};`;
+  dbconn.get(sqlstmnt, vals, callback);
 }
 
 // delete a service from the database

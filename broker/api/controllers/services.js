@@ -1,6 +1,7 @@
 'use strict';
 
 const
+  auth = require('../../controller/auth'),
   service_db = require('../../controller/service_db'),
   service_utils = require('../../controller/service_utils'),
   logger = require('../../controller/log')(module)
@@ -11,7 +12,8 @@ module.exports = {
   deregister_service: deregister_service,
   list_services: list_services,
   ping_services: ping_services,
-  ping_service: ping_service
+  ping_service: ping_service,
+  call_service : callService,
 };
 
 /*
@@ -95,4 +97,55 @@ function list_services(req, res) {
       res.end(']');
     }
   );
+}
+
+function callService(req, res, next) {
+
+  if(!req.swagger.params.data || !req.swagger.params.data.value){
+    const msg = 'No data provided.';
+    logger.warn(msg);
+    res.header('Content-Type', 'application/json; charset=utf-8');
+    res.status(500);
+    res.json({ message: msg });
+    return res.end(next);
+  }
+  const data = req.swagger.params.data.value;
+
+  if(!(data.service && data.path && data.method)){
+    const msg = 'No proper location provided.';
+    logger.warn(msg, data);
+    res.header('Content-Type', 'application/json; charset=utf-8');
+    res.status(500);
+    res.json({ message: msg, fields: data });
+    return res.end(next);
+  }
+
+  service_db.get_service_endpoint(
+    {name: data.service},
+    {path: data.path, method: data.method},
+    function(err, row){
+      if (err) {
+        const msg = 'Error retrieving service endpoint.';
+        logger.warn(msg, data);
+        res.header('Content-Type', 'application/json; charset=utf-8');
+        res.status(500);
+        res.json({ message: msg, fields: data });
+        return res.end(next);
+      }
+      if(!row) {
+        const msg = `Service endpoint not found: service: '${serviceref}', endpoint: '${endpointref}'.`;
+        logger.warn(msg, data);
+        res.header('Content-Type', 'application/json; charset=utf-8');
+        res.status(500);
+        res.json({ message: msg, fields: data });
+        return res.end(next);
+      }
+      if(row.requireslogin){
+        return auth.handle_authenticated_request(req, res, function(user) {
+          return service_utils.call_service(row.location, row.path.replace(/\{username\}/,user.name), row.method, data.data, req, res, next);
+        });
+      }
+      return service_utils.call_service(row.location, row.path, row.method, data.data, req, res, next);
+    });
+
 }

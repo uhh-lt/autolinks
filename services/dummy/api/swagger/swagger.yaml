@@ -6,8 +6,9 @@
 swagger: '2.0'
 info:
   version: '0.0.1'
-  title: Autolinks Dummy Service
+  title: Dummy
   description: |
+    Autolinks Dummy Service:
     This service is only here for demonstration
     and testing purposes
 
@@ -134,7 +135,7 @@ paths:
             $ref: "#/definitions/Error"
 
   /baz/{username}:
-    x-swagger-router-controller: dummy
+    x-swagger-router-controller: foobar
     post:
       operationId: baz
       tags:

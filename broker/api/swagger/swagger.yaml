@@ -178,6 +178,8 @@ paths:
       tags:
         - Service
       description: Call a service and get its response
+      security:
+        - broker_auth: []
       parameters:
         - name: data
           in: body
@@ -185,9 +187,11 @@ paths:
           schema:
             type: object
             properties: 
-              service: 
+              service:
                 type: string
-              endpoint:
+              path:
+                type: string
+              method:
                 type: string
               data:
                 type: object

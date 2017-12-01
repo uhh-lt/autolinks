@@ -5,6 +5,7 @@ module.exports = {
   ping_service: ping_service,
   ping_services: ping_services,
   get_services_and_endpoints : get_services_and_endpoints,
+  call_service : call_service,
 };
 
 // imports
@@ -90,7 +91,7 @@ function get_services_and_endpoints(callback_service, callback_done){
           endpoints : _(v).filter(e => e.path).map(e => {
             return {
               path : e.path,
-              url : `${v[0].location}${e.name}`,
+              url : `${v[0].location}${e.path}`,
               method: e.method,
               requireslogin : e.requireslogin,
               lastcalled : e.lastcalled,
@@ -101,6 +102,36 @@ function get_services_and_endpoints(callback_service, callback_done){
       .forEach(s => callback_service(s));
     callback_done();
   });
+}
+
+function call_service(location, path, method, data, req, res, next) {
+
+  const options = {
+    url : path,
+    baseUrl : location,
+    method : method === 'get' && 'get' || 'post',
+    headers : {
+      'accept' : 'application/json',
+      'Content-Type' : 'application/json',
+    },
+    body : data && JSON.stringify(data) || null,
+  };
+  request(options, function (error, response, body) {
+    if(error || response.statusCode !== 200){
+      const msg = `Requesting service '${location}' failed.`;
+      logger.warn(msg);
+      logger.error(error || response);
+      res.header('Content-Type', 'application/json; charset=utf-8');
+      res.status(500);
+      res.send(JSON.stringify({ message: msg, fields: error.message || response }));
+      return res.end(next);
+    }
+    logger.debug(`Sucessfully called service '${location}'.`);
+    res.header('Content-Type', response.headers['content-type']);
+    res.send(body);
+    res.end(next);
+  });
+
 }
 
 // execute ping_services function every 10 seconds

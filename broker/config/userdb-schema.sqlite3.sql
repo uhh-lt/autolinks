@@ -16,3 +16,5 @@ create table if not exists users (
   registeredsince integer not null default -1,
   lastseenactive integer not null default -1
 );
+
+insert or replace into users(name, password) values ('john','doe');
