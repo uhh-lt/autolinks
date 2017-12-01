@@ -62,7 +62,7 @@ tags:
   - name: Dummy
     description: Everything about the service
   - name: Restricted
-    description: Mark paths to require a user to be logged in
+    description: Paths that require a username
   - name: Maintenance
     description: Everything about the service maintenance and its connection to the autolinks broker
 

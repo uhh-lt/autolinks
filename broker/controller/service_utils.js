@@ -22,9 +22,9 @@ function ping_service(service) {
   let location = service.location;
 
   if(!location){
-    db.get_service(service.name, (service) => {
-      if(service.location){
-        return ping_service(service);
+    return db.get_service(service.name, (row) => {
+      if(row.location){
+        return ping_service(row);
       } else {
         return new Error(`No URL location for service ${service.name} found.`);
       }
