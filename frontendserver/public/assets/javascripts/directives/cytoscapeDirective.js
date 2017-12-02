@@ -37,8 +37,20 @@ define([
                 scope.doCy = function(){ // will be triggered on an event broadcast
                     // initialize data object
                     scope.elements = {};
-                    scope.elements.nodes = [];
-                    scope.elements.edges = [];
+                    scope.elements.nodes = [
+                      { data: { id: 'a', parent: 'b' }, position: { x: 215, y: 85 } },
+                      { data: { id: 'b' } },
+                      { data: { id: 'g', parent: 'a' } },
+                      { data: { id: 'h', parent: 'a' } },
+                      { data: { id: 'c', parent: 'b' }, position: { x: 300, y: 85 } },
+                      { data: { id: 'd' }, position: { x: 215, y: 175 } },
+                      { data: { id: 'e' } },
+                      { data: { id: 'f', parent: 'e' }, position: { x: 300, y: 175 } }
+                    ];
+                    scope.elements.edges = [
+                      { data: { id: 'ad', source: 'd', target: 'g' } },
+                      { data: { id: 'eb', source: 'e', target: 'b' } }
+                    ];
 
                     // parse edges
                     // you can build a complete object in the controller and pass it without rebuilding it in the directive.
@@ -109,15 +121,15 @@ define([
                            {
                             selector: 'node',
                             css: {
-                                'shape': 'data(typeShape)',
+                                'shape': 'circle',
                                 'width': '120',
                                 'height': '90',
-                                'background-color': 'data(typeColor)',
+                                // 'background-color': 'data(typeColor)',
                                 'content': 'data(name)',
                                 'text-valign': 'center',
                                 'color': 'white',
                                 'text-outline-width': 2,
-                                'text-outline-color': 'data(typeColor)'
+                                // 'text-outline-color': 'data(typeColor)'
                               }
                             },
                             {
@@ -171,6 +183,8 @@ define([
                 // }
 
                 }; // end doCy()
+
+                scope.doCy();
 
                 // When the app object changed = redraw the graph
                 // you can use it to pass data to be added or removed from the object without redrawing it
