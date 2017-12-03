@@ -21,7 +21,9 @@
       'cytoscape': 'libs/cytoscape/dist/cytoscape.min',
       'ngCy':'directives/angular-cy',
       'cytoscape-panzoom': 'libs/cytoscape-panzoom/cytoscape-panzoom',
+      'cytoscape.js-panzoom': 'libs/cytoscape-panzoom/cytoscape.js-panzoom',
       'cytoscape-expand-collapse': 'libs/cytoscape-expand-collapse/cytoscape-expand-collapse',
+      'cytoscape.js-undo-redo': 'libs/cytoscape.js-undo-redo/cytoscape-undo-redo',
       'ngMagnify': 'libs/ng-magnify/src/js/ng-magnify'
 		},
 		shim: {

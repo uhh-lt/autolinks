@@ -4,8 +4,9 @@ define([
     'cytoscape',
     'cytoscape-panzoom',
     'cytoscape-expand-collapse',
+    'cytoscape.js-undo-redo',
     'bootstrap',
-], function(angular, $, cytoscape, panzoom, expandCollapse) {
+], function(angular, $, cytoscape, panzoom, expandCollapse, undoRedo) {
     'use strict';
 
     angular.module('ngCy', [])
@@ -119,6 +120,7 @@ define([
                     debugger;
                     panzoom(cytoscape, $);
                     expandCollapse(cytoscape, $);
+                    undoRedo(cytoscape);
 
                     $(function() {
 
@@ -193,17 +195,17 @@ define([
                     // });
 
                     cy.expandCollapse({
-                      layoutBy: {
-                        name: "cose-bilkent",
-                        animate: "end",
-                        randomize: false,
-                        fit: true
-                      },
-                      fisheye: true,
-                      animate: true
+                      // layoutBy: {
+                      //   name: "ellipse",
+                      //   animate: "end",
+                      //   randomize: false,
+                      //   fit: true
+                      // },
+                      // fisheye: false,
+                      // animate: false
                     });
 
-                    debugger;
+                    // debugger;
 
                     // the default values of each option are outlined below:
                     var defaults = {
