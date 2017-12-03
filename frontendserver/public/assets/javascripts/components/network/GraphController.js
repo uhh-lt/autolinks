@@ -1,13 +1,13 @@
 define([
     'angular',
-    'ngCyt'
+    'ngCy'
 ], function(angular) {
     'use strict';
     /**
      * network graph module:
      * visualization and interaction of network graph
      */
-    angular.module('autolinks.graph', ['ngCyt']);
+    angular.module('autolinks.graph', ['ngCy']);
     angular.module('autolinks.graph')
         // Graph Controller
         .controller('GraphController', ['$scope', '$rootScope', function ($scope, $rootScope) {

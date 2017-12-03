@@ -1,16 +1,20 @@
 define([
     'angular',
-    'cytoscape'
-], function(angular, cytoscape) {
+    'jquery',
+    'cytoscape',
+    'cytoscape-panzoom',
+    'cytoscape-expand-collapse',
+    'bootstrap',
+], function(angular, $, cytoscape, panzoom, expandCollapse) {
     'use strict';
 
-    angular.module('ngCyt', [])
+    angular.module('ngCy', [])
 
     .directive('cytoscape', function($rootScope) {
         // graph visualisation by - https://github.com/cytoscape/cytoscape.js
         return {
             restrict: 'E',
-            template :'<div id="cy"></div>',
+            template :'<div id="cy-network"></div>',
             replace: true,
             scope: {
                 // data objects to be passed as an attributes - for nodes and edges
@@ -32,6 +36,9 @@ define([
                     'octagon':'#335577',
                     'star':'#113355'
                 };
+                // debugger;
+
+                //
 
                 // graph  build
                 scope.doCy = function(){ // will be triggered on an event broadcast
@@ -107,9 +114,19 @@ define([
                     // check Cytoscapes site for much more data, options, designs etc
                     // http://cytoscape.github.io/cytoscape.js/
                     // here are just some basic options
+                    // debugger;
+
                     debugger;
+                    panzoom(cytoscape, $);
+                    expandCollapse(cytoscape, $);
+
+                    $(function() {
+
+
+                    });
+
                     var cy = window.cy = cytoscape({
-                      container: document.getElementById('cy'),
+                      container: document.getElementById('cy-network'),
                         layout: {
                             name: 'circle',
                             fit: true, // whether to fit the viewport to the graph
@@ -121,7 +138,7 @@ define([
                            {
                             selector: 'node',
                             css: {
-                                'shape': 'circle',
+                                'shape': 'ellipse',
                                 'width': '120',
                                 'height': '90',
                                 // 'background-color': 'data(typeColor)',
@@ -169,22 +186,65 @@ define([
 
                     // Event listeners
                     // with sample calling to the controller function as passed as an attribute
-                    cy.on('tap', 'node', function(e){
-                        var evtTarget = e.cyTarget;
-                        var nodeId = evtTarget.id();
-                        scope.cyClick({value:nodeId});
+                    // cy.on('tap', 'node', function(e){
+                    //     var evtTarget = e.cyTarget;
+                    //     var nodeId = evtTarget.id();
+                    //     scope.cyClick({value:nodeId});
+                    // });
+
+                    cy.expandCollapse({
+                      layoutBy: {
+                        name: "cose-bilkent",
+                        animate: "end",
+                        randomize: false,
+                        fit: true
+                      },
+                      fisheye: true,
+                      animate: true
                     });
+
+                    debugger;
+
+                    // the default values of each option are outlined below:
+                    var defaults = {
+                      zoomFactor: 0.05, // zoom factor per zoom tick
+                      zoomDelay: 45, // how many ms between zoom ticks
+                      minZoom: 0.1, // min zoom level
+                      maxZoom: 10, // max zoom level
+                      fitPadding: 50, // padding when fitting
+                      panSpeed: 10, // how many ms in between pan ticks
+                      panDistance: 10, // max pan distance per tick
+                      panDragAreaSize: 75, // the length of the pan drag box in which the vector for panning is calculated (bigger = finer control of pan speed and direction)
+                      panMinPercentSpeed: 0.25, // the slowest speed we can pan by (as a percent of panSpeed)
+                      panInactiveArea: 8, // radius of inactive area in pan drag box
+                      panIndicatorMinOpacity: 0.5, // min opacity of pan indicator (the draggable nib); scales from this to 1.0
+                      zoomOnly: false, // a minimal version of the ui only with zooming (useful on systems with bad mousewheel resolution)
+                      fitSelector: undefined, // selector of elements to fit
+                      animateOnFit: function(){ // whether to animate on fit
+                        return false;
+                      },
+                      fitAnimationDuration: 1000, // duration of animation on fit
+
+                      // icon class names
+                      sliderHandleIcon: 'fa fa-minus',
+                      zoomInIcon: 'fa fa-plus',
+                      zoomOutIcon: 'fa fa-minus',
+                      resetIcon: 'fa fa-expand'
+                    };
+
+                    cy.panzoom( defaults );
 
                     // load the objects array
                     // use cy.add() / cy.remove() with passed data to add or remove nodes and edges without rebuilding the graph
                     // sample use can be adding a passed variable which will be broadcast on change
-                    debugger;
+                    // debugger;
                     // cy.add(scope.elements);
                 // }
 
                 }; // end doCy()
 
                 scope.doCy();
+
 
                 // When the app object changed = redraw the graph
                 // you can use it to pass data to be added or removed from the object without redrawing it

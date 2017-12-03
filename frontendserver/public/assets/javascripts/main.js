@@ -19,7 +19,9 @@
 			'vis': 'libs/vis/dist/vis.min',
 			'ngVis': 'directives/angular-vis',
       'cytoscape': 'libs/cytoscape/dist/cytoscape.min',
-      'ngCyt':'directives/cytoscapeDirective',
+      'ngCy':'directives/angular-cy',
+      'cytoscape-panzoom': 'libs/cytoscape-panzoom/cytoscape-panzoom',
+      'cytoscape-expand-collapse': 'libs/cytoscape-expand-collapse/cytoscape-expand-collapse',
       'ngMagnify': 'libs/ng-magnify/src/js/ng-magnify'
 		},
 		shim: {
@@ -61,7 +63,7 @@
 			'ngVis': {
 				deps: ['angular', 'vis']
 			},
-      'ngCyt': {
+      'ngCy': {
         deps: ['angular', 'cytoscape']
       },
       'ngMagnify': {

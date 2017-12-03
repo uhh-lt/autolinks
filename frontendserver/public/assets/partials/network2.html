@@ -1,31 +1,25 @@
 <div>
   <div id="content" class="container" ng-controller="GraphController">
     <div >
-        <button ng-click="reset()">Reset nodes</button>
-          ||||
-         Node
-        <select ng-model="form.obj.objTypes" ng-options="name for name in objTypes"></select>
-        <input ng-model="form.obj.name"/><button ng-click="addObj()">Add node</button>
-
-        &nbsp&nbsp&nbsp&nbsp&nbsp
-
-        <span ng-hide="mapData.length>1">
-            After adding 2 nodes, you can start adding connecting edges
-        </span>
-        <span ng-show="mapData.length>1">
-      Edge (between 2 nodes)
+      <span>Node:</span>
+      <select ng-model="form.obj.objTypes" ng-options="name for name in objTypes"></select>
+      <input ng-model="form.obj.name"/>
+      <button class="md-button md-primary md-raised md-button submit-button" ng-click="addObj()">Add node</button>
+      <span ng-hide="mapData.length > 1">
+        After adding 2 nodes, you can start adding connecting edges
+      </span>
+      <span ng-show="mapData.length > 1">
+          Edge (between 2 nodes)
         <select ng-model="formEdges.fromName" ng-options="c.name for c in mapData">
-            <option value=""> From >> </option>
+          <option value=""> From >> </option>
         </select>
         <select ng-model="formEdges.toName" ng-options="c.name for c in mapData">
-            <option value="">  To >> </option>
+          <option value="">  To >> </option>
         </select>
-          <button ng-click="addEdge()">Add edge</button>
-            </span>
-        <hr>
-        <cytoscape cy-data="mapData" cy-edges="edgeData" cy-click="doClick(value)"></cytoscape>
-
-        <br>
+        <button class="md-button md-primary md-raised md-button submit-button" ng-click="addEdge()">Add edge</button>
+      </span>
+      <button class="md-button md-primary md-raised md-button submit-button right" ng-click="reset()">Reset nodes</button>
+      <cytoscape class="" cy-data="mapData" cy-edges="edgeData" cy-click="doClick(value)" />
     </div>
   </div>
 </div>
