@@ -18,12 +18,14 @@
 			'underscore': 'libs/underscore/underscore-min',
 			'vis': 'libs/vis/dist/vis.min',
 			'ngVis': 'directives/angular-vis',
-      'cytoscape': 'libs/cytoscape/dist/cytoscape.min',
       'ngCy':'directives/angular-cy',
+      'cytoscape': 'libs/cytoscape/dist/cytoscape.min',
+      'cytoscape-cola': 'libs/cytoscape-cola/cytoscape-cola',
       'cytoscape-panzoom': 'libs/cytoscape-panzoom/cytoscape-panzoom',
       'cytoscape.js-panzoom': 'libs/cytoscape-panzoom/cytoscape.js-panzoom',
       'cytoscape-expand-collapse': 'libs/cytoscape-expand-collapse/cytoscape-expand-collapse',
       'cytoscape.js-undo-redo': 'libs/cytoscape.js-undo-redo/cytoscape-undo-redo',
+      'cola': 'libs/webcola/WebCola/cola.min',
       'ngMagnify': 'libs/ng-magnify/src/js/ng-magnify'
 		},
 		shim: {

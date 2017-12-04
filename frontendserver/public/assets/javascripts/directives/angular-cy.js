@@ -1,12 +1,14 @@
 define([
     'angular',
     'jquery',
+    'cola',
     'cytoscape',
+    'cytoscape-cola',
     'cytoscape-panzoom',
     'cytoscape-expand-collapse',
     'cytoscape.js-undo-redo',
     'bootstrap',
-], function(angular, $, cytoscape, panzoom, expandCollapse, undoRedo) {
+], function(angular, $, cola, cytoscape, cycola, panzoom, expandCollapse, undoRedo) {
     'use strict';
 
     angular.module('ngCy', [])
@@ -46,8 +48,8 @@ define([
                     // initialize data object
                     scope.elements = {};
                     scope.elements.nodes = [
-                      { data: { id: 'a', parent: 'b' }, position: { x: 215, y: 85 } },
-                      { data: { id: 'b' } },
+                      { data: { id: 'a', parent: 'b', name: "Disease" }, position: { x: 215, y: 85 } },
+                      { data: { id: 'b', name: "Caucasian race" } },
                       { data: { id: 'g', parent: 'a' } },
                       { data: { id: 'h', parent: 'a' } },
                       { data: { id: 'c', parent: 'b' }, position: { x: 300, y: 85 } },
@@ -116,21 +118,15 @@ define([
                     // http://cytoscape.github.io/cytoscape.js/
                     // here are just some basic options
                     // debugger;
-
-                    debugger;
                     panzoom(cytoscape, $);
                     expandCollapse(cytoscape, $);
                     undoRedo(cytoscape);
-
-                    $(function() {
-
-
-                    });
+                    cycola(cytoscape, cola);
 
                     var cy = window.cy = cytoscape({
                       container: document.getElementById('cy-network'),
                         layout: {
-                            name: 'circle',
+                            name: 'cola',
                             fit: true, // whether to fit the viewport to the graph
                             ready: undefined, // callback on layoutready
                             stop: undefined, // callback on layoutstop
@@ -140,10 +136,11 @@ define([
                            {
                             selector: 'node',
                             css: {
-                                'shape': 'ellipse',
+                                'shape': 'roundrectangle',
                                 'width': '120',
-                                'height': '90',
-                                // 'background-color': 'data(typeColor)',
+                                'height': '50',
+
+                                'background-color': 'rgba(109, 127, 227, 0.84)',
                                 'content': 'data(name)',
                                 'text-valign': 'center',
                                 'color': 'white',
@@ -154,11 +151,25 @@ define([
                             {
                             selector: 'edge',
                             css:{
-                                'width': '10',
+                                // 'width': '10',
+                                'content': 'wakwaw',
                                 'target-arrow-shape': 'triangle',
                                 'source-arrow-shape': 'triangle'
                               }
                             },
+                            {
+                              selector: ':parent',
+                              style: {
+                                'background-opacity': 0.333
+                              }
+                            },
+                						{
+                							selector: "node.cy-expand-collapse-collapsed-node",
+                							style: {
+                								"background-color": "darkblue",
+                								"shape": "hexagon"
+                							}
+                						},
                             {
                             selector: ':selected',
                             css: {
@@ -186,6 +197,17 @@ define([
                     // giddy up...
                     cy.elements().unselectify();
 
+                    // var params = {
+                    //   name: 'concentric',
+                    //   nodeSpacing: 5,
+                    //   edgeLengthVal: 45,
+                    //   animate: true,
+                    //   randomize: false,
+                    //   maxSimulationTime: 1500
+                    // };
+                    //
+                    // cy.layout( params );
+
                     // Event listeners
                     // with sample calling to the controller function as passed as an attribute
                     // cy.on('tap', 'node', function(e){
@@ -195,14 +217,14 @@ define([
                     // });
 
                     cy.expandCollapse({
-                      // layoutBy: {
-                      //   name: "ellipse",
-                      //   animate: "end",
-                      //   randomize: false,
-                      //   fit: true
-                      // },
-                      // fisheye: false,
-                      // animate: false
+                      layoutBy: {
+                        name: "circle",
+                        // animate: "end",
+                        randomize: false,
+                        fit: true
+                      },
+                      fisheye: false,
+                      animate: false
                     });
 
                     // debugger;
