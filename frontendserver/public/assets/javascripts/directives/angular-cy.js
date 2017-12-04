@@ -7,10 +7,11 @@ define([
     'cytoscape-panzoom',
     'cytoscape-qtip',
     'cytoscape-expand-collapse',
+    'cytoscape-edgehandles',
     'cytoscape.js-undo-redo',
     'qtip2',
     'bootstrap',
-], function(angular, $, cola, cytoscape, cycola, panzoom, cyqtip, expandCollapse, undoRedo, qtip2) {
+], function(angular, $, cola, cytoscape, cycola, panzoom, cyqtip, expandCollapse,edgehandles, undoRedo, qtip2) {
     'use strict';
 
     angular.module('ngCy', [])
@@ -125,6 +126,7 @@ define([
                     undoRedo(cytoscape);
                     cycola(cytoscape, cola);
                     cyqtip(cytoscape, $);
+                    edgehandles(cytoscape);
 
                     var cy = window.cy = cytoscape({
                       container: document.getElementById('cy-network'),
@@ -142,10 +144,9 @@ define([
                            {
                             selector: 'node',
                             css: {
-                                'shape': 'roundrectangle',
-                                'width': '120',
+                                'shape': 'ellipse',
+                                'width': '50',
                                 'height': '50',
-
                                 'background-color': 'rgba(109, 127, 227, 0.84)',
                                 'content': 'data(name)',
                                 'text-valign': 'center',
@@ -158,7 +159,7 @@ define([
                             selector: 'edge',
                             css:{
                                 // 'width': '10',
-                                'content': 'wakwaw',
+                                'content': 'has_relation',
                                 'target-arrow-shape': 'triangle',
                                 'source-arrow-shape': 'triangle'
                               }
@@ -173,7 +174,7 @@ define([
                 							selector: "node.cy-expand-collapse-collapsed-node",
                 							style: {
                 								"background-color": "darkblue",
-                								"shape": "hexagon"
+                								"shape": "rectangle"
                 							}
                 						},
                             {
@@ -192,7 +193,57 @@ define([
                                 'opacity': 0.65,
                                 'text-opacity': 0.65
                               }
+                            },
+
+                            // some style for the extension
+
+                            {
+                              selector: '.eh-handle',
+                              style: {
+                                'background-color': 'red',
+                                'width': 12,
+                                'height': 12,
+                                'shape': 'ellipse',
+                                'overlay-opacity': 0,
+                                'border-width': 12, // makes the handle easier to hit
+                                'border-opacity': 0
+                              }
+                            },
+
+                            {
+                              selector: '.eh-hover',
+                              style: {
+                                'background-color': 'red'
+                              }
+                            },
+
+                            {
+                              selector: '.eh-source',
+                              style: {
+                                'border-width': 2,
+                                'border-color': 'red'
+                              }
+                            },
+
+                            {
+                              selector: '.eh-target',
+                              style: {
+                                'border-width': 2,
+                                'border-color': 'red'
+                              }
+                            },
+
+                            {
+                              selector: '.eh-preview, .eh-ghost-edge',
+                              style: {
+                                'background-color': 'red',
+                                'line-color': 'red',
+                                'target-arrow-color': 'red',
+                                'source-arrow-color': 'red'
+                              }
                             }
+
+
                           ],
                           elements: scope.elements
                     });
@@ -242,7 +293,7 @@ define([
 
                     cy.expandCollapse({
                       layoutBy: {
-                        name: "circle",
+                        name: "cola",
                         // animate: "end",
                         randomize: false,
                         fit: true
@@ -281,6 +332,24 @@ define([
                     };
 
                     cy.panzoom( defaults );
+
+                    // var eh = cy.edgehandles();
+
+                    // debugger;
+                    // document.querySelector('#draw-on').addEventListener('click', function() {
+                    //   debugger;
+                    //   eh.enableDrawMode();
+                    // });
+                    //
+                    // document.querySelector('#draw-off').addEventListener('click', function() {
+                    //   eh.disableDrawMode();
+                    // });
+                    //
+                    // document.querySelector('#start').addEventListener('click', function() {
+                    //   eh.start( cy.$('node:selected') );
+                    // });
+
+                    // cy.edgehandles();
 
                     // load the objects array
                     // use cy.add() / cy.remove() with passed data to add or remove nodes and edges without rebuilding the graph

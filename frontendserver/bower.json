@@ -37,7 +37,9 @@
     "cytoscape.js-undo-redo": "^1.2.14",
     "cytoscape-cola": "^2.0.1",
     "webcola": "^3.3.6",
-    "cytoscape-qtip": "^2.7.1"
+    "cytoscape-qtip": "^2.7.1",
+    "cytoscape-cxtmenu": "^2.10.3",
+    "cytoscape-edgehandles": "^3.0.2"
   },
   "resolutions": {
     "angular": "1.6.6"

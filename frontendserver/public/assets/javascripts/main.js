@@ -24,6 +24,7 @@
       'cytoscape-panzoom': 'libs/cytoscape-panzoom/cytoscape-panzoom',
       'cytoscape.js-panzoom': 'libs/cytoscape-panzoom/cytoscape.js-panzoom',
       'cytoscape-expand-collapse': 'libs/cytoscape-expand-collapse/cytoscape-expand-collapse',
+      'cytoscape-edgehandles': 'libs/cytoscape-edgehandles/cytoscape-edgehandles',
       'cytoscape.js-undo-redo': 'libs/cytoscape.js-undo-redo/cytoscape-undo-redo',
       'cytoscape-qtip': 'libs/cytoscape-qtip/cytoscape-qtip',
       'qtip2': 'libs/qtip2/basic/jquery.qtip.min',
