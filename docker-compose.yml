@@ -42,6 +42,12 @@ services:
     networks:
       - anet
     working_dir: /opt/project
+    restart: unless-stopped
+    healthcheck:
+      test: curl 0.0.0.0:10010/ping
+      interval: 10s
+      timeout: 5s
+      retries: 3
     entrypoint:
       - /bin/sh
       - -c
@@ -54,6 +60,7 @@ services:
       - NODE_ENV=production
       - COOKIE_SECRET=hfiauhdfnaln
       - LOGLEVEL=info
+
   # END: broker
 
   ##

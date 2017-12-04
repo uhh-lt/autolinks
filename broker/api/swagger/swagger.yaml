@@ -167,8 +167,35 @@ tags:
     description: Everything about nlp
   - name: Storage
     description: Everything about reading and writing of user data
+  - name: Maintenance
+    description: Everything about the maintenance and availability of the vrok and writing of user data
 
 paths:
+
+  # here are service related endpoints
+  /ping:
+    x-swagger-router-controller: maintenance
+    get:
+      operationId: ping
+      tags:
+        - Maintenance
+      summary: self check
+      description: |
+        returns 'OK' if fully functional, ERROR otherwise
+      consumes: []
+      produces:
+        - text/plain
+      parameters: []
+      responses:
+        200:
+          description: single string with ok message
+          schema:
+            type: string
+            default: 'OK'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 
   /service/call:
     # tell nodejs where to find the code for this path
@@ -186,7 +213,7 @@ paths:
           description: The service + endpoint + parameter to be called
           schema:
             type: object
-            properties: 
+            properties:
               service:
                 type: string
               path:
@@ -195,6 +222,34 @@ paths:
                 type: string
               data:
                 type: object
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+
+  /service/details:
+    x-swagger-router-controller: services
+    post:
+      operationId: get_service_details
+      tags:
+        - Service
+      description: Get service details of a registered service
+      parameters:
+        - name: data
+          in: body
+          description: The name of the of the service
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              extended:
+                type: boolean
       responses:
         200:
           description: Success
@@ -273,21 +328,9 @@ paths:
           schema:
             $ref: "#/definitions/Error"
 
-  /service/pingServices:
-    x-swagger-router-controller: services
-    get:
-      operationId: ping_services
-      tags:
-        - Service
-      description: Ping registered services
-      responses:
-        200:
-          description: Success
-        default:
-          description: Error
-
   /service/pingService:
     x-swagger-router-controller: services
+    # ping given service
     post:
       operationId: ping_service
       tags:
@@ -302,6 +345,17 @@ paths:
             properties:
               name:
                 type: string
+      responses:
+        200:
+          description: Success
+        default:
+          description: Error
+    # ping all services
+    get:
+      operationId: ping_services
+      tags:
+        - Service
+      description: Ping registered services
       responses:
         200:
           description: Success

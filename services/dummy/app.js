@@ -12,8 +12,8 @@ const SwaggerExpress = require('swagger-express-mw'),
   util = require('util'),
   yaml = require('yamljs'),
   nodeCleanup = require('node-cleanup'),
-  os = require("os"),
-  fs = require('fs')
+  os = require('os'),
+  request = require('request')
 ;
 
 /**
@@ -71,6 +71,41 @@ global.serviceDefinition = (() => {
   };
 })();
 console.log('Service Definition: ', global.serviceDefinition);
+
+/**
+ * register at broker
+ */
+(function registerAtBroker() {
+
+  // wait while global.serviceDefinition is not available
+  if(!global.serviceDefinition) {
+    util.debuglog('Waiting for service definition to be computed.');
+    return setTimeout(registerAtBroker, 1000);
+  }
+
+  const location = process.env.BROKER_URL || 'http://broker:10010';
+  console.log(`Registering self at broker at '${location}'.`);
+  const options = {
+    url : '/service/registerService',
+    baseUrl : location,
+    method : 'POST',
+    headers : {
+      'accept' : 'application/json',
+      'Content-Type' : 'application/json',
+    },
+    body : JSON.stringify(global.serviceDefinition),
+  };
+  request(options, function (error, response, body) {
+    if(error || response.statusCode !== 200){
+      const msg = `Registering self at '${location}' failed.`;
+      console.warn(msg);
+      return console.warn(error || response);
+    }
+    console.log(`Sucessfully registered service at '${location}'.`);
+  });
+
+})();
+
 
 /**
  * cleanup on shutdown

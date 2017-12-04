@@ -164,7 +164,7 @@ paths:
             $ref: "#/definitions/Error"
 
   # here are service related endpoints
-  /service/ping:
+  /ping:
     x-swagger-router-controller: maintenance
     get:
       operationId: ping

@@ -6,6 +6,7 @@ module.exports = {
   add_service : add_service,
   get_services : get_services,
   get_joined_services_and_endpoints : get_joined_services_and_endpoints,
+  get_joined_service_and_endpoints : get_joined_service_and_endpoints,
   get_service : get_service,
   get_service_endpoint : get_service_endpoint,
   update_service : update_service,
@@ -204,4 +205,20 @@ function get_joined_services_and_endpoints(callback_endpointdef, callback_done) 
     return;
   }
   dbconn.all(sqlstmnt, [], callback_endpointdef);
+}
+
+/**
+ *
+ * get all registered services and their endpoints
+ *
+ * @param servicename
+ * @param callback = function(err, rows)
+ *
+ */
+function get_joined_service_and_endpoints(servicename, callback) {
+  dbconn.all(
+    'select * from services as s left join endpoints as e on (s.name=e.service and s.name = ?);',
+    [ servicename ],
+    callback
+  );
 }

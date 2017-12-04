@@ -41,16 +41,16 @@ function doSomething(req, res, next) {
   if(!entity){
     return res.end('No entity provided.', next);
   }
-
-  const triple = {
-    subject: entity.text,
+  const etext = entity.text || 'Simon';
+  const triples = [{
+    subject: etext,
     predicate: 'says',
     object: 'hello'
-  };
+  }];
 
   // this sends back a JSON response and ends the response
   res.header('Content-Type', 'application/json; charset=utf-8');
-  res.json(triple);
+  res.json(triples);
   res.end(next);
 
 }

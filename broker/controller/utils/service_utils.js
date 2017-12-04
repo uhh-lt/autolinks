@@ -5,15 +5,17 @@ module.exports = {
   ping_service: ping_service,
   ping_services: ping_services,
   get_services_and_endpoints : get_services_and_endpoints,
+  get_service_and_endpoints : get_service_and_endpoints,
+  get_service_details : get_service_details,
   call_service : call_service,
 };
 
 // imports
 const
   _ = require('lodash'),
-  db = require('./service_db'),
+  db = require('../service_db'),
   request = require('request'),
-  logger = require('./log')(module)
+  logger = require('../log')(module)
 	;
 
 // ping a service
@@ -31,7 +33,7 @@ function ping_service(service) {
     });
   }
 
-  const url = `${location}/service/ping`;
+  const url = `${location}/ping`;
   request(url, function (error, response, body) {
     const now = new Date().getTime();
     if(error || response.statusCode !== 200){
@@ -77,31 +79,59 @@ function get_services_and_endpoints(callback_service, callback_done){
       logger.warn(newerr.message, err);
       return callback_done(newerr);
     }
-    _(rows)
-      .groupBy(r => r.name) // group by service name
-      .map((v,k) => { // reformat row
-        return {
-          name : k,
-          location : v[0].location,
-          description : v[0].description,
-          registeredsince : v[0].registeredsince,
-          lastseenactive : v[0].lastseenactive,
-          lastcheck : v[0].lastcheck,
-          active : v[0].active,
-          endpoints : _(v).filter(e => e.path).map(e => {
-            return {
-              path : e.path,
-              url : `${v[0].location}${e.path}`,
-              method: e.method,
-              requireslogin : e.requireslogin,
-              lastcalled : e.lastcalled,
-            };
-          }).value(),
-        };
-      })
+    remap_joined_service_endpoint_rows(rows)
       .forEach(s => callback_service(s));
     callback_done();
   });
+}
+
+// get a service and its endpoints
+function get_service_and_endpoints(servicename, callback) {
+  db.get_joined_service_and_endpoints(servicename, function(err, rows) {
+    if(err) {
+      const newerr = new Error('Could not query service-endpoint joins.');
+      newerr.cause = err;
+      logger.warn(newerr.message, err);
+      return callback(newerr, null);
+    }
+    const services = remap_joined_service_endpoint_rows(rows);
+    if(services.length < 1){
+      // TODO: no service found
+    }
+    if(services.length > 1){
+      // TODO: too many services found, why??
+    }
+    callback(null, services[0]);
+  });
+}
+
+
+/**
+ *
+ * @param rows
+ */
+function remap_joined_service_endpoint_rows(rows) {
+  return _(rows).groupBy(r => r.name) // group by service name
+    .map((v,k) => { // reformat row
+      return {
+        name : k,
+        location : v[0].location,
+        description : v[0].description,
+        registeredsince : v[0].registeredsince,
+        lastseenactive : v[0].lastseenactive,
+        lastcheck : v[0].lastcheck,
+        active : v[0].active,
+        endpoints : _(v).filter(e => e.path).map(e => {
+          return {
+            path : e.path,
+            url : `${v[0].location}${e.path}`,
+            method: e.method,
+            requireslogin : e.requireslogin,
+            lastcalled : e.lastcalled,
+          };
+        }).value(),
+      };
+    }).value();
 }
 
 function call_service(location, path, method, data, req, res, next) {
@@ -132,6 +162,29 @@ function call_service(location, path, method, data, req, res, next) {
     res.end(next);
   });
 
+}
+
+
+function get_service_details(servicename, extended, callback) {
+  if (!extended) {
+    return get_service_and_endpoints(servicename, callback);
+  }
+
+  return get_service_and_endpoints(servicename, function (err, service) {
+    const location = `${service.location}/swagger`;
+    request(location, function (error, response, body) {
+      if (error || response.statusCode !== 200) {
+        const msg = `Requesting service details from '${location}' failed.`;
+        logger.warn(msg);
+        logger.error(error || response);
+        const newerr = new Error(msg);
+        newerr.cause = err;
+        return callback(newerr, null);
+      }
+      service.swagger = JSON.parse(body);
+      callback(null, service);
+    });
+  });
 }
 
 // execute ping_services function every 10 seconds

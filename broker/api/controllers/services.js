@@ -3,7 +3,7 @@
 const
   auth = require('../../controller/auth'),
   service_db = require('../../controller/service_db'),
-  service_utils = require('../../controller/service_utils'),
+  service_utils = require('../../controller/utils/service_utils'),
   logger = require('../../controller/log')(module)
   ;
 
@@ -14,6 +14,7 @@ module.exports = {
   ping_services: ping_services,
   ping_service: ping_service,
   call_service : callService,
+  get_service_details : getServiceDetails,
 };
 
 /*
@@ -147,5 +148,53 @@ function callService(req, res, next) {
       }
       return service_utils.call_service(row.location, row.path, row.method, data.data, req, res, next);
     });
+
+}
+
+function getServiceDetails(req, res, next) {
+
+  if(!req.swagger.params.data || !req.swagger.params.data.value){
+    const msg = 'No data provided.';
+    logger.warn(msg);
+    res.header('Content-Type', 'application/json; charset=utf-8');
+    res.status(500);
+    res.json({ message: msg });
+    return res.end(next);
+  }
+  const data = req.swagger.params.data.value;
+
+  if(!data.name){
+    const msg = 'No proper service name provided.';
+    logger.warn(msg, data);
+    res.header('Content-Type', 'application/json; charset=utf-8');
+    res.status(500);
+    res.json({ message: msg, fields: data });
+    return res.end(next);
+  }
+
+  service_utils.get_service_details(data.name, data.extended, function(err, service) {
+    if(err) {
+      const msg = 'Error while getting service details.';
+      logger.warn(err.message);
+      logger.warn(msg);
+      res.header('Content-Type', 'application/json; charset=utf-8');
+      res.status(500);
+      res.json({message: msg, fields: err.message});
+      return res.end(next);
+    }
+    if(!service){
+      const msg = 'Service not found.';
+      logger.warn(err.message);
+      logger.warn(msg);
+      res.header('Content-Type', 'application/json; charset=utf-8');
+      res.status(500);
+      res.json({message: msg, fields: err.message});
+      return res.end(next);
+    }
+    res.header('Content-Type', 'application/json; charset=utf-8');
+    res.write(JSON.stringify(service));
+    res.end(next);
+    }
+  );
 
 }
