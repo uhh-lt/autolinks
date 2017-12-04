@@ -60,7 +60,6 @@ services:
       - NODE_ENV=production
       - COOKIE_SECRET=hfiauhdfnaln
       - LOGLEVEL=info
-
   # END: broker
 
   ##
@@ -87,4 +86,9 @@ services:
     environment:
       - NODE_ENV=production
       - COOKIE_SECRET=ksuhfiuawhiufgb
+      - BROKER_URL=http://broker:10010
+    restart: unless-stopped
+    depends_on:
+      broker:
+        condition: service_healthy
   # END: dummy service
