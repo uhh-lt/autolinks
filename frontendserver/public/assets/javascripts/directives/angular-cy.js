@@ -4,6 +4,7 @@ define([
     'cola',
     'cytoscape',
     'cytoscape-cola',
+    'cytoscape-cxtmenu',
     'cytoscape-panzoom',
     'cytoscape-qtip',
     'cytoscape-expand-collapse',
@@ -11,7 +12,7 @@ define([
     'cytoscape.js-undo-redo',
     'qtip2',
     'bootstrap',
-], function(angular, $, cola, cytoscape, cycola, panzoom, cyqtip, expandCollapse,edgehandles, undoRedo, qtip2) {
+], function(angular, $, cola, cytoscape, cycola, cxtmenu, panzoom, cyqtip, expandCollapse,edgehandles, undoRedo, qtip2) {
     'use strict';
 
     angular.module('ngCy', [])
@@ -126,6 +127,7 @@ define([
                     undoRedo(cytoscape);
                     cycola(cytoscape, cola);
                     cyqtip(cytoscape, $);
+                    cxtmenu(cytoscape);
                     edgehandles(cytoscape);
 
                     var cy = window.cy = cytoscape({
@@ -144,8 +146,8 @@ define([
                            {
                             selector: 'node',
                             css: {
-                                'shape': 'ellipse',
-                                'width': '50',
+                                'shape': 'roundrectangle',
+                                'width': '100',
                                 'height': '50',
                                 'background-color': 'rgba(109, 127, 227, 0.84)',
                                 'content': 'data(name)',
@@ -332,6 +334,52 @@ define([
                     };
 
                     cy.panzoom( defaults );
+
+                    cy.cxtmenu({
+                      selector: 'node, edge',
+            					commands: [
+            						{
+            							content: '<span class="fa fa-flash fa-2x"></span>',
+            							select: function(ele){
+            								console.log( ele.id() );
+            							}
+            						},
+
+            						{
+            							content: '<span class="fa fa-star fa-2x"></span>',
+            							select: function(ele){
+            								console.log( ele.data('name') );
+            							},
+            							disabled: true
+            						},
+
+            						{
+            							content: 'Text',
+            							select: function(ele){
+            								console.log( ele.position() );
+            							}
+            						}
+            					]
+                    });
+
+                    cy.cxtmenu({
+          					selector: 'core',
+          					commands: [
+          						{
+          							content: 'function 1',
+          							select: function(){
+          								console.log( 'function 1' );
+          							}
+          						},
+
+          						{
+          							content: 'function 2',
+          							select: function(){
+          								console.log( 'function 2' );
+          							}
+          						}
+          					]
+          				});
 
                     // var eh = cy.edgehandles();
 
