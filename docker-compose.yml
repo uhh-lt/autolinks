@@ -1,0 +1,83 @@
+######
+##
+# 1) start: docker-compose up -d
+# 2) attach: docker attach ...
+# 3) detach: detach with <CTRL-p> <CTRL-q>
+# 4) stop: docker-compose down
+##
+######
+version: '2.3'
+
+networks:
+  anet:
+
+services:
+
+  ##
+  # Main components and their dependencies
+  ##
+  # BEGIN: frontend
+#  frontend:
+#    image: node:9.2
+#    volumes:
+#      - ${PWD}/frontendserver:/opt/project
+#    ports:
+#      - 10000:10010
+#      - 3000:3001
+#    networks:
+#      - anet
+#    working_dir: /opt/project
+#    environment:
+#      - NODE_ENV=production
+#      - COOKIE_SECRET=bsiusu78wbv
+  # END: frontend
+
+  # BEGIN: broker
+  broker:
+    image: node:9.2
+    volumes:
+      - ${PWD}/broker:/opt/project
+    ports:
+      - 20000:10010
+    networks:
+      - anet
+    working_dir: /opt/project
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        echo installing modules ...
+        npm install
+        echo starting server ...
+        npm start
+    environment:
+      - NODE_ENV=production
+      - COOKIE_SECRET=hfiauhdfnaln
+      - LOGLEVEL=info
+  # END: broker
+
+  ##
+  # Services and their dependencies
+  ##
+  # BEGIN: dummy service
+  dummy:
+    image: node:9.2
+    volumes:
+      - ${PWD}/services/dummy:/opt/project
+    ports:
+      - 20010:10010
+    networks:
+      - anet
+    working_dir: /opt/project
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        echo installing modules ...
+        npm install
+        echo starting server ...
+        npm start
+    environment:
+      - NODE_ENV=production
+      - COOKIE_SECRET=ksuhfiuawhiufgb
+  # END: dummy service

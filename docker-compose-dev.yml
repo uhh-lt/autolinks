@@ -22,8 +22,8 @@ services:
     volumes:
       - ${PWD}/frontendserver:/opt/project
     ports:
-      - 10000:10010
-      - 3000:3001
+      - 10001:10010
+      - 3001:3001
     networks:
       - anet
     stdin_open: true
@@ -42,8 +42,8 @@ services:
     volumes:
       - ${PWD}/broker:/opt/project
     ports:
-      - 10001:10010
-      - 3001:3001
+      - 10000:10010
+      - 3000:3001
     networks:
       - anet
     stdin_open: true
