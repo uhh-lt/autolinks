@@ -36,7 +36,8 @@
     "cytoscape-panzoom": "^2.5.2",
     "cytoscape.js-undo-redo": "^1.2.14",
     "cytoscape-cola": "^2.0.1",
-    "webcola": "^3.3.6"
+    "webcola": "^3.3.6",
+    "cytoscape-qtip": "^2.7.1"
   },
   "resolutions": {
     "angular": "1.6.6"

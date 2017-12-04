@@ -25,6 +25,8 @@
       'cytoscape.js-panzoom': 'libs/cytoscape-panzoom/cytoscape.js-panzoom',
       'cytoscape-expand-collapse': 'libs/cytoscape-expand-collapse/cytoscape-expand-collapse',
       'cytoscape.js-undo-redo': 'libs/cytoscape.js-undo-redo/cytoscape-undo-redo',
+      'cytoscape-qtip': 'libs/cytoscape-qtip/cytoscape-qtip',
+      'qtip2': 'libs/qtip2/basic/jquery.qtip.min',
       'cola': 'libs/webcola/WebCola/cola.min',
       'ngMagnify': 'libs/ng-magnify/src/js/ng-magnify'
 		},

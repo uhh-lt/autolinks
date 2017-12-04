@@ -5,10 +5,12 @@ define([
     'cytoscape',
     'cytoscape-cola',
     'cytoscape-panzoom',
+    'cytoscape-qtip',
     'cytoscape-expand-collapse',
     'cytoscape.js-undo-redo',
+    'qtip2',
     'bootstrap',
-], function(angular, $, cola, cytoscape, cycola, panzoom, expandCollapse, undoRedo) {
+], function(angular, $, cola, cytoscape, cycola, panzoom, cyqtip, expandCollapse, undoRedo, qtip2) {
     'use strict';
 
     angular.module('ngCy', [])
@@ -53,7 +55,7 @@ define([
                       { data: { id: 'g', parent: 'a' } },
                       { data: { id: 'h', parent: 'a' } },
                       { data: { id: 'c', parent: 'b' }, position: { x: 300, y: 85 } },
-                      { data: { id: 'd' }, position: { x: 215, y: 175 } },
+                      { data: { id: 'd', name: "Caucasian race"}, position: { x: 215, y: 175 } },
                       { data: { id: 'e' } },
                       { data: { id: 'f', parent: 'e' }, position: { x: 300, y: 175 } }
                     ];
@@ -122,11 +124,15 @@ define([
                     expandCollapse(cytoscape, $);
                     undoRedo(cytoscape);
                     cycola(cytoscape, cola);
+                    cyqtip(cytoscape, $);
 
                     var cy = window.cy = cytoscape({
                       container: document.getElementById('cy-network'),
                         layout: {
                             name: 'cola',
+                            animate: true,
+                            avoidOverlap: true, // if true, prevents overlap of node bounding boxes
+                            handleDisconnected: true, // if true, avoids disconnected components from overlapping
                             fit: true, // whether to fit the viewport to the graph
                             ready: undefined, // callback on layoutready
                             stop: undefined, // callback on layoutstop
@@ -198,7 +204,8 @@ define([
                     cy.elements().unselectify();
 
                     // var params = {
-                    //   name: 'concentric',
+                    //   name: 'cola',
+                    //   avoidOverlap: true,
                     //   nodeSpacing: 5,
                     //   edgeLengthVal: 45,
                     //   animate: true,
@@ -215,6 +222,23 @@ define([
                     //     var nodeId = evtTarget.id();
                     //     scope.cyClick({value:nodeId});
                     // });
+
+                    debugger;
+
+                    cy.$('#d').qtip({
+                      content: 'Hello!',
+                      position: {
+                        my: 'top center',
+                        at: 'bottom center'
+                      },
+                      style: {
+                        classes: 'qtip-bootstrap',
+                        tip: {
+                          width: 16,
+                          height: 8
+                        }
+                      }
+                    });
 
                     cy.expandCollapse({
                       layoutBy: {
