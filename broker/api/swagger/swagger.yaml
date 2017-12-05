@@ -408,6 +408,84 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
+            
+  /user/register:
+    x-swagger-router-controller: users
+    post:
+      tags:
+        - User
+      description: Register a new user
+      # used as the method name of the controller
+      operationId: register_new_user
+      parameters:
+        - name: data
+          in: body
+          description: The definition of a new user account
+          schema:
+            type: object
+            properties:
+              name: 
+                type: string
+              password: 
+                type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/UserInfo"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+            
+  /user/delete:
+    x-swagger-router-controller: users
+    get:
+      operationId: delete_user
+      tags:
+        - User
+      description: Delete the currently logged in user
+      security:
+        - broker_auth: []
+      responses:
+        200:
+          description: Success, returns 'OK' message
+          schema:
+            type: string
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+            
+  /user/update:
+    x-swagger-router-controller: users
+    post:
+      operationId: update_user
+      tags:
+        - User
+      description: Update the currently logged in user
+      security:
+        - broker_auth: []
+      parameters:
+        - name: data
+          in: body
+          description: The definition of changes for the user
+          schema:
+            type: object
+            properties:
+              name: 
+                type: string
+              password: 
+                type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/UserInfo"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
 
   /storage/read:
     x-swagger-router-controller: storage

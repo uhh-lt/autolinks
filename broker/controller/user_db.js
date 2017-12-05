@@ -56,13 +56,30 @@ nodeCleanup(function (exitCode, signal) {
 });
 
 // add user to db
-function add_user(name, password) {
-  const now = new Date().getTime();
-  // add user
-  dbconn.run('insert or replace into users(name, password, lastseen, registeredsince) values(?,?,?,?)', [name, password, now, now], function(err) {
-    if (err) {
-      return err;
+/**
+ *
+ * @param name
+ * @param password
+ * @param callback = function(err, user)
+ */
+function add_user(name, password, callback) {
+  get_user(name, function(err, user){
+    if(err){
+      return callback(err, null);
     }
+    if(user){
+      return callback(new Error('User already exists.'), null);
+    }
+
+    // add user
+    const now = new Date().getTime();
+    dbconn.run('insert into users(name, password, lastseenactive, registeredsince, active) values(?,?,?,?,?)', [name, password, now, now, true], function(err) {
+      if (err) {
+        return callback(err, null);
+      }
+      // finally return the user
+      get_user(name, callback);
+    });
   });
 }
 
