@@ -20,7 +20,7 @@ define([
     .directive('cytoscape', function($rootScope) {
         // graph visualisation by - https://github.com/cytoscape/cytoscape.js
         return {
-            restrict: 'E',
+            restrict: 'EA',
             template :'<div id="cy-network"></div>',
             replace: true,
             scope: {
@@ -28,7 +28,8 @@ define([
                 cyData: '=',
                 cyEdges: '=',
                 // controller function to be triggered when clicking on a node
-                cyClick:'&'
+                cyClick:'&',
+                events: '='
             },
             link: function(scope, element, attrs, fn) {
                 // dictionary of colors by types. Just to show some design options
@@ -46,6 +47,10 @@ define([
                 // debugger;
 
                 //
+
+                scope.$watch('data', function () {
+
+                });
 
                 // graph  build
                 scope.doCy = function(){ // will be triggered on an event broadcast
@@ -134,7 +139,7 @@ define([
                       container: document.getElementById('cy-network'),
                         layout: {
                             name: 'cola',
-                            animate: true,
+                            // animate: true,
                             avoidOverlap: true, // if true, prevents overlap of node bounding boxes
                             handleDisconnected: true, // if true, avoids disconnected components from overlapping
                             fit: true, // whether to fit the viewport to the graph
@@ -142,6 +147,8 @@ define([
                             stop: undefined, // callback on layoutstop
                             padding: 5 // the padding on fit
                         },
+                        // boxSelectionEnabled: false,
+                        // autounselectify: true,
                         style: [
                            {
                             selector: 'node',
@@ -150,10 +157,11 @@ define([
                                 'width': '100',
                                 'height': '50',
                                 'background-color': 'rgba(109, 127, 227, 0.84)',
+                                'background-fit': 'cover',
                                 'content': 'data(name)',
-                                'text-valign': 'center',
-                                'color': 'white',
-                                'text-outline-width': 2,
+                                'text-valign': 'bottom',
+                                // 'color': 'white',
+                                // 'text-outline-width': 2,
                                 // 'text-outline-color': 'data(typeColor)'
                               }
                             },
@@ -169,12 +177,14 @@ define([
                             {
                               selector: ':parent',
                               style: {
+                                'text-valign': 'top',
                                 'background-opacity': 0.333
                               }
                             },
                 						{
                 							selector: "node.cy-expand-collapse-collapsed-node",
                 							style: {
+                                'text-valign': 'top',
                 								"background-color": "darkblue",
                 								"shape": "rectangle"
                 							}
@@ -182,10 +192,14 @@ define([
                             {
                             selector: ':selected',
                             css: {
-                                'background-color': 'black',
+                                'border-width': 5,
+                                'background-color': 'rgba(129, 227, 227, 0.84)',
                                 'line-color': 'black',
-                                'target-arrow-color': 'black',
-                                'source-arrow-color': 'black'
+                                // 'filter': 'grayscale(200%)',
+                                // 'target-arrow-color': 'black',
+                                // 'source-arrow-color': 'black',
+                                'transition-property': 'background-color, line-color, target-arrow-color',
+                                'transition-duration': '0.4s'
                               }
                             },
                             {
@@ -254,7 +268,17 @@ define([
                     // window.cy = this;
 
                     // giddy up...
-                    cy.elements().unselectify();
+                    // cy.elements().unselectify();
+
+                    cy.style()
+                      .selector('#d')
+                      .css(
+                        {
+                        'background-image': 'url("https://farm8.staticflickr.com/7272/7633179468_3e19e45a0c_b.jpg")',
+                        'width': '50',
+                        'height': '50'
+                        }
+                      ).update();
 
                     // var params = {
                     //   name: 'cola',
@@ -276,7 +300,7 @@ define([
                     //     scope.cyClick({value:nodeId});
                     // });
 
-                    debugger;
+                    // debugger;
 
                     cy.$('#d').qtip({
                       content: 'Hello!',
@@ -337,6 +361,7 @@ define([
 
                     cy.cxtmenu({
                       selector: 'node, edge',
+                      fillColor: 'rgba(95, 239, 228, 0.84)',
             					commands: [
             						{
             							content: '<span class="fa fa-flash fa-2x"></span>',
@@ -364,6 +389,7 @@ define([
 
                     cy.cxtmenu({
           					selector: 'core',
+                    fillColor: 'rgba(95, 239, 228, 0.84)',
           					commands: [
           						{
           							content: 'function 1',
@@ -406,10 +432,35 @@ define([
                     // cy.add(scope.elements);
                 // }
 
+                  // // Attach an event handler if defined
+                  // angular.forEach(scope.events, function (callback, event) {
+                  //   debugger;
+                  //   callback(cy);
+                  //     // if (networkEvents.indexOf(String(event)) >= 0) {
+                  //         // cy.ready(cy);
+                  //     // }
+                  // });
+
+                  // onLoad callback
+                  if (scope.events != null && scope.events.onload != null &&
+                      angular.isFunction(scope.events.onload)) {
+                      scope.events.onload(cy);
+                  }
+
                 }; // end doCy()
 
-                scope.doCy();
+                // // Deletes a node
+                // $("#deleteNode").click(function () {
+                //   debugger;
+                //     if (cy.$(":selected").length > 0) {
+                //         cy.$(":selected").remove();
+                //     }
+                // });
+                //
 
+
+                debugger;
+                scope.doCy();
 
                 // When the app object changed = redraw the graph
                 // you can use it to pass data to be added or removed from the object without redrawing it

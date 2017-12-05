@@ -9,7 +9,7 @@
 .commafield {
   width: 50%;
   background-color: #ffffff;
-  z-index: 2;
+  z-index: 9;
   display: flex;
   flex-wrap: wrap;
 

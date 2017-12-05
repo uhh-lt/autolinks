@@ -12,6 +12,17 @@ define([
         // Graph Controller
         .controller('GraphController', ['$scope', '$rootScope', function ($scope, $rootScope) {
 
+          var self = this;
+
+          $scope.graphEvents = {
+              "onload": onNetworkLoad
+          };
+
+          function onNetworkLoad(cy) {
+              self.cy = cy;
+              debugger;
+          }
+
           // container objects
           $scope.mapData = [];
           $scope.edgeData = [];

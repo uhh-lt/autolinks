@@ -4,7 +4,9 @@
       <span>Node:</span>
       <select ng-model="form.obj.objTypes" ng-options="name for name in objTypes"></select>
       <input ng-model="form.obj.name"/>
-      <button class="md-button md-primary md-raised md-button submit-button" ng-click="addObj()">Add node</button>
+      <button class="btn btn-success" ng-click="addObj()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> ADD NODE</button>
+      <button id="deletenode" class="btn btn-danger"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span> DELETE NODE</button>
+      <button class="md-button md-primary md-raised md-button submit-button right" ng-click="reset()">Reset nodes</button>
       <span ng-hide="mapData.length > 1">
         After adding 2 nodes, you can start adding connecting edges
       </span>
@@ -16,10 +18,9 @@
         <select ng-model="formEdges.toName" ng-options="c.name for c in mapData">
           <option value="">  To >> </option>
         </select>
-        <button class="md-button md-primary md-raised md-button submit-button" ng-click="addEdge()">Add edge</button>
+        <button class="md-button md-primary md-raised md-button submit-button" ng-click="addEdge()">ADD EDGE</button>
       </span>
-      <button class="md-button md-primary md-raised md-button submit-button right" ng-click="reset()">Reset nodes</button>
-      <cytoscape class="" cy-data="mapData" cy-edges="edgeData" cy-click="doClick(value)" />
+      <cytoscape class="" cy-data="mapData" cy-edges="edgeData" cy-click="doClick(value)" events="graphEvents"/>
     </div>
   </div>
 </div>
