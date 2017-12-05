@@ -1,9 +1,63 @@
-html, body {
+html, body, .container {
     height: 100%;
     width: 100%;
 }
 
+#cy-network {
+    height: 800px;
+    width: 100%;
+    background-color: rgba(231, 231, 231, 0.4);
+    /*border: 2px solid #662244;
+    position: relative;
+    clear: both;*/
+}
+
+#input-region {
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  height: 181px;
+  background-color: rgba(255, 255, 255, 0);
+}
+
+#viewer-region {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  height: 181px;
+  background-color: rgba(255, 255, 255, 0);
+}
+
+.outer-canvas {
+  z-index: 2;
+}
+
+.magnify-container {
+  top: 0px;
+  position: absolute;
+}
+
+.magnify-image {
+  top: 0px;
+  position: absolute;
+  width: 200px;
+  height: 200px;
+}
+
+.magnify-glass {
+  margin-left: 200px;
+}
+
+#input-query {
+  /*z-index: 2;*/
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px;
+}
+
 #network {
+    z-index: 1;
     position: relative;
     overflow-y: hidden;
     width: 100%;
@@ -27,8 +81,7 @@ html, body {
     overflow-y: hidden;
     width: 100%;
     height: 100%;
-    height: calc(100% - 64px);
-    background-color: #d1d1d1;
+    background-color: rgba(231, 231, 231, 0.5);
 }
 
 .graphs {
@@ -37,7 +90,99 @@ html, body {
     height: 100%;
 }
 
-md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolbar) {
-    background-color: rgb(181, 63, 63);
+table.legend_table {
+  font-size: 11px;
+  border-width:1px;
+  border-color:#d3d3d3;
+  border-style:solid;
+}
+table.legend_table,td {
+  border-width:1px;
+  border-color:#d3d3d3;
+  border-style:solid;
+  padding: 2px;
+}
+div.table_content {
+  width:80px;
+  text-align:center;
+}
+div.table_description {
+  width:100px;
+}
+
+#operation {
+  font-size:28px;
+}
+#network-popUp {
+  display:none;
+  position:absolute;
+  top:350px;
+  left:170px;
+  z-index:299;
+  width:250px;
+  height:120px;
+  background-color: #f9f9f9;
+  border-style:solid;
+  border-width:3px;
+  border-color: #5394ed;
+  padding:10px;
+}
+
+/*md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolbar) {
+    background-color: rgba(181, 63, 63, 0.2);
     color: rgba(255,255,255,0.87);
+}*/
+
+/* Node card */
+
+.overlay {
+  position: absolute;
+  pointer-events: none;
+}
+
+.html-node {
+  font-family: sans-serif;
+  color: #424242;
+  background-color: #d1d1d1;
+}
+
+.html-node img {
+  width: 100px;
+}
+
+.tooltip-card {
+  width: 270px;
+  padding: 10px 5px;
+  white-space: normal;
+}
+
+div.popupMenu {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    display: block;
+    background-color: #f2f2f2;
+    border-radius: 4px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    min-width: 150px;
+    border: 1px solid #d4d4d4;
+    z-index: 1200;
+}
+
+div.popupMenu ul {
+    list-style-type: none;
+    margin: 4px 0px;
+    padding: 0px;
+    cursor: default;
+}
+
+div.popupMenu ul li {
+    padding: 4px 16px;
+    cursor: pointer;
+}
+
+div.popupMenu ul li:hover {
+    background-color: #4677f8;
+    color: #fefefe;
 }

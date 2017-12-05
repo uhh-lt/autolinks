@@ -3,7 +3,7 @@ define([
 ], function(angular) {
     'use strict';
 
-    angular.module('myApp.graphConfig', [])
+    angular.module('autolinks.graphConfig', [])
         .constant('physicOptions', {
             forceAtlas2Based: {
                 gravitationalConstant: -220,
@@ -25,6 +25,9 @@ define([
                 width: '100%',
                 nodes : {
                     shape: 'box',
+                    color: '#ffffff'
+
+
                     // font: {
                     //   color: 'rgba(66,66,66,0)'
                     // }
@@ -38,7 +41,7 @@ define([
                     // }
                 },
                 edges: {
-                    length: 200,
+                    length: 500,
                     color: {
                         color: 'rgb(169,169,169)',
                         highlight: 'blue'
@@ -49,24 +52,27 @@ define([
                     //   roundness: 0.4
                     // }
                 },
-                layout: {
-                    improvedLayout: false,
-                    hierarchical: {
-                      levelSeparation: 150,
-                      // layout: "hubsize",
-                      enabled: true,
-                      sortMethod: 'directed',
-                      direction: 'DU'
-                    }
-
-                },
+                // layout: {
+                //     // improvedLayout: true,
+                //     hierarchical: {
+                //       levelSeparation: 250,
+                //       layout: "hubsize",
+                //       enabled: true,
+                //       sortMethod: 'directed',
+                //       direction: 'LR'
+                //     }
+                //
+                // },
                 interaction: {
-                    tooltipDelay: 200,
+                    tooltipDelay: 100,
                     hover: true,
-                    hideEdgesOnDrag: true,
+                    // hideEdgesOnDrag: true,
                     navigationButtons: true,
                     keyboard: false,
                     multiselect: true
+                },
+                manipulation: {
+                  enabled: true
                 },
                 // Each entry represents one named entity type
                 groups: {

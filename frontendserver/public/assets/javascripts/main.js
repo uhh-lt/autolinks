@@ -17,7 +17,20 @@
 			'ui-router': 'libs/angular-ui-router/release/angular-ui-router.min',
 			'underscore': 'libs/underscore/underscore-min',
 			'vis': 'libs/vis/dist/vis.min',
-			'ngVis': 'directives/angular-vis'
+			'ngVis': 'directives/angular-vis',
+      'ngCy':'directives/angular-cy',
+      'cytoscape': 'libs/cytoscape/dist/cytoscape.min',
+      'cytoscape-cola': 'libs/cytoscape-cola/cytoscape-cola',
+      'cytoscape-cxtmenu': 'libs/cytoscape-cxtmenu/cytoscape-cxtmenu',
+      'cytoscape-panzoom': 'libs/cytoscape-panzoom/cytoscape-panzoom',
+      'cytoscape.js-panzoom': 'libs/cytoscape-panzoom/cytoscape.js-panzoom',
+      'cytoscape-expand-collapse': 'libs/cytoscape-expand-collapse/cytoscape-expand-collapse',
+      'cytoscape-edgehandles': 'libs/cytoscape-edgehandles/cytoscape-edgehandles',
+      'cytoscape.js-undo-redo': 'libs/cytoscape.js-undo-redo/cytoscape-undo-redo',
+      'cytoscape-qtip': 'libs/cytoscape-qtip/cytoscape-qtip',
+      'qtip2': 'libs/qtip2/basic/jquery.qtip.min',
+      'cola': 'libs/webcola/WebCola/cola.min',
+      'ngMagnify': 'libs/ng-magnify/src/js/ng-magnify'
 		},
 		shim: {
 			'jquery': {
@@ -57,7 +70,13 @@
 			},
 			'ngVis': {
 				deps: ['angular', 'vis']
-			}
+			},
+      'ngCy': {
+        deps: ['angular', 'cytoscape']
+      },
+      'ngMagnify': {
+        deps: ['angular']
+      }
 		},
 		priority: [
 			'jquery',
@@ -75,7 +94,7 @@
 			'angular',
 			'app'
 		], function(angular, app) {
-			angular.bootstrap(document, ['myApp']);
+			angular.bootstrap(document, ['autolinks']);
 		}
 	);
 })(requirejs);
