@@ -1,113 +1,26 @@
-<!-- legend and network are rendered above each other -->
-<div id="legend" ng-controller="LegendController as ctrl" ng-if="showLegend">
-    <vis-network data="ctrl.legendData" options="ctrl.legendOptions" events="ctrl.legendEvents" layout-fill></vis-network>
-</div>
-<div id="mynetwork" ng-controller="NetworkController as ctrl">
-  <vis-network data="graphData" options="graphOptions" layout-fill events="graphEvents"></vis-network>
-  <!-- <div ng-repeat="n in nodes"> -->
-    <div
-      id='html-node-{{n.id}}'
-      draggable='true'
-      class='overlay html-node'
-      ng-repeat="n in nodes"
-      style="width: 300px;padding: 10px; word-break: keep-all"
-    >
-    <md-card>
-      <img ng-src="{{n.url}}" class="md-card-image" alt="Washed Out">
-      <md-card-title>
-        <md-card-title-text>
-          <span class="md-headline">{{n.title}}</span>
-        </md-card-title-text>
-      </md-card-title>
-      <!-- <md-card-actions layout="row" layout-align="start center">
-        <md-card-icon-actions>
-          <md-button class="md-icon-button" aria-label="Favorite">
-            <md-icon md-svg-icon="img/icons/favorite.svg"></md-icon>
-          </md-button>
-          <md-button class="md-icon-button" aria-label="Share">
-            <md-icon md-svg-icon="img/icons/share-arrow.svg"></md-icon>
-          </md-button>
-        </md-card-icon-actions>
-        <md-button>Action 1</md-button>
-        <md-button>Action 2</md-button>
-      </md-card-actions> -->
-      <md-card-content>
-        <p>
-          {{n.label}}
-        </p>
-      </md-card-content>
-    </md-card>
-      <!-- <table><tr><td>
-      <img src="{{n.url}}">
-      </td><td>
-        {{n.title}}
-        <br>
-      </tr></table>
-      <div>
-        {{n.label}}
-      </div> -->
+<div>
+  <div id="content" class="container" ng-controller="GraphController">
+    <div >
+      <span>Node:</span>
+      <select ng-model="form.obj.objTypes" ng-options="name for name in objTypes"></select>
+      <input ng-model="form.obj.name"/>
+      <button class="btn btn-success" ng-click="addObj()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> ADD NODE</button>
+      <button class="btn btn-danger" ng-click="delObj()"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span> DELETE NODE</button>
+      <button class="md-button md-primary md-raised md-button submit-button right" ng-click="reset()">Reset nodes</button>
+      <span ng-hide="mapData.length > 1">
+        After adding 2 nodes, you can start adding connecting edges
+      </span>
+      <span ng-show="mapData.length > 1">
+          Edge (between 2 nodes)
+        <select ng-model="formEdges.fromName" ng-options="c.name for c in mapData">
+          <option value=""> From >> </option>
+        </select>
+        <select ng-model="formEdges.toName" ng-options="c.name for c in mapData">
+          <option value="">  To >> </option>
+        </select>
+        <button class="md-button md-primary md-raised md-button submit-button" ng-click="addEdge()">ADD EDGE</button>
+      </span>
+      <cytoscape class="" cy-data="mapData" cy-edges="edgeData" cy-click="doClick(value)" options="graphOptions" events="graphEvents"/>
     </div>
-
-    <!-- <div id='html-node-1' draggable='true' class='overlay html-node' style="width: 200px;padding: 10px; word-break: keep-all">
-      <table><tr><td>
-      	<img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Caucasoid_skull.jpg">
-        </td><td>
-        	Caucasian race<br>
-        	Title: Disease
-        </tr></table>
-        <div>
-          grouping of human beings historically regarded as a biological taxon [..], including populations of Europe, the Caucasus, Asia Minor, North Africa, the Horn of Africa, Western Asia, Central Asia and South Asia.[3]
-        </div>
-      </div>
-
-    <div id='html-node-2' draggable='true' class='overlay html-node'>
-      <table><tr><td>
-      	<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Chronic_lymphocytic_leukemia.jpg/1280px-Chronic_lymphocytic_leukemia.jpg">
-        </td><td>
-        	B-CLL<br>
-        	Title: Disease
-        </tr></table>
-        <div style="width: 200px;padding: 10px; word-break: keep-all">
-          type of leukemia (a type of cancer of the white blood cells)
-        </div>
-      </div>
-
-    <div id='html-node-3' draggable='true' class='overlay html-node'>
-    <table><tr><td>
-    	<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Blausen_0624_Lymphocyte_B_cell_%28crop%29.png/1024px-Blausen_0624_Lymphocyte_B_cell_%28crop%29.png">
-      </td><td>
-      	B-CELL<br>
-      	Title: Disease
-      </tr></table>
-      <div style="width: 200px;padding: 10px; word-break: keep-all">
-        also known as B lymphocytes, are a type of white blood cell of the lymphocyte subtype.
-      </div>
-    </div>
-
-
-    <div id='html-node-4' draggable='true' class='overlay html-node'>
-    <table><tr><td>
-    	<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Antibody.svg/255px-Antibody.svg.png">
-      </td><td>
-      	Antigen<br>
-      	Title: Disease
-      </tr></table>
-      <div style="width: 200px;padding: 10px; word-break: keep-all">
-        In immunology, an antigen is a molecule capable of inducing an immune response on the part of the host organism,
-      </div>
-    </div>
-
-    <div id='html-node-5' draggable='true' class='overlay html-node'>
-      <table><tr><td>
-      	<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Bcellreceptor.svg/251px-Bcellreceptor.svg.png">
-        </td><td>
-        	B-CELL Receptor<br>
-        	Title: Disease
-        </tr></table>
-        <div style="width: 200px;padding: 10px; word-break: keep-all">
-          is a transmembrane receptor protein located on the outer surface of B cells
-        </div>
-      </div> -->
-
   </div>
 </div>

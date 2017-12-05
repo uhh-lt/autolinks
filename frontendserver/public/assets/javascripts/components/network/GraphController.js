@@ -1,7 +1,8 @@
 define([
     'angular',
+    'jquery',
     'ngCy'
-], function(angular) {
+], function(angular, $) {
     'use strict';
     /**
      * network graph module:
@@ -10,9 +11,19 @@ define([
     angular.module('autolinks.graph', ['ngCy']);
     angular.module('autolinks.graph')
         // Graph Controller
-        .controller('GraphController', ['$scope', '$rootScope', function ($scope, $rootScope) {
+        .controller('GraphController', ['$scope', '$rootScope', 'graphProperties', function ($scope, $rootScope, graphProperties) {
 
           var self = this;
+
+          /* Background collection */
+          self.nodes = [];
+          self.edges = [];
+
+          /* Graph collection filtered during runtime */
+          self.nodesDataset = [];
+          self.edgesDataset = [];
+
+          $scope.graphOptions = graphProperties.options;
 
           $scope.graphEvents = {
               "onload": onNetworkLoad
@@ -20,7 +31,6 @@ define([
 
           function onNetworkLoad(cy) {
               self.cy = cy;
-              debugger;
           }
 
           // container objects
@@ -63,6 +73,13 @@ define([
               $scope.formEdges = '';
           };
 
+          // delete a node
+          $scope.delObj = function(){
+            if (self.cy.$(":selected").length > 0) {
+                self.cy.$(":selected").remove();
+            }
+          }
+
           // sample function to be called when clicking on an object in the chart
           $scope.doClick = function(value)
           {
@@ -78,6 +95,12 @@ define([
               $rootScope.$broadcast('appChanged');
           }
 
+          // Initialize the graph
+          $scope.graphData = {
+              nodes: self.nodesDataset,
+              edges: self.edgesDataset
+          };
+
         }
-      ]);
+    ]);
 });

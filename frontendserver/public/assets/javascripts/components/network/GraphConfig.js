@@ -20,79 +20,134 @@ define([
                 iterations: 1000
             }
         })
+        // graph  initialization
+        // use object's properties as properties using: data(propertyName)
+        // check Cytoscapes site for much more data, options, designs etc
+        // http://cytoscape.github.io/cytoscape.js/
+        // here are just some basic options
         .constant('generalOptions', {
-                height: '100%',
-                width: '100%',
-                nodes : {
-                    shape: 'box',
-                    color: '#ffffff'
+            layout: {
+                name: 'cola',
+                // animate: true,
+                avoidOverlap: true, // if true, prevents overlap of node bounding boxes
+                handleDisconnected: true, // if true, avoids disconnected components from overlapping
+                fit: true, // whether to fit the viewport to the graph
+                ready: undefined, // callback on layoutready
+                stop: undefined, // callback on layoutstop
+                padding: 5 // the padding on fit
+            },
+            // boxSelectionEnabled: false,
+            // autounselectify: true,
+            style: [
+               {
+                selector: 'node',
+                css: {
+                    'shape': 'roundrectangle',
+                    'width': '100',
+                    'height': '50',
+                    'background-color': 'rgba(109, 127, 227, 0.84)',
+                    'background-fit': 'cover',
+                    'content': 'data(name)',
+                    'text-valign': 'bottom',
+                    // 'color': 'white',
+                    // 'text-outline-width': 2,
+                    // 'text-outline-color': 'data(typeColor)'
+                  }
+                },
+                {
+                selector: 'edge',
+                css:{
+                    // 'width': '10',
+                    'content': 'has_relation',
+                    'target-arrow-shape': 'triangle',
+                    'source-arrow-shape': 'triangle'
+                  }
+                },
+                {
+                  selector: ':parent',
+                  style: {
+                    'text-valign': 'top',
+                    'background-opacity': 0.333
+                  }
+                },
+                {
+                  selector: "node.cy-expand-collapse-collapsed-node",
+                  style: {
+                    'text-valign': 'top',
+                    "background-color": "darkblue",
+                    "shape": "rectangle"
+                  }
+                },
+                {
+                selector: ':selected',
+                css: {
+                    'border-width': 5,
+                    'background-color': 'rgba(129, 227, 227, 0.84)',
+                    'line-color': 'black',
+                    // 'filter': 'grayscale(200%)',
+                    // 'target-arrow-color': 'black',
+                    // 'source-arrow-color': 'black',
+                    'transition-property': 'background-color, line-color, target-arrow-color',
+                    'transition-duration': '0.4s'
+                  }
+                },
+                {
+                selector: '.faded',
+                css:
+                  {
+                    'opacity': 0.65,
+                    'text-opacity': 0.65
+                  }
+                },
 
+                // some style for the extension
 
-                    // font: {
-                    //   color: 'rgba(66,66,66,0)'
-                    // }
-                    // size: 10,
-                    // shadow: true,
-                    // scaling: {
-                    //     label: {
-                    //         min: 30,
-                    //         max: 45
-                    //     }
-                    // }
+                {
+                  selector: '.eh-handle',
+                  style: {
+                    'background-color': 'red',
+                    'width': 12,
+                    'height': 12,
+                    'shape': 'ellipse',
+                    'overlay-opacity': 0,
+                    'border-width': 12, // makes the handle easier to hit
+                    'border-opacity': 0
+                  }
                 },
-                edges: {
-                    length: 500,
-                    color: {
-                        color: 'rgb(169,169,169)',
-                        highlight: 'blue'
-                    }
-                    // smooth: {
-                    //   type:'cubicBezier',
-                    //   forceDirection: 'vertical',
-                    //   roundness: 0.4
-                    // }
+
+                {
+                  selector: '.eh-hover',
+                  style: {
+                    'background-color': 'red'
+                  }
                 },
-                // layout: {
-                //     // improvedLayout: true,
-                //     hierarchical: {
-                //       levelSeparation: 250,
-                //       layout: "hubsize",
-                //       enabled: true,
-                //       sortMethod: 'directed',
-                //       direction: 'LR'
-                //     }
-                //
-                // },
-                interaction: {
-                    tooltipDelay: 100,
-                    hover: true,
-                    // hideEdgesOnDrag: true,
-                    navigationButtons: true,
-                    keyboard: false,
-                    multiselect: true
+
+                {
+                  selector: '.eh-source',
+                  style: {
+                    'border-width': 2,
+                    'border-color': 'red'
+                  }
                 },
-                manipulation: {
-                  enabled: true
+
+                {
+                  selector: '.eh-target',
+                  style: {
+                    'border-width': 2,
+                    'border-color': 'red'
+                  }
                 },
-                // Each entry represents one named entity type
-                groups: {
-                    // Colorblind safe colors
-                    '0': { color:  {border: "#a50026", background: "#d73027", highlight: {border: "#a50026", background: "#f46d43"}, hover: {border: "#a50026", background: "#f46d43"}}}, // 0: red
-                    '1': { color:  {border: "#fdae61", background: "#fee090", highlight: {border: "#fdae61", background: "#ffffbf"}, hover: {border: "#fdae61", background: "#ffffbf"}}}, // 1: yellow
-                    '2': { color:  {border: "#74add1", background: "#abd9e9", highlight: {border: "#74add1", background: "#e0f3f8"}, hover: {border: "#74add1", background: "#e0f3f8"}}}, // 2: light blue
-                    '3': { color:  {border: "#313695", background: "#4575b4", highlight: {border: "#313695", background: "#74add1"}, hover: {border: "#313695", background: "#74add1"}}}, // 3: dark blue
-                    // Non colorblind safe colors
-                    '4': { color:  {border: "#7C29F0", background: "#AD85E4", highlight: {border: "#7C29F0", background: "#D3BDF0"}, hover: {border: "#7C29F0", background: "#D3BDF0"}}}, // 4: purple
-                    '5': { color:  {border: "#E129F0", background: "#EB7DF4", highlight: {border: "#E129F0", background: "#F0B3F5"}, hover: {border: "#E129F0", background: "#F0B3F5"}}}, // 5: magenta
-                    '6': { color:  {border: "#C37F00", background: "#FFA807", highlight: {border: "#C37F00", background: "#FFCA66"}, hover: {border: "#C37F00", background: "#FFCA66"}}}, // 6: orange
-                    '7': { color:  {border: "#4AD63A", background: "#C2FABC", highlight: {border: "#4AD63A", background: "#E6FFE3"}, hover: {border: "#4AD63A", background: "#E6FFE3"}}}, // 7: mint
-                    '8': { color:  {border: "#FD5A77", background: "#FFC0CB", highlight: {border: "#FD5A77", background: "#FFD1D9"}, hover: {border: "#FD5A77", background: "#FFD1D9"}}}, // 8: pink
-                    '9': { color:  {border: "#41A906", background: "#7BE141", highlight: {border: "#41A906", background: "#A1EC76"}, hover: {border: "#41A906", background: "#A1EC76"}}}, // 9: green
-                    '10': { color: {border: "#990000", background: "#EE0000", highlight: {border: "#BB0000", background: "#FF3333"}, hover: {border: "#BB0000", background: "#FF3333"}}}, // 10:bright red
-                    '11': { color: {border: "#FF6000", background: "#FF6000", highlight: {border: "#FF6000", background: "#FF6000"}, hover: {border: "#FF6000", background: "#FF6000"}}},  // 12: real orange
-                    '-1': { color: {border: "#4575b4", background: "#FFFFFF", highlight: {border: "#4575b4", background: "#FFFFFF"}, hover: {border: "#4575b4", background: "#FFFFFF"}}},  // -1: white / blue
-                    '-2': { color: {border: "#7BE141", background: "#FFFFFF", highlight: {border: "#7BE141", background: "#FFFFFF"}, hover: {border: "#7BE141", background: "#FFFFFF"}}},  // -2: white / green
+
+                {
+                  selector: '.eh-preview, .eh-ghost-edge',
+                  style: {
+                    'background-color': 'red',
+                    'line-color': 'red',
+                    'target-arrow-color': 'red',
+                    'source-arrow-color': 'red'
+                  }
                 }
+              ]
             }
         )
         // Constants can't have dependencies. Inject 'graphProperties' and use options to obtain complete graph config

@@ -25,13 +25,18 @@ define([
             replace: true,
             scope: {
                 // data objects to be passed as an attributes - for nodes and edges
+                data: '=',
                 cyData: '=',
                 cyEdges: '=',
+                options: '=',
                 // controller function to be triggered when clicking on a node
                 cyClick:'&',
                 events: '='
             },
             link: function(scope, element, attrs, fn) {
+                var networkEvents = [
+                    'tap'
+                ];
                 // dictionary of colors by types. Just to show some design options
                 scope.typeColors = {
                     'ellipse':'#992222',
@@ -44,9 +49,6 @@ define([
                     'octagon':'#335577',
                     'star':'#113355'
                 };
-                // debugger;
-
-                //
 
                 scope.$watch('data', function () {
 
@@ -121,12 +123,6 @@ define([
                         scope.elements.nodes.push(elementObj);
                     }
 
-                    // graph  initialization
-                    // use object's properties as properties using: data(propertyName)
-                    // check Cytoscapes site for much more data, options, designs etc
-                    // http://cytoscape.github.io/cytoscape.js/
-                    // here are just some basic options
-                    // debugger;
                     panzoom(cytoscape, $);
                     expandCollapse(cytoscape, $);
                     undoRedo(cytoscape);
@@ -135,140 +131,14 @@ define([
                     cxtmenu(cytoscape);
                     edgehandles(cytoscape);
 
+                    var domContainer = document.getElementById('cy-network');
+
                     var cy = window.cy = cytoscape({
-                      container: document.getElementById('cy-network'),
-                        layout: {
-                            name: 'cola',
-                            // animate: true,
-                            avoidOverlap: true, // if true, prevents overlap of node bounding boxes
-                            handleDisconnected: true, // if true, avoids disconnected components from overlapping
-                            fit: true, // whether to fit the viewport to the graph
-                            ready: undefined, // callback on layoutready
-                            stop: undefined, // callback on layoutstop
-                            padding: 5 // the padding on fit
-                        },
-                        // boxSelectionEnabled: false,
-                        // autounselectify: true,
-                        style: [
-                           {
-                            selector: 'node',
-                            css: {
-                                'shape': 'roundrectangle',
-                                'width': '100',
-                                'height': '50',
-                                'background-color': 'rgba(109, 127, 227, 0.84)',
-                                'background-fit': 'cover',
-                                'content': 'data(name)',
-                                'text-valign': 'bottom',
-                                // 'color': 'white',
-                                // 'text-outline-width': 2,
-                                // 'text-outline-color': 'data(typeColor)'
-                              }
-                            },
-                            {
-                            selector: 'edge',
-                            css:{
-                                // 'width': '10',
-                                'content': 'has_relation',
-                                'target-arrow-shape': 'triangle',
-                                'source-arrow-shape': 'triangle'
-                              }
-                            },
-                            {
-                              selector: ':parent',
-                              style: {
-                                'text-valign': 'top',
-                                'background-opacity': 0.333
-                              }
-                            },
-                						{
-                							selector: "node.cy-expand-collapse-collapsed-node",
-                							style: {
-                                'text-valign': 'top',
-                								"background-color": "darkblue",
-                								"shape": "rectangle"
-                							}
-                						},
-                            {
-                            selector: ':selected',
-                            css: {
-                                'border-width': 5,
-                                'background-color': 'rgba(129, 227, 227, 0.84)',
-                                'line-color': 'black',
-                                // 'filter': 'grayscale(200%)',
-                                // 'target-arrow-color': 'black',
-                                // 'source-arrow-color': 'black',
-                                'transition-property': 'background-color, line-color, target-arrow-color',
-                                'transition-duration': '0.4s'
-                              }
-                            },
-                            {
-                            selector: '.faded',
-                            css:
-                              {
-                                'opacity': 0.65,
-                                'text-opacity': 0.65
-                              }
-                            },
-
-                            // some style for the extension
-
-                            {
-                              selector: '.eh-handle',
-                              style: {
-                                'background-color': 'red',
-                                'width': 12,
-                                'height': 12,
-                                'shape': 'ellipse',
-                                'overlay-opacity': 0,
-                                'border-width': 12, // makes the handle easier to hit
-                                'border-opacity': 0
-                              }
-                            },
-
-                            {
-                              selector: '.eh-hover',
-                              style: {
-                                'background-color': 'red'
-                              }
-                            },
-
-                            {
-                              selector: '.eh-source',
-                              style: {
-                                'border-width': 2,
-                                'border-color': 'red'
-                              }
-                            },
-
-                            {
-                              selector: '.eh-target',
-                              style: {
-                                'border-width': 2,
-                                'border-color': 'red'
-                              }
-                            },
-
-                            {
-                              selector: '.eh-preview, .eh-ghost-edge',
-                              style: {
-                                'background-color': 'red',
-                                'line-color': 'red',
-                                'target-arrow-color': 'red',
-                                'source-arrow-color': 'red'
-                              }
-                            }
-
-
-                          ],
+                          container: domContainer,
+                          layout: scope.options.layout,
+                          style: scope.options.style,
                           elements: scope.elements
                     });
-                    console.log(scope.elements);
-                    // ready: function(){
-                    // window.cy = this;
-
-                    // giddy up...
-                    // cy.elements().unselectify();
 
                     cy.style()
                       .selector('#d')
@@ -279,28 +149,6 @@ define([
                         'height': '50'
                         }
                       ).update();
-
-                    // var params = {
-                    //   name: 'cola',
-                    //   avoidOverlap: true,
-                    //   nodeSpacing: 5,
-                    //   edgeLengthVal: 45,
-                    //   animate: true,
-                    //   randomize: false,
-                    //   maxSimulationTime: 1500
-                    // };
-                    //
-                    // cy.layout( params );
-
-                    // Event listeners
-                    // with sample calling to the controller function as passed as an attribute
-                    // cy.on('tap', 'node', function(e){
-                    //     var evtTarget = e.cyTarget;
-                    //     var nodeId = evtTarget.id();
-                    //     scope.cyClick({value:nodeId});
-                    // });
-
-                    // debugger;
 
                     cy.$('#d').qtip({
                       content: 'Hello!',
@@ -327,8 +175,6 @@ define([
                       fisheye: false,
                       animate: false
                     });
-
-                    // debugger;
 
                     // the default values of each option are outlined below:
                     var defaults = {
@@ -432,14 +278,12 @@ define([
                     // cy.add(scope.elements);
                 // }
 
-                  // // Attach an event handler if defined
-                  // angular.forEach(scope.events, function (callback, event) {
-                  //   debugger;
-                  //   callback(cy);
-                  //     // if (networkEvents.indexOf(String(event)) >= 0) {
-                  //         // cy.ready(cy);
-                  //     // }
-                  // });
+                  // Attach an event handler if defined
+                  angular.forEach(scope.events, function (callback, event) {
+                      if (networkEvents.indexOf(String(event)) >= 0) {
+                          cy.on(event, callback);
+                      }
+                  });
 
                   // onLoad callback
                   if (scope.events != null && scope.events.onload != null &&
@@ -449,17 +293,6 @@ define([
 
                 }; // end doCy()
 
-                // // Deletes a node
-                // $("#deleteNode").click(function () {
-                //   debugger;
-                //     if (cy.$(":selected").length > 0) {
-                //         cy.$(":selected").remove();
-                //     }
-                // });
-                //
-
-
-                debugger;
                 scope.doCy();
 
                 // When the app object changed = redraw the graph

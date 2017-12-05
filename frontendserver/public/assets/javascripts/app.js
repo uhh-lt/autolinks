@@ -27,10 +27,6 @@ define([
             views: {
                 'network': {
                     templateUrl: 'assets/partials/network.html',
-                    controller: 'NetworkController'
-                },
-                'network2': {
-                    templateUrl: 'assets/partials/network2.html',
                     controller: 'GraphController'
                 },
                 'input': {
