@@ -70,8 +70,8 @@ services:
     image: node:9.2
     volumes:
       - ${PWD}/services/dummy:/opt/project
-    ports:
-      - 20010:10010
+#    ports:
+#      - 20010:10010
     networks:
       - anet
     working_dir: /opt/project
