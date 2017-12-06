@@ -50,12 +50,21 @@ define([
                     'star':'#113355'
                 };
 
+                var cy = null;
+
                 scope.$watch('data', function () {
 
-                });
+                    // Sanity check
+                    if (scope.data == null) {
+                        return;
+                    }
 
-                // graph  build
-                scope.doCy = function(){ // will be triggered on an event broadcast
+                    // If we've actually changed the data set, then recreate the graph
+                    // We can always update the data by adding more data to the existing data set
+                    if (cy != null) {
+                        cy.destroy();
+                    }
+
                     // initialize data object
                     scope.elements = {};
                     scope.elements.nodes = [
@@ -73,210 +82,191 @@ define([
                       { data: { id: 'eb', source: 'e', target: 'b' } }
                     ];
 
-                    // parse edges
-                    // you can build a complete object in the controller and pass it without rebuilding it in the directive.
-                    // doing it like that allows you to add options, design or what needed to the objects
-                    // doing it like that is also good if your data object/s has a different structure
-                    for (var i=0; i<scope.cyEdges.length; i++)
-                    {
-                        // get edge source
-                        var eSource = scope.cyEdges[i].source;
-                        // get edge target
-                        var eTarget = scope.cyEdges[i].target;
-                        // get edge id
-                        var eId = scope.cyEdges[i].id;
-                        // build the edge object
-                        var edgeObj = {
-                            data:{
-                            id:eId,
-                            source:eSource,
-                            target:eTarget
-                            }
-                        };
-                        // adding the edge object to the edges array
-                        scope.elements.edges.push(edgeObj);
-                    }
-
-                    // parse data and create the Nodes array
-                    // object type - is the object's group
-                    for (var i=0; i<scope.cyData.length; i++)
-                    {
-                        // get id, name and type  from the object
-                        var dId = scope.cyData[i].id;
-                        var dName = scope.cyData[i].name;
-                        var dType = scope.cyData[i].type;
-                        // get color from the object-color dictionary
-                        debugger;
-                        var typeColor = scope.typeColors[dType];
-                        // build the object, add or change properties as you need - just have a name and id
-                        var elementObj = {
-                            // group:dType,
-                            'data':{
-                                id:dId,
-                                name:dName,
-                                typeColor:typeColor,
-                                typeShape:dType,
-                                type:dType,
-
-                        }};
-                        // add new object to the Nodes array
-                        scope.elements.nodes.push(elementObj);
-                    }
-
                     panzoom(cytoscape, $);
                     expandCollapse(cytoscape, $);
                     undoRedo(cytoscape);
                     cycola(cytoscape, cola);
                     cyqtip(cytoscape, $);
                     cxtmenu(cytoscape);
-                    edgehandles(cytoscape);
+                    // edgehandles(cytoscape);
 
                     var domContainer = document.getElementById('cy-network');
-
-                    var cy = window.cy = cytoscape({
-                          container: domContainer,
-                          layout: scope.options.layout,
-                          style: scope.options.style,
-                          elements: scope.elements
-                    });
-
-                    cy.style()
-                      .selector('#d')
-                      .css(
-                        {
-                        'background-image': 'url("https://farm8.staticflickr.com/7272/7633179468_3e19e45a0c_b.jpg")',
-                        'width': '50',
-                        'height': '50'
-                        }
-                      ).update();
-
-                    cy.$('#d').qtip({
-                      content: 'Hello!',
-                      position: {
-                        my: 'top center',
-                        at: 'bottom center'
-                      },
-                      style: {
-                        classes: 'qtip-bootstrap',
-                        tip: {
-                          width: 16,
-                          height: 8
-                        }
+                    console.log(scope.data);
+                    // graph  build
+                    scope.doCy = function(){ // will be triggered on an event broadcast
+                      // parse edges
+                      // you can build a complete object in the controller and pass it without rebuilding it in the directive.
+                      // doing it like that allows you to add options, design or what needed to the objects
+                      // doing it like that is also good if your data object/s has a different structure
+                      for (var i=0; i<scope.cyEdges.length; i++)
+                      {
+                          // get edge source
+                          var eSource = scope.cyEdges[i].source;
+                          // get edge target
+                          var eTarget = scope.cyEdges[i].target;
+                          // get edge id
+                          var eId = scope.cyEdges[i].id;
+                          // build the edge object
+                          var edgeObj = {
+                              data:{
+                              id:eId,
+                              source:eSource,
+                              target:eTarget
+                              }
+                          };
+                          // adding the edge object to the edges array
+                          scope.data.edges.push(edgeObj);
                       }
-                    });
 
-                    cy.expandCollapse({
-                      layoutBy: {
-                        name: "cola",
-                        // animate: "end",
-                        randomize: false,
-                        fit: true
-                      },
-                      fisheye: false,
-                      animate: false
-                    });
+                      // parse data and create the Nodes array
+                      // object type - is the object's group
+                      for (var i=0; i<scope.cyData.length; i++)
+                      {
+                          // get id, name and type  from the object
+                          var dId = scope.cyData[i].id;
+                          var dName = scope.cyData[i].name;
+                          var dType = scope.cyData[i].type;
+                          // get color from the object-color dictionary
 
-                    // the default values of each option are outlined below:
-                    var defaults = {
-                      zoomFactor: 0.05, // zoom factor per zoom tick
-                      zoomDelay: 45, // how many ms between zoom ticks
-                      minZoom: 0.1, // min zoom level
-                      maxZoom: 10, // max zoom level
-                      fitPadding: 50, // padding when fitting
-                      panSpeed: 10, // how many ms in between pan ticks
-                      panDistance: 10, // max pan distance per tick
-                      panDragAreaSize: 75, // the length of the pan drag box in which the vector for panning is calculated (bigger = finer control of pan speed and direction)
-                      panMinPercentSpeed: 0.25, // the slowest speed we can pan by (as a percent of panSpeed)
-                      panInactiveArea: 8, // radius of inactive area in pan drag box
-                      panIndicatorMinOpacity: 0.5, // min opacity of pan indicator (the draggable nib); scales from this to 1.0
-                      zoomOnly: false, // a minimal version of the ui only with zooming (useful on systems with bad mousewheel resolution)
-                      fitSelector: undefined, // selector of elements to fit
-                      animateOnFit: function(){ // whether to animate on fit
-                        return false;
-                      },
-                      fitAnimationDuration: 1000, // duration of animation on fit
+                          var typeColor = scope.typeColors[dType];
+                          // build the object, add or change properties as you need - just have a name and id
+                          var elementObj = {
+                              // group:dType,
+                              'data':{
+                                  id:dId,
+                                  name:dName,
+                                  typeColor:typeColor,
+                                  typeShape:dType,
+                                  type:dType,
 
-                      // icon class names
-                      sliderHandleIcon: 'fa fa-minus',
-                      zoomInIcon: 'fa fa-plus',
-                      zoomOutIcon: 'fa fa-minus',
-                      resetIcon: 'fa fa-expand'
-                    };
+                          }};
+                          // add new object to the Nodes array
+                          scope.data.nodes.push(elementObj);
+                      }
 
-                    cy.panzoom( defaults );
+                      cy = window.cy = cytoscape({
+                            container: domContainer,
+                            layout: scope.options.layout,
+                            style: scope.options.style,
+                            elements: scope.data
+                      });
 
-                    cy.cxtmenu({
-                      selector: 'node, edge',
-                      fillColor: 'rgba(95, 239, 228, 0.84)',
-            					commands: [
-            						{
-            							content: '<span class="fa fa-flash fa-2x"></span>',
-            							select: function(ele){
-            								console.log( ele.id() );
-            							}
-            						},
+                      cy.style()
+                        .selector('#d')
+                        .css(
+                          {
+                          'background-image': 'url("https://farm8.staticflickr.com/7272/7633179468_3e19e45a0c_b.jpg")',
+                          'width': '50',
+                          'height': '50'
+                          }
+                        ).update();
 
-            						{
-            							content: '<span class="fa fa-star fa-2x"></span>',
-            							select: function(ele){
-            								console.log( ele.data('name') );
-            							},
-            							disabled: true
-            						},
+                      cy.$('#d').qtip({
+                        content: 'Hello!',
+                        position: {
+                          my: 'top center',
+                          at: 'bottom center'
+                        },
+                        style: {
+                          classes: 'qtip-bootstrap',
+                          tip: {
+                            width: 16,
+                            height: 8
+                          }
+                        }
+                      });
 
-            						{
-            							content: 'Text',
-            							select: function(ele){
-            								console.log( ele.position() );
-            							}
-            						}
-            					]
-                    });
+                      cy.expandCollapse({
+                        layoutBy: {
+                          name: "cola",
+                          // animate: "end",
+                          randomize: false,
+                          fit: true
+                        },
+                        fisheye: false,
+                        animate: false
+                      });
 
-                    cy.cxtmenu({
-          					selector: 'core',
-                    fillColor: 'rgba(95, 239, 228, 0.84)',
-          					commands: [
-          						{
-          							content: 'function 1',
-          							select: function(){
-          								console.log( 'function 1' );
-          							}
-          						},
+                        // the default values of each option are outlined below:
+                        var defaults = {
+                          zoomFactor: 0.05, // zoom factor per zoom tick
+                          zoomDelay: 45, // how many ms between zoom ticks
+                          minZoom: 0.1, // min zoom level
+                          maxZoom: 10, // max zoom level
+                          fitPadding: 50, // padding when fitting
+                          panSpeed: 10, // how many ms in between pan ticks
+                          panDistance: 10, // max pan distance per tick
+                          panDragAreaSize: 75, // the length of the pan drag box in which the vector for panning is calculated (bigger = finer control of pan speed and direction)
+                          panMinPercentSpeed: 0.25, // the slowest speed we can pan by (as a percent of panSpeed)
+                          panInactiveArea: 8, // radius of inactive area in pan drag box
+                          panIndicatorMinOpacity: 0.5, // min opacity of pan indicator (the draggable nib); scales from this to 1.0
+                          zoomOnly: false, // a minimal version of the ui only with zooming (useful on systems with bad mousewheel resolution)
+                          fitSelector: undefined, // selector of elements to fit
+                          animateOnFit: function(){ // whether to animate on fit
+                            return false;
+                          },
+                          fitAnimationDuration: 1000, // duration of animation on fit
 
-          						{
-          							content: 'function 2',
-          							select: function(){
-          								console.log( 'function 2' );
-          							}
-          						}
-          					]
-          				});
+                          // icon class names
+                          sliderHandleIcon: 'fa fa-minus',
+                          zoomInIcon: 'fa fa-plus',
+                          zoomOutIcon: 'fa fa-minus',
+                          resetIcon: 'fa fa-expand'
+                        };
 
-                    // var eh = cy.edgehandles();
+                        cy.panzoom( defaults );
 
-                    // debugger;
-                    // document.querySelector('#draw-on').addEventListener('click', function() {
-                    //   debugger;
-                    //   eh.enableDrawMode();
-                    // });
-                    //
-                    // document.querySelector('#draw-off').addEventListener('click', function() {
-                    //   eh.disableDrawMode();
-                    // });
-                    //
-                    // document.querySelector('#start').addEventListener('click', function() {
-                    //   eh.start( cy.$('node:selected') );
-                    // });
+                        cy.cxtmenu({
+                          selector: 'node, edge',
+                          fillColor: 'rgba(95, 239, 228, 0.84)',
+                          commands: [
+                            {
+                              content: '<span class="fa fa-flash fa-2x"></span>',
+                              select: function(ele){
+                                console.log( ele.id() );
+                              }
+                            },
 
-                    // cy.edgehandles();
+                            {
+                              content: '<span class="fa fa-star fa-2x"></span>',
+                              select: function(ele){
+                                console.log( ele.data('name') );
+                              },
+                              disabled: true
+                            },
 
-                    // load the objects array
-                    // use cy.add() / cy.remove() with passed data to add or remove nodes and edges without rebuilding the graph
-                    // sample use can be adding a passed variable which will be broadcast on change
-                    // debugger;
-                    // cy.add(scope.elements);
-                // }
+                            {
+                              content: 'Text',
+                              select: function(ele){
+                                console.log( ele.position() );
+                              }
+                            }
+                          ]
+                        });
+
+                        cy.cxtmenu({
+                        selector: 'core',
+                        fillColor: 'rgba(95, 239, 228, 0.84)',
+                        commands: [
+                          {
+                            content: 'function 1',
+                            select: function(){
+                              console.log( 'function 1' );
+                            }
+                          },
+
+                          {
+                            content: 'function 2',
+                            select: function(){
+                              console.log( 'function 2' );
+                            }
+                          }
+                        ]
+                      });
+
+                    }; // end doCy()
+
+                  scope.doCy();
 
                   // Attach an event handler if defined
                   angular.forEach(scope.events, function (callback, event) {
@@ -291,16 +281,15 @@ define([
                       scope.events.onload(cy);
                   }
 
-                }; // end doCy()
+                  // When the app object changed = redraw the graph
+                  // you can use it to pass data to be added or removed from the object without redrawing it
+                  // using cy.remove() / cy.add()
+                  $rootScope.$on('appChanged', function(){
+                      scope.doCy();
+                  });
 
-                scope.doCy();
-
-                // When the app object changed = redraw the graph
-                // you can use it to pass data to be added or removed from the object without redrawing it
-                // using cy.remove() / cy.add()
-                $rootScope.$on('appChanged', function(){
-                    scope.doCy();
                 });
+
             }
         };
     });

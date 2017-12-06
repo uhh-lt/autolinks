@@ -1,26 +1,37 @@
 <div>
   <div id="content" class="container" ng-controller="GraphController">
-    <div >
-      <span>Node:</span>
-      <select ng-model="form.obj.objTypes" ng-options="name for name in objTypes"></select>
-      <input ng-model="form.obj.name"/>
-      <button class="btn btn-success" ng-click="addObj()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> ADD NODE</button>
-      <button class="btn btn-danger" ng-click="delObj()"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span> DELETE NODE</button>
-      <button class="md-button md-primary md-raised md-button submit-button right" ng-click="reset()">Reset nodes</button>
-      <span ng-hide="mapData.length > 1">
-        After adding 2 nodes, you can start adding connecting edges
-      </span>
-      <span ng-show="mapData.length > 1">
-          Edge (between 2 nodes)
-        <select ng-model="formEdges.fromName" ng-options="c.name for c in mapData">
-          <option value=""> From >> </option>
-        </select>
-        <select ng-model="formEdges.toName" ng-options="c.name for c in mapData">
-          <option value="">  To >> </option>
-        </select>
-        <button class="md-button md-primary md-raised md-button submit-button" ng-click="addEdge()">ADD EDGE</button>
-      </span>
-      <cytoscape class="" cy-data="mapData" cy-edges="edgeData" cy-click="doClick(value)" options="graphOptions" events="graphEvents"/>
+    <div>
+      <div class="row">
+        <div class="col-xs-8">
+          <span>Node:</span>
+          <select class="btn btn-primary dropdown-toggle" ng-model="form.obj.objTypes" ng-options="name for name in objTypes"></select>
+          <md-input-container style="margin: 0; vertical-align:top; height: 30px;">
+            <input ng-model="form.obj.name" placeholder="Node text">
+          </md-input-container>
+          <button class="btn btn-success" ng-click="addObj()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> ADD NODE</button>
+          <button class="btn btn-danger" ng-click="delObj()"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span> DELETE NODE</button>
+          <button class="btn btn-default" ng-click="centerGraph()"><span class="glyphicon glyphicon-resize-full" aria-hidden="true"></span> FIT NODES</button>
+          <button class="btn btn-default" ng-click="reset()"><span class="glyphicon glyphicon-retweet" aria-hidden="true"></span> RESET NODES</button>
+        </div>
+        <div class="col-xs-4 text-right">
+          <button ng-hide="edgehandler" class="btn btn-success" ng-click="activateEdgeHandle()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> ADD EDGE</button>
+          <button ng-show="edgehandler" class="btn btn-default" ng-click="disableEdgeHandle()"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> BACK</button>
+          <span ng-hide="mapData.length > 1">
+            After adding 2 nodes, you can start adding connecting edges
+          </span>
+          <span ng-show="mapData.length > 1">
+              Edge (between 2 nodes)
+            <select ng-model="formEdges.fromName" ng-options="c.name for c in mapData">
+              <option value=""> From >> </option>
+            </select>
+            <select ng-model="formEdges.toName" ng-options="c.name for c in mapData">
+              <option value="">  To >> </option>
+            </select>
+            <button class="btn btn-success" ng-click="addEdge()">ADD EDGE</button>
+          </span>
+        </div>
+      </div>
+      <cytoscape data="graphData" cy-data="mapData" cy-edges="edgeData" cy-click="doClick(value)" options="graphOptions" events="graphEvents"/>
     </div>
   </div>
 </div>
