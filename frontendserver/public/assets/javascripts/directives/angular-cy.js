@@ -52,6 +52,13 @@ define([
 
                 var cy = null;
 
+                panzoom(cytoscape, $);
+                expandCollapse(cytoscape, $);
+                undoRedo(cytoscape);
+                cycola(cytoscape, cola);
+                cyqtip(cytoscape, $);
+                cxtmenu(cytoscape);
+
                 scope.$watch('data', function () {
 
                     // Sanity check
@@ -65,29 +72,6 @@ define([
                         cy.destroy();
                     }
 
-                    // initialize data object
-                    scope.elements = {};
-                    scope.elements.nodes = [
-                      { data: { id: 'a', parent: 'b', name: "Disease" }, position: { x: 215, y: 85 } },
-                      { data: { id: 'b', name: "Caucasian race" } },
-                      { data: { id: 'g', parent: 'a' } },
-                      { data: { id: 'h', parent: 'a' } },
-                      { data: { id: 'c', parent: 'b' }, position: { x: 300, y: 85 } },
-                      { data: { id: 'd', name: "Caucasian race"}, position: { x: 215, y: 175 } },
-                      { data: { id: 'e' } },
-                      { data: { id: 'f', parent: 'e' }, position: { x: 300, y: 175 } }
-                    ];
-                    scope.elements.edges = [
-                      { data: { id: 'ad', source: 'd', target: 'g' } },
-                      { data: { id: 'eb', source: 'e', target: 'b' } }
-                    ];
-
-                    panzoom(cytoscape, $);
-                    expandCollapse(cytoscape, $);
-                    undoRedo(cytoscape);
-                    cycola(cytoscape, cola);
-                    cyqtip(cytoscape, $);
-                    cxtmenu(cytoscape);
                     // edgehandles(cytoscape);
 
                     var domContainer = document.getElementById('cy-network');
@@ -98,6 +82,7 @@ define([
                       // you can build a complete object in the controller and pass it without rebuilding it in the directive.
                       // doing it like that allows you to add options, design or what needed to the objects
                       // doing it like that is also good if your data object/s has a different structure
+
                       for (var i=0; i<scope.cyEdges.length; i++)
                       {
                           // get edge source
@@ -109,9 +94,9 @@ define([
                           // build the edge object
                           var edgeObj = {
                               data:{
-                              id:eId,
-                              source:eSource,
-                              target:eTarget
+                                id:eId,
+                                source:eSource,
+                                target:eTarget
                               }
                           };
                           // adding the edge object to the edges array
@@ -150,6 +135,35 @@ define([
                             style: scope.options.style,
                             elements: scope.data
                       });
+
+                      var edgeHandleProps = {
+                        complete: function( sourceNode, targetNode, addedEles ){
+                          // fired when edgehandles is done and elements are added
+                          // build the edge object
+                          // get edge source
+                          var eSource = sourceNode._private.data.id;
+                          // get edge target
+                          var eTarget = targetNode._private.data.id;
+                          // get edge id
+                          var eId = eSource + eTarget;
+                          // build the edge object
+                          var edgeObj = {
+                              data:{
+                                id:eId,
+                                source:eSource,
+                                target:eTarget
+                              }
+                          };
+                          // adding the edge object to the edges array
+                          scope.data.edges.push(edgeObj);
+                        },
+                      }
+
+                      if (scope.$parent.edgehandler) {
+                        edgehandles(cytoscape);
+                        cy.edgehandles(edgeHandleProps);
+                      }
+
 
                       cy.style()
                         .selector('#d')
