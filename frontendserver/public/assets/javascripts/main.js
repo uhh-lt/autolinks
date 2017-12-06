@@ -21,6 +21,7 @@
       'ngCy':'directives/angular-cy',
       'cytoscape': 'libs/cytoscape/dist/cytoscape.min',
       'cytoscape-cola': 'libs/cytoscape-cola/cytoscape-cola',
+      'cytoscape-cose-bilkent': 'libs/cytoscape-cose-bilkent/cytoscape-cose-bilkent',
       'cytoscape-cxtmenu': 'libs/cytoscape-cxtmenu/cytoscape-cxtmenu',
       'cytoscape-panzoom': 'libs/cytoscape-panzoom/cytoscape-panzoom',
       'cytoscape.js-panzoom': 'libs/cytoscape-panzoom/cytoscape.js-panzoom',

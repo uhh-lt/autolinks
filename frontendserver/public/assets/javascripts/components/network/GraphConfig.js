@@ -27,29 +27,29 @@ define([
         // here are just some basic options
         .constant('generalOptions', {
             layout: {
-                name: 'concentric',
-                edgeLengthVal: 10,
-                // animate: true,
-                avoidOverlap: true, // if true, prevents overlap of node bounding boxes
-                handleDisconnected: true, // if true, avoids disconnected components from overlapping
-                fit: true, // whether to fit the viewport to the graph
-                ready: undefined, // callback on layoutready
-                stop: undefined, // callback on layoutstop
-                padding: 5 // the padding on fit
+                name: 'cose-bilkent',
+                animate: 'end'
+                // edgeLengthVal: 10,
+                // idealEdgeLength: function( edge ){ return 1; },
+                // // animate: true,
+                // avoidOverlap: true, // if true, prevents overlap of node bounding boxes
+                // handleDisconnected: true, // if true, avoids disconnected components from overlapping
+                // fit: true, // whether to fit the viewport to the graph
+                // ready: undefined, // callback on layoutready
+                // stop: undefined, // callback on layoutstop
+                // padding: 5 // the padding on fit
             },
-            // boxSelectionEnabled: false,
-            // autounselectify: true,
             style: [
                {
                 selector: 'node',
                 css: {
                     'shape': 'roundrectangle',
-                    'width': '100',
+                    'width': '120',
                     'height': '50',
-                    'background-color': 'rgba(109, 127, 227, 0.84)',
+                    // 'background-color': 'rgba(102, 127, 227, 0.84)',
                     'background-fit': 'cover',
                     'content': 'data(name)',
-                    'text-valign': 'bottom',
+                    'text-valign': 'center',
                     // 'color': 'white',
                     // 'text-outline-width': 2,
                     // 'text-outline-color': 'data(typeColor)'
@@ -60,8 +60,8 @@ define([
                 css:{
                     'width': '1',
                     'content': 'data(name)',
+                    'curve-style': 'bezier',
                     'target-arrow-shape': 'triangle',
-                    'source-arrow-shape': 'triangle'
                   }
                 },
                 {

@@ -3,7 +3,7 @@ define([
     'jquery',
     'cola',
     'cytoscape',
-    'cytoscape-cola',
+    'cytoscape-cose-bilkent',
     'cytoscape-cxtmenu',
     'cytoscape-panzoom',
     'cytoscape-qtip',
@@ -12,7 +12,7 @@ define([
     'cytoscape.js-undo-redo',
     'qtip2',
     'bootstrap',
-], function(angular, $, cola, cytoscape, cycola, cxtmenu, panzoom, cyqtip, expandCollapse,edgehandles, undoRedo, qtip2) {
+], function(angular, $, cola, cytoscape, regCose, cxtmenu, panzoom, cyqtip, expandCollapse,edgehandles, undoRedo, qtip2) {
     'use strict';
 
     angular.module('ngCy', [])
@@ -55,7 +55,7 @@ define([
                 panzoom(cytoscape, $);
                 expandCollapse(cytoscape, $);
                 undoRedo(cytoscape);
-                cycola(cytoscape, cola);
+                regCose(cytoscape);
                 cyqtip(cytoscape, $);
                 cxtmenu(cytoscape);
 
@@ -166,16 +166,19 @@ define([
 
 
                       cy.nodes().forEach(function(n){
-                        cy.style()
-                          .selector('#'+ n.data('id'))
-                          .css(
-                            {
-                            'background-image': n.data('image'),
-                            'background-color': 'rgba(255, 255, 255, 0)',
-                            'width': '50',
-                            'height': '50'
-                            }
-                          ).update();
+                        if (n.data('image')) {
+                          cy.style()
+                            .selector('#'+ n.data('id'))
+                            .css(
+                              {
+                              'background-image': n.data('image'),
+                              'background-color': 'rgba(255, 255, 255, 0)',
+                              'text-valign': 'bottom',
+                              'width': '50',
+                              'height': '50'
+                              }
+                            ).update();
+                        }
                       });
 
                       cy.nodes().forEach(function(n){
@@ -199,7 +202,7 @@ define([
 
                       cy.expandCollapse({
                         layoutBy: {
-                          name: "cola",
+                          name: "cose-bilkent",
                           // animate: "end",
                           randomize: false,
                           fit: true
