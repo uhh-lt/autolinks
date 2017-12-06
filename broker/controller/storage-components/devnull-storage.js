@@ -13,13 +13,20 @@ module.exports = {
   },
   read : function read(username, storagekey, callback) {
     // generate some random data
-    const triple = {
-      subject: randowords(1),
-      predicate: randowords(1),
-      object: randowords(1)
-    };
-    logger.info(`cowsay ( ${username}, ${JSON.stringify(storagekey)} ) : ${JSON.stringify(triple)}`);
-    return callback(null, triple);
+    const triples = [
+      {
+        subject: 'Simon',
+        predicate: 'is',
+        object: username,
+      },
+      {
+        subject: 'Simon',
+        predicate: 'says',
+        object: randowords(1)[0],
+      }
+    ];
+    logger.info(`cowsay ( ${username}, ${JSON.stringify(storagekey)} ) : ${JSON.stringify(triples)}`);
+    return callback(null, triples);
   },
   write : function write(username, storagekey, storagevalue, callback) {
     logger.info(`echo ( ${username}, ${JSON.stringify(storagekey)}, ${JSON.stringify(storagevalue)} ) > /dev/null`);

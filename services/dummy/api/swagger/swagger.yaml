@@ -31,23 +31,24 @@ definitions:
         type: string
 
   # Objects related to required return types
-  RDFtriple:
+  Triple:
     type: object
     properties:
       subject:
-        type: string
-        description: the subject of the rdf triple
+        type: object
+        description: the subject of the triple is either a string or a triple
       predicate:
-        type: string
-        description: the predicate of the the rdf triple
+        type: object
+        description: the predicate of the triple is either a string or a triple
       object:
-        type: string
-        description: the object of the rdf triple
-      properties:
-        type: array
-        description: additional properties are also rdf triples
-        items:
-          $ref: '#/definitions/RDFtriple'
+        type: object
+        description: the object of the triple is either a string or a triple
+        
+  Triples:
+    type: array
+    description: a list of triples
+    items:
+      $ref: '#/definitions/Triple'
 
   # In case of error return this object schema
   Error:
@@ -85,7 +86,7 @@ paths:
         200:
           description: Success
           schema:
-            $ref: '#/definitions/RDFtriple'
+            $ref: '#/definitions/Triples'
         default:
           description: Error
           schema:
@@ -109,7 +110,7 @@ paths:
         200:
           description: Success
           schema:
-            $ref: '#/definitions/RDFtriple'
+            $ref: '#/definitions/Triples'
         default:
           description: Error
           schema:
@@ -128,7 +129,7 @@ paths:
         200:
           description: Success
           schema:
-            $ref: '#/definitions/RDFtriple'
+            $ref: '#/definitions/Triples'
         default:
           description: Error
           schema:
@@ -157,7 +158,7 @@ paths:
         200:
           description: Success
           schema:
-            $ref: '#/definitions/RDFtriple'
+            $ref: '#/definitions/Triples'
         default:
           description: Error
           schema:
