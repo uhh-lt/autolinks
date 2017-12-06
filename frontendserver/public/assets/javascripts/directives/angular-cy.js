@@ -165,28 +165,35 @@ define([
                       }
 
 
-                      cy.style()
-                        .selector('#d')
-                        .css(
-                          {
-                          'background-image': 'url("https://farm8.staticflickr.com/7272/7633179468_3e19e45a0c_b.jpg")',
-                          'width': '50',
-                          'height': '50'
-                          }
-                        ).update();
+                      cy.nodes().forEach(function(n){
+                        cy.style()
+                          .selector('#'+ n.data('id'))
+                          .css(
+                            {
+                            'background-image': n.data('image'),
+                            'background-color': 'rgba(255, 255, 255, 0)',
+                            'width': '50',
+                            'height': '50'
+                            }
+                          ).update();
+                      });
 
-                      cy.$('#d').qtip({
-                        content: 'Hello!',
-                        position: {
-                          my: 'top center',
-                          at: 'bottom center'
-                        },
-                        style: {
-                          classes: 'qtip-bootstrap',
-                          tip: {
-                            width: 16,
-                            height: 8
-                          }
+                      cy.nodes().forEach(function(n){
+                        if (n.data('desc')) {
+                          cy.$('#'+ n.data('id')).qtip({
+                            content: n.data('desc'),
+                            position: {
+                              my: 'top center',
+                              at: 'bottom center'
+                            },
+                            style: {
+                              classes: 'qtip-bootstrap',
+                              tip: {
+                                width: 16,
+                                height: 8
+                              }
+                            }
+                          });
                         }
                       });
 

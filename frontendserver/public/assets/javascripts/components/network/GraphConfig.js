@@ -27,7 +27,8 @@ define([
         // here are just some basic options
         .constant('generalOptions', {
             layout: {
-                name: 'cola',
+                name: 'concentric',
+                edgeLengthVal: 10,
                 // animate: true,
                 avoidOverlap: true, // if true, prevents overlap of node bounding boxes
                 handleDisconnected: true, // if true, avoids disconnected components from overlapping
@@ -57,8 +58,8 @@ define([
                 {
                 selector: 'edge',
                 css:{
-                    // 'width': '10',
-                    'content': 'has_relation',
+                    'width': '1',
+                    'content': 'data(name)',
                     'target-arrow-shape': 'triangle',
                     'source-arrow-shape': 'triangle'
                   }
