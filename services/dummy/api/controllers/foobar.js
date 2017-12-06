@@ -20,24 +20,33 @@ function foo(req, res, next) {
   }
 
   const etext = entity.text || 'Simon';
-  const triple = {
-    subject: etext,
-    predicate: 'says',
-    object: 'foo'
-  };
+  const triples = [
+    {
+      subject: etext,
+      predicate: 'says',
+      object: 'bar'
+    }
+  ];
 
-  res.json(triple);
+  res.json(triples);
   res.end(next);
 
 }
 
 function bar(req, res, next) {
 
-  const triples = [{
-    subject: 'Simon',
-    predicate: 'says',
-    object: 'bar'
-  }];
+  const triples = [
+    {
+      subject: 'Simon',
+      predicate: 'says',
+      object: 'foo'
+    },
+    {
+      subject: 'Simon',
+      predicate: 'says',
+      object: 'bar'
+    }
+  ];
 
   // this sends back a JSON response and ends the response
   res.header('Content-Type', 'application/json; charset=utf-8');
@@ -61,8 +70,12 @@ function baz(req, res, next) {
   const triples = [{
     subject: {
       subject: username,
-      predicate: 'is',
-      object: entity.text || 'Simon',
+      predicate: 'is same as',
+      object: {
+        subject: entity.text || 'Simon',
+        predicate: 'is a',
+        object: 'human',
+      },
     },
     predicate: {
       subject: 'says',
