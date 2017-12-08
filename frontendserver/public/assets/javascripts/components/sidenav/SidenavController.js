@@ -14,6 +14,7 @@ define([
           $scope.init = function() {
             // $timeout( function(){
               $scope.selectedEntity = EntityService.getRootScopeEntity();
+              console.log($scope);
             // }, 1000);
           }
 

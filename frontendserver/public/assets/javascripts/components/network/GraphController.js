@@ -13,8 +13,8 @@ define([
     angular.module('autolinks.graph', ['ngCy']);
     angular.module('autolinks.graph')
         // Graph Controller
-        .controller('GraphController', ['$scope', '$q', '$rootScope', 'graphProperties',
-        function ($scope, $q, $rootScope, graphProperties) {
+        .controller('GraphController', ['$scope', '$q', '$rootScope', 'graphProperties', 'EntityService',
+        function ($scope, $q, $rootScope, graphProperties, EntityService) {
 
           var self = this;
           /* Background collection */
@@ -34,6 +34,8 @@ define([
           function onNetworkLoad(cy) {
               self.cy = cy;
           }
+
+          $scope.EntityService = EntityService;
 
           $scope.edgehandler = false;
           // container objects

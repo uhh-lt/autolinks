@@ -164,6 +164,15 @@ define([
                         cy.edgehandles(edgeHandleProps);
                       }
 
+                      // Event listeners
+                      // with sample calling to the controller function as passed as an attribute
+                      cy.on('tap', 'node', function(e){
+                          var evtTarget = e.target;
+                          var nodeId = evtTarget.id();
+                          // scope.cyClick({value:nodeId});
+                          scope.$parent.EntityService.openSideNav(evtTarget);
+                      });
+
 
                       cy.nodes().forEach(function(n){
                         if (n.data('image')) {
