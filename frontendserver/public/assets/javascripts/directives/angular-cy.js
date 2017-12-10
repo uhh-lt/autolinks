@@ -170,7 +170,7 @@ define([
                           var evtTarget = e.target;
                           var nodeId = evtTarget.id();
                           // scope.cyClick({value:nodeId});
-                          scope.$parent.EntityService.openSideNav(evtTarget);
+                          // scope.$parent.EntityService.openSideNav(evtTarget);
                       });
 
 
@@ -191,9 +191,53 @@ define([
                       });
 
                       cy.nodes().forEach(function(n){
+
+                        scope.currentNode = {};
+                        // Increase Font Size
+                        $(document).on('click', "#readMode", function(event, n){
+                          scope.$parent.EntityService.openSideNav(scope.currentNode);
+                        return false;
+                        });
+
+                        // var qtipDefaults = {
+                        //   style: {
+                        //       backgroundColor: red
+                        //   }
+                        // };
                         if (n.data('desc')) {
                           cy.$('#'+ n.data('id')).qtip({
-                            content: n.data('desc'),
+                            content: {
+                                text: function(event, api) {
+                                  scope.currentNode = n;
+                                  // debugger;
+                                  // $(this).next('.autolinks-qtip').css
+                                  return (
+                                  '<div class="node-buttons">' +
+                                  '<button id="readMode" class="node-button"><i class="fa fa-book fa-2x"/></button>' +
+                                  '<button id="addEdge" class="node-button"><i class="fa fa-arrows-alt fa-2x"/></button> ' +
+                                  '<button id="editNode" class="node-button"><i class="fa fa-pencil fa-2x"/></button>' +
+                                  '</div>'
+                                  )
+                                }
+                            },
+                            position: {
+                              my: 'bottom center',
+                              at: 'top center'
+                            },
+                            style: {
+                                name: 'qtip-content'
+                            }
+                          });
+                          cy.$('#'+ n.data('id')).qtip({
+                            content: {
+                                text: function(event, api) {
+                                  // debugger;
+                                  // $(this).next('.autolinks-qtip').css
+                                  return (
+                                  '<div class="node-description">' + n.data('desc') + '</div>'
+                                  )
+                                }
+                            },
                             position: {
                               my: 'top center',
                               at: 'bottom center'
@@ -203,11 +247,47 @@ define([
                               tip: {
                                 width: 16,
                                 height: 8
-                              }
+                              },
                             }
                           });
                         }
                       });
+
+                      // call on core
+                    cy.qtip({
+                      content: {
+                          text: function(event, api) {
+                            // debugger;
+                            // $(this).next('.autolinks-qtip').css
+                            return '<button class="increase" title="Increase font size">A+</button> <button class="decrease" title="Decrease font size">A-</button> <button class="resetMe" title="Default font size">A</button>';
+                          }
+                      },
+                      position: {
+                        my: 'top center',
+                        at: 'bottom center'
+                      },
+                      show: {
+                        cyBgOnly: true
+                      },
+                      style: {
+                        classes: 'qtip-bootstrap',
+                        tip: {
+                          width: 16,
+                          height: 8
+                        }
+                      }
+                    });
+
+                    // Decrease Font Size
+                    $(document).on('click', ".decrease", function(){
+                    var currentFontSize = $('.entry').css('font-size');
+                    var currentSize = $('.entry').css('font-size');
+                    var currentSize = parseFloat(currentSize)*0.8;
+                    $('.entry').css('font-size', currentSize);
+
+                    return false;
+                    });
+
 
                       cy.expandCollapse({
                         layoutBy: {
@@ -252,6 +332,7 @@ define([
                         cy.cxtmenu({
                           selector: 'node, edge',
                           fillColor: 'rgba(95, 239, 228, 0.84)',
+                          // openMenuEvents: 'tap',
                           commands: [
                             {
                               content: '<span class="fa fa-flash fa-2x"></span>',
@@ -280,10 +361,12 @@ define([
                         cy.cxtmenu({
                         selector: 'core',
                         fillColor: 'rgba(95, 239, 228, 0.84)',
+                        // openMenuEvents: 'tap',
                         commands: [
                           {
                             content: 'function 1',
-                            select: function(){
+                            select: function(e){
+                              console.log(e);
                               console.log( 'function 1' );
                             }
                           },
