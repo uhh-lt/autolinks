@@ -76,6 +76,18 @@ definitions:
         type: integer
         description: the point in time when the user was last seen, i.e. the time of the last login
 
+#  NamedEntity:
+#    type: object
+#    properties:
+#      text:
+#        type: string
+#      type:
+#        type: string
+#      offset:
+#        $ref: "#/definitions/DOffset"
+#      analyzer:
+#        type: string
+
   # objects related to NLP
   Document:
     type: object
@@ -87,24 +99,46 @@ definitions:
       language:
         type: string
 
-  NamedEntity:
+  Analysis:
     type: object
     properties:
-      text:
+      focusoffset:
+        $ref: "#/definitions/DOffset"
+      context:
         type: string
+      source:
+        type: string
+      lang:
+        type: string
+      annotations:
+        type: array
+        items:
+          $ref: "#/definitions/Annotation"
+
+  Annotation:
+    type: object
+    properties:
       type:
         type: string
       offset:
-        $ref: "#/definitions/Offset"
+        $ref: "#/definitions/DOffset"
+      properties:
+        type: object
       analyzer:
         type: string
+
+  # Discontinuous offset, composed of a list of offsets to allow for discontinuous annotations
+  DOffset:
+    type: array
+    items:
+      $ref: "#/definitions/Offset"
 
   Offset:
     type: object
     properties:
       from:
         type: integer
-      to:
+      length:
         type: integer
 
   # objects related to storage
@@ -370,6 +404,32 @@ paths:
         - NLP
       description: Find named entites in the provided text
       parameters:
+        - name: analysis
+          in: body
+          description: |
+            The analysis object which contains the current analysis object.
+          schema:
+            $ref: "#/definitions/Analysis"
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Annotation"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+
+  /nlp/analyze:
+    x-swagger-router-controller: nlp
+    post:
+      operationId: analyze
+      tags:
+        - NLP
+      description: Analyze the provided document
+      parameters:
         - name: document
           in: body
           description: |
@@ -381,9 +441,7 @@ paths:
         200:
           description: Success
           schema:
-            type: array
-            items:
-              $ref: "#/definitions/NamedEntity"
+            $ref: "#/definitions/Analysis"
         default:
           description: Error
           schema:

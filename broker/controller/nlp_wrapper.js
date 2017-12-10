@@ -11,6 +11,7 @@ const logger = require('./log')(module);
 module.exports = {
   init : init,
   analyze : analyze,
+  findNamedEntities : findNamedEntities,
 }
 
 const explicitNLP = (() => {
@@ -43,10 +44,21 @@ function init(callback) {
 /**
  *
  * @param document
+ * @param callbackIter = function(err, analysis)
+ */
+function analyze(document, callback) {
+  return explicitNLP.analyze(document, callback);
+}
+
+/**
+ *
+ * @param analysis
+ * @param callbackStart = function(err)
  * @param callbackIter = function(err, entities)
  * @param callbackDone = function(err)
  */
-function analyze(document, callbackStart, callbackIter, callbackDone) {
-  return explicitNLP.analyze(document, callbackStart, callbackIter, callbackDone);
+function findNamedEntities(analysis, callbackStart, callbackIter, callbackDone) {
+  return explicitNLP.analyze(analysis, callbackStart, callbackIter, callbackDone);
 }
+
 

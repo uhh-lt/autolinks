@@ -22,7 +22,7 @@ module.exports = {
    * @param callbackDone
    *
    */
-  analyze : function(document, callbackStart, callbackIter, callbackDone) {
+  findNamedEntities : function(document, callbackStart, callbackIter, callbackDone) {
 
     logger.debug(`Analyzing document: '${document.source}'.`, document);
 
@@ -63,6 +63,10 @@ module.exports = {
     // report that we're done
     callbackDone(null);
 
+  },
+
+  analyze : function(document, callback) {
+    callback(new Error('not yet implemented'), null);
   }
 
 };
