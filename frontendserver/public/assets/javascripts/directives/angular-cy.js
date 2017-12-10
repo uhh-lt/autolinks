@@ -58,6 +58,7 @@ define([
                 regCose(cytoscape);
                 cyqtip(cytoscape, $);
                 cxtmenu(cytoscape);
+                edgehandles(cytoscape);
 
                 scope.$watch('data', function () {
 
@@ -137,36 +138,45 @@ define([
                       });
 
                       var edgeHandleProps = {
+                        preview: false,
                         complete: function( sourceNode, targetNode, addedEles ){
                           // fired when edgehandles is done and elements are added
                           // build the edge object
                           // get edge source
-                          var eSource = sourceNode._private.data.id;
-                          // get edge target
-                          var eTarget = targetNode._private.data.id;
-                          // get edge id
-                          var eId = eSource + eTarget;
-                          // build the edge object
-                          var edgeObj = {
-                              data:{
-                                id:eId,
-                                source:eSource,
-                                target:eTarget
-                              }
-                          };
-                          // adding the edge object to the edges array
-                          scope.data.edges.push(edgeObj);
+                          if (sourceNode.data && targetNode.data) {
+                            var eSource = sourceNode.data('id');
+                            // get edge target
+                            var eTarget = targetNode.data('id');
+                            // get edge id
+                            var eId = eSource + eTarget;
+                            // build the edge object
+                            var edgeObj = {
+                                data:{
+                                  id:eId,
+                                  source:eSource,
+                                  target:eTarget,
+                                  name: 'has relation'
+                                }
+                            };
+                            // adding the edge object to the edges array
+                            scope.data.edges.push(edgeObj);
+                          }
+                          this.enabled = false;
                         },
                       }
 
+                      var eh = cy.edgehandles(edgeHandleProps);
+                      eh.enabled = false;
+
                       if (scope.$parent.edgehandler) {
-                        edgehandles(cytoscape);
-                        cy.edgehandles(edgeHandleProps);
+                        eh.enabled = true;
+                        eh.start( cy.$('node:selected') );
                       }
 
                       // Event listeners
                       // with sample calling to the controller function as passed as an attribute
                       cy.on('tap', 'node', function(e){
+                          eh.enabled = false;
                           var evtTarget = e.target;
                           var nodeId = evtTarget.id();
                           // scope.cyClick({value:nodeId});
@@ -193,24 +203,22 @@ define([
                       cy.nodes().forEach(function(n){
 
                         scope.currentNode = {};
-                        // Increase Font Size
-                        $(document).on('click', "#readMode", function(event, n){
+
+                        $(document).on('click', "#editNode", function(event, n){
                           scope.$parent.EntityService.openSideNav(scope.currentNode);
-                        return false;
                         });
 
-                        // var qtipDefaults = {
-                        //   style: {
-                        //       backgroundColor: red
-                        //   }
-                        // };
-                        if (n.data('desc')) {
+                        $(document).on('click', "#addEdge", function(){
+                          eh.enabled = true;
+                          eh.start( cy.$('node:selected') );
+                          // scope.$parent.edgehandler = true;
+                        });
+
+                        if (n.data('name') && !n.isParent()) {
                           cy.$('#'+ n.data('id')).qtip({
                             content: {
                                 text: function(event, api) {
                                   scope.currentNode = n;
-                                  // debugger;
-                                  // $(this).next('.autolinks-qtip').css
                                   return (
                                   '<div class="node-buttons">' +
                                   '<button id="readMode" class="node-button"><i class="fa fa-book fa-2x"/></button>' +
@@ -228,11 +236,12 @@ define([
                                 name: 'qtip-content'
                             }
                           });
+                        }
+
+                        if (n.data('desc')) {
                           cy.$('#'+ n.data('id')).qtip({
                             content: {
                                 text: function(event, api) {
-                                  // debugger;
-                                  // $(this).next('.autolinks-qtip').css
                                   return (
                                   '<div class="node-description">' + n.data('desc') + '</div>'
                                   )
@@ -252,42 +261,6 @@ define([
                           });
                         }
                       });
-
-                      // call on core
-                    cy.qtip({
-                      content: {
-                          text: function(event, api) {
-                            // debugger;
-                            // $(this).next('.autolinks-qtip').css
-                            return '<button class="increase" title="Increase font size">A+</button> <button class="decrease" title="Decrease font size">A-</button> <button class="resetMe" title="Default font size">A</button>';
-                          }
-                      },
-                      position: {
-                        my: 'top center',
-                        at: 'bottom center'
-                      },
-                      show: {
-                        cyBgOnly: true
-                      },
-                      style: {
-                        classes: 'qtip-bootstrap',
-                        tip: {
-                          width: 16,
-                          height: 8
-                        }
-                      }
-                    });
-
-                    // Decrease Font Size
-                    $(document).on('click', ".decrease", function(){
-                    var currentFontSize = $('.entry').css('font-size');
-                    var currentSize = $('.entry').css('font-size');
-                    var currentSize = parseFloat(currentSize)*0.8;
-                    $('.entry').css('font-size', currentSize);
-
-                    return false;
-                    });
-
 
                       cy.expandCollapse({
                         layoutBy: {
@@ -364,15 +337,27 @@ define([
                         // openMenuEvents: 'tap',
                         commands: [
                           {
-                            content: 'function 1',
+                            content: '<span class="fa fa-plus-circle fa-2x"></span>',
                             select: function(e){
-                              console.log(e);
-                              console.log( 'function 1' );
+                              var x = e.pan('x');
+                              var y = e.pan('y')
+                              var nodeObj = {
+                                  data: {
+                                    id: 'n' + scope.data.nodes.length,
+                                    name: 'new'
+                                  },
+                                  position: {
+                                    x,
+                                    y
+                                  }
+                              };
+                              scope.data.nodes.push(nodeObj);
+                              cy.add(nodeObj);
                             }
                           },
 
                           {
-                            content: 'function 2',
+                            content: '<span class="fa fa-flash fa-2x"></span>',
                             select: function(){
                               console.log( 'function 2' );
                             }

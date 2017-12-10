@@ -48,7 +48,10 @@ define([
                     'height': '50',
                     // 'background-color': 'rgba(102, 127, 227, 0.84)',
                     'background-fit': 'cover',
-                    'content': 'data(name)',
+                    'content':
+                      function(e) {
+                        return e.data('name');
+                      },
                     'text-valign': 'center',
                     // 'color': 'white',
                     // 'text-outline-width': 2,
@@ -59,7 +62,10 @@ define([
                 selector: 'edge',
                 css:{
                     'width': '1',
-                    'content': 'data(name)',
+                    'content':
+                      function(e) {
+                        return e.data('name') ? e.data('name') : 'has relation';
+                      },
                     'curve-style': 'bezier',
                     'target-arrow-shape': 'triangle',
                   }
