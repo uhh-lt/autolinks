@@ -183,6 +183,13 @@ define([
                           // scope.$parent.EntityService.openSideNav(evtTarget);
                       });
 
+                      scope.coordinate = {};
+
+                      cy.on('taphold', function(e){
+                          eh.enabled = false;
+                          scope.coordinate = e.position;
+                      });
+
 
                       cy.nodes().forEach(function(n){
                         if (n.data('image')) {
@@ -201,7 +208,10 @@ define([
                       });
 
                       cy.nodes().forEach(function(n){
+                        nodeTipExtension(n);
+                      });
 
+                      function nodeTipExtension(n) {
                         scope.currentNode = {};
 
                         $(document).on('click', "#editNode", function(event, n){
@@ -211,7 +221,6 @@ define([
                         $(document).on('click', "#addEdge", function(){
                           eh.enabled = true;
                           eh.start( cy.$('node:selected') );
-                          // scope.$parent.edgehandler = true;
                         });
 
                         if (n.data('name') && !n.isParent()) {
@@ -260,7 +269,7 @@ define([
                             }
                           });
                         }
-                      });
+                      }
 
                       cy.expandCollapse({
                         layoutBy: {
@@ -302,6 +311,7 @@ define([
 
                         cy.panzoom( defaults );
 
+
                         cy.cxtmenu({
                           selector: 'node, edge',
                           fillColor: 'rgba(95, 239, 228, 0.84)',
@@ -334,13 +344,13 @@ define([
                         cy.cxtmenu({
                         selector: 'core',
                         fillColor: 'rgba(95, 239, 228, 0.84)',
-                        // openMenuEvents: 'tap',
+                        openMenuEvents: 'taphold',
                         commands: [
                           {
                             content: '<span class="fa fa-plus-circle fa-2x"></span>',
                             select: function(e){
-                              var x = e.pan('x');
-                              var y = e.pan('y')
+                              var x = scope.coordinate.x;
+                              var y = scope.coordinate.y;
                               var nodeObj = {
                                   data: {
                                     id: 'n' + scope.data.nodes.length,
@@ -352,7 +362,9 @@ define([
                                   }
                               };
                               scope.data.nodes.push(nodeObj);
-                              cy.add(nodeObj);
+                              var n = cy.add(nodeObj);
+                              nodeTipExtension(n);
+                              cy.fit();
                             }
                           },
 
@@ -364,6 +376,7 @@ define([
                           }
                         ]
                       });
+
 
                     }; // end doCy()
 

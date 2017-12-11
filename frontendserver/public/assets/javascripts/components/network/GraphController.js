@@ -225,6 +225,10 @@ define([
             }
           }
 
+          $scope.centerGraph = function() {
+            self.cy.fit();
+          };
+
           // sample function to be called when clicking on an object in the chart
           $scope.doClick = function(value)
           {
