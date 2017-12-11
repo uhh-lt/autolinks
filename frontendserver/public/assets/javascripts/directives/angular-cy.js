@@ -211,6 +211,35 @@ define([
                         nodeTipExtension(n);
                       });
 
+                      cy.edges().forEach(function(n) {
+
+                        $(document).on('click', "#editEdge", function(event, n){
+                          scope.$parent.EntityService.openSideNav(scope.currentNode);
+                        });
+
+                        if (n.data('name') && !n.isParent()) {
+                          cy.$('#'+ n.data('id')).qtip({
+                            content: {
+                                text: function(event, api) {
+                                  scope.currentNode = n;
+                                  return (
+                                  '<div class="node-buttons">' +
+                                  '<button id="editEdge" class="node-button"><i class="fa fa-pencil fa-2x"/></button>' +
+                                  '</div>'
+                                  )
+                                }
+                            },
+                            position: {
+                              my: 'bottom center',
+                              at: 'top center'
+                            },
+                            style: {
+                                name: 'qtip-content'
+                            }
+                          });
+                        }
+                      });
+
                       function nodeTipExtension(n) {
                         scope.currentNode = {};
 

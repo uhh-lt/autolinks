@@ -61,7 +61,7 @@ define([
                 {
                 selector: 'edge',
                 css:{
-                    'width': '1',
+                    'width': '2',
                     'content':
                       function(e) {
                         return e.data('name') ? e.data('name') : 'has relation';
@@ -90,7 +90,7 @@ define([
                 css: {
                     'border-width': 5,
                     'background-color': 'rgba(129, 227, 227, 0.84)',
-                    'line-color': 'black',
+                    // 'line-color': 'black',
                     // 'filter': 'grayscale(200%)',
                     // 'target-arrow-color': 'black',
                     // 'source-arrow-color': 'black',

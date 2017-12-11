@@ -219,7 +219,6 @@ define([
 
           // delete a node
           $scope.delObj = function(){
-            debugger;
             if (self.cy.$(":selected").length > 0) {
                 self.cy.$(":selected").remove();
             }
