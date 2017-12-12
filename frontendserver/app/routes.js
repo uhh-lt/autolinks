@@ -1,7 +1,7 @@
 var request = require('request');
 
 module.exports = function (app) {
-    debugger;
+
     app.get('/api/data/', function (req, res) {
 
       var resp = [];
@@ -42,7 +42,7 @@ module.exports = function (app) {
 
     // application -------------------------------------------------------------
     app.get('*', function (req, res) {
-        debugger;
+
         console.log('yeahhh');
         res.sendFile('./public/index.html'); // load the single view file (angular will handle the page changes on the front-end)
     });

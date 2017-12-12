@@ -143,23 +143,12 @@ define([
                           // fired when edgehandles is done and elements are added
                           // build the edge object
                           // get edge source
-                          if (sourceNode.data && targetNode.data) {
-                            var eSource = sourceNode.data('id');
-                            // get edge target
-                            var eTarget = targetNode.data('id');
-                            // get edge id
-                            var eId = eSource + eTarget;
+                          if (sourceNode.data && targetNode.data) {;
                             // build the edge object
-                            var edgeObj = {
-                                data:{
-                                  id:eId,
-                                  source:eSource,
-                                  target:eTarget,
-                                  name: 'has relation'
-                                }
-                            };
+                            addedEles.data().name = 'has relation';
                             // adding the edge object to the edges array
-                            scope.data.edges.push(edgeObj);
+                            scope.data.edges.push(addedEles);
+                            edgeTipExtension(addedEles);
                           }
                           this.enabled = false;
                         },
@@ -184,12 +173,12 @@ define([
                       });
 
                       scope.coordinate = {};
+                      scope.selectedEntity = {};
 
                       cy.on('taphold', function(e){
                           eh.enabled = false;
                           scope.coordinate = e.position;
                       });
-
 
                       cy.nodes().forEach(function(n){
                         if (n.data('image')) {
@@ -211,19 +200,22 @@ define([
                         nodeTipExtension(n);
                       });
 
-                      cy.edges().forEach(function(n) {
+                      cy.edges().forEach(function(e) {
+                        edgeTipExtension(e);
+                      });
 
-                        $(document).on('click', "#editEdge", function(event, n){
-                          scope.$parent.EntityService.openSideNav(scope.currentNode);
+                      function edgeTipExtension(e) {
+                        $(document).on('click', "#editEdge", function(event, e) {
+                          scope.$parent.EntityService.openSideNav(scope.selectedEntity);
                         });
 
-                        if (n.data('name') && !n.isParent()) {
-                          cy.$('#'+ n.data('id')).qtip({
+                        if (e.data('name')) {
+                          cy.$('#'+ e.data('id')).qtip({
                             content: {
                                 text: function(event, api) {
-                                  scope.currentNode = n;
+                                  scope.selectedEntity = e;
                                   return (
-                                  '<div class="node-buttons">' +
+                                  '<div class="edge-buttons">' +
                                   '<button id="editEdge" class="node-button"><i class="fa fa-pencil fa-2x"/></button>' +
                                   '</div>'
                                   )
@@ -238,13 +230,11 @@ define([
                             }
                           });
                         }
-                      });
+                      }
 
                       function nodeTipExtension(n) {
-                        scope.currentNode = {};
-
                         $(document).on('click', "#editNode", function(event, n){
-                          scope.$parent.EntityService.openSideNav(scope.currentNode);
+                          scope.$parent.EntityService.openSideNav(scope.selectedEntity);
                         });
 
                         $(document).on('click', "#addEdge", function(){
@@ -252,11 +242,11 @@ define([
                           eh.start( cy.$('node:selected') );
                         });
 
-                        if (n.data('name') && !n.isParent()) {
+                        if (!n.isParent()) {
                           cy.$('#'+ n.data('id')).qtip({
                             content: {
                                 text: function(event, api) {
-                                  scope.currentNode = n;
+                                  scope.selectedEntity = n;
                                   return (
                                   '<div class="node-buttons">' +
                                   '<button id="readMode" class="node-button"><i class="fa fa-book fa-2x"/></button>' +
@@ -274,15 +264,15 @@ define([
                                 name: 'qtip-content'
                             }
                           });
-                        }
 
-                        if (n.data('desc')) {
                           cy.$('#'+ n.data('id')).qtip({
                             content: {
                                 text: function(event, api) {
-                                  return (
-                                  '<div class="node-description">' + n.data('desc') + '</div>'
-                                  )
+                                  if (n.data('desc')) {
+                                    return (
+                                    '<div class="node-description">' + n.data('desc') + '</div>'
+                                    )
+                                  }
                                 }
                             },
                             position: {
@@ -390,8 +380,8 @@ define([
                                     y
                                   }
                               };
-                              scope.data.nodes.push(nodeObj);
                               var n = cy.add(nodeObj);
+                              scope.data.nodes.push(nodeObj);
                               nodeTipExtension(n);
                               cy.fit();
                             }
@@ -406,6 +396,11 @@ define([
                         ]
                       });
 
+                      $rootScope.$on('deleteEntity', function(){
+                        if (cy.$(":selected").length > 0) {
+                            cy.$(":selected").remove();
+                        }
+                      });
 
                     }; // end doCy()
 

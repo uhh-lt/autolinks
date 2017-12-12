@@ -8,20 +8,30 @@ define([
             var entityScope = null;
             $rootScope.entity = {};
             return {
-              openSideNav: function(scope) {
-                $rootScope.entity = scope;
+              openSideNav: function(entity) {
+                $mdSidenav('right').close();
+                $rootScope.entity = entity;
                 // console.log($rootScope);
                 $timeout(function () {
                 // $mdComponentRegistry.when('right', true).then(function() {
                   // Now you can use $mdSidenav('left') or $mdSidenav('left', true) without getting an error.
-                  $rootScope.$emit('sidenavReinit', 'waw');
-                  $mdSidenav('right').toggle();
+                  $rootScope.$emit('sidenavReinit');
+                  $mdSidenav('right').open();
                 // });
-              }, 100);
+                }, 100);
               },
 
               getRootScopeEntity: function() {
                 return $rootScope.entity;
+              },
+
+              updateRootScopeEntity: function(entity) {
+                $rootScope.entity = entity;
+                $rootScope.$broadcast('updateNode');
+              },
+
+              deleteEntity: function() {
+                $rootScope.$emit('deleteEntity');
               }
             };
         }])

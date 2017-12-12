@@ -12,20 +12,33 @@ define([
         function ($scope, $rootScope, $timeout, $mdSidenav, $log, EntityService, EndPointService) {
 
           $scope.init = function() {
-            // $timeout( function(){
+            // $timeout( function
               $scope.selectedEntity = EntityService.getRootScopeEntity();
-              console.log($scope);
+              // console.log($scope);
             // }, 1000);
           }
 
           $rootScope.$on('sidenavReinit', function (event, args) {
             $scope.init();
-            console.log('sidenavReinit');
           });
 
           $scope.init();
           // $scope.selectedEntity = EntityService.getRootScopeEntity();
           // console.log(selectedEntity);
+
+          // // add Edges to the edges object, then broadcast the change event
+          // $scope.update = function(){
+          //     $scope.selectedEntity = EntityService.updateRootScopeEntity($scope.selectedEntity);
+          //     // broadcasting the event
+          //     // $rootScope.$broadcast('appChanged');
+          //     $mdSidenav('right').close();
+          // };
+
+          $scope.delete = function(){
+              EntityService.deleteEntity();
+              $mdSidenav('right').close();
+          };
+
           $scope.close = function () {
             // Component lookup should always be available since we are not using `ng-if`
             // $route.reload();

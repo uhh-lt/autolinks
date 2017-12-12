@@ -94,23 +94,20 @@ define([
 
               $scope.resultNodes = response.data.entities.map(function(n) {
                   var result = {};
-                  if (n.data.parent) {
-                    result = { data: { id: n.data.id, parent: n.data.parent, name: n.data.name }};
-                  } else {
-                    result = { data: { id: n.data.id, name: n.data.name }};
-                  }
+
+                  result = { data: { id: n.data.id, parent: n.data.parent, name: n.data.name, image: n.data.image, desc: n.data.desc }};
 
                   if (n.position) {
                     result['position'] = { x: n.position.x, y: n.position.y }
                   }
 
-                  if(n.data.image){
-                    result['data'].image = n.data.image;
-                  }
-
-                  if(n.data.desc){
-                    result['data'].desc = n.data.desc;
-                  }
+                  // if(n.data.image){
+                  //   result['data'].image = n.data.image;
+                  // }
+                  //
+                  // if(n.data.desc){
+                  //   result['data'].desc = n.data.desc;
+                  // }
 
                   return result;
               });

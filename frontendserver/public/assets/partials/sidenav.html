@@ -1,31 +1,42 @@
 <md-sidenav class="md-sidenav-right md-whiteframe-4dp" md-component-id="right">
   <div ng-controller="SidenavController"git >
-     <md-toolbar class="md-theme-light">
-       <h1 class="md-toolbar-tools">{{selectedEntity.data('name')}}</h1>
-     </md-toolbar>
-     <md-content layout-padding>
-       <form>
-        <img
-          ng-show="selectedEntity.data('image')"
-          ng-src="{{selectedEntity.data('image') === undefined ? '' : selectedEntity.data('image')}}"
-          style="width:200px;"
-        />
-         <md-input-container>
-           <label for="testInput">Description</label>
-           <textarea
-              ng-model="selectedEntity.data('desc')"
-              md-autofocus
-              ng-value="{{selectedEntity.data('desc')}}"
-            >
-           </textarea>
-         </md-input-container>
-       </form>
-       <md-button ng-click="close()" class="md-primary">
-         Close
-       </md-button>
-       <md-button ng-click="close()" class="md-warn">
-         Delete Node
-       </md-button>
-     </md-content>
+     <form>
+       <md-toolbar class="md-theme-light">
+         <h1 class="md-toolbar-tools">
+           <md-input-container class="example-full-width">
+             <input
+              style="color: white"
+              ng-model="selectedEntity.data().name"
+              ng-model-options="{ getterSetter: true, updateOn: 'default' }"
+             >
+           </md-input-container>
+           <!-- <input value="{{selectedEntity.data('name')}}" /> -->
+          </h1>
+       </md-toolbar>
+       <md-content layout-padding>
+          <img
+            ng-show="selectedEntity.data('image')"
+            ng-src="{{selectedEntity.data('image') === undefined ? '' : selectedEntity.data('image')}}"
+            style="width:200px;"
+          />
+           <md-input-container>
+             <label for="testInput">Description</label>
+             <textarea
+                ng-model="selectedEntity.data().desc"
+                md-autofocus
+                ng-model-options="{ getterSetter: true, updateOn: 'default' }"
+              >
+             </textarea>
+           </md-input-container>
+         <md-button ng-click="delete()" class="md-warn">
+           Delete Node
+         </md-button>
+       </md-content>
+     </form>
+     <md-toolbar class="md-scroll-shrink">
+      <div layout="row" layout-align="center center" class="overflow-y: auto" ng-click="close()" flex>
+        Close
+      </div>
+    </md-toolbar>
    </div>
 </md-sidenav>

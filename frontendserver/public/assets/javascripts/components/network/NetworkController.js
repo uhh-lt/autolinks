@@ -11,8 +11,8 @@ define([
     angular.module('autolinks.network', ['ngMaterial', 'ngVis']);
     angular.module('autolinks.network')
         // Network Controller
-        .controller('NetworkController', ['$scope', '$q', '$timeout', '$compile', '$mdDialog', 'VisDataSet', '_', 'graphProperties', 'EntityService', '$mdSidenav',
-         function ($scope, $q, $timeout, $compile, $mdDialog, VisDataSet, _, graphProperties, EntityService, $mdSidenav) {
+        .controller('NetworkController', ['$scope', '$rootScope', '$q', '$timeout', '$compile', '$mdDialog', 'VisDataSet', '_', 'graphProperties', 'EntityService', '$mdSidenav',
+         function ($scope, $rootScope, $q, $timeout, $compile, $mdDialog, VisDataSet, _, graphProperties, EntityService, $mdSidenav) {
 
             var self = this;
             /* Background collection */
@@ -466,6 +466,12 @@ define([
                 clearGraph();
                 $scope.buildGraph();
             };
+
+            $rootScope.$on('updateNode', function() {
+                debugger;
+                $scope.selectedEntity = EntityService.getRootScopeEntity();
+                debugger;
+            });
 
             function buildToggler(navID) {
               return function() {
