@@ -17,6 +17,7 @@
 @border_color_2: #5394ed;
 
 @import "input";
+@import "navs/circlenav";
 /*md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolbar) {
     background-color: rgba(181, 63, 63, 0.2);
     color: rgba(255,255,255,0.87);
@@ -204,5 +205,11 @@ div.popupMenu {
 				color: @color_3;
 			}
 		}
+	}
+}
+
+@media (max-width:960px) {
+  .container {
+		padding: 0;
 	}
 }
