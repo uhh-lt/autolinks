@@ -19,17 +19,20 @@ const
 	;
 
 // ping a service
-function ping_service(service) {
+function ping_service(service, callback) {
 
   let location = service.location;
 
   if(!location){
-    return db.get_service(service.name, (row) => {
-      if(row.location){
-        return ping_service(row);
-      } else {
-        return new Error(`No URL location for service ${service.name} found.`);
+    return db.get_service(service.name, service.version, (err, row) => {
+      if(err){
+        return callback(err);
       }
+      if(!row.location){
+        return callback(new Error(`No URL location for service '${service.name}:${service.version}' found.`));
+
+      }
+      ping_service(row, callback);
     });
   }
 
@@ -39,35 +42,66 @@ function ping_service(service) {
     if(error || response.statusCode !== 200){
       // if service was active before print a warning, otherwise ignore it
       if(service.active) {
-        logger.warn(`Cannot reach service ${service.name}`, { service : service , error: error || response }, {});
-        logger.warn(`Setting service ${service.name} to defunct.`);
+        logger.warn(`Cannot reach service '${service.name}:${service.version}'`, { service : service , error: error || response }, {});
+        logger.warn(`Setting service '${service.name}:${service.version}' to defunct.`);
       }
-      logger.warn(`ping service '${service.name}' failed.`);
-      return db.update_service(service.name, {
-        lastcheck: now,
-        active: false
-      });
-    }else{
-      logger.debug(`ping service '${service.name}' success.`);
-      // if service was not active before print an info, otherwise ignore it
-      if(!service.active) {
-        logger.info(`Service '${service.name}' is now available.`);
-      }
-      return db.update_service(service.name, {
+      logger.warn(`ping service '${service.name}:${service.version}' failed.`);
+      return db.update_service(
+        service.name,
+        {
+          lastcheck: now,
+          active: false
+        },
+        function(err2) {
+          if(err2){
+            err.message = err.message + ' AND ' + err2.message;
+          }
+          callback(err)
+        });
+    }
+
+    logger.debug(`ping service '${service.name}' success.`);
+    // if service was not active before print an info, otherwise ignore it
+    if(!service.active) {
+      logger.info(`Service '${service.name}' is now available.`);
+    }
+    return db.update_service(
+      service.name,
+      service.version,
+      {
         lastseenactive: now,
         lastcheck: now,
         active: true
-      });
-    }
+      },
+      function(err){
+        if(err){
+          // log err but ignore in callback
+          logger.warn(`Could not update service: '${service.name}:${service.version}'.`);
+          logger.warn(err);
+        }
+        callback();
+      }
+    );
+
   });
 }
 
 // ping all registered services
 function ping_services(){
-  const err = db.get_services(ping_service, () => {});
-  if(err){
-    logger.warn('Ping services failed.', { error: err }, {});
-  }
+  db.get_services(
+    function(err, service){
+      if(err){
+        /* ignore */
+        return;
+      }
+      ping_service(service, function(err){
+        /* ignore */
+        return;
+      })
+    },
+    function(err, numrows) {
+      /* ignore */
+    });
 }
 
 // get the services + endpoints
@@ -80,8 +114,8 @@ function get_services_and_endpoints(callback_service, callback_done){
       return callback_done(newerr);
     }
     remap_joined_service_endpoint_rows(rows)
-      .forEach(s => callback_service(s));
-    callback_done();
+      .forEach(s => callback_service(null, s));
+    callback_done(null, remap_joined_service_endpoint_rows.length);
   });
 }
 

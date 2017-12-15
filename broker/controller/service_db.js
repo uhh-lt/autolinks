@@ -62,18 +62,26 @@ nodeCleanup(function (exitCode, signal) {
 });
 
 // add service to db
-function add_service(name, version, location, description, endpoints, callback) {
+function add_service(name, version, location, description, endpoints, callback_service, callback_endpoint, callback_done) {
   const now = new Date().getTime();
   // add the service
   dbconn.run('insert or replace into services(name, version, location, description, registeredsince) values(?,?,?,?,?)', [name, version, location, description, now], function(err) {
     if (err) {
-      return callback(err);
+      return callback_service(err);
     }
+    callback_service(null);
 
     // add the endpoints only after successfully added the service
     endpoints.forEach(function (ep) {
-      dbconn.run('insert or replace into endpoints(service, version, path, method, requireslogin) values(?,?,?,?,?)', [name, version, ep.path, ep.method, ep.requireslogin], callback);
+      dbconn.run('insert or replace into endpoints(service, version, path, method, requireslogin) values(?,?,?,?,?)', [name, version, ep.path, ep.method, ep.requireslogin], function(err) {
+        if(err){
+          return callback_endpoint(ep, err);
+        }
+        callback_endpoint(ep, null);
+      });
     });
+
+    callback_done(null);
   });
 }
 
@@ -169,12 +177,7 @@ function delete_service(name, version, callback){
 
 // get all registered services
 function get_services(callback_service, callback_done) {
-  dbconn.each('select * from services;', [], function(err, service) {
-    if (err) {
-      return err;
-    }
-    callback_service(service);
-  }, () => { return callback_done(); } );
+  dbconn.each('select * from services;', [], callback_service, callback_done );
 }
 
 
@@ -182,13 +185,7 @@ function get_services(callback_service, callback_done) {
 function get_joined_services_and_endpoints(callback_endpointdef, callback_done) {
   const sqlstmnt = 'select * from services as s left join endpoints as e on (s.name=e.service);';
   if(callback_done){
-    dbconn.each(sqlstmnt, [], function(err, row) {
-      if (err) {
-        return err;
-      }
-      callback_endpointdef(row);
-    }, () => { return callback_done(); } );
-    return;
+    return dbconn.each(sqlstmnt, [], callback_endpointdef, callback_done);
   }
   dbconn.all(sqlstmnt, [], callback_endpointdef);
 }
