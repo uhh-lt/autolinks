@@ -48,15 +48,20 @@ function ping_service(service, callback) {
       logger.warn(`ping service '${service.name}:${service.version}' failed.`);
       return db.update_service(
         service.name,
+        service.version,
         {
           lastcheck: now,
           active: false
         },
         function(err2) {
           if(err2){
-            err.message = err.message + ' AND ' + err2.message;
+            if(error){
+              error.message = error.message + ' AND ' + err2.message;
+            } else {
+              error  = err2
+            }
           }
-          callback(err)
+          callback(error)
         });
     }
 
