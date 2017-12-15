@@ -31,6 +31,9 @@ definitions:
       name:
         type: string
         description: the name of the service
+      version:
+        type: string
+        description: the current version of the service
       location:
         type: string
         description: where to find the service

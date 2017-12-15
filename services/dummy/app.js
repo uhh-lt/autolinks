@@ -58,6 +58,7 @@ global.serviceDefinition = (() => {
   return {
     name : swaggerDocument.info.title,
     description : swaggerDocument.info.description,
+    version : swaggerDocument.info.version,
     location : `http://${os.hostname()}:${port}`,
     endpoints: Object.keys(swaggerDocument.paths)
       .filter(p => !p.startsWith('/service/') && !p.startsWith('/swagger') && !p.startsWith('/ping'))

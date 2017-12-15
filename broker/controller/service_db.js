@@ -62,27 +62,23 @@ nodeCleanup(function (exitCode, signal) {
 });
 
 // add service to db
-function add_service(name, location, description, endpoints) {
+function add_service(name, version, location, description, endpoints, callback) {
   const now = new Date().getTime();
   // add the service
-  dbconn.run('insert or replace into services(name, location, description, registeredsince) values(?,?,?,?)', [name, location, description, now], function(err) {
+  dbconn.run('insert or replace into services(name, version, location, description, registeredsince) values(?,?,?,?,?)', [name, version, location, description, now], function(err) {
     if (err) {
-      return err;
+      return callback(err);
     }
 
     // add the endpoints only after successfully added the service
     endpoints.forEach(function (ep) {
-      dbconn.run('insert or replace into endpoints(service, path, method, requireslogin) values(?,?,?,?)', [name, ep.path, ep.method, ep.requireslogin], function(err) {
-        if (err) {
-          return err;
-        }
-      });
+      dbconn.run('insert or replace into endpoints(service, version, path, method, requireslogin) values(?,?,?,?,?)', [name, version, ep.path, ep.method, ep.requireslogin], callback);
     });
   });
 }
 
 // update a service in the database, set key-value pairs from the service obj
-function update_service(name, serviceobj){
+function update_service(name, version, serviceobj, callback){
   // prepare sql statement and values
   const keys = [];
   const vals = [];
@@ -92,20 +88,17 @@ function update_service(name, serviceobj){
       keys.push(`${key} = ?`);
       vals.push(serviceobj[key]);
   });
-  const sql = `update services set ${keys.join(', ')} where name = ?`;
+  const sql = `update services set ${keys.join(', ')} where name = ? and version = ?`;
   vals.push(name);
+  vals.push(version);
 
   //run sql statement
-  dbconn.run(sql, vals, function(err) {
-    if (err) {
-      return err;
-    }
-  });
+  dbconn.run(sql, vals, callback);
 
 }
 
 // update a service in the database, set key-value pairs from the service obj
-function update_endpoint(servicename, path, endpointobj){
+function update_endpoint(servicename, path, version, endpointobj, callback){
   // prepare sql statement and values
   const keys = [];
   const vals = [];
@@ -115,29 +108,26 @@ function update_endpoint(servicename, path, endpointobj){
       keys.push(`${key} = ?`);
       vals.push(endpointobj[key]);
   });
-  const sql = `update endpoints set ${keys.join(', ')} where service = ? and path = ?`;
+  const sql = `update endpoints set ${keys.join(', ')} where service = ? and version = ? and path = ?`;
   vals.push(servicename);
+  vals.push(version);
   vals.push(path);
 
   //run sql statement
-  dbconn.run(sql, vals, function(err) {
-    if (err) {
-      return err;
-    }
-  });
+  dbconn.run(sql, vals, callback);
 }
 
 // get a service from the database
-function get_service(name, callback){
+function get_service(name, version, callback){
   //run sql statement
-  dbconn.get('select * from services where name = ?', [name], (err, row) => {
+  dbconn.get('select * from services where name = ? and version = ?', [name, version], (err, row) => {
     if (err) {
-      return err;
+      return callback(err, null);
     }
     if(!row) {
-      return new Error(`Service '${name}' not found.`);
+      return callback(new Error(`Service '${name}:${version}' not found.`), null);
     }
-    return callback(row);
+    callback(null, row);
   });
 }
 
@@ -166,18 +156,14 @@ function get_service_endpoint(serviceref, endpointref, callback){
 }
 
 // delete a service from the database
-function delete_service(name){
+function delete_service(name, version, callback){
   // delete service
-  dbconn.run('delete from services where name = ?', [name], function(err) {
+  dbconn.run('delete from services where name = ? and version = ?', [name, version], function(err) {
     if (err) {
-      return err;
+      return callback(err);
     }
     // on success, delete endpoints associated with that service
-    dbconn.run('delete from endpoints where service = ?', [name], function(err) {
-      if (err) {
-        return err;
-      }
-    });
+    dbconn.run('delete from endpoints where service = ? and version = ?', [name, version], callback);
   });
 }
 
