@@ -446,6 +446,8 @@ paths:
                 type: string
               content-type:
                 type: string
+              source:
+                type: string
       responses:
         200:
           description: Success

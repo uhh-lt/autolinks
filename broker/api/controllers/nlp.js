@@ -17,15 +17,15 @@ module.exports = {
  * @param next
  */
 function analyze(req, res, next) {
-  const ana = req.swagger.params.analysis.value;
-  NLP.analyze(ana, (err, newana) => {
+  const data = req.swagger.params.data.value;
+  NLP.analyze(data.data, data.content_type, data.source , (err, ana) => {
     res.header('Content-Type', 'application/json; charset=utf-8');
     if (err) {
       res.status(500);
       return res.end(JSON.stringify({message: err.message, fields: { error: err.message }}), next);
     }
-
-    res.end('NOT YET IMPLEMENTED',next);
+    res.json(ana);
+    res.end(next);
   });
 }
 

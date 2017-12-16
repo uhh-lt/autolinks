@@ -43,11 +43,11 @@ function init(callback) {
 
 /**
  *
- * @param document
+ * @param text
  * @param callbackIter = function(err, analysis)
  */
-function analyze(document, callback) {
-  return explicitNLP.analyze(document, callback);
+function analyze(text, contentType, source, callback) {
+  return explicitNLP.analyze(text, contentType, source, callback);
 }
 
 /**
