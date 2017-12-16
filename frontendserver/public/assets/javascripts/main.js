@@ -15,7 +15,7 @@
 			'ui-bootstrap': 'libs/angular-bootstrap/ui-bootstrap-tpls.min',
 			'ui-layout': 'libs/angular-ui-layout/src/ui-layout',
 			'ui-router': 'libs/angular-ui-router/release/angular-ui-router.min',
-			'underscore': 'libs/underscore/underscore-min',
+      'lodash': 'libs/lodash/lodash',
 			'vis': 'libs/vis/dist/vis.min',
 			'ngVis': 'directives/angular-vis',
       'ngCy':'directives/angular-cy',
@@ -67,7 +67,7 @@
 			'ngMaterial': {
 				deps: ['angular', 'ngAria', 'ngAnimate']
 			},
-			'underscore': {
+			'lodash': {
 				exports: '_'
 			},
 			'ngVis': {

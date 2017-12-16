@@ -9,7 +9,7 @@ define([
     './components/network/GraphConfig',
     './services/EntityService',
     './services/EndPointService',
-    './services/underscore-module',
+    './services/lodash-module',
     'ui-layout',
     'ui-router',
     'ui-bootstrap',
@@ -18,7 +18,7 @@ define([
     'use strict';
 
     var app = angular.module('autolinks', [
-            'ui.layout', 'ui.router', 'ui.bootstrap', 'underscore',  'autolinks.graphConfig', 'autolinks.network', 'autolinks.graph',
+            'ui.layout', 'ui.router', 'ui.bootstrap', 'lodash', 'autolinks.graphConfig', 'autolinks.network', 'autolinks.graph',
             'autolinks.input', 'autolinks.viewer', 'ngMaterial', 'autolinks.entityservice', 'autolinks.circlenav', 'autolinks.sidenav', 'autolinks.endpointservice'
           ]);
 
