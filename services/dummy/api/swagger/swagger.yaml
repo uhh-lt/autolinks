@@ -76,6 +76,7 @@ paths:
       tags:
         - Dummy
       description: Do something
+      requirements: asd
       parameters:
         - name: entity
           in: body

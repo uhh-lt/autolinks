@@ -45,6 +45,14 @@ definitions:
         description: the endpoints a service offers
         items:
           $ref: '#/definitions/Endpoint'
+          
+  ServiceParameter:
+    type: object
+    properties:
+      focus: 
+        $ref: '#/definitions/DOffset'
+      context:
+        $ref: '#/definitions/Analysis'
 
   Endpoint:
     type: object
@@ -58,6 +66,11 @@ definitions:
       requireslogin:
         type: boolean
         description: does the service require a user to be logged in?
+      requirements:
+        description: A list of type requirements
+        type: array
+        items: 
+          type: string
 
   # objects related to user management
   UserInfo:
@@ -78,41 +91,21 @@ definitions:
       lastseenactive:
         type: integer
         description: the point in time when the user was last seen, i.e. the time of the last login
-
-#  NamedEntity:
-#    type: object
-#    properties:
-#      text:
-#        type: string
-#      type:
-#        type: string
-#      offset:
-#        $ref: "#/definitions/DOffset"
-#      analyzer:
-#        type: string
-
-  # objects related to NLP
-  Document:
+  
+  # NLP related objects
+  Analysis:
     type: object
     properties:
       text:
         type: string
       source:
         type: string
-      language:
-        type: string
-
-  Analysis:
-    type: object
-    properties:
-      focusoffset:
-        $ref: "#/definitions/DOffset"
-      context:
-        type: string
-      source:
-        type: string
       lang:
         type: string
+      availabletypes:
+        type: array
+        items:
+          type: string
       annotations:
         type: array
         items:
@@ -123,7 +116,7 @@ definitions:
     properties:
       type:
         type: string
-      offset:
+      doffset:
         $ref: "#/definitions/DOffset"
       properties:
         type: object
@@ -260,7 +253,7 @@ paths:
               method:
                 type: string
               data:
-                type: object
+                $ref: '#/definitions/ServiceParameter'
       responses:
         200:
           description: Success
@@ -441,13 +434,18 @@ paths:
         - NLP
       description: Analyze the provided document
       parameters:
-        - name: document
+        - name: data
           in: body
           description: |
             The document object which contains the plain text and some
             configuration parameters, e.g. the desired language of analyis.
           schema:
-            $ref: "#/definitions/Document"
+            type: object
+            properties:
+              data: 
+                type: string
+              content-type:
+                type: string
       responses:
         200:
           description: Success

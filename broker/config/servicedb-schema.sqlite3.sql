@@ -26,6 +26,7 @@ create table if not exists endpoints (
   version text not null,
   path text not null,
   method text not null,
+  requirements text,
   requireslogin boolean default false,
   lastcalled integer not null default -1,
   primary key(service, version, path)

@@ -66,7 +66,8 @@ global.serviceDefinition = (() => {
       return {
         path : p,
         requireslogin : p.endsWith('{username}'),
-        method: swaggerDocument.paths[p].post && 'post' || 'get'
+        method: swaggerDocument.paths[p].post && 'post' || 'get',
+        requirements: undefined,
       };
     })
   };

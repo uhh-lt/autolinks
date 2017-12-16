@@ -73,7 +73,7 @@ function add_service(name, version, location, description, endpoints, callback_s
 
     // add the endpoints only after successfully added the service
     endpoints.forEach(function (ep) {
-      dbconn.run('insert or replace into endpoints(service, version, path, method, requireslogin) values(?,?,?,?,?)', [name, version, ep.path, ep.method, ep.requireslogin], function(err) {
+      dbconn.run('insert or replace into endpoints(service, version, path, method, requirements, requireslogin) values(?,?,?,?,?,?)', [name, version, ep.path, ep.method, ep.requirements, ep.requireslogin], function(err) {
         if(err){
           return callback_endpoint(ep, err);
         }
@@ -186,6 +186,7 @@ function get_joined_services_and_endpoints(callback_endpointdef, callback_done) 
   const sqlstmnt = 'select * from services as s left join endpoints as e on (s.name=e.service);';
   if(callback_done){
     return dbconn.each(sqlstmnt, [], callback_endpointdef, callback_done);
+
   }
   dbconn.all(sqlstmnt, [], callback_endpointdef);
 }

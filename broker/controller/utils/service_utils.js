@@ -1,22 +1,24 @@
 'use strict';
 
-// exports
-module.exports = {
-  ping_service: ping_service,
-  ping_services: ping_services,
-  get_services_and_endpoints : get_services_and_endpoints,
-  get_service_and_endpoints : get_service_and_endpoints,
-  get_service_details : get_service_details,
-  call_service : call_service,
-};
-
 // imports
 const
   _ = require('lodash'),
   db = require('../service_db'),
   request = require('request'),
   logger = require('../log')(module)
-	;
+;
+
+
+
+module.exports = {
+  ping_service : ping_service,
+  get_services_and_endpoints : get_services_and_endpoints,
+  get_service_and_endpoints : get_service_and_endpoints,
+  get_service_details : get_service_details,
+  call_service : call_service,
+};
+
+
 
 // ping a service
 function ping_service(service, callback) {
@@ -165,6 +167,7 @@ function remap_joined_service_endpoint_rows(rows) {
             path : e.path,
             url : `${v[0].location}${e.path}`,
             method: e.method,
+            requirements: e.requirements,
             requireslogin : e.requireslogin,
             lastcalled : e.lastcalled,
           };

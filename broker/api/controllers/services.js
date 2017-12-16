@@ -54,7 +54,7 @@ function register_service(req, res, next) {
 
 }
 
-function deregister_service (req, res) {
+function deregister_service (req, res, next) {
   const service = req.swagger.params.service.value;
   service_db.delete_service(service.name, service.version, function(err){
     res.header('Content-Type', 'application/json; charset=utf-8');
@@ -65,11 +65,11 @@ function deregister_service (req, res) {
     } else {
       logger.info(`Sucessfully removed service '${service.name}:${service.version}' and its endpoints.`, service);
     }
-    res.end();
+    res.end(next);
   });
 }
 
-function ping_service(req, res) {
+function ping_service(req, res, next) {
   const service = req.swagger.params.service.value;
   service_utils.ping_service(service, function(err) {
     res.header('Content-Type', 'application/json; charset=utf-8');
@@ -78,7 +78,7 @@ function ping_service(req, res) {
       res.status(500);
       res.json({ message: err.message, fields: { service: service, error: err } });
     }
-    res.end();
+    res.end(next);
   });
 
 }
@@ -109,14 +109,14 @@ function ping_services(req, res, next) {
 
 }
 
-function list_services(req, res) {
+function list_services(req, res, next) {
   res.header('Content-Type', 'application/json; charset=utf-8');
   res.write('[');
   let startedwriting = false;
   service_utils.get_services_and_endpoints(
     function(err, service) {
       if(err) {
-        /* ignore for now */
+        /*  */
       }
       if (startedwriting) {
         res.write(',');
@@ -125,7 +125,7 @@ function list_services(req, res) {
       startedwriting = true;
     },
     (err, numrows) => {
-      res.end(']');
+      res.end(']', next);
     }
   );
 }
