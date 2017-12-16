@@ -3,10 +3,10 @@ define([
 ], function (angular) {
     'use strict';
     angular.module('autolinks.endpointservice', [])
-        .factory('EndPointService', ['$rootScope', '$http', function ($rootScope, $http) {
+        .factory('EndPointService', ['$rootScope', '$http', '$q', function ($rootScope, $http, $q) {
 
             return {
-              fetchData: function() {
+              fetchService: function() {
                 $http.get('/api/data')
                  .then(function(response){
                    console.log(response);
@@ -49,6 +49,15 @@ define([
                 // res.success(function(data, status, headers, config) {
                 //   $scope.message = data;
                 // });
+              },
+
+              fetchData: function() {
+                var promise = $q.defer();
+                var data = {};
+                return $http.get('/service/call').then(function(response) {
+                  return data = response.data;
+                });
+                // return promise.promise;
               }
             };
         }])
