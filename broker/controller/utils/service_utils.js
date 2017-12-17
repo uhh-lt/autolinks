@@ -8,20 +8,8 @@ const
   logger = require('../log')(module)
 ;
 
-
-
-module.exports = {
-  ping_service : ping_service,
-  get_services_and_endpoints : get_services_and_endpoints,
-  get_service_and_endpoints : get_service_and_endpoints,
-  get_service_details : get_service_details,
-  call_service : call_service,
-};
-
-
-
 // ping a service
-function ping_service(service, callback) {
+module.exports.ping_service = function(service, callback) {
 
   let location = service.location;
 
@@ -34,7 +22,7 @@ function ping_service(service, callback) {
         return callback(new Error(`No URL location for service '${service.name}:${service.version}' found.`));
 
       }
-      ping_service(row, callback);
+      module.exports.ping_service(row, callback);
     });
   }
 
@@ -89,31 +77,29 @@ function ping_service(service, callback) {
         callback();
       }
     );
-
   });
-}
+};
 
 // ping all registered services
-function ping_services(){
-  db.get_services(
-    function(err, service){
-      if(err){
-        /* ignore */
-        return;
-      }
-      ping_service(service, function(err){
-        /* ignore */
-        return;
-      })
-    },
-    function(err, numrows) {
+module.exports.ping_services = function() {
+  db.get_services ( function(err, service){
+    if(err){
       /* ignore */
+      return;
+    }
+    module.exports.ping_service(service, function(err){
+      /* ignore */
+      return;
     });
-}
+  },
+  function(err, numrows) {
+    /* ignore */
+  });
+};
 
 // get the services + endpoints
-function get_services_and_endpoints(callback_service, callback_done){
-  db.get_joined_services_and_endpoints(function(err, rows){
+module.exports.get_services_and_endpoints = function(callback_service, callback_done){
+  db.get_joined_services_and_endpoints(function(err, rows) {
     if(err) {
       const newerr = new Error('Could not query service-endpoint joins.');
       newerr.cause = err;
@@ -124,10 +110,10 @@ function get_services_and_endpoints(callback_service, callback_done){
       .forEach(s => callback_service(null, s));
     callback_done(null, remap_joined_service_endpoint_rows.length);
   });
-}
+};
 
 // get a service and its endpoints
-function get_service_and_endpoints(servicename, callback) {
+module.exports.get_service_and_endpoints = function(servicename, callback) {
   db.get_joined_service_and_endpoints(servicename, function(err, rows) {
     if(err) {
       const newerr = new Error('Could not query service-endpoint joins.');
@@ -144,7 +130,7 @@ function get_service_and_endpoints(servicename, callback) {
     }
     callback(null, services[0]);
   });
-}
+};
 
 
 /**
@@ -176,7 +162,7 @@ function remap_joined_service_endpoint_rows(rows) {
     }).value();
 }
 
-function call_service(location, path, method, data, req, res, next) {
+module.exports.call_service = function(location, path, method, data, req, res, next) {
 
   const options = {
     url : path,
@@ -204,15 +190,15 @@ function call_service(location, path, method, data, req, res, next) {
     res.end(next);
   });
 
-}
+};
 
 
-function get_service_details(servicename, extended, callback) {
+module.exports.get_service_details = function(servicename, extended, callback) {
   if (!extended) {
-    return get_service_and_endpoints(servicename, callback);
+    return module.exports.get_service_and_endpoints(servicename, callback);
   }
 
-  return get_service_and_endpoints(servicename, function (err, service) {
+  return module.exports.get_service_and_endpoints(servicename, function (err, service) {
     const location = `${service.location}/swagger`;
     request(location, function (error, response, body) {
       if (error || response.statusCode !== 200) {
@@ -227,11 +213,11 @@ function get_service_details(servicename, extended, callback) {
       callback(null, service);
     });
   });
-}
+};
 
 // execute ping_services function every 10 seconds
 (function ping_services_at_intervals(){
     // do some stuff
-    ping_services();
+    module.exports.ping_services();
     setTimeout(ping_services_at_intervals, 10000);
 })();
