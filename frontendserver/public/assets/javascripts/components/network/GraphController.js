@@ -186,11 +186,11 @@ define([
 
           function init() {
               var promise = $q.defer();
-              $scope.fetchData = {};
-              EndPointService.fetchData().then(function(response) {
-                  $scope.fetchData = response;
-                  $scope.reloadGraph();
-              });
+              // $scope.fetchData = {};
+              // EndPointService.fetchData().then(function(response) {
+              //     $scope.fetchData = response;
+              $scope.reloadGraph();
+              // });
           }
 
           // Init the network modulegit

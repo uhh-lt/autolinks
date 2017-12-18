@@ -209,27 +209,29 @@ define([
                           scope.$parent.EntityService.openSideNav(scope.selectedEntity);
                         });
 
-                        if (e.data('name')) {
-                          cy.$('#'+ e.data('id')).qtip({
-                            content: {
-                                text: function(event, api) {
-                                  scope.selectedEntity = e;
-                                  return (
-                                  '<div class="edge-buttons">' +
-                                  '<button id="editEdge" class="node-button"><i class="fa fa-pencil fa-2x"/></button>' +
-                                  '</div>'
-                                  )
-                                }
-                            },
-                            position: {
-                              my: 'bottom center',
-                              at: 'top center'
-                            },
-                            style: {
-                                name: 'qtip-content'
-                            }
-                          });
-                        }
+                        _.forEach(e, function(e) {
+                          if (e.data('name')) {
+                            cy.$('#'+ e.data('id')).qtip({
+                              content: {
+                                  text: function(event, api) {
+                                    scope.selectedEntity = e;
+                                    return (
+                                    '<div class="edge-buttons">' +
+                                    '<button id="editEdge" class="node-button"><i class="fa fa-pencil fa-2x"/></button>' +
+                                    '</div>'
+                                    )
+                                  }
+                              },
+                              position: {
+                                my: 'bottom center',
+                                at: 'top center'
+                              },
+                              style: {
+                                  name: 'qtip-content'
+                              }
+                            });
+                          }
+                        });
                       }
 
                       function nodeTipExtension(n) {
@@ -242,52 +244,54 @@ define([
                           eh.start( cy.$('node:selected') );
                         });
 
-                        if (!n.isParent()) {
-                          cy.$('#'+ n.data('id')).qtip({
-                            content: {
-                                text: function(event, api) {
-                                  scope.selectedEntity = n;
-                                  return (
-                                  '<div class="node-buttons">' +
-                                  '<button id="readMode" class="node-button"><i class="fa fa-book fa-2x"/></button>' +
-                                  '<button id="addEdge" class="node-button"><i class="fa fa-arrows-alt fa-2x"/></button> ' +
-                                  '<button id="editNode" class="node-button"><i class="fa fa-pencil fa-2x"/></button>' +
-                                  '</div>'
-                                  )
-                                }
-                            },
-                            position: {
-                              my: 'bottom center',
-                              at: 'top center'
-                            },
-                            style: {
-                                name: 'qtip-content'
-                            }
-                          });
-
-                          cy.$('#'+ n.data('id')).qtip({
-                            content: {
-                                text: function(event, api) {
-                                  if (n.data('desc')) {
+                        _.forEach(n, function(n) {
+                          if (!n.isParent()) {
+                            cy.$('#'+ n.data('id')).qtip({
+                              content: {
+                                  text: function(event, api) {
+                                    scope.selectedEntity = n;
                                     return (
-                                    '<div class="node-description">' + n.data('desc') + '</div>'
+                                    '<div class="node-buttons">' +
+                                    '<button id="readMode" class="node-button"><i class="fa fa-book fa-2x"/></button>' +
+                                    '<button id="addEdge" class="node-button"><i class="fa fa-arrows-alt fa-2x"/></button> ' +
+                                    '<button id="editNode" class="node-button"><i class="fa fa-pencil fa-2x"/></button>' +
+                                    '</div>'
                                     )
                                   }
-                                }
-                            },
-                            position: {
-                              my: 'top center',
-                              at: 'bottom center'
-                            },
-                            style: {
-                              classes: 'qtip-bootstrap',
-                              tip: {
-                                width: 16,
-                                height: 8
                               },
-                            }
-                          });
-                        }
+                              position: {
+                                my: 'bottom center',
+                                at: 'top center'
+                              },
+                              style: {
+                                  name: 'qtip-content'
+                              }
+                            });
+
+                            cy.$('#'+ n.data('id')).qtip({
+                              content: {
+                                  text: function(event, api) {
+                                    if (n.data('desc')) {
+                                      return (
+                                      '<div class="node-description">' + n.data('desc') + '</div>'
+                                      )
+                                    }
+                                  }
+                              },
+                              position: {
+                                my: 'top center',
+                                at: 'bottom center'
+                              },
+                              style: {
+                                classes: 'qtip-bootstrap',
+                                tip: {
+                                  width: 16,
+                                  height: 8
+                                },
+                              }
+                            });
+                          }
+                        });
                       }
 
                       cy.expandCollapse({
@@ -394,6 +398,52 @@ define([
                             }
                           }
                         ]
+                      });
+
+                      $rootScope.$on('addEntity', function(event, entity){
+                        var nodes = scope.data.nodes;
+                        var edges = scope.data.edges;
+                        var newNode = [];
+                        var newEdge = [];
+
+                        if (entity) {
+                          entity.forEach(function(n) {
+                            var subject = {
+                                id: n.subject,
+                                name: n.subject
+                            };
+                            var object = {
+                                id: n.object,
+                                name: n.object
+                            };
+                            var edge = {
+                              group: "edges",
+                              data: {
+                                id: ( n.subject + n.object ),
+                                source: n.subject,
+                                target: n.object,
+                                name: n.predicate
+                              }
+                            }
+                            newNode.push(subject, object);
+                            newEdge.push(edge);
+                          });
+
+                          var filterNode = [];
+                          _.forEach(_.uniqBy(newNode, 'id'), function(n) {
+                            filterNode.push({group: 'nodes', data: n});
+                          });
+
+                          var n = cy.add(filterNode);
+                          var e = cy.add(newEdge);
+
+                          nodeTipExtension(n);
+                          edgeTipExtension(e);
+                          cy.fit();
+
+                          scope.data.nodes = _.union(nodes, filterNode);
+                          scope.data.edges = _.union(edges, newEdge);
+                        }
                       });
 
                       $rootScope.$on('deleteEntity', function(){

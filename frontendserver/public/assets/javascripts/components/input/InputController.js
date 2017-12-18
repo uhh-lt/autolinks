@@ -9,7 +9,7 @@ define([
     angular.module('autolinks.input', []);
     angular.module('autolinks.input')
         // Network Controller
-        .controller('InputController', ['$scope', function ($scope) {
+        .controller('InputController', ['$scope', 'EndPointService', 'EntityService', '_', function ($scope, EndPointService, EntityService, _) {
 
           /* This contains the JavaScript code for the 'commafield,' which is basically
           a tag input. It just gives visual feedback that inputs were 'registered' when a
@@ -23,6 +23,35 @@ define([
           function removeThis() {
             this.parentElement.removeChild(this);
           }
+
+          $scope.submit = function() {
+            resetNetworkFromInput();
+          }
+
+          // Reset the network with the content from the input box.
+          function resetNetworkFromInput() {
+            // Network should be reset
+            var needsreset = true;
+            var cf = document.getElementsByClassName("commafield")[0];
+            // Items entered.
+            var inputs = getItems(cf);
+
+            // If no input is given, prompt user to enter articles
+            if (!inputs[0]) {
+              // noInputDetected();
+              return;
+            }
+
+            // for (var i=0; i<inputs.length; i++) {
+            if (_.includes(inputs, 'Simon')) {
+              EndPointService.fetchData().then(function(response) {
+                  EntityService.addEntity(response);
+              });
+            }
+              // getPageName(encodeURI(inputs[i]), addStart);
+            // }
+          }
+
 
           // Add an item to an input
           function addItem(cf, itemtext) {

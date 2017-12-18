@@ -1,9 +1,9 @@
-  <div id="input-region">
+  <div id="input-region" ng-controller="InputController">
     <div style="padding: 10px; z-index: 2;">
-      <form layout layout-align="center center" ng-submit="addFulltext(fulltextInput)">
+      <form layout layout-align="center center">
         <!-- <div layout="row" flex="33"> -->
           <div id="input" class="commafield"></div>
-          <button class="md-button md-primary md-raised md-button submit-button" type="button"><span class="">Go!</span></button>
+          <button id="submit" class="md-button md-primary md-raised md-button submit-button" type="button"><span ng-click="submit()" class="">Go!</span></button>
         <!-- </div> -->
       </form>
     </div>
