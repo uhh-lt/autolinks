@@ -52,31 +52,6 @@ define([
 
               var newNode = [];
               var newEdge = [];
-              $scope.fetchData.forEach(function(n) {
-                var subject = {
-                    id: n.subject,
-                    name: n.subject
-                };
-                var object = {
-                    id: n.object,
-                    name: n.object
-                };
-                var edge = {
-                  data: {
-                    id: ( n.subject + n.object ),
-                    source: n.subject,
-                    target: n.object,
-                    name: n.predicate
-                  }
-                }
-                newNode.push(subject, object);
-                newEdge.push(edge);
-              });
-
-              var filterNode = [];
-              _.forEach(_.uniqBy(newNode, 'id'), function(n) {
-                filterNode.push({data: n});
-              });
 
               var nodes = [
                 { data: { id: '0', parent: 'b', name: "Disease" }, position: { x: 215, y: 85 } },
@@ -89,7 +64,6 @@ define([
                 { data: { id: '7', name: "IgVH Mutation" }, position: { x: 300, y: 175 } },
                 { data: { id: '8', name: "BCR" }, position: { x: 300, y: 175 } }
               ];
-              nodes = _.union(nodes, filterNode);
 
               $scope.nodes = nodes;
               var edges = [
@@ -101,7 +75,37 @@ define([
                 { data: { id: '76', source: '7', target: '6', name: 'causes' } },
                 { data: { id: '65', source: '6', target: '5', name: 'affects' } }
               ];
-              edges = _.union(edges, newEdge);
+
+              if ($scope.fetchData) {
+                $scope.fetchData.forEach(function(n) {
+                  var subject = {
+                      id: n.subject,
+                      name: n.subject
+                  };
+                  var object = {
+                      id: n.object,
+                      name: n.object
+                  };
+                  var edge = {
+                    data: {
+                      id: ( n.subject + n.object ),
+                      source: n.subject,
+                      target: n.object,
+                      name: n.predicate
+                    }
+                  }
+                  newNode.push(subject, object);
+                  newEdge.push(edge);
+                });
+
+                var filterNode = [];
+                _.forEach(_.uniqBy(newNode, 'id'), function(n) {
+                  filterNode.push({data: n});
+                });
+
+                nodes = _.union(nodes, filterNode);
+                edges = _.union(edges, newEdge);
+              }
 
               var response = {data: {entities: nodes, relations: edges}};
               // // Enable physics for new graph data when network is initialized
