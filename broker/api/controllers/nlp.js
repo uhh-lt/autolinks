@@ -1,24 +1,24 @@
 'use strict';
 
+/**
+ * imports
+ */
 const
   NLP = require('../../controller/nlp_wrapper'),
   logger = require('../../controller/log')(module)
   ;
 
-module.exports = {
-  find_named_entities: findNamedEntities,
-  analyze: analyze,
-};
 
 /**
+ * analyze text and create an analysis object
  *
  * @param req
  * @param res
  * @param next
  */
-function analyze(req, res, next) {
+module.exports.analyze = function(req, res, next) {
   const data = req.swagger.params.data.value;
-  NLP.analyze(data.data, data.content_type, data.source , (err, ana) => {
+  NLP.analyze(data.data, data['content-type'], data.source , (err, ana) => {
     res.header('Content-Type', 'application/json; charset=utf-8');
     if (err) {
       res.status(500);
@@ -27,7 +27,7 @@ function analyze(req, res, next) {
     res.json(ana);
     res.end(next);
   });
-}
+};
 
 
 /**
@@ -35,7 +35,7 @@ function analyze(req, res, next) {
  * @param req request object
  * @param res response object
  */
-function findNamedEntities(req, res, next) {
+module.exports.find_named_entities = function(req, res, next) {
   // get the analysis parameter from swagger
   // TODO: check for existence
   const ana = req.swagger.params.analysis.value;
@@ -76,4 +76,4 @@ function findNamedEntities(req, res, next) {
     }
   );
 
-}
+};

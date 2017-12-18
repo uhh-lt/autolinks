@@ -70,6 +70,7 @@ module.exports = {
     const ana = new Analysis();
     ana.text = text;
     ana.source = source;
+    logger.info({text: text, contentType: contentType, source: source});
 
     this.findNamedEntities(ana, () => {}, (err, anno) => {ana.annotations.push(anno);}, () => {});
 
