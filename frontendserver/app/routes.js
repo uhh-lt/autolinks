@@ -1,9 +1,22 @@
 var request = require('request');
-﻿var config = require('../config.json');
+﻿var config = require('config.json');
+var express = require('express');
+var serviceList = require('app/endpoints/serviceList');
+var router = express.Router();
+
+
+// routes
+// router.post('/authenticate', authenticateUser);
+// router.post('/register', registerUser);
+// router.get('/current', getCurrentUser);
+// router.put('/:_id', updateUser);
+// router.delete('/:_id', deleteUser);
+
+// module.exports = router;
 
 
 module.exports = function (app) {
-
+    debugger;
     app.get('/api/data/', function (req, res) {
 
       var resp = [];
@@ -81,9 +94,9 @@ module.exports = function (app) {
     });
 
     // application -------------------------------------------------------------
-    app.get('*', function (req, res) {
+    app.get('/', function (req, res) {
 
         console.log('yeahhh');
-        res.sendFile('./public/index.html'); // load the single view file (angular will handle the page changes on the front-end)
+        res.sendFile('public/index.html'); // load the single view file (angular will handle the page changes on the front-end)
     });
 };
