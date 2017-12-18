@@ -28,16 +28,72 @@ define([
         .constant('generalOptions', {
             layout: {
                 name: 'cose-bilkent',
-                animate: 'end'
-                // edgeLengthVal: 10,
-                // idealEdgeLength: function( edge ){ return 1; },
-                // // animate: true,
-                // avoidOverlap: true, // if true, prevents overlap of node bounding boxes
-                // handleDisconnected: true, // if true, avoids disconnected components from overlapping
-                // fit: true, // whether to fit the viewport to the graph
-                // ready: undefined, // callback on layoutready
-                // stop: undefined, // callback on layoutstop
-                // padding: 5 // the padding on fit
+
+                // maxSimulationTime: 1000,
+                // padding: 6,
+                // ungrabifyWhileSimulating: false,
+
+
+                // nodeDimensionsIncludeLabels: false,
+                avoidOverlap: true,
+                // handleDisconnected: true
+                // // number of ticks per frame; higher is faster but more jerky
+                refresh: 4,
+                // // Whether to fit the network view after when done
+                // fit: true,
+                // // Padding on fit
+                // padding: 50,
+                // paddingCompound: 500,
+                // // Whether to enable incremental mode
+                randomize: false,
+                // // Node repulsion (non overlapping) multiplier
+                // nodeRepulsion: 4500,
+                // // Ideal (intra-graph) edge length
+                // idealEdgeLength: 50,
+                // // Divisor to compute edge forces
+                // edgeElasticity: 0.45,
+                // // Nesting factor (multiplier) to compute ideal edge length for inter-graph edges
+                // nestingFactor: 0.1,
+                // // Gravity force (constant)
+                // gravity: 0.25,
+                // // Maximum number of iterations to perform
+                // numIter: 2500,
+                // // Whether to tile disconnected nodes
+                // tile: true,
+                // // Type of layout animation. The option set is {'during', 'end', false}
+                // animate: 'start',
+                // // Amount of vertical space to put between degree zero nodes during tiling (can also be a function)
+                // tilingPaddingVertical: 10,
+                // // Amount of horizontal space to put between degree zero nodes during tiling (can also be a function)
+                // tilingPaddingHorizontal: 10,
+                // // Gravity range (constant) for compounds
+                // gravityRangeCompound: 1.5,
+                // // Gravity force (constant) for compounds
+                // gravityCompound: 1.0,
+                // // Gravity range (constant)
+                // gravityRange: 3.8,
+                // // Initial cooling factor for incremental layout
+                // initialEnergyOnIncremental: 0.5
+                // // edgeLengthVal: 10,
+                // // idealEdgeLength: function( edge ){ return 1; },
+                // // // animate: true,
+                // // avoidOverlap: true, // if true, prevents overlap of node bounding boxes
+                // // handleDisconnected: true, // if true, avoids disconnected components from overlapping
+                // // fit: true, // whether to fit the viewport to the graph
+                // // ready: undefined, // callback on layoutready
+                // // stop: undefined, // callback on layoutstop
+                // // padding: 5 // the padding on fit
+
+                // // webcola options
+                // // infinite: false // blocks all interaction
+                // randomize: false, // kose-bilkent will randomize node positions
+                // refresh: 4, // fast animation
+                // avoidOverlap: true,
+                edgeLength: 250, // should be at least two times the diagonal of a block, blocks are 100x60, therefore around 2*116
+                unconstrIter: 1, // unconstrained initial layout iterations
+                userConstIter: 0, // initial layout iterations with user-specified constraints - we don't have any user constraints
+                allConstIter: 1, // initial layout iterations with all constraints including non-overlap
+                infinite: false,
             },
             style: [
                {

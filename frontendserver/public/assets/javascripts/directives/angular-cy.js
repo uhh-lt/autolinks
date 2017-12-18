@@ -4,6 +4,7 @@ define([
     'cola',
     'cytoscape',
     'cytoscape-cose-bilkent',
+    'cytoscape-cola',
     'cytoscape-cxtmenu',
     'cytoscape-panzoom',
     'cytoscape-qtip',
@@ -12,7 +13,7 @@ define([
     'cytoscape.js-undo-redo',
     'qtip2',
     'bootstrap',
-], function(angular, $, cola, cytoscape, regCose, cxtmenu, panzoom, cyqtip, expandCollapse,edgehandles, undoRedo, qtip2) {
+], function(angular, $, cola, cytoscape, regCose, cycola, cxtmenu, panzoom, cyqtip, expandCollapse,edgehandles, undoRedo, qtip2) {
     'use strict';
 
     angular.module('ngCy', [])
@@ -56,6 +57,7 @@ define([
                 expandCollapse(cytoscape, $);
                 undoRedo(cytoscape);
                 regCose(cytoscape);
+                cycola(cytoscape, cola);
                 cyqtip(cytoscape, $);
                 cxtmenu(cytoscape);
                 edgehandles(cytoscape);
@@ -253,7 +255,7 @@ define([
                                     return (
                                     '<div class="node-buttons">' +
                                     '<button id="readMode" class="node-button"><i class="fa fa-book fa-2x"/></button>' +
-                                    '<button id="addEdge" class="node-button"><i class="fa fa-arrows-alt fa-2x"/></button> ' +
+                                    '<button id="addEdge" class="node-button"><i class="fa fa-link fa-2x"/></button> ' +
                                     '<button id="editNode" class="node-button"><i class="fa fa-pencil fa-2x"/></button>' +
                                     '</div>'
                                     )
@@ -439,10 +441,10 @@ define([
 
                           nodeTipExtension(n);
                           edgeTipExtension(e);
-                          cy.fit();
 
                           scope.data.nodes = _.union(nodes, filterNode);
                           scope.data.edges = _.union(edges, newEdge);
+                          $rootScope.$broadcast('appChanged');
                         }
                       });
 
