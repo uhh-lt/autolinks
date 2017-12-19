@@ -57,34 +57,40 @@ define([
                 expandCollapse(cytoscape, $);
                 undoRedo(cytoscape);
                 regCose(cytoscape);
-                cycola(cytoscape, cola);
+                // cycola(cytoscape, cola);
                 cyqtip(cytoscape, $);
                 cxtmenu(cytoscape);
                 edgehandles(cytoscape);
 
+                scope.ehListeners = [];
+
                 scope.$watch('data', function () {
-
-                    // Sanity check
-                    if (scope.data == null) {
-                        return;
-                    }
-
-                    // If we've actually changed the data set, then recreate the graph
-                    // We can always update the data by adding more data to the existing data set
-                    if (cy != null) {
-                        cy.destroy();
-                    }
-
-                    // edgehandles(cytoscape);
 
                     var domContainer = document.getElementById('cy-network');
                     console.log(scope.data);
                     // graph  build
-                    scope.doCy = function(){ // will be triggered on an event broadcast
+                    scope.doCy = function(){
+                      // will be triggered on an event broadcast
                       // parse edges
                       // you can build a complete object in the controller and pass it without rebuilding it in the directive.
                       // doing it like that allows you to add options, design or what needed to the objects
                       // doing it like that is also good if your data object/s has a different structure
+
+                      // Sanity check
+                      if (scope.data == null) {
+                          return;
+                      }
+
+                      // If we've actually changed the data set, then recreate the graph
+                      // We can always update the data by adding more data to the existing data set
+                      if (cy != null) {
+                          cy.destroy();
+                          cy = null;
+                          // delete $rootScope.$$listeners['addEdge'];
+                          // $rootScope.$destroy();
+                          // debugger;
+                          // cy.edgehandles().destroy();
+                      }
 
                       for (var i=0; i<scope.cyEdges.length; i++)
                       {
@@ -145,24 +151,33 @@ define([
                           // fired when edgehandles is done and elements are added
                           // build the edge object
                           // get edge source
-                          if (sourceNode.data && targetNode.data) {;
+                          if (sourceNode.data && targetNode.data) {
                             // build the edge object
+                            var edgeObj = {
+                                data:{
+                                  id: sourceNode.data('id') + targetNode.data('id'),
+                                  source: sourceNode.data('id'),
+                                  target: targetNode.data('id'),
+                                  name: 'has relation'
+                                }
+                            };
                             addedEles.data().name = 'has relation';
                             // adding the edge object to the edges array
-                            scope.data.edges.push(addedEles);
+                            scope.data.edges.push(edgeObj);
                             edgeTipExtension(addedEles);
                           }
                           this.enabled = false;
                         },
                       }
-
+                      // debugger;
                       var eh = cy.edgehandles(edgeHandleProps);
                       eh.enabled = false;
 
-                      if (scope.$parent.edgehandler) {
-                        eh.enabled = true;
-                        eh.start( cy.$('node:selected') );
-                      }
+                      // if (scope.$parent.edgehandler) {
+                      //   eh.enabled = true;
+                      //   debugger;
+                      //   eh.start( cy.$('node:selected').remove() );
+                      // }
 
                       // Event listeners
                       // with sample calling to the controller function as passed as an attribute
@@ -170,6 +185,7 @@ define([
                           eh.enabled = false;
                           var evtTarget = e.target;
                           var nodeId = evtTarget.id();
+                          scope.selectedEntity = evtTarget;
                           // scope.cyClick({value:nodeId});
                           // scope.$parent.EntityService.openSideNav(evtTarget);
                       });
@@ -188,6 +204,7 @@ define([
                             .selector('#'+ n.data('id'))
                             .css(
                               {
+                              // 'shape': 'roundrectangle',
                               'background-image': n.data('image'),
                               'background-color': 'rgba(255, 255, 255, 0)',
                               'text-valign': 'bottom',
@@ -207,10 +224,6 @@ define([
                       });
 
                       function edgeTipExtension(e) {
-                        $(document).on('click', "#editEdge", function(event, e) {
-                          scope.$parent.EntityService.openSideNav(scope.selectedEntity);
-                        });
-
                         _.forEach(e, function(e) {
                           if (e.data('name')) {
                             cy.$('#'+ e.data('id')).qtip({
@@ -237,15 +250,6 @@ define([
                       }
 
                       function nodeTipExtension(n) {
-                        $(document).on('click', "#editNode", function(event, n){
-                          scope.$parent.EntityService.openSideNav(scope.selectedEntity);
-                        });
-
-                        $(document).on('click', "#addEdge", function(){
-                          eh.enabled = true;
-                          eh.start( cy.$('node:selected') );
-                        });
-
                         _.forEach(n, function(n) {
                           if (!n.isParent()) {
                             cy.$('#'+ n.data('id')).qtip({
@@ -433,7 +437,14 @@ define([
 
                           var filterNode = [];
                           _.forEach(_.uniqBy(newNode, 'id'), function(n) {
-                            filterNode.push({group: 'nodes', data: n});
+                            filterNode.push({
+                              group: 'nodes',
+                              data: n,
+                              position: {
+                                x: 100 + Math.random() * 100,
+                                y: 100 + Math.random() * 100
+                              }
+                            });
                           });
 
                           var n = cy.add(filterNode);
@@ -447,6 +458,31 @@ define([
                           $rootScope.$broadcast('appChanged');
                         }
                       });
+                      // debugger;
+                      if (!$rootScope.$$listenerCount.addEdge) {
+                        if ($rootScope.$$listenerCount.addEdge === 1) {
+                          $rootScope.$$listenerCount.addEdge = 0;
+                          // debugger;
+                          return;
+                        } else {
+                          $rootScope.$on('addEdge', function(e){
+                            debugger;
+                            eh.enabled = true;
+                            // eh.active = true;
+                            var nodeId = scope.selectedEntity.data('id');
+                            console.log(nodeId);
+                            // debugger;
+                            // console.log(eh.listeners);
+                            // console.log(cy.$('#' + nodeId));
+                            if (eh.listeners.length === 0) {
+                              eh.addCytoscapeListeners();
+                              // eh.listeners = scope.ehListeners;
+                            }
+                            // scope.ehListeners = eh.listeners;
+                            eh.start( cy.$('#' + nodeId) );
+                          });
+                        }
+                      }
 
                       $rootScope.$on('deleteEntity', function(){
                         if (cy.$(":selected").length > 0) {
@@ -476,6 +512,19 @@ define([
                   // using cy.remove() / cy.add()
                   $rootScope.$on('appChanged', function(){
                       scope.doCy();
+                  });
+
+                  $(document).on('click', "#editNode", function(event, n){
+                    scope.$parent.EntityService.openSideNav(scope.selectedEntity);
+                  });
+
+                  $(document).on('click', "#editEdge", function(event, e) {
+                    scope.$parent.EntityService.openSideNav(scope.selectedEntity);
+                  });
+
+                  $(document).on('click', "#addEdge", function(e){
+                    console.log('waw');
+                    $rootScope.$broadcast('addEdge');
                   });
 
                 });
