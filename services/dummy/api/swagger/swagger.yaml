@@ -20,15 +20,61 @@ produces:
 definitions:
 
   # Objects used as parameters
-  NamedEntity:
+  ServiceParameter:
+    type: object
+    properties:
+      focus: 
+        $ref: '#/definitions/DOffset'
+      context:
+        $ref: '#/definitions/Analysis'
+        
+  # NLP related objects
+  Analysis:
     type: object
     properties:
       text:
         type: string
+      source:
+        type: string
+      lang:
+        type: string
+      availabletypes:
+        type: array
+        items:
+          type: string
+      annotations:
+        type: array
+        items:
+          $ref: "#/definitions/Annotation"
+
+  Annotation:
+    type: object
+    properties:
       type:
         type: string
-      context:
+      doffset:
+        $ref: "#/definitions/DOffset"
+      properties:
+        type: object
+      analyzer:
         type: string
+
+  # Discontinuous offset, composed of a list of offsets to allow for discontinuous annotations
+  DOffset:
+    type: object
+    properties:
+      offsets:
+        type: array
+        items:
+          $ref: "#/definitions/Offset"
+
+  Offset:
+    type: object
+    properties:
+      from:
+        type: integer
+      length:
+        type: integer
 
   # Objects related to required return types
   Triple:
@@ -75,14 +121,15 @@ paths:
       operationId: dosomething
       tags:
         - Dummy
-      description: Do something
-      requirements: asd
+      description: | 
+        Do something 
+        requires: [ner]
       parameters:
-        - name: entity
+        - name: data
           in: body
-          description: The entity object to do something with
+          description: The service parameter
           schema:
-            $ref: '#/definitions/NamedEntity'
+            $ref: '#/definitions/ServiceParameter'
       responses:
         200:
           description: Success
@@ -102,11 +149,11 @@ paths:
         - Restricted
       description: Do something
       parameters:
-        - name: entity
+        - name: data
           in: body
-          description: The entity object to do something with
+          description: The service parameter
           schema:
-            $ref: '#/definitions/NamedEntity'
+            $ref: '#/definitions/ServiceParameter'
       responses:
         200:
           description: Success
@@ -150,11 +197,11 @@ paths:
           in: path
           description: The username
           type: string
-        - name: entity
+        - name: data
           in: body
-          description: The entity object to do something with
+          description: The service parameter
           schema:
-            $ref: '#/definitions/NamedEntity'
+            $ref: '#/definitions/ServiceParameter'
       responses:
         200:
           description: Success

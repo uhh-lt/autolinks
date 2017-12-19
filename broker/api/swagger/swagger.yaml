@@ -125,9 +125,12 @@ definitions:
 
   # Discontinuous offset, composed of a list of offsets to allow for discontinuous annotations
   DOffset:
-    type: array
-    items:
-      $ref: "#/definitions/Offset"
+    type: object
+    properties:
+      offsets:
+        type: array
+        items:
+          $ref: "#/definitions/Offset"
 
   Offset:
     type: object

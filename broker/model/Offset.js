@@ -21,8 +21,30 @@ function Offset(from, length) {
 
 Offset.prototype.end = function() {
   return this.from + this.length;
-}
+};
 
 Offset.prototype.getText = function (text) {
   return text.substring(this.from, this.end());
-}
+};
+
+
+/**
+ *
+ * Deep copy from ordinary object
+ *
+ * @param obj
+ * @returns {Offset}
+ */
+Offset.prototype.deepAssign = function(obj) {
+  return this.assign(obj);
+};
+
+/**
+ *
+ * @param obj
+ * @returns {Offset}
+ */
+Offset.prototype.assign = function(obj) {
+  return Object.assign(this, obj);
+};
+

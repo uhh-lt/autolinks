@@ -10,7 +10,10 @@
 
   It is a good idea to list the modules that your application depends on in the package.json in the project root
  */
-const util = require('util');
+const
+  Analysis = require('../../../../broker/model/Analysis'),
+  DOffset = require('../../../../broker/model/DOffset'),
+  util = require('util');
 
 /*
  Once you 'require' a module you can reference the things that it exports.  These are defined in module.exports.
@@ -37,11 +40,23 @@ module.exports = {
  */
 function doSomething(req, res, next) {
   // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
-  const entity = req.swagger.params.entity.value;
-  if(!entity){
-    return res.end('No entity provided.', next);
+  const service_parameter = req.swagger.params.data.value;
+  if(!service_parameter){
+    return res.status(500).end('No data object provided.', next);
   }
-  const etext = entity.text || 'Simon';
+  if(!service_parameter.focus){
+    return res.status(500).end("Parameter 'focus' (DOffset) missing.", next);
+  }
+  if(!service_parameter.context){
+    return res.status(500).end("Parameter 'context' (Analysis) missing.", next);
+  }
+
+  // create the objects with models borrowed from the broker
+  const doffset = new DOffset().deepAssign(service_parameter.focus);
+  const analysis = new Analysis().deepAssign(service_parameter.context);
+
+  // get the text for the offset
+  const etext = doffset.getText(analysis.text);
   const triples = [{
     subject: etext,
     predicate: 'says',

@@ -27,3 +27,25 @@ function Triple(subject, predicate, object) {
 Triple.prototype.resolve = function(){
   console.log('NOT YET IMPLEMENTED');
 };
+
+/**
+ *
+ * Deep copy from ordinary object
+ *
+ * @param obj
+ * @returns {Triple}
+ */
+Triple.prototype.deepAssign = function(obj) {
+  return this.assign(obj);
+};
+
+/**
+ *
+ * @param obj
+ * @returns {Triple}
+ */
+Triple.prototype.assign = function(obj) {
+  return Object.assign(this, obj);
+};
+
+

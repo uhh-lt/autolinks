@@ -3,6 +3,7 @@
 
 /* imports */
 const
+  Exception = require('./model/Exception'),
   Triple = require('./model/Triple'),
   Offset = require('./model/Offset'),
   Annotation = require('./model/Annotation'),
@@ -55,6 +56,46 @@ console.log(e.doffset)
 // console.log(d.text);
 // console.log(d.source);
 // console.log(d.lang);
+
+
+
+const f = { from : 1, to : 10 };
+console.log(f instanceof Offset);
+console.log(f);
+
+const g = Object.assign(new Offset(), f);
+console.log(g instanceof Offset);
+console.log(g);
+
+const h = {
+  text: 'hello world.',
+  source: 'bla.html',
+  annotations: [
+    new Annotation().assign({
+      type: 'word',
+      analyzer: 'manual',
+      properties: {},
+      doffset: [
+        new Offset(7, 5)
+      ]
+    })
+  ]
+};
+
+console.log(h);
+const i = Object.assign(new Analysis(), h);
+console.log(h instanceof Analysis);
+console.log(i instanceof Analysis);
+console.log(i);
+console.log(i.annotations[0] instanceof Annotation);
+
+const j = new Analysis().assign(h);
+console.log(j instanceof Analysis);
+console.log(j.annotations[0] instanceof Annotation);
+console.log(j.annotations[0].doffset[0] instanceof Offset);
+
+
+
 
 
 
