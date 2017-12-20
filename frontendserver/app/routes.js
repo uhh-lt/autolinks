@@ -67,6 +67,32 @@ module.exports = function (app) {
         });
     });
 
+    // app.get('/service/call/', function (req, res) {
+    //
+    //   var resp = [];
+    //
+    //       var options = {
+    //             url: config.apiUrl + 'service/call',
+    //             method: 'POST',
+    //             headers: {
+    //                'Content-Type': 'application/json',
+    //                'Accept': 'application/json'
+    //              },
+    //             json: true,
+    //             body: {
+    //               "service": "Dummy",
+    //               "path": "/bar",
+    //               "method": "get",
+    //               "data": {}
+    //              }
+    //           }
+    //
+    //     console.log('service call');
+    //     var req = request(options, function (error, response, body) {
+    //       res.send(body);
+    //     });
+    // });
+
     app.get('/service/call/', function (req, res) {
 
       var resp = [];
@@ -76,13 +102,14 @@ module.exports = function (app) {
                 method: 'POST',
                 headers: {
                    'Content-Type': 'application/json',
-                   'Accept': 'application/json'
+                   'Accept': 'application/json',
+                   'authorization': 'Basic am9objpkb2U='
                  },
                 json: true,
                 body: {
                   "service": "Dummy",
-                  "path": "/bar",
-                  "method": "get",
+                  "path": "/baz/{username}",
+                  "method": "post",
                   "data": {}
                  }
               }
@@ -92,6 +119,9 @@ module.exports = function (app) {
           res.send(body);
         });
     });
+
+    // Basic Authorization
+    // curl -X POST "http://localhost:10000/service/call" -H "accept: application/json" -H "Content-Type: application/json" -d "{ \"service\": \"Dummy\", \"path\": \"/baz/{username}\", \"method\": \"post\", \"data\": {}}" -H "authorization: Basic am9objpkb2U="
 
     // application -------------------------------------------------------------
     app.get('/', function (req, res) {
