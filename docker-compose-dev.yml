@@ -99,3 +99,24 @@ services:
       - NODE_ENV=development
       - COOKIE_SECRET=YOUR_COOKIE_SECRET
   # END: dummy service
+
+  # BEGIN: wikiservice
+  wiki:
+    image: remstef/node-swagger:latest
+    volumes:
+      - ${PWD}/services/wikiservice/wikiservice-node:/opt/project/services/wikiservice/wikiservice-node
+      - ${PWD}/broker:/opt/project/broker
+    ports:
+      - 10011:10010
+      - 3011:3001
+    networks:
+      - anet
+    stdin_open: true
+    tty: true
+    working_dir: /opt/project/services/wikiservice/wikiservice-node
+    entrypoint: bash
+    environment:
+      - NODE_ENV=development
+      - COOKIE_SECRET=YOUR_COOKIE_SECRET
+      - ELASTICSEARCH_URLS=http://ltdocker.informatik.uni-hamburg.de:10004
+  # END: wikiservice

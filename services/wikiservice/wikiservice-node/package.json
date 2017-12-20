@@ -1,0 +1,24 @@
+{
+  "name": "AutolinksWikiservice",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Autolinks Wikiservice",
+  "keywords": [],
+  "author": "",
+  "license": "",
+  "main": "app.js",
+  "dependencies": {
+    "elasticsearch": "^14.0.0",
+    "express": "^4.12.3",
+    "node-cleanup": "^2.1.2",
+    "request": "^2.83.0",
+    "swagger-express-mw": "^0.1.0",
+    "swagger-ui-express": "^2.0.11",
+    "yamljs": "^0.3.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node app.js",
+    "test": "swagger project test"
+  }
+}
