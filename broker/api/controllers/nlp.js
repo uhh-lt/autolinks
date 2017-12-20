@@ -42,7 +42,10 @@ module.exports.find_named_entities = function(req, res, next) {
   // TODO: check for existence
   const ana = req.swagger.params.data.value;
 
+  let started_writing = false;
   let written_at_least_one = false;
+
+  res.header('Content-Type', 'application/json; charset=utf-8');
 
   try {
     NLP.findNamedEntities(
@@ -54,6 +57,7 @@ module.exports.find_named_entities = function(req, res, next) {
           logger.warn(ex.message, ex);
           ex.handleResponse(res);
         }
+        started_writing = true;
       },
       /* callbackIter */ (err, entity) => {
         if (err) {
@@ -78,7 +82,12 @@ module.exports.find_named_entities = function(req, res, next) {
       }
     );
   } catch(err) {
-    return Exception.fromError(err, 'Error while processing data.', {analysis: ana}).handleResponse(res).end(next);
+    Exception.fromError(err, 'Error while processing data.', {analysis: ana}).handleResponse(res);
+    if(started_writing){
+      res.write(']');
+    }
+    res.end(next);
+
   }
 
 };
