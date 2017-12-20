@@ -29,14 +29,16 @@ function Exception(type, message) {
  * @param fields
  * @returns {Exception}
  */
-Exception.fromError = function(err, newMessage, fields){
+Exception.fromError = function(err, newMessage, fields) {
   const ex = new Exception();
   ex.message = newMessage || err.message;
   ex.cause = err;
   ex.cause = {}; // serialize error to normal json object
-  Object.getOwnPropertyNames(err).forEach(function (key) {
-    ex.cause[key] = this[key];
-  }, err);
+  if (err) {
+    Object.getOwnPropertyNames(err).forEach(function (key) {
+      ex.cause[key] = this[key];
+    }, err);
+  }
   ex.fields = fields;
   return ex;
 };

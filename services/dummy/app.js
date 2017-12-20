@@ -79,7 +79,7 @@ console.log('Service Definition: ', global.serviceDefinition);
  */
 (function registerAtBroker() {
 
-  // wait while global.serviceDefinition is not available
+  // wait for global.serviceDefinition to be available
   if(!global.serviceDefinition) {
     util.debuglog('Waiting for service definition to be computed.');
     return setTimeout(registerAtBroker, 1000);

@@ -96,14 +96,18 @@ definitions:
     items:
       $ref: '#/definitions/Triple'
 
-  # In case of error return this object schema
-  Error:
+  # in case of error return this object schema
+  Exception:
     type: object
     properties:
+      type:
+        type: string
       message:
         type: string
-      fields:
+      cause:
         type: string
+      fields:
+        type: object
 
 tags:
   - name: Dummy
@@ -138,7 +142,7 @@ paths:
         default:
           description: Error
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/Exception"
 
   /foo:
     x-swagger-router-controller: foobar
@@ -162,7 +166,7 @@ paths:
         default:
           description: Error
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/Exception"
 
   /bar:
     x-swagger-router-controller: foobar
@@ -181,7 +185,7 @@ paths:
         default:
           description: Error
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/Exception"
 
   /baz/{username}:
     x-swagger-router-controller: foobar
@@ -210,7 +214,7 @@ paths:
         default:
           description: Error
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/Exception"
 
   # here are service related endpoints
   /ping:
@@ -235,7 +239,7 @@ paths:
         default:
           description: Unexpected error
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/Exception'
 
   /service/registerAtBroker:
     x-swagger-router-controller: maintenance
@@ -268,7 +272,28 @@ paths:
         default:
           description: Unexpected error
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/Exception'
+    get:
+      operationId: register_at_system_broker
+      tags:
+        - Maintenance
+      summary: Manually register this service and its endpoints at the provided autolinks broker service
+      description: |
+        returns 'OK' if service is fully available or ERROR if service partly fails
+      consumes: []
+      produces:
+        - text/plain
+      parameters: []
+      responses:
+        200:
+          description: single string with ok message if registered
+          schema:
+            type: string
+            default: 'OK'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Exception'
 
   /swagger:
     x-swagger-pipe: swagger_raw
