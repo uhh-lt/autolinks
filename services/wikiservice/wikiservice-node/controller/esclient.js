@@ -49,6 +49,15 @@ module.exports.search = function(text, callback){
   callback(new Error('NOT YET IMPLEMENTED'), null);
 };
 
+/**
+ *
+ * @param callback = function(err)
+ */
+module.exports.close = function(callback){
+  esclient.close();
+  callback(null);
+};
+
 
 /**
  * @param index
