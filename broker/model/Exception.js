@@ -10,10 +10,16 @@ Exception.prototype.fields = null;
 /**
  * @constructor
  */
-function Exception() {
+function Exception(type, message) {
   /*
    * The Exception object
    */
+  if (!message) { // if two parameters provided 1st is type, second is message, otherwise first is message
+    this.message = type;
+  }else {
+    this.type = type;
+    this.message = message;
+  }
 }
 
 /**
