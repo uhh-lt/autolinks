@@ -42,7 +42,7 @@ Exception.fromError = function(err, newMessage, fields){
  */
 Exception.prototype.handleResponse = function(res){
   res.status(500);
-  if(!res._header) {
+  if(!res.headersSent) {
     res.header('Content-Type', 'application/json; charset=utf-8');
   }
   res.write(JSON.stringify(this));
