@@ -11,8 +11,7 @@
   It is a good idea to list the modules that your application depends on in the package.json in the project root
  */
 const
-  Analysis = require('../../../../broker/model/Analysis'),
-  DOffset = require('../../../../broker/model/DOffset'),
+  ServiceParameter = require('../../../../broker/model/ServiceParameter'),
   Exception = require('../../../../broker/model/Exception'),
   util = require('util');
 
@@ -41,32 +40,26 @@ module.exports = {
  */
 function doSomething(req, res, next) {
   // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
-  const service_parameter = req.swagger.params.data.value;
-  if(!service_parameter) {
-    return new Exception('No data object provided.').handleResponse(res).end(next);
-  }
-  if(!service_parameter.focus) {
-    return new Exception('Parameter \'focus\' (DOffset) missing.').handleResponse(res).end(next);
-  }
-  if(!service_parameter.context) {
-    return new Exception('Parameter \'context\' (Analysis) missing.').handleResponse(res).end(next);
-  }
+  // Get the serviceParameter object from the request and handle the error properly if it fails
+  ServiceParameter.fromRequest(req, function(err, serviceParameter) {
 
-  // create the objects with models borrowed from the broker
-  const doffset = new DOffset().deepAssign(service_parameter.focus);
-  const analysis = new Analysis().deepAssign(service_parameter.context);
+    if (err) {
+      return Exception.handleErrorResponse(err, res).end(next);
+    }
 
-  // get the text for the offset
-  const etext = doffset.getText(analysis.text);
-  const triples = [{
-    subject: etext,
-    predicate: 'says',
-    object: 'hello'
-  }];
+    // get the text for the offset
+    const text = serviceParameter.focus.getText(serviceParameter.context.text);
+    const triples = [{
+      subject: text,
+      predicate: 'says',
+      object: 'hello'
+    }];
 
-  // this sends back a JSON response and ends the response
-  res.header('Content-Type', 'application/json; charset=utf-8');
-  res.json(triples);
-  res.end(next);
+    // this sends back a JSON response and ends the response
+    res.header('Content-Type', 'application/json; charset=utf-8');
+    res.json(triples);
+    res.end(next);
+
+  });
 
 }

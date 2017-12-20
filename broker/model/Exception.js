@@ -45,6 +45,26 @@ Exception.fromError = function(err, newMessage, fields) {
 
 /**
  *
+ * @param err
+ * @param res
+ * @returns {*}
+ */
+Exception.handleErrorResponse = function(err, res){
+  res.status(500);
+  if(!res.headersSent) {
+    res.header('Content-Type', 'application/json; charset=utf-8');
+  }
+  if (err instanceof Exception) {
+    res.write(JSON.stringify(err));
+  } else {
+    const exc = Exception.fromError(err, err.message, null);
+    res.write(JSON.stringify(exc));
+  }
+  return res;
+};
+
+/**
+ *
  * @param res server response
  * @returns {ServerResponse}
  */
