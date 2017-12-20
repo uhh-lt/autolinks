@@ -118,5 +118,56 @@ services:
     environment:
       - NODE_ENV=development
       - COOKIE_SECRET=YOUR_COOKIE_SECRET
-      - ELASTICSEARCH_URLS=http://ltdocker.informatik.uni-hamburg.de:10004
+      - ELASTICSEARCH_URLS=http://elasticsearch:9200
+#      - ELASTICSEARCH_URLS=http://ltdocker.informatik.uni-hamburg.de:10004
+
+  elasticsearch:
+    image: custom-elasticsearch:5.5.2
+    build:
+      context: services/wikiservice/es
+      dockerfile: Dockerfile
+#      args:
+#        CUSTOM_UID: 39000
+#        CUSTOM_GID: 390
+    environment:
+      - cluster.name=escluster
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=false
+      - http.host=0.0.0.0
+      - transport.host=0.0.0.0
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 131072
+        hard: 131072
+      nproc:
+        soft: 8192
+        hard: 8192
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ${PWD}/services/wikiservice/esdata:/usr/share/elasticsearch/data
+      #- ${PWD}/es/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    networks:
+      - anet
+    healthcheck:
+      test: curl --silent --fail 'localhost:9200/_cluster/health' || exit 1
+      interval: 5s
+      timeout: 2s
+      retries: 12
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:5.5.2
+    ports:
+      - 5601:5601
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+    networks:
+      - anet
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
   # END: wikiservice

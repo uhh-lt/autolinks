@@ -4,7 +4,12 @@ const
   elasticsearch = require('elasticsearch'),
   logger = require('../../../../broker/controller/log')(module);
 
-
+const wiki_indices = [
+  // 'enwiki',
+  // 'wikidata',
+  // 'wiktionary',
+  'simplewiki',
+];
 
 let esclient;
 
@@ -20,14 +25,23 @@ module.exports.init = function (callback) {
   try {
     esclient = new elasticsearch.Client({
       hosts: es_urls,
-      apiVersion: '5.4',
-      sniffOnStart: true,
-      sniffInterval: 20000,
+      apiVersion: '5.5',
+      // sniffOnStart: true,
+      // sniffInterval: 20000,
     });
   } catch(err){
     return callback(err);
   }
   callback(null);
+};
+
+/**
+ *
+ * @param callback
+ */
+module.exports.findWikiIndices = function(callback) {
+  // _cat/indices?index=*wik*
+  callback(new Error('NOT YET IMPLEMENTED'));
 };
 
 /**
@@ -44,9 +58,16 @@ module.exports.ping = function(callback){
  *
  * @param text
  * @param callback
+ * @param callbackDone
  */
-module.exports.search = function(text, callback){
-  callback(new Error('NOT YET IMPLEMENTED'), null);
+module.exports.search = function(text, callback, callbackDone){
+  const query = {
+    match: {
+      title: text
+    }
+  };
+  wiki_indices.forEach(index => this.query(index, query, callback));
+  callbackDone(null);
 };
 
 /**
@@ -58,6 +79,21 @@ module.exports.close = function(callback){
   callback(null);
 };
 
+/**
+ *
+ * @param index
+ * @param type
+ * @param id
+ * @param callback
+ */
+module.exports.get = function(index, type, id, callback){
+  esclient.get({
+    index: index,
+    type: type,
+    id: id
+  }, callback);
+};
+
 
 /**
  * @param index
@@ -65,26 +101,14 @@ module.exports.close = function(callback){
  * @param callback
  */
 module.exports.query = function(index, query, callback){
-  return callback(new Error('NOT YET IMPLEMENTED'), null);
-
-  // client.search({
-  //   index: 'myindex',
-  //   body: {
-  //     query: {
-  //       match: {
-  //         title: 'test'
-  //       }
-  //     },
-  //     facets: {
-  //       tags: {
-  //         terms: {
-  //           field: 'tags'
-  //         }
-  //       }
-  //     }
-  //   }
-  // }, function (error, response) {
-  //   // ...
-  // });
-
+  console.log(query);
+  esclient.search({
+    index: index,
+    body: {
+      query : query
+    }
+  }).then(
+    result => callback(null, result),
+    err => callback(err, null)
+  );
 };
