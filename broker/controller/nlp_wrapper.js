@@ -49,7 +49,7 @@ module.exports.analyze = function(text, contentType, source, callback) {
  * @param callbackDone = function(err)
  */
 module.exports.findNamedEntities = function(analysis, callbackStart, callbackIter, callbackDone) {
-  return explicitNLP.analyze(analysis, callbackStart, callbackIter, callbackDone);
+  return explicitNLP.findNamedEntities(analysis, callbackStart, callbackIter, callbackDone);
 };
 
 

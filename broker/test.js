@@ -94,6 +94,8 @@ console.log(j instanceof Analysis);
 console.log(j.annotations[0] instanceof Annotation);
 console.log(j.annotations[0].doffset[0] instanceof Offset);
 
+const k = Exception.fromError(new Error('dasdkba'), 'kjqebrhkwb');
+console.log(k)
 
 
 

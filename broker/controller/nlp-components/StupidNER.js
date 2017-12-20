@@ -72,6 +72,7 @@ module.exports = {
     ana.source = source;
     logger.info({text: text, contentType: contentType, source: source});
 
+    // currently ignores errors completely
     this.findNamedEntities(ana, () => {}, (err, anno) => {ana.annotations.push(anno);}, () => {});
 
     callback(null, ana);
