@@ -36,12 +36,12 @@ services:
   broker:
     image: node:9.2
     volumes:
-      - ${PWD}/broker:/opt/project
+      - ${PWD}/broker:/opt/project/broker
     ports:
       - 20000:10010
     networks:
       - anet
-    working_dir: /opt/project
+    working_dir: /opt/project/broker
     restart: unless-stopped
     healthcheck:
       test: curl 0.0.0.0:10010/ping
@@ -69,12 +69,13 @@ services:
   dummy:
     image: node:9.2
     volumes:
-      - ${PWD}/services/dummy:/opt/project
+      - ${PWD}/services/dummy:/opt/project/services/dummy
+      - ${PWD}/broker:/opt/project/broker
 #    ports:
 #      - 20010:10010
     networks:
       - anet
-    working_dir: /opt/project
+    working_dir: /opt/project/dummy
     entrypoint:
       - /bin/sh
       - -c

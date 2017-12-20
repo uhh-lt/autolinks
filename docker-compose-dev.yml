@@ -40,7 +40,7 @@ services:
   broker:
     image: remstef/node-swagger:latest
     volumes:
-      - ${PWD}/broker:/opt/project
+      - ${PWD}/broker:/opt/project/broker
     ports:
       - 10000:10010
       - 3000:3001
@@ -48,7 +48,7 @@ services:
       - anet
     stdin_open: true
     tty: true
-    working_dir: /opt/project
+    working_dir: /opt/project/broker
     entrypoint: bash
     environment:
       - NODE_ENV=development
@@ -84,7 +84,8 @@ services:
   dummy:
     image: remstef/node-swagger:latest
     volumes:
-      - ${PWD}/services/dummy:/opt/project
+      - ${PWD}/services/dummy:/opt/project/services/dummy
+      - ${PWD}/broker:/opt/project/broker
     ports:
       - 10010:10010
       - 3010:3001
@@ -92,7 +93,7 @@ services:
       - anet
     stdin_open: true
     tty: true
-    working_dir: /opt/project
+    working_dir: /opt/project/services/dummy
     entrypoint: bash
     environment:
       - NODE_ENV=development

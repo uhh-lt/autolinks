@@ -41,13 +41,13 @@ module.exports = {
 function doSomething(req, res, next) {
   // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
   const service_parameter = req.swagger.params.data.value;
-  if(!service_parameter){
+  if(!service_parameter) {
     return res.status(500).end('No data object provided.', next);
   }
-  if(!service_parameter.focus){
+  if(!service_parameter.focus) {
     return res.status(500).end("Parameter 'focus' (DOffset) missing.", next);
   }
-  if(!service_parameter.context){
+  if(!service_parameter.context) {
     return res.status(500).end("Parameter 'context' (Analysis) missing.", next);
   }
 

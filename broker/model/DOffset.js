@@ -51,7 +51,7 @@ DOffset.prototype.deepAssign = function(obj) {
  * @param obj
  * @returns {DOffset}
  */
-Offset.prototype.assign = function(obj) {
+DOffset.prototype.assign = function(obj) {
   return Object.assign(this, obj);
 };
 
