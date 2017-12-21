@@ -112,7 +112,7 @@ module.exports.transformSearchResults = function(text, searchResult){
             )
           ).value()
         ).concat(
-          _(h._source.redirects).map(r =>
+          _(h._source.redirect).map(r =>
             new Triple(
               h._id,
               'has_redirect',
@@ -159,7 +159,7 @@ module.exports.query = function(index, query, offset, limitResults, callback, ca
     query : query,
     from : offset,
     size : limitResults,
-    _source: ['title', 'category']
+    _source: ['title', 'category', 'redirect']
   };
   logger.debug('Query: ', queryBody);
 
