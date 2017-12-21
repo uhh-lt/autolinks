@@ -120,6 +120,7 @@ services:
       - LOGLEVEL=debug
       - COOKIE_SECRET=YOUR_COOKIE_SECRET
       - ELASTICSEARCH_URLS=http://elasticsearch:9200
+      - ELASTICSEARCH_VERSION=5.5
       - ELASTICSEARCH_INDICES=simplewiki
 #      - ELASTICSEARCH_URLS=http://ltdocker.informatik.uni-hamburg.de:10004
 #      - ELASTICSEARCH_INDICES=enwiki,wikidata,enwiktionary
@@ -173,6 +174,6 @@ services:
     networks:
       - anet
     depends_on:
-      elasticsearch:
+      es:
         condition: service_healthy
   # END: wikiservice

@@ -20,17 +20,30 @@ module.exports.findArticles = function(req, res, next) {
     const text = serviceParameter.focus.getText(serviceParameter.context.text);
 
     // query elastic search
+    res.header('Content-Type', 'application/json; charset=utf-8');
+    let writtenAtLeastOneResult = false;
     es.search(
       text,
       function(err, result){
+        if (writtenAtLeastOneResult) {
+          res.write(',');
+        } else {
+          res.write('[');
+        }
         if (err) {
           const exc = Exception.fromError(err, 'Failed to query elasticsearch.', { serviceParameter : serviceParameter, text : text });
           logger.warn(exc.message, exc);
-          return exc.handleResponse(res);
+          exc.handleResponse(res);
         }
-        res.header('Content-Type', 'application/json; charset=utf-8');
-        res.write(JSON.stringify(es.transformSearchResults(text, result)));
-        // res.json(es.transformSearchResults(text, result));
+
+        res.write(
+          es.transformSearchResults(text, result)
+            .map(triple => JSON.stringify(triple))
+            .join(',')
+        );
+
+        writtenAtLeastOneResult = true;
+
       },
       function(err){
         if(err){
@@ -38,7 +51,7 @@ module.exports.findArticles = function(req, res, next) {
           logger.warn(exc.message, exc);
           exc.handleResponse(res);
         }
-        res.end(next);
+        res.end(']', next);
       }
     );
   });

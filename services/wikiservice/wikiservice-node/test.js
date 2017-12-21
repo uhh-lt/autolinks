@@ -31,7 +31,6 @@ es.search(
     if(err){
       console.log(err);
     }
-
   }
 );
 

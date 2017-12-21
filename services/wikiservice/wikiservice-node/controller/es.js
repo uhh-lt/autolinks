@@ -19,6 +19,9 @@ module.exports.init = function (callback) {
   const es_urls =  (process.env.ELASTICSEARCH_URLS || 'http://elasticsearch:9200').split(/,/);
   logger.info(`Using the follwing elasticsearch nodes: '${JSON.stringify(es_urls)}'`);
 
+  const es_version = process.env.ELASTICSEARCH_VERSION || '5.5';
+  logger.info(`Using the follwing elasticsearch nodes: '${JSON.stringify(es_urls)}'`);
+
   (process.env.ELASTICSEARCH_INDICES || '')
     .split(/,/)
     .map(x => x.trim())
@@ -29,7 +32,7 @@ module.exports.init = function (callback) {
   try {
     esClient = new elasticsearch.Client({
       hosts: es_urls,
-      apiVersion: '5.5',
+      apiVersion: es_version,
       // sniffOnStart: true,
       // sniffInterval: 20000,
     });
@@ -67,13 +70,18 @@ module.exports.ping = function(callback){
  * @param callbackDone
  */
 module.exports.search = function(text, callback, callbackDone) {
-  // const query = { query_string: { query: `title:"${text}"` } };
-  const query = { term : { title : text } };
-  // _(esIndices)
-  //   .forEach(index => this.query(index, query, 0, 1, callback));
-    // .done(() => callbackDone(null));
-  // TODO: this currently only queries the first index in the list
-  this.query(esIndices[0], query, 0, 1, callback, callbackDone);
+  const query = { query_string: { query: `title:(${text})` } };
+  // const query = { term : { title : text } };
+  (function searchRecursive(i){
+    module.exports.query(esIndices[i], query, 0, 2, callback, () => {
+      if(esIndices > 0) {
+        return searchRecursive(i-1);
+      }
+      callbackDone(null);
+    });
+  })(esIndices.length-1);
+
+
 };
 
 module.exports.transformSearchResults = function(text, searchResult){
@@ -156,15 +164,14 @@ module.exports.query = function(index, query, offset, limitResults, callback, ca
   logger.debug('Query: ', queryBody);
 
   esClient.search({
-    index: index,
+    index: index, //esIndices, //index
     body: queryBody
   }).then(
     result => {
-      logger.debug(`Found ${result.hits.total} hits.`);
+      logger.debug(`Found ${result.hits.total} hits for '${index}', returning ${limitResults}.`);
       callback(null, result);
     },
     err => callback(err, null)
-
   ).then(
     result => callbackDone(null, result),
     err => callbackDone(err, null)
