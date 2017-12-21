@@ -117,11 +117,14 @@ services:
     entrypoint: bash
     environment:
       - NODE_ENV=development
+      - LOGLEVEL=debug
       - COOKIE_SECRET=YOUR_COOKIE_SECRET
       - ELASTICSEARCH_URLS=http://elasticsearch:9200
+      - ELASTICSEARCH_INDICES=simplewiki
 #      - ELASTICSEARCH_URLS=http://ltdocker.informatik.uni-hamburg.de:10004
+#      - ELASTICSEARCH_INDICES=enwiki,wikidata,enwiktionary
 
-  elasticsearch:
+  es:
     image: custom-elasticsearch:5.5.2
     build:
       context: services/wikiservice/es
@@ -152,7 +155,9 @@ services:
       - ${PWD}/services/wikiservice/esdata:/usr/share/elasticsearch/data
       #- ${PWD}/es/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
     networks:
-      - anet
+      anet:
+        aliases:
+          - elasticsearch
     healthcheck:
       test: curl --silent --fail 'localhost:9200/_cluster/health' || exit 1
       interval: 5s

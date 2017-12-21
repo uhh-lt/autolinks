@@ -10,6 +10,7 @@
   "dependencies": {
     "elasticsearch": "^14.0.0",
     "express": "^4.12.3",
+    "lodash": "^4.17.4",
     "node-cleanup": "^2.1.2",
     "request": "^2.83.0",
     "swagger-express-mw": "^0.1.0",

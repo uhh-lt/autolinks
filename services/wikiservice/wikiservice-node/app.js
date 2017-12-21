@@ -14,7 +14,7 @@ const SwaggerExpress = require('swagger-express-mw'),
   nodeCleanup = require('node-cleanup'),
   os = require('os'),
   fs = require('fs'),
-  esclient = require('./controller/esclient'),
+  es = require('./controller/es'),
   logger = require('../../../broker/controller/log')(module),
   request = require('request')
 ;
@@ -26,7 +26,7 @@ if (!fs.existsSync(datadir)) { fs.mkdirSync(datadir); }
 /**
  * init connections
  */
-esclient.init(function(err){
+es.init(function(err){
   if(err){
     logger.error(err);
     process.exit(1);

@@ -2,7 +2,7 @@
 
 const
   Exception = require('../../../../../broker/model/Exception'),
-  esclient = require('../../controller/esclient'),
+  es = require('../../controller/es'),
   logger = require('../../../../../broker/controller/log'),
   request = require('request');
 
@@ -14,7 +14,7 @@ const
  */
 module.exports.ping = function (req, res, next) {
 
-  esclient.ping(function(err){
+  es.ping(function(err){
     if(err) {
       return Exception
         .fromError(err, 'Elasticsearch is not available.')
