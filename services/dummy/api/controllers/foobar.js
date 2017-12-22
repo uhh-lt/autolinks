@@ -57,27 +57,31 @@ module.exports.baz = function(req, res, next) {
     // this is required
     const username = req.swagger.params.username.value;
 
-    const triples = [{
-      subject: [{
-        subject: username,
-        predicate: 'is same as',
-        object: [{
-          subject: etext,
-          predicate: 'is a',
-          object: 'human',
-        }]
-      }],
-      predicate: [{
-        subject: 'says',
-        predicate: 'is similar to',
-        object: 'shout',
-      }],
-      object: [{
-        subject: 'hello',
-        predicate: 'is not',
-        object: 'goodbye',
-      }]
-    }];
+    const triples =
+      [
+        {
+          subject: [{
+            subject: username,
+            predicate: 'is same as',
+            object: [{
+              subject: etext,
+              predicate: 'is a',
+              object: 'human',
+            }]
+          }],
+          predicate: 'says',
+          object: [{
+            subject: 'hello',
+            predicate: 'is not',
+            object: 'goodbye',
+          }]
+        },
+        {
+          subject: 'says',
+          predicate: 'is similar to',
+          object: 'shout',
+        }
+      ];
 
     // this sends back a JSON response and ends the response
     res.header('Content-Type', 'application/json; charset=utf-8');
