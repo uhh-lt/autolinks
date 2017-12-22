@@ -83,5 +83,7 @@ module.exports.baz = function(req, res, next) {
     res.header('Content-Type', 'application/json; charset=utf-8');
     res.json(triples);
     res.end(next);
+
   });
+
 };
