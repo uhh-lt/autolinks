@@ -48,7 +48,7 @@ function doSomething(req, res, next) {
     }
 
     // get the text for the offset
-    const text = serviceParameter.focus.getText(serviceParameter.context.text);
+    const text = serviceParameter.focus.getText(serviceParameter.context.text) || 'Simon';
     const triples = [{
       subject: text,
       predicate: 'says',
