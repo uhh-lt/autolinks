@@ -13,11 +13,18 @@ app.use(express.static(__dirname + '/public')); 		// set the static files locati
 app.use(express.static(__dirname + '/assets'));
 app.use('/assets', express.static(__dirname + '/assets/'));
 
+app.set('view engine', 'ejs');
+app.set('views', __dirname + '/public');
+
 // start server
 var server = app.listen(port, function () {
     console.log('Server listening at http://' + server.address().address + ':' + server.address().port);
 });
 
 // routes ==================================================
+app.use('/login', require('./controllers/loginController'));
+app.get('/', function (req, res) {
+    res.redirect('/login'); // load the single view file (angular will handle the page changes on the front-end)
+});
 
 require('app/routes')(app); // pass our application into our routes

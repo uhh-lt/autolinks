@@ -5,13 +5,14 @@ var config = require('config.json');
 
 router.get('/', function (req, res) {
     // log user out
-    delete req.session.token;
+    // delete req.session.token;
 
     // move success message into local variable so it only appears once (single read)
-    var viewData = { success: req.session.success };
-    delete req.session.success;
+    // var viewData = { success: req.session.success };
+    // delete req.session.success;
 
-    res.render('login', viewData);
+    // res.render('login', viewData);
+    res.render('login');
 });
 
 router.post('/', function (req, res) {
