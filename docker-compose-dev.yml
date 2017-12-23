@@ -55,26 +55,24 @@ services:
       - COOKIE_SECRET=YOUR_COOKIE_SECRET
       - LOGLEVEL=debug
 
-  brokermysqlserver:
+  mysql:
     image: "mysql:5.7"
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=yes
       - MYSQL_DATABASE=autolinks
       - MYSQL_USER=autolinks
       - MYSQL_PORT=3306
-      - MYSQL_PASSWORD=autolinks
+      - MYSQL_PASSWORD=autolinks1
     volumes:
       - ${PWD}/broker-mysql-data:/var/lib/mysql
     command: ["--character-set-server=utf8", "--collation-server=utf8_bin"]
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-pautolinks", "-uautolinks"]
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-pautolinks1", "-uautolinks"]
       interval: 20s
       timeout: 10s
       retries: 3
     networks:
-      anet:
-        aliases:
-          - mysql
+      - anet
   # END: broker
 
   ##
