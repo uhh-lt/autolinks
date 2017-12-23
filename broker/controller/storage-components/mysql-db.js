@@ -6,22 +6,26 @@ const
   nodeCleanup = require('node-cleanup'),
   mysql = require('mysql'),
   Exception = require('../../model/Exception'),
+  Triple = require('../../model/Triple'),
   logger = require('../log')(module);
 
-// try connectiontring: 'mysql://user:pass@host/db?debug=true&charset=BIG5_CHINESE_CI&timezone=-0700&connectionlimit=100'
-const pool = mysql.createPool({
-  connectionLimit : 100, //important
-  host     : process.env.MYSQLHOST || 'localhost',
-  user     : 'autolinks',
-  password : 'autolinks',
-  database : 'autolinks',
-  debug    :  false
-});
+// try connectiontring:
+const connectionString = process.env.MYSQL || 'mysql://autolinks:autolinks1@mysql/autolinks?debug=false&connectionLimit=100';
+const pool = mysql.createPool(connectionString);
+// const pool = mysql.createPool({
+//   connectionLimit : 100, //important
+//   host     : process.env.MYSQLHOST || 'mysql',
+//   user     : 'autolinks',
+//   password : 'autolinks1',
+//   database : 'autolinks',
+//   debug    :  false
+// });
+logger.info(`Using ${pool.config.connectionLimit} connections.`);
 
 module.exports.init = function(callback) {
 
   // read the script
-  fs.readFile('config/userdb-schema.sql', 'utf8', function (err,data) {
+  fs.readFile('config/storagedb-schema.mysql.sql', 'utf8', function (err,data) {
     if (err) {
       return callback(err);
     }
@@ -35,7 +39,9 @@ module.exports.init = function(callback) {
     // split the queries
     const queries = data.split(/;/g);
 
-    queries.forEach((query) => {
+    queries
+      .filter(query => query.length > 0)
+      .forEach((query) => {
 
       pool.getConnection(function (err, connection) {
         if (err) {
@@ -66,9 +72,52 @@ module.exports.read = function(username, storagekey, callback) {
   return callback(new Exception('NOT YET IMPLEMENTED'));
 };
 
-module.exports.write = function(username, storagekey, storagevalue, callback) {
+module.exports.write = function(username, storagekey, triples, callback) {
+  triples.forEach(triple => {
+    const t = Triple.asTriple(triple);
+    // save
+    // triple.subject;
+    // triple.object;
+    // triple.predicate
+
+
+    if(Array.isArray(triple)){
+
+    } else {
+
+    }
+
+  });
+
   return callback(new Exception('NOT YET IMPLEMENTED'));
 };
+
+function saveResource(resource, callback) {
+  pool.getConnection(function(err, connection){
+    if (err) {
+      return callback(Exception.fromError(err, 'Could not establish connection to database.', {resource: resource}), null);
+    }
+    logger.debug(`Connected to DB with id ${connection.threadId}`);
+
+    // do the query
+    connection.query('insert into resources() where resource = ?', [resource], function(err,rows) {
+      connection.release();
+      if(err) {
+        return callback(Exception.fromError(err, 'Could not query database.', {resource: resource}), null);
+
+      }
+      return callback(null, rows);
+    });
+
+    connection.on('error', function(err) {
+      const newerr = new Error('Error connecting to database.');
+      newerr.cause = err;
+      return callback(newerr, null);
+    });
+  });
+
+
+}
 
 module.exports.info = function(username, callback) {
   return callback(new Exception('NOT YET IMPLEMENTED'));

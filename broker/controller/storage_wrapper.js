@@ -13,9 +13,7 @@ const explicitStorage  = (() => {
   switch (process.env.STORAGE) {
     case 'mysql':
       logger.info('Using mysql-db');
-      return require('./storage-components/mysql-db')({
-
-      });
+      return require('./storage-components/mysql-db');
     case 'none': // fall-through
     case '/dev/null': // fall-through
     default:

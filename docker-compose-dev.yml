@@ -53,6 +53,8 @@ services:
     environment:
       - NODE_ENV=development
       - COOKIE_SECRET=YOUR_COOKIE_SECRET
+      - STORAGE=mysql
+      - MYSQL=mysql://autolinks:autolinks1@mysql/autolinks?debug=false&connectionLimit=100
       - LOGLEVEL=debug
 
   mysql:

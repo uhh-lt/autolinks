@@ -48,4 +48,11 @@ Triple.prototype.assign = function(obj) {
   return Object.assign(this, obj);
 };
 
+Triple.asTriple = function(obj){
+  if(obj instanceof Triple){
+    return obj;
+  }
+  return new Triple().assign(obj);
+};
+
 
