@@ -12,15 +12,23 @@ const
 // try connectiontring:
 const connectionString = process.env.MYSQL || 'mysql://autolinks:autolinks1@mysql/autolinks?debug=false&connectionLimit=100';
 const pool = mysql.createPool(connectionString);
-// const pool = mysql.createPool({
-//   connectionLimit : 100, //important
-//   host     : process.env.MYSQLHOST || 'mysql',
-//   user     : 'autolinks',
-//   password : 'autolinks1',
-//   database : 'autolinks',
-//   debug    :  false
-// });
 logger.info(`Using ${pool.config.connectionLimit} connections.`);
+
+function withConnection(callback) {
+  pool.getConnection(function (err, connection) {
+    if (err) {
+      return callback(Exception.fromError(err, 'Could not establish connection to database.'), null);
+    }
+
+    callback(null, connection);
+
+    connection.on('error', function (err) {
+      return callback(Exception.fromError(err, 'Error connecting to database.'), null);
+    });
+
+  });
+}
+
 
 module.exports.init = function(callback) {
 
@@ -29,41 +37,37 @@ module.exports.init = function(callback) {
     if (err) {
       return callback(err);
     }
-
     // need to load sql script manually
 
     // remove comments
     data = data.replace(/--.*$/gm, '');
-    // remove newlines
-    data = data.replace(/\n/gm, '');
+    // remove DELEMITER LINES
+    data = data.replace(/^DELIMITER.*$/gm, '');
+    // remove new DELEMITERS
+    data = data.replace(/\/\//gm, '');
+    // // remove newlines
+    // data = data.replace(/\n/gm, '');
     // split the queries
-    const queries = data.split(/;/g);
+    const queries = data.split(/\n\n/g);
 
     queries
+      .map(query => query.trim())
       .filter(query => query.length > 0)
-      .forEach((query) => {
-
-      pool.getConnection(function (err, connection) {
-        if (err) {
-          return callback(Exception.fromError(err, 'Could not establish connection to database.'), null);
-        }
-        logger.debug(`Connected to DB with id ${connection.threadId}`);
-
-        connection.query(query, function (err, rows) {
-          connection.release();
-          if (err) {
-            return callback(Exception.fromError(err, `Could not execute query: ${query}.`), null);
+      .forEach(query => {
+        withConnection(function(err, connection) {
+          if(err){
+            return callback(err);
           }
-          return callback(null, rows);
-        });
-        connection.on('error', function (err) {
-          return callback(Exception.fromError(err, 'Error connecting to database.'), null);
-        });
-
-      }); // end pool.getConnection
-
-    }); // queries.forEach
-
+          logger.debug(`Connected to DB with id ${connection.threadId}`);
+          connection.query({sql: query, multipleStatements: true}, function (err, rows) {
+            connection.release();
+            if (err) {
+              return callback(Exception.fromError(err, `Could not execute query: ${query}.`), null);
+            }
+            return callback(null, rows);
+          });
+        }); // end withConnection
+      }); // queries.forEach
   }); // end fs.readFile
 
 };
@@ -74,14 +78,14 @@ module.exports.read = function(username, storagekey, callback) {
 
 module.exports.write = function(username, storagekey, triples, callback) {
   triples.forEach(triple => {
-    const t = Triple.asTriple(triple);
+    const tripleObj = Triple.asTriple(triple);
     // save
     // triple.subject;
     // triple.object;
     // triple.predicate
 
 
-    if(Array.isArray(triple)){
+    if (Array.isArray(triple)) {
 
     } else {
 
@@ -92,30 +96,40 @@ module.exports.write = function(username, storagekey, triples, callback) {
   return callback(new Exception('NOT YET IMPLEMENTED'));
 };
 
-function saveResource(resource, callback) {
-  pool.getConnection(function(err, connection){
-    if (err) {
-      return callback(Exception.fromError(err, 'Could not establish connection to database.', {resource: resource}), null);
+function saveTriple(triple, callback) {
+
+  withConnection(function(err, connection) {
+    if(err){
+      return callback(err);
     }
     logger.debug(`Connected to DB with id ${connection.threadId}`);
-
     // do the query
-    connection.query('insert into resources() where resource = ?', [resource], function(err,rows) {
+    connection.query('select add_resource(?)', [resource], function(err,rows) {
       connection.release();
       if(err) {
-        return callback(Exception.fromError(err, 'Could not query database.', {resource: resource}), null);
-
+        return callback(Exception.fromError(err, `Could not add resource '${resource}' database.`, {resource: resource}), null);
       }
-      return callback(null, rows);
-    });
-
-    connection.on('error', function(err) {
-      const newerr = new Error('Error connecting to database.');
-      newerr.cause = err;
-      return callback(newerr, null);
+      return callback(null, rows.rid);
     });
   });
 
+}
+
+function saveResource(resource, callback) {
+  withConnection(function(err, connection) {
+    if(err){
+      return callback(err);
+    }
+    logger.debug(`Connected to DB with id ${connection.threadId}`);
+    // do the query
+    connection.query('select add_resource(?)', [resource], function(err,rows) {
+      connection.release();
+      if(err) {
+        return callback(Exception.fromError(err, `Could not add resource '${resource}' database.`, {resource: resource}), null);
+      }
+      return callback(null, rows.rid);
+    });
+  });
 
 }
 
@@ -126,29 +140,17 @@ module.exports.info = function(username, callback) {
 
 
 function get_entry(username, servicekey, callback) {
-  pool.getConnection(function(err, connection){
-    if (err) {
-      const newerr = new Error('Could not establish connection to database.');
-      newerr.cause = err;
-      return callback(newerr, null);
+  withConnection(function(err, connection) {
+    if(err){
+      return callback(err);
     }
-    logger.debug(`Connected to DB with id ${connection.threadId}`);
-
     // do the query
     connection.query('select * from data where username = ? and servicekey = ?', [username, servicekey], function(err,rows) {
       connection.release();
       if(err) {
-        const newerr = new Error(`Could not get entry for user ${username}, and servicekey ${servicekey} from database.`);
-        newerr.cause = err;
-        return callback(newerr, null);
+        return callback(Exception.fromError(err, `Could not get entry for user ${username}, and servicekey ${servicekey} from database.`));
       }
       return callback(null, rows);
-    });
-
-    connection.on('error', function(err) {
-      const newerr = new Error('Error connecting to database.');
-      newerr.cause = err;
-      return callback(newerr, null);
     });
   });
 }
