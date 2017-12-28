@@ -10,8 +10,8 @@ const
   utils = require('../utils/utils'),
   logger = require('../log')(module);
 
-// try connectiontring:
-const connectionString = process.env.MYSQL || 'mysql://autolinks:autolinks1@mysql/autolinks?debug=false&connectionLimit=100';
+// connection string: mysql://user:pass@host:port/database?optionkey=optionvalue&optionkey=optionvalue&...
+const connectionString = process.env.MYSQL || 'mysql://autolinks:autolinks1@mysql:3306/autolinks?debug=false&connectionLimit=100';
 const pool = mysql.createPool(connectionString);
 logger.info(`Using ${pool.config.connectionLimit} connections.`);
 
@@ -46,7 +46,6 @@ function promisedQuery(query, values){
         }
         return resolve({rows: rows, fields: fields});
       });
-
     });
   });
 }
@@ -81,9 +80,6 @@ module.exports.init = function(callback) {
       );
 
   }); // end fs.readFile
-
-  // wait some milliseconds for the queries to finish
-  // utils.pause(2000);
 
 };
 
@@ -145,11 +141,11 @@ module.exports.saveResource = function(resource) {
 
 function saveResourceString(resource) {
   return new Promise((resolve, reject) => {
-    logger.debug(`Saving resource ${resource}.`)
+    logger.debug(`Saving resource ${resource}.`);
     promisedQuery('select add_resource(?) as rid', [resource]).then(
       res => {
         const rid = res.rows[0].rid;
-        logger.debug(`Successfully saved resource '${resource}' with id ${rid}.`)
+        logger.debug(`Successfully saved resource '${resource}' with id ${rid}.`);
         return resolve(rid);
       },
       err => reject(err)
@@ -160,22 +156,6 @@ function saveResourceString(resource) {
 module.exports.info = function(username, callback) {
   return callback(new Exception('NOT YET IMPLEMENTED'));
 };
-
-function get_entry(username, servicekey, callback) {
-  withConnection(function(err, connection) {
-    if(err){
-      return callback(err);
-    }
-    // do the query
-    connection.query('select * from data where username = ? and servicekey = ?', [username, servicekey], function(err,rows) {
-      connection.release();
-      if(err) {
-        return callback(Exception.fromError(err, `Could not get entry for user ${username}, and servicekey ${servicekey} from database.`));
-      }
-      return callback(null, rows);
-    });
-  });
-}
 
 module.exports.close = function(callback){
   pool.end(function (err) {
