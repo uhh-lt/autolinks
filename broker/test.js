@@ -117,22 +117,43 @@ mysqldb.init((err, r) => {
 //
 // const y = mysqldb.saveTriple(new Triple('You', 'save', 'the world'));
 //
-  const z = mysqldb.saveResource([
-    new Triple('I', 'save', [
-      new Triple('I', [ new Triple('You', 'saved', 'me') ], 'you')
-    ]),
-    new Triple('You', 'save', 'the world'),
-    new Triple('He', 'save', 'the world'),
-  ]);
+//   const z = mysqldb.saveResource([
+//     new Triple('I', 'save', [
+//       new Triple('I', [ new Triple('You', 'saved', 'me') ], 'you')
+//     ]),
+//     new Triple('You', 'save', 'the world'),
+//     new Triple('He', 'save', 'the world'),
+//   ]);
+//
+//   setTimeout(function(){
+//     console.log(z);
+//   }, 1000);
+
+  // mysqldb.saveResourceTripleMapping(23,231).then(console.log,console.error);
+  // mysqldb.saveStorageResourceMapping(23,21).then(console.log,console.error);
+  // mysqldb.saveToStorage('me','asdjbao').then(console.log, console.error);
 
 
-  setTimeout(function(){
-    console.log(z);
-  }, 1000);
+
+  mysqldb.write('me', 'aiugfq',
+    [
+      new Triple('I', 'save', [
+        new Triple('I', [ new Triple('You', 'saved', 'me') ], 'you')
+      ]),
+      new Triple('You', 'save', 'the world'),
+      new Triple('He', 'save', 'me'),
+      new Triple('ME', 'save', 'He'),
+    ], function(err, res) {
+      if(err){
+        return console.log(err);
+      }
+      return console.log(res);
+    });
+
 
   setTimeout(function(){
     mysqldb.close((err) => {});
-  }, 10000);
+  }, 3000);
 
 });
 

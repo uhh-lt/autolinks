@@ -40,16 +40,16 @@ CREATE TABLE IF NOT EXISTS storage (
 ) ENGINE=MyISAM;
 
 
-CREATE TABLE IF NOT EXISTS storageToTriples (
+CREATE TABLE IF NOT EXISTS storageToResource (
   sid int unsigned NOT NULL AUTO_INCREMENT,
-  tid int unsigned NOT NULL,
-  PRIMARY KEY (sid, tid),
+  rid int unsigned NOT NULL,
+  PRIMARY KEY (sid, rid),
   KEY (sid),
-  KEY (tid)
+  KEY (rid)
 ) ENGINE=MyISAM;
 
 
-drop function if exists add_triple_to_storage;
+drop function if exists add_resource_to_triple_mapping;
 
 
 drop function if exists add_child_to_resource;
@@ -67,71 +67,37 @@ drop function if exists add_resource;
 drop function if exists add_triple;
 
 
+drop function if exists add_storage_to_resource_mapping;
+
+
 DELIMITER //
 
 
-create function add_triple_to_storage (
-  sid int unsigned, tid int unsigned)
-RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
-BEGIN
-  declare mapping_exists tinyint default 0;
-  select count(*) > 0 into mapping_exists from storageToTriples where sid = sid and tid = tid limit 1;
-  if not mapping_exists then
-    insert into storageToTriples set sid = sid, tid = tid;
-  end if;
-  return mapping_exists;
-END //
-
-
-create function add_child_to_resource (
-  rid int unsigned, tid int unsigned)
-RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
-BEGIN
-  declare mapping_exists int unsigned default 0;
-  -- check for existence
-  select count(*) > 0 into mapping_exists from resourceToTriples where rid = rid and tid = tid limit 1;
-  if not mapping_exists then
-    insert into resourceToTriples set rid = rid, tid = tid;
-  end if;
-  return mapping_exists;
-END //
-
-
 create function add_to_storage (
-  username varchar(32), storagekey varchar(512))
+  username_ varchar(32), storagekey_ varchar(512))
 RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
 BEGIN
   declare sid_ int unsigned default 0;
-  select sid into sid_ from storage where username = username and storagekey = storagekey limit 1;
+  select sid into sid_ from storage where username = username_ and storagekey = storagekey_ limit 1;
   if sid_ = 0 then
-    insert into storage set username = username, storagekey = storagekey;
+    insert into storage set username = username_, storagekey = storagekey_;
     select LAST_INSERT_ID() into sid_;
   end if;
   return sid_;
 END //
 
 
-create function add_triple_complete (
-  subject varchar(512), predicate varchar(512), object varchar(512))
-RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
-BEGIN
-  declare tid_, rid_s, rid_p, rid_o int unsigned default 0;
-  select add_resource(subject) into rid_s;
-  select add_resource(predicate) into rid_p;
-  select add_resource(object) into rid_o;
-  select add_triple(rid_s, rid_p, rid_o) into tid_;
-  return tid_;
-END //
-
-
 create function add_resource (
-  surface_form varchar(512))
+  surfaceform_ varchar(512))
 RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
 BEGIN
   declare rid_ int unsigned default 0;
-  select rid into rid_ from resources where surfaceform = surface_form limit 1;
-  if rid_ = 0 or surface_form is NULL then
-    insert into resources set surfaceform = surface_form;
+  if surfaceform_ is NULL then
+    return rid_;
+  end if;
+  select rid into rid_ from resources where surfaceform = surfaceform_ limit 1;
+  if rid_ = 0 then
+    insert into resources set surfaceform = surfaceform_;
     select LAST_INSERT_ID() into rid_;
   end if;
   return rid_;
@@ -149,6 +115,33 @@ BEGIN
     select LAST_INSERT_ID() into tid_;
   end if;
   return tid_;
+END //
+
+
+create function add_resource_to_triple_mapping (
+  rid_ int unsigned, tid_ int unsigned)
+RETURNS tinyint DETERMINISTIC MODIFIES SQL DATA
+BEGIN
+  declare mapping_exists tinyint default 0;
+  -- check for existence
+  select count(*) > 0 into mapping_exists from resourceToTriples where rid = rid_ and tid = tid_ limit 1;
+  if not mapping_exists then
+    insert into resourceToTriples set rid = rid_, tid = tid_;
+  end if;
+  return mapping_exists;
+END //
+
+
+create function add_storage_to_resource_mapping (
+  sid_ int unsigned, rid_ int unsigned)
+RETURNS tinyint DETERMINISTIC MODIFIES SQL DATA
+BEGIN
+  declare mapping_exists tinyint default 0;
+  select count(*) > 0 into mapping_exists from storageToResource where sid = sid_ and rid = rid_ limit 1;
+  if not mapping_exists then
+    insert into storageToResource set sid = sid_, rid = rid_;
+  end if;
+  return mapping_exists;
 END //
 
 

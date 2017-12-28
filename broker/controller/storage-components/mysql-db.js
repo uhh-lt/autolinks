@@ -88,7 +88,13 @@ module.exports.read = function(username, storagekey, callback) {
 };
 
 module.exports.write = function(username, storagekey, triples, callback) {
-  return callback(new Exception('NOT YET IMPLEMENTED'));
+  return this.saveResource(triples)
+    .then(rid => this.saveToStorage(username, storagekey).then(sid => {return {sid:sid, rid:rid};}))
+    .then(ids => this.saveStorageResourceMapping(ids.sid, ids.rid))
+    .then(
+      res => callback(null, res),
+      err => callback(err, null)
+    );
 };
 
 /**
@@ -132,15 +138,17 @@ module.exports.saveResource = function(resource) {
         tids => {
           logger.debug(`Saved triples ${tids}.`);
           const metaresource = 'l:[' + tids.join(',') + ']';
-          return this.saveResource(metaresource);
+          return this.saveResource(metaresource).then(rid => {return {rid: rid, tids: tids};});
         }
+      ).then(
+        ids => Promise.all(ids.tids.map(tid => this.saveResourceTripleMapping(ids.rid, tid))).then(ignore_ => ids.rid)
       );
   }
   // promise to save the resource (this is the recursion anchor)
-  return saveResourceString(resource);
+  return this.saveResourceString(resource);
 };
 
-function saveResourceString(resource) {
+module.exports.saveResourceString = function(resource) {
   return new Promise((resolve, reject) => {
     logger.debug(`Saving resource ${resource}.`);
     promisedQuery('select add_resource(?) as rid', [resource]).then(
@@ -153,6 +161,48 @@ function saveResourceString(resource) {
     );
   });
 }
+
+module.exports.saveToStorage = function(username, storagekey) {
+  return new Promise((resolve, reject) => {
+    logger.debug(`Saving storage '${storagekey}' for user '${username}'.`);
+    promisedQuery('select add_to_storage(?,?) as sid', [username, storagekey]).then(
+      res => {
+        const sid = res.rows[0].sid;
+        logger.debug(`Successfully saved storgae '${storagekey}' for user '${username}'.`);
+        return resolve(sid);
+      },
+      err => reject(err)
+    );
+  });
+};
+
+module.exports.saveStorageResourceMapping = function(sid, rid) {
+  return new Promise((resolve, reject) => {
+    logger.debug(`Saving storage resource mapping (${sid},${rid}).`);
+    promisedQuery('select add_storage_to_resource_mapping(?,?) as mapping_exists', [sid, rid]).then(
+      res => {
+        const mapping_existed = res.rows[0].mapping_exists;
+        logger.debug(`Successfully saved storage-resource mapping (${sid},${rid}). Existed before: ${mapping_existed}.`);
+        return resolve(mapping_existed);
+      },
+      err => reject(err)
+    );
+  });
+};
+
+module.exports.saveResourceTripleMapping = function(rid, tid) {
+  return new Promise((resolve, reject) => {
+    logger.debug(`Saving resource triple mapping (${rid},${tid}).`);
+    promisedQuery('select add_resource_to_triple_mapping(?,?) as mapping_exists', [rid, tid]).then(
+      res => {
+        const mapping_existed = res.rows[0].mapping_exists;
+        logger.debug(`Successfully saved resource-triple mapping (${rid},${tid}). Existed before: ${mapping_existed}.`);
+        return resolve(mapping_existed);
+      },
+      err => reject(err)
+    );
+  });
+};
 
 module.exports.info = function(username, callback) {
   return callback(new Exception('NOT YET IMPLEMENTED'));
