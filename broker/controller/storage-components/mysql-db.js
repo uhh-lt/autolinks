@@ -131,7 +131,8 @@ module.exports.saveResource = function(resource) {
       .then(
         tids => {
           logger.debug(`Saved triples ${tids}.`);
-          return this.saveResource(null);
+          const metaresource = 'l:[' + tids.join(',') + ']';
+          return this.saveResource(metaresource);
         }
       );
   }
