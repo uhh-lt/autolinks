@@ -84,7 +84,11 @@ module.exports.init = function(callback) {
 };
 
 module.exports.read = function(username, storagekey, callback) {
-  return callback(new Exception('NOT YET IMPLEMENTED'));
+  return this.getStorageResource(username, storagekey)
+    .then(
+      resource => callback(null, resource),
+      err => callback(err, null)
+    );
 };
 
 module.exports.write = function(username, storagekey, triples, callback) {
@@ -160,7 +164,7 @@ module.exports.saveResourceString = function(resource) {
       err => reject(err)
     );
   });
-}
+};
 
 module.exports.saveToStorage = function(username, storagekey) {
   return new Promise((resolve, reject) => {
@@ -202,6 +206,35 @@ module.exports.saveResourceTripleMapping = function(rid, tid) {
       err => reject(err)
     );
   });
+};
+
+module.exports.getResource = function(rid) {
+  return promisedQuery('select * from resources where rid = ?', [rid])
+    .then(res => {
+      const r = res.rows[0];
+      if(r.surfaceform.startsWith('l:[')) {
+        return promisedQuery('select * from resourceToTriples where rid = ?', rid)
+          .then(res => res.rows.map(r => r.tid))
+          .then(tids => Promise.all(tids.map(tid => this.getTriple(tid))))
+          .then(triples => triples);
+      }
+      return r.surfaceform;
+    });
+};
+
+module.exports.getTriple = function(tid) {
+  return promisedQuery('select * from triples where tid = ?;', [tid])
+    .then(res => res.rows[0])
+    .then(row => [row.s, row.p, row.o])
+    .then(rids => Promise.all(rids.map(rid => this.getResource(rid))))
+    // .catch(err => ['asd','asd','asd'])
+    .then(resources => new Triple(resources[0], resources[1], resources[2]));
+};
+
+module.exports.getStorageResource = function(username, storagekey) {
+  return promisedQuery('select rid from storage s, storageToResource s2r where s.storagekey = ? and s.username = ? and s2r.sid = s.sid', [storagekey, username])
+    .then(res => res.rows[0].rid)
+    .then(rid => this.getResource(rid));
 };
 
 module.exports.info = function(username, callback) {
