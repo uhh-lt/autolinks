@@ -414,47 +414,65 @@ define([
 
                         if (entity) {
                           entity.forEach(function(n) {
-
-                          function extractEntity(n) {
-                            function extractSubject(n) {
-                              if (_.isObject(n.subject)) {
-                                return extractSubject(n.subject);
+                            function extractEntity(n) {
+                              function extractSubject(n) {
+                                if (_.isObject(n.subject)) {
+                                  return extractSubject(n.subject);
+                                }
+                                return n;
                               }
-                              return n;
-                            }
 
-                            function extractObject(n) {
+                              function extractObject(n) {
+                                if (_.isObject(n.object)) {
+                                  return extractSubject(n.object);
+                                }
+                                return n;
+                              }
+
+                              var s = extractSubject(n);
+                              var o = extractObject(n);
+
+                              var subject = {
+                                  id: s.subject,
+                                  name: s.subject
+                              };
+
                               if (_.isObject(n.object)) {
-                                return extractSubject(n.object);
+                                var object = {
+                                    id: o.subject,
+                                    name: o.subject
+                                };
+                              } else {
+                                var object = {
+                                    id: o.object,
+                                    name: o.object
+                                };
                               }
-                              return n;
-                            }
 
-                            var s = extractSubject(n);
-                            var o = extractObject(n);
-
-                            var subject = {
-                                id: s.subject,
-                                name: s.subject
-                            };
-                            var object = {
-                                id: o.subject,
-                                name: o.subject
-                            };
-
-                            var edge = {
-                              group: "edges",
-                              data: {
-                                id: ( subject.id + object.id ),
-                                source: subject.id,
-                                target: object.id,
-                                name: n.predicate.subject
+                              if (_.isObject(n.predicate)) {
+                                var edge = {
+                                  group: "edges",
+                                  data: {
+                                    id: ( subject.id + object.id ),
+                                    source: subject.id,
+                                    target: object.id,
+                                    name: n.predicate.subject
+                                  }
+                                }
+                              } else {
+                                var edge = {
+                                  group: "edges",
+                                  data: {
+                                    id: ( subject.id + object.id ),
+                                    source: subject.id,
+                                    target: object.id,
+                                    name: n.predicate
+                                  }
+                                }
                               }
-                            }
 
-                            newEdge.push(edge);
-                            newNode.push(subject, object);
-
+                              newEdge.push(edge);
+                              newNode.push(subject, object);
 
                               if (_.isObject(n.subject)) {
                                 extractEntity(n.subject);
@@ -465,7 +483,6 @@ define([
                               };
                             }
                             extractEntity(n);
-                            debugger;
                           });
 
                           var filterNode = [];
