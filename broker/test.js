@@ -7,6 +7,8 @@ const
   Triple = require('./model/Triple'),
   Offset = require('./model/Offset'),
   Annotation = require('./model/Annotation'),
+  mysqldb = require('./controller/storage-components/mysql-db'),
+  utils = require('./controller/utils/utils'),
   Analysis = require('./model/Analysis');
 
 const o = new Offset(3,10);
@@ -97,6 +99,42 @@ console.log(j.annotations[0].doffset[0] instanceof Offset);
 const k = Exception.fromError(new Error('dasdkba'), 'kjqebrhkwb');
 console.log(k)
 
+console.log('\n\n\ndbtest: ');
+mysqldb.init((err, r) => {
+  if(err) {
+    return console.log(err);
+  }
+  console.log(r);
+
+//
+//
+// // const x = Promise.all([
+// //   mysqldb.saveResource(null),
+// //   mysqldb.saveResource('hello new world'),
+// //   mysqldb.saveResource('hello funny world'),
+// //   mysqldb.saveResource('hello world')
+// // ]).then((i) => console.log(`fullfilled ${i}`), (err) => console.log(`rejected ${err}`));
+//
+// const y = mysqldb.saveTriple(new Triple('You', 'save', 'the world'));
+//
+  const z = mysqldb.saveResource([
+    new Triple('I', 'save', [
+      new Triple('I', [ new Triple('You', 'saved', 'me') ], 'you')
+    ]),
+    new Triple('You', 'save', 'the world'),
+    new Triple('He', 'save', 'the world'),
+  ]);
+
+
+  setTimeout(function(){
+    console.log(z);
+  }, 1000);
+
+  setTimeout(function(){
+    mysqldb.close((err) => {});
+  }, 10000);
+
+});
 
 
 

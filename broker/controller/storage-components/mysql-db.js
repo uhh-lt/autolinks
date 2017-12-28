@@ -7,6 +7,7 @@ const
   mysql = require('mysql'),
   Exception = require('../../model/Exception'),
   Triple = require('../../model/Triple'),
+  utils = require('../utils/utils'),
   logger = require('../log')(module);
 
 // try connectiontring:
@@ -19,16 +20,36 @@ function withConnection(callback) {
     if (err) {
       return callback(Exception.fromError(err, 'Could not establish connection to database.'), null);
     }
-
     callback(null, connection);
-
     connection.on('error', function (err) {
       return callback(Exception.fromError(err, 'Error connecting to database.'), null);
     });
-
   });
 }
 
+function promisedQuery(query, values){
+  return new Promise((resolve, reject) => {
+    withConnection(function(err, connection){
+      if(err){
+        return reject(err);
+      }
+      if(query !== Object(query)){
+        query = {
+          sql: query,
+          values: values,
+        };
+      }
+      connection.query(query, function(err, rows, fields){
+        connection.release();
+        if(err){
+          return reject(Exception.fromError(err, `Query failed: '${query.sql}'.`, query));
+        }
+        return resolve({rows: rows, fields: fields});
+      });
+
+    });
+  });
+}
 
 module.exports.init = function(callback) {
 
@@ -48,27 +69,21 @@ module.exports.init = function(callback) {
     // // remove newlines
     // data = data.replace(/\n/gm, '');
     // split the queries
-    const queries = data.split(/\n\n/g);
-
-    queries
+    const queries = data.split(/\n\n/g)
       .map(query => query.trim())
-      .filter(query => query.length > 0)
-      .forEach(query => {
-        withConnection(function(err, connection) {
-          if(err){
-            return callback(err);
-          }
-          logger.debug(`Connected to DB with id ${connection.threadId}`);
-          connection.query({sql: query, multipleStatements: true}, function (err, rows) {
-            connection.release();
-            if (err) {
-              return callback(Exception.fromError(err, `Could not execute query: ${query}.`), null);
-            }
-            return callback(null, rows);
-          });
-        }); // end withConnection
-      }); // queries.forEach
+      .filter(query => query.length > 0);
+
+    // resolve queries sequentially
+    utils.sequentialPromise(queries, promisedQuery)
+      .then(
+        res => callback(null, res),
+        err => callback(err)
+      );
+
   }); // end fs.readFile
+
+  // wait some milliseconds for the queries to finish
+  // utils.pause(2000);
 
 };
 
@@ -77,67 +92,74 @@ module.exports.read = function(username, storagekey, callback) {
 };
 
 module.exports.write = function(username, storagekey, triples, callback) {
-  triples.forEach(triple => {
-    const tripleObj = Triple.asTriple(triple);
-    // save
-    // triple.subject;
-    // triple.object;
-    // triple.predicate
-
-
-    if (Array.isArray(triple)) {
-
-    } else {
-
-    }
-
-  });
-
   return callback(new Exception('NOT YET IMPLEMENTED'));
 };
 
-function saveTriple(triple, callback) {
-
-  withConnection(function(err, connection) {
-    if(err){
-      return callback(err);
-    }
-    logger.debug(`Connected to DB with id ${connection.threadId}`);
-    // do the query
-    connection.query('select add_resource(?)', [resource], function(err,rows) {
-      connection.release();
-      if(err) {
-        return callback(Exception.fromError(err, `Could not add resource '${resource}' database.`, {resource: resource}), null);
-      }
-      return callback(null, rows.rid);
-    });
+/**
+ * work with Promises here
+ * @param triple
+ * @return {Promise}
+ */
+module.exports.saveTriple = function(triple) {
+  return new Promise((resolve, reject) => {
+    const tripleObj = Triple.asTriple(triple);
+    // save resources
+    Promise.all([
+      this.saveResource(tripleObj.subject),
+      this.saveResource(tripleObj.predicate),
+      this.saveResource(tripleObj.object),
+    ]).then(
+      rids => { // on success add triple
+        const rid_s = rids[0];
+        const rid_p = rids[1];
+        const rid_o = rids[2];
+        logger.debug(`Saving triple ${rids}.`);
+        return promisedQuery('select add_triple(?,?,?) as tid', [rid_s, rid_p, rid_o]).then(res => resolve(res.rows[0].tid));
+      },
+      err => reject(err) // on failure return the respective error
+    );
   });
+};
 
-}
+/**
+ * work with Promises here
+ * @param resource
+ * @return {Promise}
+ */
+module.exports.saveResource = function(resource) {
+  // a resource can be an array of triples or a string
+  if(Array.isArray(resource)) {
+    logger.debug('Resource is an array.');
+    const promises = resource.map(triple => this.saveTriple(triple));
+    return Promise.all(promises)
+      .then(
+        tids => {
+          logger.debug(`Saved triples ${tids}.`);
+          return this.saveResource(null);
+        }
+      );
+  }
+  // promise to save the resource (this is the recursion anchor)
+  return saveResourceString(resource);
+};
 
-function saveResource(resource, callback) {
-  withConnection(function(err, connection) {
-    if(err){
-      return callback(err);
-    }
-    logger.debug(`Connected to DB with id ${connection.threadId}`);
-    // do the query
-    connection.query('select add_resource(?)', [resource], function(err,rows) {
-      connection.release();
-      if(err) {
-        return callback(Exception.fromError(err, `Could not add resource '${resource}' database.`, {resource: resource}), null);
-      }
-      return callback(null, rows.rid);
-    });
+function saveResourceString(resource) {
+  return new Promise((resolve, reject) => {
+    logger.debug(`Saving resource ${resource}.`)
+    promisedQuery('select add_resource(?) as rid', [resource]).then(
+      res => {
+        const rid = res.rows[0].rid;
+        logger.debug(`Successfully saved resource '${resource}' with id ${rid}.`)
+        return resolve(rid);
+      },
+      err => reject(err)
+    );
   });
-
 }
 
 module.exports.info = function(username, callback) {
   return callback(new Exception('NOT YET IMPLEMENTED'));
 };
-
-
 
 function get_entry(username, servicekey, callback) {
   withConnection(function(err, connection) {
@@ -155,13 +177,22 @@ function get_entry(username, servicekey, callback) {
   });
 }
 
+module.exports.close = function(callback){
+  pool.end(function (err) {
+    if(err){
+      logger.warn(`Closing mysql pool failed.`, err);
+      return callback(err);
+    }
+    // all connections in the pool have ended
+  });
+  logger.debug('Closed storage database connection.');
+  callback(null);
+};
+
 // close database connection on exit
 nodeCleanup(function (exitCode, signal) {
   // release resources here before node exits
-  logger.debug(`About to exit with code: ${signal}`);
-  pool.end(function (err) {
-    // all connections in the pool have ended
-  });
-  logger.debug('Closed userdata database connection.');
+  logger.debug(`About to exit with code: ${exitCode} and signal ${signal}.`);
+  module.exports.close((err) => {});
 });
 
