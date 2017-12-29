@@ -142,6 +142,7 @@ function remap_joined_service_endpoint_rows(rows) {
     .map((v,k) => { // reformat row
       return {
         name : k,
+        version : v[0].version,
         location : v[0].location,
         description : v[0].description,
         registeredsince : v[0].registeredsince,
