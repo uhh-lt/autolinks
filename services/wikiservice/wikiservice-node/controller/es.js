@@ -95,10 +95,15 @@ module.exports.transformSearchResults = function(text, searchResult){
             'appears_in',
             'has_score',
             h._score
+          ),
+          new Triple (
+            'appears_in',
+            'has_index',
+            h._index
           )
         ],
         [
-          new Triple(
+          new Triple (
             h._id,
             'has_title',
             h._source.title
