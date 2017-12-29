@@ -18,7 +18,7 @@ services:
   ##
   # BEGIN: frontend
   frontend:
-    image: node:9.2
+    image: node:9.3
     volumes:
       - ${PWD}/frontendserver:/opt/project
     ports:
@@ -98,6 +98,7 @@ services:
     environment:
       - NODE_ENV=development
       - COOKIE_SECRET=YOUR_COOKIE_SECRET
+      - BROKER_URL=http://broker:10010
   # END: dummy service
 
   # BEGIN: wikiservice
@@ -119,11 +120,12 @@ services:
       - NODE_ENV=development
       - LOGLEVEL=debug
       - COOKIE_SECRET=YOUR_COOKIE_SECRET
-      - ELASTICSEARCH_URLS=http://elasticsearch:9200
-      - ELASTICSEARCH_VERSION=5.5
-      - ELASTICSEARCH_INDICES=simplewiki
+      - ELASTICSEARCH_URLS=http://localhost:9200
+#      - ELASTICSEARCH_URLS=http://elasticsearch:9200
 #      - ELASTICSEARCH_URLS=http://ltdocker.informatik.uni-hamburg.de:10004
-#      - ELASTICSEARCH_INDICES=enwiki,wikidata,enwiktionary
+      - ELASTICSEARCH_VERSION=5.5
+#      - ELASTICSEARCH_INDICES=simplewiki
+      - ELASTICSEARCH_INDICES=enwiki,wikidata,enwiktionary
 
   es:
     image: custom-elasticsearch:5.5.2
