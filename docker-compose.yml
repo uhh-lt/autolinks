@@ -123,7 +123,7 @@ services:
 
   # BEGIN: wikiservice
   wiki:
-    image: remstef/node-swagger:latest
+    image: node:9.3
     volumes:
       - ${PWD}/services/wikiservice/wikiservice-node:/opt/project/services/wikiservice/wikiservice-node
       - ${PWD}/broker:/opt/project/broker
@@ -134,15 +134,25 @@ services:
     stdin_open: true
     tty: true
     working_dir: /opt/project/services/wikiservice/wikiservice-node
-    entrypoint: bash
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        echo installing modules ...
+        npm install
+        echo starting server ...
+        npm start
     environment:
-      - NODE_ENV=development
-      - LOGLEVEL=debug
-      - COOKIE_SECRET=YOUR_COOKIE_SECRET
-      - ELASTICSEARCH_URLS=http://0.0.0.0:9200
+      - NODE_ENV=production
+      - COOKIE_SECRET=98ydiaug9f7asjb
+      - BROKER_URL=http://broker:10010
+#      - ELASTICSEARCH_URLS=http://0.0.0.0:9200
 #      - ELASTICSEARCH_URLS=http://elasticsearch:9200
-#      - ELASTICSEARCH_URLS=http://ltdocker.informatik.uni-hamburg.de:10004
+      - ELASTICSEARCH_URLS=http://ltdocker.informatik.uni-hamburg.de:10004
       - ELASTICSEARCH_VERSION=5.5
-      - ELASTICSEARCH_INDICES=simplewiki
-#      - ELASTICSEARCH_INDICES=enwiki,wikidata,enwiktionary
+#      - ELASTICSEARCH_INDICES=simplewiki
+      - ELASTICSEARCH_INDICES=enwiki,wikidata,enwiktionary
+    depends_on:
+      broker:
+        condition: service_healthy
   # END: wikiservice
