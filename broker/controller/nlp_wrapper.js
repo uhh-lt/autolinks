@@ -5,14 +5,6 @@
  */
 const logger = require('./log')(module);
 
-/**
- * exports
- */
-module.exports = {
-  init : init,
-  analyze : analyze,
-}
-
 const explicitNLP = (() => {
   switch (process.env.NER) {
     case 'corenlp':
@@ -36,17 +28,28 @@ const explicitNLP = (() => {
  *
  * @param callback
  */
-function init(callback) {
+module.exports.init = function(callback) {
   return explicitNLP.init(callback);
-}
+};
 
 /**
  *
- * @param document
+ * @param text
+ * @param callbackIter = function(err, analysis)
+ */
+module.exports.analyze = function(text, contentType, source, callback) {
+  return explicitNLP.analyze(text, contentType, source, callback);
+};
+
+/**
+ *
+ * @param analysis
+ * @param callbackStart = function(err)
  * @param callbackIter = function(err, entities)
  * @param callbackDone = function(err)
  */
-function analyze(document, callbackStart, callbackIter, callbackDone) {
-  return explicitNLP.analyze(document, callbackStart, callbackIter, callbackDone);
-}
+module.exports.findNamedEntities = function(analysis, callbackStart, callbackIter, callbackDone) {
+  return explicitNLP.findNamedEntities(analysis, callbackStart, callbackIter, callbackDone);
+};
+
 

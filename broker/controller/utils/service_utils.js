@@ -1,35 +1,28 @@
 'use strict';
 
-// exports
-module.exports = {
-  ping_service: ping_service,
-  ping_services: ping_services,
-  get_services_and_endpoints : get_services_and_endpoints,
-  get_service_and_endpoints : get_service_and_endpoints,
-  get_service_details : get_service_details,
-  call_service : call_service,
-};
-
 // imports
 const
   _ = require('lodash'),
   db = require('../service_db'),
   request = require('request'),
   logger = require('../log')(module)
-	;
+;
 
 // ping a service
-function ping_service(service) {
+module.exports.ping_service = function(service, callback) {
 
   let location = service.location;
 
   if(!location){
-    return db.get_service(service.name, (row) => {
-      if(row.location){
-        return ping_service(row);
-      } else {
-        return new Error(`No URL location for service ${service.name} found.`);
+    return db.get_service(service.name, service.version, (err, row) => {
+      if(err){
+        return callback(err);
       }
+      if(!row.location){
+        return callback(new Error(`No URL location for service '${service.name}:${service.version}' found.`));
+
+      }
+      module.exports.ping_service(row, callback);
     });
   }
 
@@ -39,40 +32,74 @@ function ping_service(service) {
     if(error || response.statusCode !== 200){
       // if service was active before print a warning, otherwise ignore it
       if(service.active) {
-        logger.warn(`Cannot reach service ${service.name}`, { service : service , error: error || response }, {});
-        logger.warn(`Setting service ${service.name} to defunct.`);
+        logger.warn(`Cannot reach service '${service.name}:${service.version}'`, { service : service , error: error || response }, {});
+        logger.warn(`Setting service '${service.name}:${service.version}' to defunct.`);
       }
-      logger.warn(`ping service '${service.name}' failed.`);
-      return db.update_service(service.name, {
-        lastcheck: now,
-        active: false
-      });
-    }else{
-      logger.debug(`ping service '${service.name}' success.`);
-      // if service was not active before print an info, otherwise ignore it
-      if(!service.active) {
-        logger.info(`Service '${service.name}' is now available.`);
-      }
-      return db.update_service(service.name, {
+      logger.warn(`ping service '${service.name}:${service.version}' failed.`);
+      return db.update_service(
+        service.name,
+        service.version,
+        {
+          lastcheck: now,
+          active: false
+        },
+        function(err2) {
+          if(err2){
+            if(error){
+              error.message = error.message + ' AND ' + err2.message;
+            } else {
+              error  = err2
+            }
+          }
+          callback(error)
+        });
+    }
+
+    logger.debug(`ping service '${service.name}' success.`);
+    // if service was not active before print an info, otherwise ignore it
+    if(!service.active) {
+      logger.info(`Service '${service.name}' is now available.`);
+    }
+    return db.update_service(
+      service.name,
+      service.version,
+      {
         lastseenactive: now,
         lastcheck: now,
         active: true
-      });
-    }
+      },
+      function(err){
+        if(err){
+          // log err but ignore in callback
+          logger.warn(`Could not update service: '${service.name}:${service.version}'.`);
+          logger.warn(err);
+        }
+        callback();
+      }
+    );
   });
-}
+};
 
 // ping all registered services
-function ping_services(){
-  const err = db.get_services(ping_service, () => {});
-  if(err){
-    logger.warn('Ping services failed.', { error: err }, {});
-  }
-}
+module.exports.ping_services = function() {
+  db.get_services ( function(err, service){
+    if(err){
+      /* ignore */
+      return;
+    }
+    module.exports.ping_service(service, function(err){
+      /* ignore */
+      return;
+    });
+  },
+  function(err, numrows) {
+    /* ignore */
+  });
+};
 
 // get the services + endpoints
-function get_services_and_endpoints(callback_service, callback_done){
-  db.get_joined_services_and_endpoints(function(err, rows){
+module.exports.get_services_and_endpoints = function(callback_service, callback_done){
+  db.get_joined_services_and_endpoints(function(err, rows) {
     if(err) {
       const newerr = new Error('Could not query service-endpoint joins.');
       newerr.cause = err;
@@ -80,13 +107,13 @@ function get_services_and_endpoints(callback_service, callback_done){
       return callback_done(newerr);
     }
     remap_joined_service_endpoint_rows(rows)
-      .forEach(s => callback_service(s));
-    callback_done();
+      .forEach(s => callback_service(null, s));
+    callback_done(null, remap_joined_service_endpoint_rows.length);
   });
-}
+};
 
 // get a service and its endpoints
-function get_service_and_endpoints(servicename, callback) {
+module.exports.get_service_and_endpoints = function(servicename, callback) {
   db.get_joined_service_and_endpoints(servicename, function(err, rows) {
     if(err) {
       const newerr = new Error('Could not query service-endpoint joins.');
@@ -103,7 +130,7 @@ function get_service_and_endpoints(servicename, callback) {
     }
     callback(null, services[0]);
   });
-}
+};
 
 
 /**
@@ -126,6 +153,7 @@ function remap_joined_service_endpoint_rows(rows) {
             path : e.path,
             url : `${v[0].location}${e.path}`,
             method: e.method,
+            requirements: e.requirements,
             requireslogin : e.requireslogin,
             lastcalled : e.lastcalled,
           };
@@ -134,7 +162,7 @@ function remap_joined_service_endpoint_rows(rows) {
     }).value();
 }
 
-function call_service(location, path, method, data, req, res, next) {
+module.exports.call_service = function(location, path, method, data, req, res, next) {
 
   const options = {
     url : path,
@@ -162,15 +190,15 @@ function call_service(location, path, method, data, req, res, next) {
     res.end(next);
   });
 
-}
+};
 
 
-function get_service_details(servicename, extended, callback) {
+module.exports.get_service_details = function(servicename, extended, callback) {
   if (!extended) {
-    return get_service_and_endpoints(servicename, callback);
+    return module.exports.get_service_and_endpoints(servicename, callback);
   }
 
-  return get_service_and_endpoints(servicename, function (err, service) {
+  return module.exports.get_service_and_endpoints(servicename, function (err, service) {
     const location = `${service.location}/swagger`;
     request(location, function (error, response, body) {
       if (error || response.statusCode !== 200) {
@@ -185,11 +213,11 @@ function get_service_details(servicename, extended, callback) {
       callback(null, service);
     });
   });
-}
+};
 
 // execute ping_services function every 10 seconds
 (function ping_services_at_intervals(){
     // do some stuff
-    ping_services();
+    module.exports.ping_services();
     setTimeout(ping_services_at_intervals, 10000);
 })();

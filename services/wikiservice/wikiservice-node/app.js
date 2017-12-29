@@ -13,8 +13,25 @@ const SwaggerExpress = require('swagger-express-mw'),
   yaml = require('yamljs'),
   nodeCleanup = require('node-cleanup'),
   os = require('os'),
+  fs = require('fs'),
+  es = require('./controller/es'),
+  logger = require('../../../broker/controller/log')(module),
   request = require('request')
 ;
+
+/* make sure the data directory exists */
+const datadir = './data';
+if (!fs.existsSync(datadir)) { fs.mkdirSync(datadir); }
+
+/**
+ * init connections
+ */
+es.init(function(err){
+  if(err){
+    logger.error(err);
+    process.exit(1);
+  }
+});
 
 /**
  * init swagger ui

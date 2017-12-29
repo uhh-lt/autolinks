@@ -10,7 +10,10 @@
 
   It is a good idea to list the modules that your application depends on in the package.json in the project root
  */
-const util = require('util');
+const
+  ServiceParameter = require('../../../../broker/model/ServiceParameter'),
+  Exception = require('../../../../broker/model/Exception'),
+  util = require('util');
 
 /*
  Once you 'require' a module you can reference the things that it exports.  These are defined in module.exports.
@@ -37,20 +40,26 @@ module.exports = {
  */
 function doSomething(req, res, next) {
   // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
-  const entity = req.swagger.params.entity.value;
-  if(!entity){
-    return res.end('No entity provided.', next);
-  }
-  const etext = entity.text || 'Simon';
-  const triples = [{
-    subject: etext,
-    predicate: 'says',
-    object: 'hello'
-  }];
+  // Get the serviceParameter object from the request and handle the error properly if it fails
+  ServiceParameter.fromRequest(req, function(err, serviceParameter) {
 
-  // this sends back a JSON response and ends the response
-  res.header('Content-Type', 'application/json; charset=utf-8');
-  res.json(triples);
-  res.end(next);
+    if (err) {
+      return Exception.handleErrorResponse(err, res).end(next);
+    }
+
+    // get the text for the offset
+    const text = serviceParameter.focus.getText(serviceParameter.context.text) || 'Simon';
+    const triples = [{
+      subject: text,
+      predicate: 'says',
+      object: 'hello'
+    }];
+
+    // this sends back a JSON response and ends the response
+    res.header('Content-Type', 'application/json; charset=utf-8');
+    res.json(triples);
+    res.end(next);
+
+  });
 
 }

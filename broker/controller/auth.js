@@ -53,7 +53,7 @@ function verifyUser(username, password, done){
       return done(new Error('Incorrect password.'), false);
     }
     // TODO: update user (lastseen)
-    return done(null, user);
+    done(null, user);
   });
 }
 
