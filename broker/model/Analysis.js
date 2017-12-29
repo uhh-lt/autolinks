@@ -49,4 +49,15 @@ Analysis.prototype.assign = function(obj) {
   return Object.assign(this, obj);
 };
 
+/**
+ *
+ * @param text
+ * @return {Analysis}
+ */
+Analysis.fromText = function(text){
+  const analysis = new Analysis();
+  analysis.text = text;
+  return analysis;
+}
+
 

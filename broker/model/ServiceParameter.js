@@ -3,6 +3,7 @@
 /* imports */
 const
   DOffset = require('./DOffset'),
+  Offset = require('./Offset'),
   Analysis = require('./Analysis'),
   Exception = require('./Exception');
 
@@ -46,7 +47,12 @@ ServiceParameter.prototype.assign = function(obj) {
   return Object.assign(this, obj);
 };
 
-
+/**
+ * Get a service parameter object from a request
+ * @param req
+ * @param callback
+ * @return {*}
+ */
 ServiceParameter.fromRequest = function(req, callback) {
 
   const service_parameter = req.swagger.params.data.value;
@@ -71,5 +77,14 @@ ServiceParameter.fromRequest = function(req, callback) {
 
 };
 
-
-
+/**
+ * Create a simple service parameter object that uses the whole given text as focus object
+ * @param text
+ * @return {ServiceParameter}
+ */
+ServiceParameter.simpleText = function(text){
+  const sp = new ServiceParameter();
+  sp.context = Analysis.fromText(text);
+  sp.focus = new DOffset([new Offset(0,text.length)]);
+  return sp;
+};
