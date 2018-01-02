@@ -1,13 +1,30 @@
 'use strict';
 
-const util = require('util'),
-  Exception = require('../../../../broker/model/Exception'),
-  request = require('request')
-  ;
+const
+  Exception = require('../../../../../broker/model/Exception'),
+  es = require('../../controller/es'),
+  logger = require('../../../../../broker/controller/log'),
+  request = require('request');
 
+/**
+ *
+ * @param req
+ * @param res
+ * @param next
+ */
 module.exports.ping = function (req, res, next) {
-  res.header('Content-Type', 'text/plain; charset=utf-8');
-  res.end('OK\n', next);
+
+  es.ping(function(err){
+    if(err) {
+      return Exception
+        .fromError(err, 'Elasticsearch is not available.')
+        .handleResponse(res)
+        .end(next);
+    }
+    res.header('Content-Type', 'text/plain; charset=utf-8');
+    res.end('OK\n', next);
+  });
+
 };
 
 module.exports.register_at_broker = function(req, res, next) {
@@ -37,7 +54,7 @@ module.exports.register_at_broker = function(req, res, next) {
 module.exports.register_at_system_broker = function (req, res, next) {
 
   const location = process.env.BROKER_URL || 'http://broker:10010';
-  console.log(`Registering self at broker at '${location}'.`);
+  logger.info(`Registering self at broker at '${location}'.`);
   const options = {
     url : '/service/registerService',
     baseUrl : location,
@@ -58,10 +75,10 @@ function callBroker(options, res, next){
   request(options, function (error, response, body) {
     if(error || response.statusCode !== 200){
       const ex =  Exception.fromError(error, `Registering self at '${options.baseUrl}' failed.`, { response: response });
-      console.warn(ex.message, ex);
+      logger.warn(ex.message, ex);
       return ex.handleResponse(res).end(next);
     }
-    util.debuglog(`Sucessfully registered service at '${options.baseUrl}'.`);
+    logger.debug(`Sucessfully registered service at '${options.baseUrl}'.`);
     res.header('Content-Type', 'text/plain; charset=utf-8');
     res.end('OK\n', next);
   });

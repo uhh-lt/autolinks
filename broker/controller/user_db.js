@@ -85,7 +85,7 @@ function add_user(name, password, callback) {
 
 
 // update a user in the database, set key-value pairs from the user obj
-function update_user(name, userobj){
+function update_user(name, userobj, callback){
   // prepare sql statement and values
   const keys = [];
   const vals = [];
@@ -99,11 +99,7 @@ function update_user(name, userobj){
   vals.push(name);
 
   //run sql statement
-  dbconn.run(sql, vals, function(err) {
-    if (err) {
-      return err;
-    }
-  });
+  dbconn.run(sql, vals, callback);
 }
 
 
@@ -111,21 +107,17 @@ function update_user(name, userobj){
 /**
  *
  * @param name username
- * @param next function(err, row)
+ * @param callback function(err, row)
  */
-function get_user(name, next){
+function get_user(name, callback){
   //run sql statement
-  dbconn.get('select * from users where name = ?', [name], next);
+  dbconn.get('select * from users where name = ?', [name], callback);
 }
 
 // delete a service from the database
-function delete_user(name){
+function delete_user(name, callback){
   // delete user
-  dbconn.run('delete from users where name = ?', [name], function(err) {
-    if (err) {
-      return err;
-    }
-  });
+  dbconn.run('delete from users where name = ?', [name], callback);
 }
 
 // get all registered users

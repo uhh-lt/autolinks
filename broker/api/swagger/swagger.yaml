@@ -31,6 +31,9 @@ definitions:
       name:
         type: string
         description: the name of the service
+      version:
+        type: string
+        description: the current version of the service
       location:
         type: string
         description: where to find the service
@@ -42,6 +45,14 @@ definitions:
         description: the endpoints a service offers
         items:
           $ref: '#/definitions/Endpoint'
+          
+  ServiceParameter:
+    type: object
+    properties:
+      focus: 
+        $ref: '#/definitions/DOffset'
+      context:
+        $ref: '#/definitions/Analysis'
 
   Endpoint:
     type: object
@@ -55,6 +66,11 @@ definitions:
       requireslogin:
         type: boolean
         description: does the service require a user to be logged in?
+      requirements:
+        description: A list of type requirements
+        type: array
+        items: 
+          type: string
 
   # objects related to user management
   UserInfo:
@@ -75,36 +91,53 @@ definitions:
       lastseenactive:
         type: integer
         description: the point in time when the user was last seen, i.e. the time of the last login
-
-  # objects related to NLP
-  Document:
+  
+  # NLP related objects
+  Analysis:
     type: object
     properties:
       text:
         type: string
       source:
         type: string
-      language:
+      lang:
         type: string
+      availabletypes:
+        type: array
+        items:
+          type: string
+      annotations:
+        type: array
+        items:
+          $ref: "#/definitions/Annotation"
 
-  NamedEntity:
+  Annotation:
     type: object
     properties:
-      text:
-        type: string
       type:
         type: string
-      offset:
-        $ref: "#/definitions/Offset"
+      doffset:
+        $ref: "#/definitions/DOffset"
+      properties:
+        type: object
       analyzer:
         type: string
+
+  # Discontinuous offset, composed of a list of offsets to allow for discontinuous annotations
+  DOffset:
+    type: object
+    properties:
+      offsets:
+        type: array
+        items:
+          $ref: "#/definitions/Offset"
 
   Offset:
     type: object
     properties:
       from:
         type: integer
-      to:
+      length:
         type: integer
 
   # objects related to storage
@@ -135,13 +168,17 @@ definitions:
     type: object
 
   # in case of error return this object schema
-  Error:
+  Exception:
     type: object
     properties:
+      type:
+        type: string
       message:
         type: string
-      fields:
+      cause:
         type: string
+      fields:
+        type: object
         
 securityDefinitions:
 #  broker_auth:
@@ -195,7 +232,7 @@ paths:
         default:
           description: Unexpected error
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/Exception'
 
   /service/call:
     # tell nodejs where to find the code for this path
@@ -216,12 +253,14 @@ paths:
             properties:
               service:
                 type: string
+              version:
+                type: string
               path:
                 type: string
               method:
                 type: string
               data:
-                type: object
+                $ref: '#/definitions/ServiceParameter'
       responses:
         200:
           description: Success
@@ -230,7 +269,7 @@ paths:
         default:
           description: Error
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/Exception"
 
   /service/details:
     x-swagger-router-controller: services
@@ -248,6 +287,8 @@ paths:
             properties:
               name:
                 type: string
+              version:
+                type: string
               extended:
                 type: boolean
       responses:
@@ -258,7 +299,7 @@ paths:
         default:
           description: Error
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/Exception"
 
   /service/registerService:
     # tell nodejs where to find the code for this path
@@ -282,7 +323,7 @@ paths:
         default:
           description: Error
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/Exception"
             
   /service/deregisterService:
     x-swagger-router-controller: services
@@ -300,13 +341,15 @@ paths:
             properties:
               name:
                 type: string
+              version:
+                type: string
       responses:
         200:
           description: Success
         default:
           description: Error
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/Exception"
 
   /service/listServices:
     x-swagger-router-controller: services
@@ -326,7 +369,7 @@ paths:
         default:
           description: Error
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/Exception"
 
   /service/pingService:
     x-swagger-router-controller: services
@@ -345,11 +388,15 @@ paths:
             properties:
               name:
                 type: string
+              version:
+                type: string
       responses:
         200:
           description: Success
         default:
           description: Error
+          schema:
+            $ref: "#/definitions/Exception"
     # ping all services
     get:
       operationId: ping_services
@@ -361,6 +408,8 @@ paths:
           description: Success
         default:
           description: Error
+          schema:
+            $ref: "#/definitions/Exception"
 
   /nlp/findentities:
     x-swagger-router-controller: nlp
@@ -370,24 +419,55 @@ paths:
         - NLP
       description: Find named entites in the provided text
       parameters:
-        - name: document
+        - name: data
           in: body
           description: |
-            The document object which contains the plain text and some
-            configuration parameters, e.g. the desired language of analyis.
+            The analysis object which contains the current analysis object.
           schema:
-            $ref: "#/definitions/Document"
+            $ref: "#/definitions/Analysis"
       responses:
         200:
           description: Success
           schema:
             type: array
             items:
-              $ref: "#/definitions/NamedEntity"
+              $ref: "#/definitions/Annotation"
         default:
           description: Error
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/Exception"
+
+  /nlp/analyze:
+    x-swagger-router-controller: nlp
+    post:
+      operationId: analyze
+      tags:
+        - NLP
+      description: Analyze the provided document
+      parameters:
+        - name: data
+          in: body
+          description: |
+            The document object which contains the plain text and some
+            configuration parameters, e.g. the desired language of analyis.
+          schema:
+            type: object
+            properties:
+              data: 
+                type: string
+              content-type:
+                type: string
+              source:
+                type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Analysis"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Exception"
 
   /user/info:
     x-swagger-router-controller: users
@@ -407,7 +487,7 @@ paths:
         default:
           description: Error
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/Exception"
             
   /user/register:
     x-swagger-router-controller: users
@@ -436,7 +516,7 @@ paths:
         default:
           description: Error
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/Exception"
             
   /user/delete:
     x-swagger-router-controller: users
@@ -455,7 +535,7 @@ paths:
         default:
           description: Error
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/Exception"
             
   /user/update:
     x-swagger-router-controller: users
@@ -485,7 +565,7 @@ paths:
         default:
           description: Error
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/Exception"
 
   /storage/read:
     x-swagger-router-controller: storage
@@ -511,7 +591,7 @@ paths:
         default:
           description: Error
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/Exception"
 
   /storage/write:
     x-swagger-router-controller: storage
@@ -535,7 +615,7 @@ paths:
         default:
           description: Error
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/Exception"
 
   /storage/info:
     x-swagger-router-controller: storage
@@ -556,7 +636,7 @@ paths:
         default:
           description: Error
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/Exception"
 
   /swagger:
     x-swagger-pipe: swagger_raw

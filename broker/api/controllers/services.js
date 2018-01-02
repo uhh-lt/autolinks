@@ -21,81 +21,111 @@ module.exports = {
   Param 1: a handle to the request object
   Param 2: a handle to the response object
  */
-function register_service(req, res) {
+function register_service(req, res, next) {
   // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
   const service = req.swagger.params.service.value;
-
-  const err = service_db.add_service(
+  res.header('Content-Type', 'application/json; charset=utf-8');
+  service_db.add_service(
     service.name,
+    service.version,
     service.location,
     service.description,
-    service.endpoints
+    service.endpoints,
+    function(err){
+      if(err) {
+        logger.warn(`Adding service '${service.name}:${service.version}' failed.`, service, err, {} );
+        res.status(500);
+        return res.write(JSON.stringify({ message: err.message, fields: { service: service, error: err } }));
+      }
+      logger.info(`Sucessfully added service '${service.name}:${service.version}'.`);
+    },
+    function(endpoint, err){
+      if(err) {
+        logger.warn(`Adding endoint '${endpoint.path}' for '${service.name}:${service.version}' failed.`, err, {} );
+        res.status(500);
+        return res.write(JSON.stringify({ message: err.message, fields: { service: service, error: err } }));
+      }
+      logger.info(`Sucessfully added endpoint '${endpoint.path}' for '${service.name}:${service.version}'.`);
+    },
+    function() {
+      res.end(next);
+    }
   );
 
-  res.header('Content-Type', 'application/json; charset=utf-8');
-  if(err) {
-    logger.warn(`Adding service '${service.name}' failed.`, service, err, {} );
-    res.status(500);
-    res.write(JSON.stringify({ message: err.message, fields: { service: service, error: err } }));
-  } else {
-    logger.info(`Sucessfully added service '${service.name}'.`, service);
-  }
-  res.end();
-
 }
 
-function deregister_service (req, res) {
+function deregister_service (req, res, next) {
   const service = req.swagger.params.service.value;
-  const err = service_db.delete_service(service.name);
-  res.header('Content-Type', 'application/json; charset=utf-8');
-  if(err){
-    logger.warn(`De-register service '${service.name}' failed.`, service, err, {} );
-    res.status(500);
-    res.json({ message: err.message, fields: { service: service, error: err } });
-  } else {
-    logger.info(`Sucessfully removed service '${service.name}'.`, service);
-  }
-  res.end();
+  service_db.delete_service(service.name, service.version, function(err){
+    res.header('Content-Type', 'application/json; charset=utf-8');
+    if(err){
+      logger.warn(`De-register service '${service.name}:${service.version}' failed.`, service, err, {} );
+      res.status(500);
+      res.json({ message: err.message, fields: { service: service, error: err } });
+    } else {
+      logger.info(`Sucessfully removed service '${service.name}:${service.version}' and its endpoints.`, service);
+    }
+    res.end(next);
+  });
 }
 
-function ping_service(req, res) {
+function ping_service(req, res, next) {
   const service = req.swagger.params.service.value;
-  const err = service_utils.ping_service(service);
-  res.header('Content-Type', 'application/json; charset=utf-8');
-  if(err){
-    logger.warn(`Ping service '${service.name}' failed.`, service, err, {} );
-    res.status(500);
-    res.json({ message: err.message, fields: { service: service, error: err } });
-  }
-  res.end();
+  service_utils.ping_service(service, function(err) {
+    res.header('Content-Type', 'application/json; charset=utf-8');
+    if(err){
+      logger.warn(`Ping service '${service.name}:${service.version}' failed.`, service, err, {} );
+      res.status(500);
+      res.json({ message: err.message, fields: { service: service, error: err } });
+    }
+    res.end(next);
+  });
+
 }
 
 
-function ping_services(req, res) {
+function ping_services(req, res, next) {
   // get all services and apply ping_service as callback for each of the services
-  const err = service_db.get_services(service_utils.ping_service, () => res.end());
   res.header('Content-Type', 'application/json; charset=utf-8');
-  if(err){
-    logger.warn('Ping all services failed.', err, {} );
-    res.status(500);
-    res.json({ message: err.message, fields: { error: err } });
-  }
-  res.end();
+  service_db.get_services(
+
+    function(err, service){
+      if(err){
+        logger.warn(`Ping service '${service.name}' failed.`, err, {} );
+        res.status(500);
+        return res.write(JSON.stringify({ message: err.message, fields: { error: err } }));
+      }
+      service_utils.ping_service(service, function(err) {
+        if(err) {
+          logger.warn(`Ping service '${service.name}' failed.`, err, {});
+          res.status(500);
+          return res.write(JSON.stringify({message: err.message, fields: {error: err}}));
+        }
+      });
+    },
+    function(err, numrows){
+      res.end(next);
+    });
 
 }
 
-function list_services(req, res) {
+function list_services(req, res, next) {
   res.header('Content-Type', 'application/json; charset=utf-8');
   res.write('[');
   let startedwriting = false;
   service_utils.get_services_and_endpoints(
-    (service) => {
-      if(startedwriting) { res.write(','); };
+    function(err, service) {
+      if(err) {
+        /*  */
+      }
+      if (startedwriting) {
+        res.write(',');
+      }
       res.write(JSON.stringify(service));
       startedwriting = true;
     },
-    () => {
-      res.end(']');
+    (err, numrows) => {
+      res.end(']', next);
     }
   );
 }

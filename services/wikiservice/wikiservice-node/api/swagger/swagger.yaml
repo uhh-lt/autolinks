@@ -1,16 +1,17 @@
 ##
 #
-# API description of autolinks dummy service
+# API description of autolinks wikiservice
 #
 ##
 swagger: '2.0'
 info:
   version: '0.0.1'
-  title: Dummy
+  title: Wiki
   description: |
-    Autolinks Dummy Service:
-    This service is only here for demonstration
-    and testing purposes
+    Autolinks Wikiservice. Give access to wikimedia indices:
+    - wikidata
+    - wiktionary
+    - wikipedia
 
 consumes:
   - application/json
@@ -110,7 +111,7 @@ definitions:
         type: object
 
 tags:
-  - name: Dummy
+  - name: Wiki
     description: Everything about the service
   - name: Restricted
     description: Paths that require a username
@@ -119,88 +120,16 @@ tags:
 
 paths:
   # here are the endpoints to what the service does
-  /dosomething:
-    x-swagger-router-controller: dummy
+  /findarticles:
+    x-swagger-router-controller: wiki
     post:
-      operationId: dosomething
+      operationId: findArticles
       tags:
-        - Dummy
+        - Wiki
       description: | 
-        Do something 
-        requires: [ner]
+        find articles for the focus text
+        requires: []
       parameters:
-        - name: data
-          in: body
-          description: The service parameter
-          schema:
-            $ref: '#/definitions/ServiceParameter'
-      responses:
-        200:
-          description: Success
-          schema:
-            $ref: '#/definitions/Triples'
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/Exception"
-
-  /foo:
-    x-swagger-router-controller: foobar
-    post:
-      operationId: foo
-      tags:
-        - Dummy
-        - Restricted
-      description: Do something
-      parameters:
-        - name: data
-          in: body
-          description: The service parameter
-          schema:
-            $ref: '#/definitions/ServiceParameter'
-      responses:
-        200:
-          description: Success
-          schema:
-            $ref: '#/definitions/Triples'
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/Exception"
-
-  /bar:
-    x-swagger-router-controller: foobar
-    get:
-      operationId: bar
-      tags:
-        - Dummy
-        - Restricted
-      description: Do something
-      parameters: []
-      responses:
-        200:
-          description: Success
-          schema:
-            $ref: '#/definitions/Triples'
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/Exception"
-
-  /baz/{username}:
-    x-swagger-router-controller: foobar
-    post:
-      operationId: baz
-      tags:
-        - Dummy
-        - Restricted
-      description: Do something
-      parameters:
-        - name: username
-          required: true
-          in: path
-          description: The username
-          type: string
         - name: data
           in: body
           description: The service parameter
