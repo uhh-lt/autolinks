@@ -413,77 +413,84 @@ define([
                         var newEdge = [];
 
                         if (entity) {
-                          entity.forEach(function(n) {
-                            function extractEntity(n) {
+                          _.forEach(entity, function(n) {
+                            function extractEntity(n, parent = null) {
                               function extractSubject(n) {
-                                if (_.isObject(n.subject)) {
-                                  return extractSubject(n.subject);
+                                if (_.isArray(n.subject)) {
+                                  return extractSubject(n.subject[0]);
                                 }
                                 return n;
                               }
 
                               function extractObject(n) {
-                                if (_.isObject(n.object)) {
-                                  return extractSubject(n.object);
+                                if (_.isArray(n.object)) {
+                                  return extractSubject(n.object[0]);
                                 }
                                 return n;
                               }
 
-                              var s = extractSubject(n);
-                              var o = extractObject(n);
-
-                              var subject = {
-                                  id: s.subject,
-                                  name: s.subject
-                              };
-
-                              if (_.isObject(n.object)) {
-                                var object = {
-                                    id: o.subject,
-                                    name: o.subject
+                              if (_.isArray(n.subject)) {
+                                var s = extractSubject(n);
+                                var subject = {
+                                    id: s.subject + '_as_parent',
+                                    name: s.subject + '_as_parent',
+                                    parent: parent ? parent.id : null
                                 };
                               } else {
-                                var object = {
-                                    id: o.object,
-                                    name: o.object
+                                var subject = {
+                                    id: n.subject,
+                                    name: n.subject,
+                                    parent: parent ? parent.id : null
                                 };
                               }
 
-                              if (_.isObject(n.predicate)) {
-                                var edge = {
-                                  group: "edges",
-                                  data: {
-                                    id: ( subject.id + object.id ),
-                                    source: subject.id,
-                                    target: object.id,
-                                    name: n.predicate.subject
-                                  }
-                                }
+                              if (_.isArray(n.object)) {
+                                var o = extractObject(n);
+                                var object = {
+                                    id: o.subject + '_as_parent',
+                                    name: o.subject + '_as_parent',
+                                    parent: parent ? parent.id : null
+                                };
                               } else {
-                                var edge = {
-                                  group: "edges",
-                                  data: {
-                                    id: ( subject.id + object.id ),
-                                    source: subject.id,
-                                    target: object.id,
-                                    name: n.predicate
-                                  }
+                                var object = {
+                                    id: n.object,
+                                    name: n.object,
+                                    parent: parent ? parent.id : null
+                                };
+                              }
+
+                              var edge = {
+                                group: "edges",
+                                data:
+                                {
+                                  id: ( subject.id + object.id ),
+                                  source: subject.id,
+                                  target: object.id,
+                                  name: n.predicate
                                 }
                               }
 
                               newEdge.push(edge);
                               newNode.push(subject, object);
 
-                              if (_.isObject(n.subject)) {
-                                extractEntity(n.subject);
+                              debugger;
+
+                              if (_.isArray(n.subject)) {
+                                _.forEach(n.subject, function(n) {
+                                  extractEntity(n, subject);
+                                });
                               };
 
-                              if (_.isObject(n.object)) {
-                                extractEntity(n.object);
+                              if (_.isArray(n.object)) {
+                                _.forEach(n.object, function(n) {
+                                  extractEntity(n, object);
+                                });
                               };
                             }
                             extractEntity(n);
                           });
+
+                          debugger;
 
                           var filterNode = [];
                           _.forEach(_.uniqBy(newNode, 'id'), function(n) {
