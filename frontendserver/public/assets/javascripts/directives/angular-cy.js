@@ -433,7 +433,7 @@ define([
                                 var s = extractSubject(n);
                                 var subject = {
                                     id: s.subject + '_as_parent',
-                                    name: s.subject + '_as_parent',
+                                    name: s.subject,
                                     parent: parent ? parent.id : null
                                 };
                               } else {
@@ -448,7 +448,7 @@ define([
                                 var o = extractObject(n);
                                 var object = {
                                     id: o.subject + '_as_parent',
-                                    name: o.subject + '_as_parent',
+                                    name: o.subject,
                                     parent: parent ? parent.id : null
                                 };
                               } else {
@@ -464,16 +464,14 @@ define([
                                 data:
                                 {
                                   id: ( subject.id + object.id ),
-                                  source: subject.id,
-                                  target: object.id,
+                                  source: subject.name,
+                                  target: object.name,
                                   name: n.predicate
                                 }
                               }
 
                               newEdge.push(edge);
                               newNode.push(subject, object);
-
-                              debugger;
 
                               if (_.isArray(n.subject)) {
                                 _.forEach(n.subject, function(n) {
@@ -489,8 +487,6 @@ define([
                             }
                             extractEntity(n);
                           });
-
-                          debugger;
 
                           var filterNode = [];
                           _.forEach(_.uniqBy(newNode, 'id'), function(n) {
