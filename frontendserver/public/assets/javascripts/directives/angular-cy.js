@@ -509,7 +509,8 @@ define([
 
                           scope.data.nodes = _.union(nodes, filterNode);
                           scope.data.edges = _.union(edges, newEdge);
-                          $rootScope.$broadcast('appChanged');
+                          cy.layout(scope.options.layout).run();
+                          // $rootScope.$broadcast('appChanged');
                         }
                       });
                       // debugger;
