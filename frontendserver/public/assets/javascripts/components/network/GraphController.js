@@ -54,26 +54,26 @@ define([
               var newEdge = [];
 
               var nodes = [
-                { data: { id: '0', parent: 'b', name: "Disease" }, position: { x: 215, y: 85 } },
-                { data: { id: '1', name: "Caucasian race" } },
-                { data: { id: '2', name: 'B_CLL', desc: "type of leukemia (a type of cancer of the white blood cells)", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Chronic_lymphocytic_leukemia.jpg/1280px-Chronic_lymphocytic_leukemia.jpg" } },
-                { data: { id: '3', name: 'B Cell', desc: "also known as B lymphocytes, are a type of white blood cell of the lymphocyte subtype.",   image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Blausen_0624_Lymphocyte_B_cell_%28crop%29.png/1024px-Blausen_0624_Lymphocyte_B_cell_%28crop%29.png" } },
-                { data: { id: '4', name: 'Antigen', parent: '8', desc: "In immunology, an antigen is a molecule capable of inducing an immune response on the part of the host organism", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Antibody.svg/255px-Antibody.svg.png" }, position: { x: 300, y: 85 } },
-                { data: { id: '5', name: "B-cell receptor", parent: '8', desc: " is a transmembrane receptor protein located on the outer surface of B cells", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Bcellreceptor.svg/251px-Bcellreceptor.svg.png" }, position: { x: 215, y: 175 } },
-                { data: { id: '6', name: "V(D)J recombination" } },
-                { data: { id: '7', name: "IgVH Mutation" }, position: { x: 300, y: 175 } },
-                { data: { id: '8', name: "BCR" }, position: { x: 300, y: 175 } }
+                // { data: { id: '0', parent: 'b', name: "Disease" }, position: { x: 215, y: 85 } },
+                // { data: { id: '1', name: "Caucasian race" } },
+                // { data: { id: '2', name: 'B_CLL', desc: "type of leukemia (a type of cancer of the white blood cells)", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Chronic_lymphocytic_leukemia.jpg/1280px-Chronic_lymphocytic_leukemia.jpg" } },
+                // { data: { id: '3', name: 'B Cell', desc: "also known as B lymphocytes, are a type of white blood cell of the lymphocyte subtype.",   image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Blausen_0624_Lymphocyte_B_cell_%28crop%29.png/1024px-Blausen_0624_Lymphocyte_B_cell_%28crop%29.png" } },
+                // { data: { id: '4', name: 'Antigen', parent: '8', desc: "In immunology, an antigen is a molecule capable of inducing an immune response on the part of the host organism", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Antibody.svg/255px-Antibody.svg.png" }, position: { x: 300, y: 85 } },
+                // { data: { id: '5', name: "B-cell receptor", parent: '8', desc: " is a transmembrane receptor protein located on the outer surface of B cells", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Bcellreceptor.svg/251px-Bcellreceptor.svg.png" }, position: { x: 215, y: 175 } },
+                // { data: { id: '6', name: "V(D)J recombination" } },
+                // { data: { id: '7', name: "IgVH Mutation" }, position: { x: 300, y: 175 } },
+                // { data: { id: '8', name: "BCR" }, position: { x: 300, y: 175 } }
               ];
 
               $scope.nodes = nodes;
               var edges = [
-                { data: { id: '20', source: '2', target: '0', name: 'is-a' } },
-                { data: { id: '21', source: '2', target: '1', name: 'affects' } },
-                { data: { id: '23', source: '2', target: '3', name: 'affects' } },
-                { data: { id: '53', source: '5', target: '3', name: 'part-of' } },
-                { data: { id: '54', source: '5', target: '4', name: 'binds' } },
-                { data: { id: '76', source: '7', target: '6', name: 'causes' } },
-                { data: { id: '65', source: '6', target: '5', name: 'affects' } }
+                // { data: { id: '20', source: '2', target: '0', name: 'is-a' } },
+                // { data: { id: '21', source: '2', target: '1', name: 'affects' } },
+                // { data: { id: '23', source: '2', target: '3', name: 'affects' } },
+                // { data: { id: '53', source: '5', target: '3', name: 'part-of' } },
+                // { data: { id: '54', source: '5', target: '4', name: 'binds' } },
+                // { data: { id: '76', source: '7', target: '6', name: 'causes' } },
+                // { data: { id: '65', source: '6', target: '5', name: 'affects' } }
               ];
 
               if ($scope.fetchData) {

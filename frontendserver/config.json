@@ -1,5 +1,6 @@
 {
     "connectionString": "mongodb://localhost:27017/xxx-xxx-xxx",
-    "apiUrl": "http://localhost:10000/",
+    "apiUrl": "http://ltdemos.informatik.uni-hamburg.de:8093",
+    "brokerEndPoint": "services",
     "secret": "REPLACE THIS WITH YOUR OWN SECRET, IT CAN BE ANY STRING"
 }

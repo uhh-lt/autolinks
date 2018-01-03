@@ -412,6 +412,7 @@ define([
                         var newNode = [];
                         var newEdge = [];
 
+                        debugger;
                         if (entity) {
                           _.forEach(entity, function(n) {
                             function extractEntity(n, parent = null) {
