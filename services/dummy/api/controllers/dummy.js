@@ -13,6 +13,7 @@
 const
   ServiceParameter = require('../../../../broker/model/ServiceParameter'),
   Exception = require('../../../../broker/model/Exception'),
+  Triple = require('../../../../broker/model/Triple'),
   util = require('util');
 
 /*
@@ -27,9 +28,6 @@ const
   In the starter/skeleton project the 'get' operation on the '/hello' path has an operationId named 'hello'.  Here,
   we specify that in the exports of this module that 'hello' maps to the function named 'hello'
  */
-module.exports = {
-  dosomething: doSomething
-};
 
 /*
   Functions in a127 controllers used for operations should take two parameters:
@@ -38,7 +36,7 @@ module.exports = {
   Param 2: a handle to the response object
   Param 3: a handle to the callback which will be executed next
  */
-function doSomething(req, res, next) {
+module.exports.demo = function(req, res, next) {
   // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
   // Get the serviceParameter object from the request and handle the error properly if it fails
   ServiceParameter.fromRequest(req, function(err, serviceParameter) {
@@ -49,11 +47,27 @@ function doSomething(req, res, next) {
 
     // get the text for the offset
     const text = serviceParameter.focus.getText(serviceParameter.context.text) || 'Simon';
-    const triples = [{
-      subject: text,
-      predicate: 'says',
-      object: 'hello'
-    }];
+    let triples = [
+      new Triple(text, 'says', 'hello')
+    ];
+    if(text.replace(/(\s|-)+/g,'').toLocaleLowerCase() === 'bcell'){
+      triples =
+        [
+          new Triple(
+            [
+              new Triple('BCR', 'is synonym', 'B-cell receptor'),
+              new Triple('B-cell receptor', 'binds', 'Antigen')
+            ],
+            'part-of',
+            'B Cell'
+          ),
+          new Triple('B_CLL', 'affects', 'B Cell'),
+          new Triple('B_CLL', 'is a', 'Disease'),
+          new Triple('B_CLL', 'affects', 'Caucasian race'),
+          new Triple('V(D)J recombination', 'affects', 'B-cell receptor'),
+          new Triple('IgVH Mutation', 'causes', 'V(D)J recombination'),
+        ];
+    }
 
     // this sends back a JSON response and ends the response
     res.header('Content-Type', 'application/json; charset=utf-8');
@@ -62,4 +76,4 @@ function doSomething(req, res, next) {
 
   });
 
-}
+};
