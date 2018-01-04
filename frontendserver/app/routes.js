@@ -98,7 +98,7 @@ module.exports = function (app) {
       var resp = [];
 
           var options = {
-                url: config.apiUrl + 'service/call',
+                url: config.apiUrl + '/service/call',
                 method: 'POST',
                 headers: {
                    'Content-Type': 'application/json',

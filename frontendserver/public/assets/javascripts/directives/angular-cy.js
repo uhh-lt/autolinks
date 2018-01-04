@@ -412,6 +412,7 @@ define([
                         var newNode = [];
                         var newEdge = [];
 
+                        debugger;
                         if (entity) {
                           _.forEach(entity, function(n) {
                             function extractEntity(n, parent = null) {
@@ -433,7 +434,7 @@ define([
                                 var s = extractSubject(n);
                                 var subject = {
                                     id: s.subject + '_as_parent',
-                                    name: s.subject + '_as_parent',
+                                    name: s.subject,
                                     parent: parent ? parent.id : null
                                 };
                               } else {
@@ -448,7 +449,7 @@ define([
                                 var o = extractObject(n);
                                 var object = {
                                     id: o.subject + '_as_parent',
-                                    name: o.subject + '_as_parent',
+                                    name: o.subject,
                                     parent: parent ? parent.id : null
                                 };
                               } else {
@@ -464,16 +465,14 @@ define([
                                 data:
                                 {
                                   id: ( subject.id + object.id ),
-                                  source: subject.id,
-                                  target: object.id,
+                                  source: subject.name,
+                                  target: object.name,
                                   name: n.predicate
                                 }
                               }
 
                               newEdge.push(edge);
                               newNode.push(subject, object);
-
-                              debugger;
 
                               if (_.isArray(n.subject)) {
                                 _.forEach(n.subject, function(n) {
@@ -489,8 +488,6 @@ define([
                             }
                             extractEntity(n);
                           });
-
-                          debugger;
 
                           var filterNode = [];
                           _.forEach(_.uniqBy(newNode, 'id'), function(n) {
@@ -512,7 +509,7 @@ define([
 
                           scope.data.nodes = _.union(nodes, filterNode);
                           scope.data.edges = _.union(edges, newEdge);
-                          $rootScope.$broadcast('appChanged');
+                          cy.layout(scope.options.layout).run();
                         }
                       });
                       // debugger;
@@ -545,6 +542,10 @@ define([
                         if (cy.$(":selected").length > 0) {
                             cy.$(":selected").remove();
                         }
+                      });
+
+                      $rootScope.$on('layoutReset', function(){
+                          cy.layout(scope.options.layout).run();
                       });
 
                     }; // end doCy()
@@ -580,7 +581,6 @@ define([
                   });
 
                   $(document).on('click', "#addEdge", function(e){
-                    console.log('waw');
                     $rootScope.$broadcast('addEdge');
                   });
 

@@ -125,7 +125,8 @@ define([
                   selector: ':parent',
                   style: {
                     'text-valign': 'top',
-                    'background-opacity': 0.333
+                    'background-opacity': 0.333,
+                    'text-opacity': 0
                   }
                 },
                 {

@@ -265,7 +265,7 @@ define([
           $scope.reset = function(){
               $scope.mapData = [];
               $scope.edgeData = [];
-              $rootScope.$broadcast('appChanged');
+              $rootScope.$broadcast('layoutReset');
           }
         }
     ]);
