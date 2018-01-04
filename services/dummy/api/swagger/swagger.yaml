@@ -119,10 +119,10 @@ tags:
 
 paths:
   # here are the endpoints to what the service does
-  /dosomething:
+  /demo:
     x-swagger-router-controller: dummy
     post:
-      operationId: dosomething
+      operationId: demo
       tags:
         - Dummy
       description: | 

@@ -36,7 +36,20 @@ Triple.prototype.resolve = function(){
  * @returns {Triple}
  */
 Triple.prototype.deepAssign = function(obj) {
-  return this.assign(obj);
+  this.assign(obj);
+  const castResource = resource => {
+    if(Array.isArray(resource)) {
+      return resource.map(tripleObj => {
+        if(tripleObj instanceof Triple) {
+          return tripleObj;
+        }
+        return new Triple().deepAssign(tripleObj);
+      });
+    }
+  };
+  this.subject = castResource(this.subject);
+  this.predicate = castResource(this.predicate);
+  this.object = castResource(this.object);
 };
 
 /**
