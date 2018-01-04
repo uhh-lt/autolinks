@@ -262,7 +262,7 @@ define([
           };
 
           // reset the sample nodes
-          $scope.reset = function(){
+          $scope.layoutReset = function(){
               $scope.mapData = [];
               $scope.edgeData = [];
               $rootScope.$broadcast('layoutReset');

@@ -548,6 +548,10 @@ define([
                           cy.layout(scope.options.layout).run();
                       });
 
+                      $rootScope.$on('centerGraph', function(){
+                          cy.fit();
+                      });
+
                     }; // end doCy()
 
                   scope.doCy();

@@ -9,8 +9,8 @@ define([
     angular.module('autolinks.circlenav', []);
     angular.module('autolinks.circlenav')
         // Circlenav Controller
-        .controller('CirclenavController', ['$scope',
-        function ($scope) {
+        .controller('CirclenavController', ['$scope', '$rootScope',
+        function ($scope, $rootScope) {
 
           $scope.init = function() {
             	var ul = $("#navs"),
@@ -35,7 +35,20 @@ define([
             		}
             	});
           };
+
           $scope.init();
+
+          $scope.addCompound = function(){
+              debugger;
+          };
+
+          $scope.centerGraph = function() {
+            $rootScope.$emit('centerGraph');
+          };
+
+          $scope.layoutReset = function(){
+              $rootScope.$broadcast('layoutReset');
+          };
 
         }
       ]);

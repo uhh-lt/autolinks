@@ -1,8 +1,24 @@
 <div ng-controller="CirclenavController">
   <ul id="navs">
-    <li><a href=""><i id="circle-fit" class="fa fa-expand fa-2x" aria-hidden="true"></i></a></li>
-    <li><a href=""><i id="circle-reset" class="fa fa-retweet fa-2x" aria-hidden="true"></i></a></li>
-    <li><a href=""><i id="circle-parent" class="fa fa-object-group fa-2x" aria-hidden="true"></i></a></li>
-    <li><a href=""><i id="circle-burger" class="fa fa-bars fa-2x" aria-hidden="true"></i></a></li>
+    <li>
+      <a href="" ng-click="centerGraph()">
+        <i id="circle-fit" class="fa fa-expand fa-2x" aria-hidden="true"></i>
+      </a>
+    </li>
+    <li>
+      <a href="" ng-click="layoutReset()">
+        <i id="circle-reset" class="fa fa-retweet fa-2x" aria-hidden="true"></i>
+      </a>
+    </li>
+    <li>
+      <a href="" ng-click="addCompound()">
+        <i id="circle-parent" class="fa fa-object-group fa-2x" aria-hidden="true"></i>
+      </a>
+    </li>
+    <li>
+      <a href="">
+        <i id="circle-burger" class="fa fa-bars fa-2x" aria-hidden="true"></i>
+      </a>
+    </li>
   </ul>
 </div>
