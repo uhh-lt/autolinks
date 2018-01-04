@@ -64,6 +64,8 @@ module.exports.demo = function(req, res, next) {
           new Triple('B_CLL', 'affects', 'B Cell'),
           new Triple('B_CLL', 'is a', 'Disease'),
           new Triple('B_CLL', 'affects', 'Caucasian race'),
+          new Triple('V(D)J recombination', 'affects', 'B-cell receptor'),
+          new Triple('IgVH Mutation', 'causes', 'V(D)J recombination'),
         ];
     }
 
