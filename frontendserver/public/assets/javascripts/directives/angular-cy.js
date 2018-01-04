@@ -510,7 +510,6 @@ define([
                           scope.data.nodes = _.union(nodes, filterNode);
                           scope.data.edges = _.union(edges, newEdge);
                           cy.layout(scope.options.layout).run();
-                          // $rootScope.$broadcast('appChanged');
                         }
                       });
                       // debugger;
@@ -543,6 +542,10 @@ define([
                         if (cy.$(":selected").length > 0) {
                             cy.$(":selected").remove();
                         }
+                      });
+
+                      $rootScope.$on('layoutReset', function(){
+                          cy.layout(scope.options.layout).run();
                       });
 
                     }; // end doCy()
@@ -578,7 +581,6 @@ define([
                   });
 
                   $(document).on('click', "#addEdge", function(e){
-                    console.log('waw');
                     $rootScope.$broadcast('addEdge');
                   });
 
