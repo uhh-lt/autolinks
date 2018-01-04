@@ -93,7 +93,7 @@ module.exports.read = function(username, storagekey, callback) {
 
 module.exports.write = function(username, storagekey, triples, callback) {
   return this.saveResource(triples)
-    .then(rid => this.saveToStorage(username, storagekey).then(sid => {return {sid:sid, rid:rid};}))
+    .then(rid => this.saveToStorage(username, storagekey).then(sid => Object.create({sid:sid, rid:rid})))
     .then(ids => this.saveStorageResourceMapping(ids.sid, ids.rid))
     .then(
       res => callback(null, res),
@@ -136,26 +136,45 @@ module.exports.saveResource = function(resource) {
   // a resource can be an array of triples or a string
   if(Array.isArray(resource)) {
     logger.debug('Resource is an array.');
-    const promises = resource.map(triple => this.saveTriple(triple));
-    return Promise.all(promises)
-      .then(
-        tids => {
-          logger.debug(`Saved triples ${tids}.`);
-          const metaresource = 'l:[' + tids.join(',') + ']';
-          return this.saveResource(metaresource).then(rid => {return {rid: rid, tids: tids};});
-        }
-      ).then(
-        ids => Promise.all(ids.tids.map(tid => this.saveResourceTripleMapping(ids.rid, tid))).then(ignore_ => ids.rid)
-      );
+    return this.saveResourceList(resource);
+  }
+  if(resource === Object(resource)){
+    logger.debug('Resource is an object.');
+    return this.saveResourceObject(resource);
   }
   // promise to save the resource (this is the recursion anchor)
+  logger.debug('Resource is a string.');
   return this.saveResourceString(resource);
 };
 
+module.exports.saveResourceList = function(resource){
+  const promises = resource.map(triple => this.saveTriple(triple));
+  return Promise.all(promises)
+    .then(
+      tids => {
+        logger.debug(`Saved triples ${tids}.`);
+        const metaresource = 'l:[' + tids.join(',') + ']';
+        return this.saveResourceAnchor(metaresource, true, false).then(rid => Object.create({rid: rid, tids: tids}));
+      }
+    ).then(
+      ids => Promise
+        .all(ids.tids.map(tid => this.saveResourceTripleMapping(ids.rid, tid)))
+        .then(ignore_ => ids.rid)
+    );
+};
+
+module.exports.saveResourceObject = function(resource){
+  return Promise.reject(new Error('NOT YET IMPLEMENTED'));
+};
+
 module.exports.saveResourceString = function(resource) {
+  return this.saveResourceAnchor(resource, false, false);
+};
+
+module.exports.saveResourceAnchor = function(resource, isList, isObject) {
   return new Promise((resolve, reject) => {
     logger.debug(`Saving resource ${resource}.`);
-    promisedQuery('select add_resource(?) as rid', [resource]).then(
+    promisedQuery('select add_resource(?, ?, ?) as rid', [resource, isList, isObject]).then(
       res => {
         const rid = res.rows[0].rid;
         logger.debug(`Successfully saved resource '${resource}' with id ${rid}.`);

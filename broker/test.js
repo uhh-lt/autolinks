@@ -133,20 +133,20 @@ mysqldb.init((err, r) => {
   // mysqldb.saveStorageResourceMapping(23,21).then(console.log,console.error);
   // mysqldb.saveToStorage('me','asdjbao').then(console.log, console.error);
 
-  // mysqldb.write('me', '123',
-  //   [
-  //     new Triple('I', 'save', [
-  //       new Triple('I', [ new Triple('You', 'saved', 'me') ], 'you')
-  //     ]),
-  //     new Triple('You', 'save', 'the world'),
-  //     new Triple('He', 'save', 'me'),
-  //     new Triple('ME', 'save', 'He'),
-  //   ], function(err, res) {
-  //     if(err){
-  //       return console.log(err);
-  //     }
-  //     return console.log(res);
-  //   });
+  mysqldb.write('me', '123',
+    [
+      new Triple('I', 'save', [
+        new Triple('I', [ new Triple('You', 'saved', 'me') ], 'you')
+      ]),
+      new Triple('You', 'save', 'the world'),
+      new Triple('He', 'save', 'me'),
+      new Triple('ME', 'save', 'He'),
+    ], function(err, res) {
+      if(err){
+        return console.log(err);
+      }
+      return console.log(`yay, success ${res}`);
+    });
 
   // mysqldb.getTriple(2).then(console.log,console.err);
   // mysqldb.getResource(12).then(console.log,console.err);

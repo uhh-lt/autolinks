@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS triples (
 CREATE TABLE IF NOT EXISTS resources (
   rid         int unsigned NOT NULL AUTO_INCREMENT,
   surfaceform varchar(512) DEFAULT NULL,
+  islist      boolean DEFAULT false,
+  istriple    boolean DEFAULT NULL,
   PRIMARY KEY (rid),
   UNIQUE (surfaceform(333))
 ) ENGINE=MyISAM;
@@ -88,16 +90,16 @@ END //
 
 
 create function add_resource (
-  surfaceform_ varchar(512))
+  surfaceform_ varchar(512), islist_ boolean, istriple_ boolean)
 RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
 BEGIN
   declare rid_ int unsigned default 0;
-  if surfaceform_ is NULL then
+  if surfaceform_ is NULL and not islist_ and not istriple_ then
     return rid_;
   end if;
-  select rid into rid_ from resources where surfaceform = surfaceform_ limit 1;
+  select rid into rid_ from resources where surfaceform = surfaceform_ and islist = islist_ and istriple = istriple_ limit 1;
   if rid_ = 0 then
-    insert into resources set surfaceform = surfaceform_;
+    insert into resources set surfaceform = surfaceform_, islist = islist_, istriple = istriple_;
     select LAST_INSERT_ID() into rid_;
   end if;
   return rid_;
