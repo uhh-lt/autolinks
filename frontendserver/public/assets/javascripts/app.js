@@ -2,6 +2,7 @@ define([
     'angular',
     './components/navs/CirclenavController',
     './components/navs/SidenavController',
+    './components/navs/MainnavController',
     './components/input/InputController',
     './components/viewer/ViewerController',
     './components/network/NetworkController',
@@ -19,7 +20,8 @@ define([
 
     var app = angular.module('autolinks', [
             'ui.layout', 'ui.router', 'ui.bootstrap', 'lodash', 'autolinks.graphConfig', 'autolinks.network', 'autolinks.graph',
-            'autolinks.input', 'autolinks.viewer', 'ngMaterial', 'autolinks.entityservice', 'autolinks.circlenav', 'autolinks.sidenav', 'autolinks.endpointservice'
+            'autolinks.input', 'autolinks.viewer', 'ngMaterial', 'autolinks.entityservice', 'autolinks.circlenav', 'autolinks.sidenav',
+            'autolinks.mainnav', 'autolinks.endpointservice'
           ]);
 
     app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
@@ -31,7 +33,8 @@ define([
                   controller: 'CirclenavController'
                 },
                 'mainnav': {
-                  templateUrl: 'assets/partials/navs/mainnav.html'
+                  templateUrl: 'assets/partials/navs/mainnav.html',
+                  controller: 'MainnavController'
                 },
                 'network': {
                   templateUrl: 'assets/partials/network.html',
@@ -73,7 +76,10 @@ define([
                   });
               };
             }
+
+            $scope.toggleLeft = buildToggler('left');
             $scope.toggleRight = buildToggler('right');
+
             $scope.isOpenRight = function(){
               return $mdSidenav('right').isOpen();
             };
