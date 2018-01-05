@@ -9,8 +9,8 @@ define([
     angular.module('autolinks.circlenav', []);
     angular.module('autolinks.circlenav')
         // Circlenav Controller
-        .controller('CirclenavController', ['$scope', '$rootScope', '$mdSidenav',
-        function ($scope, $rootScope, $mdSidenav) {
+        .controller('CirclenavController', ['$scope', '$rootScope', '$mdSidenav', 'EntityService',
+        function ($scope, $rootScope, $mdSidenav, EntityService) {
 
           $scope.lockLeft = true;
 
@@ -41,7 +41,7 @@ define([
           $scope.init();
 
           $scope.addCompound = function(){
-              debugger;
+            EntityService.openSideNav('createCompound');
           };
 
           $scope.centerGraph = function() {
@@ -49,7 +49,7 @@ define([
           };
 
           $scope.layoutReset = function(){
-              $rootScope.$broadcast('layoutReset');
+            $rootScope.$broadcast('layoutReset');
           };
 
           $scope.toggleSidenav = function() {
