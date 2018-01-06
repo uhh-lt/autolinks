@@ -544,6 +544,25 @@ define([
                         }
                       });
 
+                      $rootScope.$on('createCompound', function() {
+                        var newCompound = angular.element('#newCompound').val();
+                        var nodeObj = {
+                            data: {
+                              id: newCompound + '_as_parent',
+                              name: newCompound
+                            }
+                        };
+                        scope.newCompound = cy.add(nodeObj);
+                        scope.data.nodes.push(nodeObj);
+                        var ns = cy.$(':selected');
+                        _.forEach(ns, function(n) {
+                          n.data().parent = scope.newCompound.data('id');
+                        });
+                        cy.elements().remove();
+                        cy.add(scope.data);
+                        cy.layout({name: 'cose-bilkent'}).run();
+                      });
+
                       $rootScope.$on('layoutReset', function(){
                           cy.layout(scope.options.layout).run();
                       });

@@ -22,15 +22,26 @@
             ng-src="{{selectedEntity.data('image') === undefined ? '' : selectedEntity.data('image')}}"
             style="width:200px;"
           />
-           <md-input-container>
-             <label for="testInput" ng-if="selectedEntity !== 'createCompound'">Description</label>
-             <label for="testInput" ng-if="selectedEntity === 'createCompound'">Name</label>
+           <md-input-container
+            ng-if="selectedEntity !== 'createCompound'"
+           >
+             <label for="testInput">Description</label>
              <textarea
                 ng-model="selectedEntity.data().desc"
                 md-autofocus
                 ng-model-options="{ getterSetter: true, updateOn: 'default' }"
               >
              </textarea>
+           </md-input-container>
+           <md-input-container
+            ng-if="selectedEntity === 'createCompound'"
+           >
+             <label for="newCompound">Name</label>
+             <input
+                id="newCompound"
+                ng-if="selectedEntity === 'createCompound'"
+              >
+            </input>
            </md-input-container>
          <md-button ng-click="delete()" class="md-warn" ng-if="selectedEntity !== 'createCompound'">
            Delete

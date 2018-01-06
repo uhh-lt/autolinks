@@ -41,7 +41,11 @@ define([
           $scope.init();
 
           $scope.addCompound = function(){
-            EntityService.openSideNav('createCompound');
+            if (cy.$(':selected').length > 0) {
+              EntityService.openSideNav('createCompound');
+            } else {
+              console.log('Please select one or more node to be children');
+            }
           };
 
           $scope.centerGraph = function() {
