@@ -5,8 +5,8 @@ define([
     './components/navs/MainnavController',
     './components/input/InputController',
     './components/viewer/ViewerController',
-    './components/network/GraphController',
-    './components/network/GraphConfig',
+    './components/graph/GraphController',
+    './components/graph/GraphConfig',
     './services/EntityService',
     './services/EndPointService',
     './services/lodash-module',
@@ -35,8 +35,8 @@ define([
                   templateUrl: 'assets/partials/navs/mainnav.html',
                   controller: 'MainnavController'
                 },
-                'network': {
-                  templateUrl: 'assets/partials/network.html',
+                'graph': {
+                  templateUrl: 'assets/partials/graph.html',
                   controller: 'GraphController'
                 },
                 'input': {
