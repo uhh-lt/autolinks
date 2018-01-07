@@ -560,7 +560,14 @@ define([
                         });
                         cy.elements().remove();
                         cy.add(scope.data);
+                        cy.nodes().forEach(function(n){
+                          nodeTipExtension(n);
+                        });
+                        cy.edges().forEach(function(e) {
+                          edgeTipExtension(e);
+                        });
                         cy.layout({name: 'cose-bilkent'}).run();
+                        cy.fit();
                       });
 
                       $rootScope.$on('layoutReset', function(){

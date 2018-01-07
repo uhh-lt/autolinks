@@ -1,7 +1,7 @@
 <div>
   <div id="content" class="container" ng-controller="GraphController">
     <div>
-      <div class="row">
+      <!-- <div class="row">
         <div class="col-xs-8">
           <span>Node:</span>
           <select class="btn btn-primary dropdown-toggle" ng-model="form.obj.objTypes" ng-options="name for name in objTypes"></select>
@@ -30,7 +30,7 @@
             <button class="btn btn-success" ng-click="addEdge()">ADD EDGE</button>
           </span>
         </div>
-      </div>
+      </div> -->
       <cytoscape data="graphData" cy-data="mapData" cy-edges="edgeData" cy-click="doClick(value)" options="graphOptions" events="graphEvents"/>
     </div>
   </div>

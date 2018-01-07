@@ -37,7 +37,7 @@ html, body, .container {
 	bottom: 0px;
 	left: 0px;
 	right: 0px;
-	height: 181px;
+	height: 81px;
 	background-color: @background_color_2;
 }
 #viewer-region {
@@ -47,6 +47,9 @@ html, body, .container {
 	right: 0px;
 	height: 181px;
 	background-color: @background_color_2;
+}
+#canvas {
+	z-index: 1 !important;
 }
 .outer-canvas {
 	z-index: 2;
@@ -69,7 +72,7 @@ html, body, .container {
 	margin: auto;
 }
 .qtip {
-	z-index: 2 !important;
+	z-index: 999 !important;
 	background-color: @background_color_2 !important;
 	border: none !important;
 }
@@ -95,7 +98,7 @@ html, body, .container {
 	background: rgba(255, 255, 255, 0.5);
 	border: 1px;
 }
-#network {
+#graph {
 	z-index: 1;
 	position: relative;
 	overflow-y: hidden;
@@ -154,7 +157,7 @@ div.table_description {
 	position: absolute;
 	top: 350px;
 	left: 170px;
-	z-index: 299;
+	z-index: 999;
 	width: 250px;
 	height: 120px;
 	background-color: @background_color_7;
