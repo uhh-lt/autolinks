@@ -1,9 +1,8 @@
 ######
 ##
-# 1) start: docker-compose up -d
-# 2) attach: docker attach ...
-# 3) detach: detach with <CTRL-p> <CTRL-q>
-# 4) stop: docker-compose down
+# 1) start: docker-compose up -d <services>
+# 2) continuously check logs: docker-compose logs -f
+# 3) stop: docker-compose down
 ##
 ######
 version: '2.3'
@@ -17,19 +16,29 @@ services:
   # Main components and their dependencies
   ##
   # BEGIN: frontend
-#  frontend:
-#    image: node:9.2
-#    volumes:
-#      - ${PWD}/frontendserver:/opt/project
-#    ports:
-#      - 10000:10010
-#      - 3000:3001
-#    networks:
-#      - anet
-#    working_dir: /opt/project
-#    environment:
-#      - NODE_ENV=production
-#      - COOKIE_SECRET=bsiusu78wbv
+  frontend:
+    image: node:9.3
+    volumes:
+      - ${PWD}/frontendserver:/opt/project/frontendserver
+    ports:
+      - 20001:9090
+    networks:
+      - anet
+    working_dir: /opt/project
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        echo installing modules ...
+        sh init-repo.sh
+        echo starting server ...
+        npm start
+    environment:
+      - NODE_ENV=production
+      - COOKIE_SECRET=bsiusussg78
+      - BROKER_URL=http://broker:10010
+      - LOGLEVEL=debug
+    restart: unless-stopped
   # END: frontend
 
   # BEGIN: broker
@@ -77,7 +86,7 @@ services:
       - MYSQL_PORT=3306
       - MYSQL_PASSWORD=autolinks1
     volumes:
-      - ${PWD}/broker-mysql-data:/var/lib/mysql
+      - ${PWD}/data/mysql:/var/lib/mysql
     command: ["--character-set-server=utf8", "--collation-server=utf8_bin"]
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-pautolinks1", "-uautolinks"]
@@ -98,8 +107,6 @@ services:
     volumes:
       - ${PWD}/services/dummy:/opt/project/services/dummy
       - ${PWD}/broker:/opt/project/broker
-#    ports:
-#      - 20010:10010
     networks:
       - anet
     working_dir: /opt/project/services/dummy
@@ -127,8 +134,6 @@ services:
     volumes:
       - ${PWD}/services/wikiservice/wikiservice-node:/opt/project/services/wikiservice/wikiservice-node
       - ${PWD}/broker:/opt/project/broker
-#    ports:
-#      - 20011:10010
     networks:
       - anet
     stdin_open: true
@@ -156,3 +161,44 @@ services:
       broker:
         condition: service_healthy
   # END: wikiservice
+
+  # BEGIN: elasticsearch index
+  es:
+    image: custom-elasticsearch:5.5.2
+    build:
+      context: services/wikiservice/es-docker
+      dockerfile: Dockerfile
+#      args:
+#        CUSTOM_UID: 39000
+#        CUSTOM_GID: 390
+    environment:
+      - cluster.name=escluster
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=false
+      - http.host=0.0.0.0
+      - transport.host=0.0.0.0
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 131072
+        hard: 131072
+      nproc:
+        soft: 8192
+        hard: 8192
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ${PWD}/data/es:/usr/share/elasticsearch/data
+    networks:
+      anet:
+        aliases:
+          - elasticsearch
+    healthcheck:
+      test: curl --silent --fail 'localhost:9200/_cluster/health' || exit 1
+      interval: 5s
+      timeout: 2s
+      retries: 12
+  # END: elasticsearch index

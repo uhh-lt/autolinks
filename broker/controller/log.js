@@ -1,6 +1,8 @@
 'use strict';
 
-const winston = require('winston');
+const
+  path = require('path'),
+  winston = require('winston');
 
 const loglevel = process.env.LOGLEVEL || 'info';
 
@@ -12,7 +14,7 @@ function getLabel(callingModule) {
 
 module.exports = function(callingModule) {
 
-  let aModulesLabel = getLabel(callingModule);
+  const aModulesLabel = getLabel(callingModule);
 
   return new (winston.Logger)({
 
@@ -28,7 +30,7 @@ module.exports = function(callingModule) {
 
       new (winston.transports.File)({
         level: 'debug',
-        filename: 'data/server.log', // uses the base path
+        filename: path.resolve(global.__datadir && path.join(global.__datadir, 'server.log') || 'server.log'),
         handleExceptions: true,
         humanReadableUnhandledException: true,
         timestamp: true,
