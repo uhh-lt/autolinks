@@ -2,6 +2,15 @@
 
 /* some global settings and requirements */
 process.setMaxListeners(0); // prevent: (node:308) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 uncaughtException listeners added. Use emitter.setMaxListeners() to increase limit
+require('events').EventEmitter.defaultMaxListeners = 100; // prevent: (node:24) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 error listeners added. Use emitter.setMaxListeners() to increase limit
+
+/* make sure the data directory exists */
+const fs = require('fs'), path = require('path');
+const datadir = process.env.DATA_DIR || '../data/broker';
+global.__datadir = path.resolve(path.join(__dirname, datadir));
+if (!fs.existsSync(global.__datadir)) { fs.mkdirSync(global.__datadir); }
+global.__basedir = path.resolve(__dirname);
+
 
 /* imports */
 const
@@ -10,7 +19,6 @@ const
   swaggerUi = require('swagger-ui-express'),
   yaml = require('yamljs'),
   nodeCleanup = require('node-cleanup'),
-  fs = require('fs'),
   servicedb = require('./controller/service_db'),
   userdb = require('./controller/user_db'),
   storage = require('./controller/storage_wrapper'),
@@ -18,10 +26,6 @@ const
   auth = require('./controller/auth'),
   logger = require('./controller/log')(module)
   ;
-
-/* make sure the data directory exists */
-const datadir = './data';
-if (!fs.existsSync(datadir)) { fs.mkdirSync(datadir); }
 
 /*
  * init databases, exit on error
