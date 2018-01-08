@@ -51,10 +51,10 @@ define([
                 // });
               },
 
-              fetchData: function() {
+              fetchData: function(text) {
                 var promise = $q.defer();
                 var data = {};
-                return $http.get('/service/call').then(function(response) {
+                return $http.post('/service/call', { text: text }).then(function(response) {
                   return data = response.data;
                 });
                 // return promise.promise;

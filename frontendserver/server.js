@@ -1,17 +1,21 @@
 // set up ======================================================================
 require('rootpath')();
-var express = require('express');
-var app = express(); 						// create our app w/ express
-var port = process.env.PORT || 9090; 				// set the port
-var session = require('express-session');
-var bodyParser = require('body-parser');
-var expressJwt = require('express-jwt');
-var config = require('config.json');
+const express = require('express');
+const app = express(); 						// create our app w/ express
+const port = process.env.PORT || 9090; 				// set the port
+const session = require('express-session');
+const bodyParser = require('body-parser');
+const expressJwt = require('express-jwt');
+const config = require('config.json');
 
 
 app.use(express.static(__dirname + '/public')); 		// set the static files location /public/img will be /img for users
 app.use(express.static(__dirname + '/assets'));
 app.use('/assets', express.static(__dirname + '/assets/'));
+
+app.use(bodyParser.urlencoded({'extended': 'true'})); // parse application/x-www-form-urlencoded
+app.use(bodyParser.json()); // parse application/json
+app.use(bodyParser.json({type: 'application/vnd.api+json'})); // parse application/vnd.api+json as json
 
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/public');

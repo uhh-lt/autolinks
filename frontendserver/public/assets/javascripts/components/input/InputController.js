@@ -43,11 +43,11 @@ define([
             }
 
             // for (var i=0; i<inputs.length; i++) {
-            if (_.includes(inputs, 'Simon')) {
-              EndPointService.fetchData().then(function(response) {
+            // if (_.includes(inputs, 'Simon')) {
+              EndPointService.fetchData(inputs[0]).then(function(response) {
                   EntityService.addEntity(response);
               });
-            }
+            // }
               // getPageName(encodeURI(inputs[i]), addStart);
             // }
           }

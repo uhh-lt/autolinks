@@ -93,10 +93,10 @@ module.exports = function (app) {
     //     });
     // });
 
-    app.get('/service/call/', function (req, res) {
+    app.post('/service/call', function (req, res) {
 
-      var resp = [];
-
+          var resp = [];
+          debugger;
           var options = {
                 url: config.apiUrl + '/service/call',
                 method: 'POST',
@@ -128,7 +128,7 @@ module.exports = function (app) {
                       ]
                     },
                     "context": {
-                      "text": "German",
+                      "text": req.body.text,
                       "source": "string",
                       "lang": "string",
                       "availabletypes": [
