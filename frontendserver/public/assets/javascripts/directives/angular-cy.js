@@ -430,6 +430,13 @@ define([
                                 return n;
                               }
 
+                              function extractPredicate(n) {
+                                if (_.isArray(n.predicate)) {
+                                  return extractSubject(n.predicate[0]);
+                                }
+                                return n;
+                              }
+
                               if (_.isArray(n.subject)) {
                                 var s = extractSubject(n);
                                 var subject = {
@@ -460,16 +467,32 @@ define([
                                 };
                               }
 
-                              var edge = {
-                                group: "edges",
-                                data:
-                                {
-                                  id: ( subject.id + object.id ),
-                                  source: subject.name,
-                                  target: object.name,
-                                  name: n.predicate
+                              if (_.isArray(n.predicate)) {
+                                var p = extractPredicate(n);
+                                var edge = {
+                                  group: "edges",
+                                  data:
+                                  {
+                                    id: ( subject.id + object.id ),
+                                    source: subject.name,
+                                    target: object.name,
+                                    name: p.subject
+                                  }
                                 }
+                              } else {
+                                var edge = {
+                                  group: "edges",
+                                  data:
+                                  {
+                                    id: ( subject.id + object.id ),
+                                    source: subject.name,
+                                    target: object.name,
+                                    name: n.predicate
+                                  }
+                                };
                               }
+
+
 
                               newEdge.push(edge);
                               newNode.push(subject, object);

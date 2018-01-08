@@ -106,12 +106,52 @@ module.exports = function (app) {
                    'authorization': 'Basic am9objpkb2U='
                  },
                 json: true,
-                body: {
-                  "service": "Dummy",
-                  "path": "/baz/{username}",
+                body:
+                // {
+                //   "service": "Dummy",
+                //   "path": "/baz/{username}",
+                //   "method": "post",
+                //   "data": {}
+                //  }
+                {
+                  "service": "Wiki",
+                  "version": "0.0.1",
+                  "path": "/findarticles",
                   "method": "post",
-                  "data": {}
-                 }
+                  "data": {
+                    "focus": {
+                      "offsets": [
+                        {
+                          "from": 0,
+                          "length": 6
+                        }
+                      ]
+                    },
+                    "context": {
+                      "text": "German",
+                      "source": "string",
+                      "lang": "string",
+                      "availabletypes": [
+                        "string"
+                      ],
+                      "annotations": [
+                        {
+                          "type": "string",
+                          "doffset": {
+                            "offsets": [
+                              {
+                                "from": 0,
+                                "length": 0
+                              }
+                            ]
+                          },
+                          "properties": {},
+                          "analyzer": "string"
+                        }
+                      ]
+                    }
+                  }
+                }
               }
 
         console.log('service call');
