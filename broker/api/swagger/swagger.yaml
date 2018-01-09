@@ -573,7 +573,6 @@ paths:
       operationId: read
       tags:
         - Storage
-        - User
       description: Get the data for a particular key
       parameters:
         - name: key
@@ -599,7 +598,6 @@ paths:
       operationId: write
       tags:
         - Storage
-        - User
       description: Write data for a particular key
       parameters:
         - name: kvp
@@ -622,7 +620,6 @@ paths:
     get:
       tags:
         - Storage
-        - User
       description: Get info about the storage of the currently logged in user
       # used as the method name of the controller
       operationId: info
