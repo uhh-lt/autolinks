@@ -3,7 +3,7 @@
      <form>
        <md-toolbar class="md-theme-light">
          <h1 class="md-toolbar-tools">
-           <md-input-container class="example-full-width">
+           <md-input-container class="example-full-width" ng-if="selectedEntity !== 'createCompound'">
              <input
               style="color: white"
               ng-model="selectedEntity.data().name"
@@ -11,6 +11,9 @@
              >
            </md-input-container>
            <!-- <input value="{{selectedEntity.data('name')}}" /> -->
+           <div ng-if="selectedEntity === 'createCompound'">
+            Create Compound Node:
+          </div>
           </h1>
        </md-toolbar>
        <md-content layout-padding>
@@ -19,7 +22,9 @@
             ng-src="{{selectedEntity.data('image') === undefined ? '' : selectedEntity.data('image')}}"
             style="width:200px;"
           />
-           <md-input-container>
+           <md-input-container
+            ng-if="selectedEntity !== 'createCompound'"
+           >
              <label for="testInput">Description</label>
              <textarea
                 ng-model="selectedEntity.data().desc"
@@ -28,8 +33,21 @@
               >
              </textarea>
            </md-input-container>
-         <md-button ng-click="delete()" class="md-warn">
+           <md-input-container
+            ng-if="selectedEntity === 'createCompound'"
+           >
+             <label for="newCompound">Name</label>
+             <input
+                id="newCompound"
+                ng-if="selectedEntity === 'createCompound'"
+              >
+            </input>
+           </md-input-container>
+         <md-button ng-click="delete()" class="md-warn" ng-if="selectedEntity !== 'createCompound'">
            Delete
+         </md-button>
+         <md-button ng-click="createCompound()" class="md-primary" ng-if="selectedEntity === 'createCompound'">
+           Create
          </md-button>
        </md-content>
      </form>

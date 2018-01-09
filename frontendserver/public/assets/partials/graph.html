@@ -1,7 +1,7 @@
 <div>
   <div id="content" class="container" ng-controller="GraphController">
     <div>
-      <div class="row">
+      <!-- <div class="row">
         <div class="col-xs-8">
           <span>Node:</span>
           <select class="btn btn-primary dropdown-toggle" ng-model="form.obj.objTypes" ng-options="name for name in objTypes"></select>
@@ -11,7 +11,7 @@
           <button class="btn btn-success" ng-click="addObj()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> ADD NODE</button>
           <button class="btn btn-danger" ng-click="delObj()"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span> DELETE NODE</button>
           <button class="btn btn-default" ng-click="centerGraph()"><span class="glyphicon glyphicon-resize-full" aria-hidden="true"></span> FIT NODES</button>
-          <button class="btn btn-default" ng-click="reset()"><span class="glyphicon glyphicon-retweet" aria-hidden="true"></span> RESET NODES</button>
+          <button class="btn btn-default" ng-click="layoutReset()"><span class="glyphicon glyphicon-retweet" aria-hidden="true"></span> RESET NODES</button>
         </div>
         <div class="col-xs-4 text-right">
           <button ng-hide="edgehandler" class="btn btn-success" ng-click="activateEdgeHandle()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> ADD EDGE</button>
@@ -30,7 +30,7 @@
             <button class="btn btn-success" ng-click="addEdge()">ADD EDGE</button>
           </span>
         </div>
-      </div>
+      </div> -->
       <cytoscape data="graphData" cy-data="mapData" cy-edges="edgeData" cy-click="doClick(value)" options="graphOptions" events="graphEvents"/>
     </div>
   </div>

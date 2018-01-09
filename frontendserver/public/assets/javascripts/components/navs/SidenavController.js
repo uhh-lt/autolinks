@@ -8,12 +8,15 @@ define([
     angular.module('autolinks.sidenav', []);
     angular.module('autolinks.sidenav')
         // Viewer Controller
-        .controller('SidenavController', ['$scope', '$rootScope', '$timeout', '$mdSidenav', '$log', 'EntityService', 'EndPointService',
-        function ($scope, $rootScope, $timeout, $mdSidenav, $log, EntityService, EndPointService) {
+        .controller('SidenavController', ['$scope', '$rootScope', '$timeout', '$mdSidenav', '$log', 'EntityService', 'EndPointService', '_',
+        function ($scope, $rootScope, $timeout, $mdSidenav, $log, EntityService, EndPointService, _) {
+
+          $scope.newCompound = '';
 
           $scope.init = function() {
             // $timeout( function
               $scope.selectedEntity = EntityService.getRootScopeEntity();
+              console.log($scope.selectedEntity);
               // console.log($scope);
             // }, 1000);
           }
@@ -33,6 +36,11 @@ define([
           //     // $rootScope.$broadcast('appChanged');
           //     $mdSidenav('right').close();
           // };
+
+          $scope.createCompound = function(){
+              $rootScope.$emit('createCompound');
+              $mdSidenav('right').close();
+          };
 
           $scope.delete = function(){
               EntityService.deleteEntity();

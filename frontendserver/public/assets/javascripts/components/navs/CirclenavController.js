@@ -9,8 +9,10 @@ define([
     angular.module('autolinks.circlenav', []);
     angular.module('autolinks.circlenav')
         // Circlenav Controller
-        .controller('CirclenavController', ['$scope',
-        function ($scope) {
+        .controller('CirclenavController', ['$scope', '$rootScope', '$mdSidenav', 'EntityService',
+        function ($scope, $rootScope, $mdSidenav, EntityService) {
+
+          $scope.lockLeft = true;
 
           $scope.init = function() {
             	var ul = $("#navs"),
@@ -35,8 +37,32 @@ define([
             		}
             	});
           };
+
           $scope.init();
 
+          $scope.addCompound = function(){
+            if (cy.$(':selected').length > 0) {
+              EntityService.openSideNav('createCompound');
+            } else {
+              console.log('Please select one or more node to be children');
+            }
+          };
+
+          $scope.centerGraph = function() {
+            $rootScope.$emit('centerGraph');
+          };
+
+          $scope.layoutReset = function(){
+            $rootScope.$broadcast('layoutReset');
+          };
+
+          $scope.toggleSidenav = function() {
+            if (window.innerWidth > 1280) {
+              $rootScope.$emit('toggleMainnav');
+            } else {
+              $mdSidenav('left').toggle();
+            }
+          };
         }
       ]);
 });
