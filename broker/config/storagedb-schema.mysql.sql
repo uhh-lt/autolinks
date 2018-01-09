@@ -2,47 +2,67 @@
 -- CREATE DATABASE IF NOT EXISTS autolinks DEFAULT CHARACTER SET binary;
 -- USE autolinks;
 -- create the tables
-CREATE TABLE IF NOT EXISTS triples (
-  tid  int unsigned NOT NULL AUTO_INCREMENT,
-  s    int unsigned NOT NULL,
-  p    int unsigned NOT NULL,
-  o    int unsigned NOT NULL,
-  PRIMARY KEY (tid),
-  KEY (s),
-  KEY (p),
-  KEY (o),
-  UNIQUE spo (s, p, o)
-) ENGINE=MyISAM;
-
-
 CREATE TABLE IF NOT EXISTS resources (
   rid         int unsigned NOT NULL AUTO_INCREMENT,
-  surfaceform varchar(512) DEFAULT NULL,
-  islist      boolean DEFAULT false,
+  isstring    boolean DEFAULT NULL,
   istriple    boolean DEFAULT NULL,
+  islist      boolean DEFAULT NULL,
+  PRIMARY KEY (rid)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS stringResources (
+  rid         int unsigned NOT NULL,
+  surfaceform varchar(512) NOT NULL,
   PRIMARY KEY (rid),
   UNIQUE (surfaceform(333))
 ) ENGINE=MyISAM;
 
-
-CREATE TABLE IF NOT EXISTS resourceToTriples (
-  rid int unsigned NOT NULL,
-  tid int unsigned NOT NULL,
-  PRIMARY KEY (rid, tid),
-  KEY (rid),
-  KEY (tid)
+CREATE TABLE IF NOT EXISTS tripleResources (
+  rid  int unsigned NOT NULL,
+  subj int unsigned NOT NULL,
+  pred int unsigned NOT NULL,
+  obj  int unsigned NOT NULL,
+  PRIMARY KEY (rid),
+  KEY (subj),
+  KEY (pred),
+  KEY (obj),
+  UNIQUE spo (subj, pred, obj)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS listResources (
+  rid            int unsigned NOT NULL,
+  listdescriptor varchar(256) NOT NULL,
+  PRIMARY KEY (rid, listdescriptor),
+  KEY (rid),
+  KEY (listdescriptor)
+) ENGINE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS storage (
+CREATE TABLE IF NOT EXISTS listResourceItems (
+  rid     int unsigned NOT NULL,
+  itemrid int unsigned NOT NULL,
+  PRIMARY KEY (rid, itemrid),
+  KEY (rid),
+  KEY (itemrid)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS resourcePermission (
+  rid         int unsigned NOT NULL,
+  uid         int unsigned NOT NULL,
+  r           boolean DEFAULT TRUE,
+  w           boolean DEFAULT NULL,
+  PRIMARY KEY (rid,uid),
+  KEY (uid),
+  KEY (rid)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS storageItems (
   sid        int unsigned NOT NULL AUTO_INCREMENT,
   username   varchar(32),
   storagekey varchar(512) NOT NULL,
   PRIMARY KEY (sid, username, storagekey(256))
 ) ENGINE=MyISAM;
 
-
-CREATE TABLE IF NOT EXISTS storageToResource (
+CREATE TABLE IF NOT EXISTS storageItemToResource (
   sid int unsigned NOT NULL AUTO_INCREMENT,
   rid int unsigned NOT NULL,
   PRIMARY KEY (sid, rid),
@@ -50,100 +70,111 @@ CREATE TABLE IF NOT EXISTS storageToResource (
   KEY (rid)
 ) ENGINE=MyISAM;
 
-
-drop function if exists add_resource_to_triple_mapping;
-
-
-drop function if exists add_child_to_resource;
-
-
-drop function if exists add_to_storage;
-
-
-drop function if exists add_triple_complete;
-
+-- DEFINE SOME HELPER FUNCTIONS
 
 drop function if exists add_resource;
 
+drop function if exists get_or_add_stringResource;
 
-drop function if exists add_triple;
+drop function if exists get_or_add_tripleResource;
 
+drop function if exists get_or_add_listResource;
 
-drop function if exists add_storage_to_resource_mapping;
+drop function if exists add_listResourceItem;
 
+drop function if exists get_or_add_storageItem;
+
+drop function if exists create_storageItemToResourceMapping;
 
 DELIMITER //
 
+create function add_resource ( isstring_ boolean, istriple_ boolean, islist_ boolean )
+RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
+BEGIN
+  declare rid_ int unsigned default 0;
+  -- TODO: check if multiple values are set
+  if NOT ( isstring_ AND istriple_ AND islist_) then
+    return rid_;
+  end if;
+  insert into resources set isstring = isstring_, istriple = istriple_, islist = islist_;
+  select LAST_INSERT_ID() into rid_;
+  return rid_;
+END //
 
-create function add_to_storage (
-  username_ varchar(32), storagekey_ varchar(512))
+create function get_or_add_stringResource ( surfaceform_ varchar(512) )
+RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
+BEGIN
+  declare rid_ int unsigned default 0;
+  if surfaceform_ is NULL then
+    return rid_;
+  end if;
+  select rid into rid_ from stringResources where surfaceform = surfaceform_ limit 1;
+  if rid_ = 0 then
+    select add_resource(TRUE, NULL, NULL) into rid_;
+    insert into stringResources set rid = rid_, surfaceform = surfaceform_;
+  end if;
+  return rid_;
+END //
+
+create function get_or_add_tripleResource ( subj_ int unsigned, pred_ int unsigned, obj_ int unsigned )
+RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
+BEGIN
+  declare rid_ int unsigned default 0;
+  select rid into rid_ from tripleResources where subj = subj_ and pred = pred_ and obj = obj_ limit 1;
+  if rid_ = 0 then
+    select add_resource(NULL, TRUE, NULL) into rid_;
+    insert into tripleResources set rid = rid_, subj = subj_, pred = pred_, obj = obj_;
+  end if;
+  return rid_;
+END //
+
+create function get_or_add_listResource ( listdescriptor_ varchar(512) )
+RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
+BEGIN
+  declare rid_ int unsigned default 0;
+  if listdescriptor_ is NULL then
+    return rid_;
+  end if;
+  select rid into rid_ from listResources where listdescriptor = listdescriptor_ limit 1;
+  if rid_ = 0 then
+    select add_resource(NULL, NULL, TRUE) into rid_;
+    insert into listResources set rid = rid_, listdescriptor = listdescriptor_;
+  end if;
+  return rid_;
+END //
+
+create function add_listResourceItem ( rid_ int unsigned, itemrid_ int unsigned )
+RETURNS boolean DETERMINISTIC MODIFIES SQL DATA
+BEGIN
+  declare list_item_existed boolean default false;
+  select count(*) > 0 into list_item_existed from listResourceItems where rid = rid_ and itemrid = itemrid_ limit 1;
+  if not list_item_existed then
+    insert into listResourceItems set rid = rid_, itemrid = itemrid_;
+  end if;
+  return list_item_existed;
+END //
+
+create function get_or_add_storageItem ( username_ varchar(32), storagekey_ varchar(512) )
 RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
 BEGIN
   declare sid_ int unsigned default 0;
-  select sid into sid_ from storage where username = username_ and storagekey = storagekey_ limit 1;
+  select sid into sid_ from storageItems where username = username_ and storagekey = storagekey_ limit 1;
   if sid_ = 0 then
-    insert into storage set username = username_, storagekey = storagekey_;
+    insert into storageItems set username = username_, storagekey = storagekey_;
     select LAST_INSERT_ID() into sid_;
   end if;
   return sid_;
 END //
 
-
-create function add_resource (
-  surfaceform_ varchar(512), islist_ boolean, istriple_ boolean)
-RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
+create function create_storageItemToResourceMapping ( sid_ int unsigned, rid_ int unsigned )
+RETURNS boolean DETERMINISTIC MODIFIES SQL DATA
 BEGIN
-  declare rid_ int unsigned default 0;
-  if surfaceform_ is NULL and not islist_ and not istriple_ then
-    return rid_;
+  declare mapping_existed boolean default false;
+  select count(*) > 0 into mapping_existed from storageItemToResource where sid = sid_ and rid = rid_ limit 1;
+  if not mapping_existed then
+    insert into storageItemToResource set sid = sid_, rid = rid_;
   end if;
-  select rid into rid_ from resources where surfaceform = surfaceform_ and islist = islist_ and istriple = istriple_ limit 1;
-  if rid_ = 0 then
-    insert into resources set surfaceform = surfaceform_, islist = islist_, istriple = istriple_;
-    select LAST_INSERT_ID() into rid_;
-  end if;
-  return rid_;
-END //
-
-
-create function add_triple (
-  rid_s int unsigned, rid_p int unsigned, rid_o int unsigned)
-RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
-BEGIN
-  declare tid_ int unsigned default 0;
-  select tid into tid_ from triples where s = rid_s and p = rid_p and o = rid_o limit 1;
-  if tid_ = 0 then
-    insert into triples set s = rid_s, p = rid_p, o = rid_o;
-    select LAST_INSERT_ID() into tid_;
-  end if;
-  return tid_;
-END //
-
-
-create function add_resource_to_triple_mapping (
-  rid_ int unsigned, tid_ int unsigned)
-RETURNS tinyint DETERMINISTIC MODIFIES SQL DATA
-BEGIN
-  declare mapping_exists tinyint default 0;
-  -- check for existence
-  select count(*) > 0 into mapping_exists from resourceToTriples where rid = rid_ and tid = tid_ limit 1;
-  if not mapping_exists then
-    insert into resourceToTriples set rid = rid_, tid = tid_;
-  end if;
-  return mapping_exists;
-END //
-
-
-create function add_storage_to_resource_mapping (
-  sid_ int unsigned, rid_ int unsigned)
-RETURNS tinyint DETERMINISTIC MODIFIES SQL DATA
-BEGIN
-  declare mapping_exists tinyint default 0;
-  select count(*) > 0 into mapping_exists from storageToResource where sid = sid_ and rid = rid_ limit 1;
-  if not mapping_exists then
-    insert into storageToResource set sid = sid_, rid = rid_;
-  end if;
-  return mapping_exists;
+  return mapping_existed;
 END //
 
 
