@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS resources (
   isstring    boolean DEFAULT NULL,
   istriple    boolean DEFAULT NULL,
   islist      boolean DEFAULT NULL,
+  label       varchar(64) DEFAULT NULL,
   PRIMARY KEY (rid)
 ) ENGINE=MyISAM;
 
@@ -57,9 +58,9 @@ CREATE TABLE IF NOT EXISTS resourcePermission (
 
 CREATE TABLE IF NOT EXISTS storageItems (
   sid        int unsigned NOT NULL AUTO_INCREMENT,
-  username   varchar(32),
+  uid        int unsigned NOT NULL,
   storagekey varchar(512) NOT NULL,
-  PRIMARY KEY (sid, username, storagekey(256))
+  PRIMARY KEY (sid, uid, storagekey(256))
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS storageItemToResource (
@@ -68,6 +69,14 @@ CREATE TABLE IF NOT EXISTS storageItemToResource (
   PRIMARY KEY (sid, rid),
   KEY (sid),
   KEY (rid)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS users (
+  uid         int unsigned NOT NULL AUTO_INCREMENT,
+  name        varchar(32),
+  isgroup     boolean DEFAULT NULL,
+  PRIMARY KEY (uid),
+  UNIQUE (name)
 ) ENGINE=MyISAM;
 
 -- DEFINE SOME HELPER FUNCTIONS
@@ -85,6 +94,8 @@ drop function if exists add_listResourceItem;
 drop function if exists get_or_add_storageItem;
 
 drop function if exists create_storageItemToResourceMapping;
+
+drop function if exists get_or_add_user;
 
 DELIMITER //
 
@@ -154,13 +165,17 @@ BEGIN
   return list_item_existed;
 END //
 
-create function get_or_add_storageItem ( username_ varchar(32), storagekey_ varchar(512) )
+create function get_or_add_storageItem ( name_ varchar(32), storagekey_ varchar(512) )
 RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
 BEGIN
+  declare uid_ int unsigned default 0;
   declare sid_ int unsigned default 0;
-  select sid into sid_ from storageItems where username = username_ and storagekey = storagekey_ limit 1;
+  -- get the user first (user must exist)
+  select uid into uid_ from users where name = name_ limit 1;
+  -- then get the sid
+  select sid into sid_ from storageItems where uid = uid_ and storagekey = storagekey_ limit 1;
   if sid_ = 0 then
-    insert into storageItems set username = username_, storagekey = storagekey_;
+    insert into storageItems set uid = uid_, storagekey = storagekey_;
     select LAST_INSERT_ID() into sid_;
   end if;
   return sid_;
@@ -177,5 +192,18 @@ BEGIN
   return mapping_existed;
 END //
 
+create function get_or_add_user ( name_ varchar(32), isgroup_ boolean )
+RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
+BEGIN
+  declare uid_ int unsigned default 0;
+  if name_ is NULL then
+    return uid_;
+  end if;
+  select uid into uid_ from users where name = name_ limit 1;
+  if uid_ = 0 then
+    insert into users set name = name_, isgroup = isgroup_;
+  end if;
+  return uid_;
+END //
 
 DELIMITER ;

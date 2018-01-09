@@ -129,6 +129,8 @@ mysqldb.init((err, r) => {
   // mysqldb.saveStorageResourceMapping(23,21).then(console.log,console.error);
   // mysqldb.saveStorageItemToResourceMapping('me','asdjbao').then(console.log, console.error);
 
+  // mysqldb.createUsergroup('me').then(console.log, console.error);
+
   // mysqldb.write('me', '12345',
   //   [
   //     'hello',

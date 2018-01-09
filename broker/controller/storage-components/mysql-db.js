@@ -284,7 +284,6 @@ module.exports.getTripleResource = function(rid) {
         .then(rids => Promise.all(rids.map(rid => this.getResource(rid))))
         .then(resources => new Triple(resources[0], resources[1], resources[2]));
     });
-
 };
 
 module.exports.getListResource = function(rid) {
@@ -294,7 +293,7 @@ module.exports.getListResource = function(rid) {
 };
 
 module.exports.getStorageResource = function(username, storagekey) {
-  return promisedQuery('select s2r.rid as rid from storageItems s, storageItemToResource s2r where s.storagekey = ? and s.username = ? and s2r.sid = s.sid', [storagekey, username])
+  return promisedQuery('select s2r.rid as rid from storageItems s, users u, storageItemToResource s2r where s2r.sid = s.sid and s.uid = u.uid and s.storagekey = ? and u.name = ?', [storagekey, username])
     .then(res => {
       if(!res.rows.length){
         logger.debug(`Storage item '${storagekey}' for user '${username}' does not exist`);
@@ -304,6 +303,12 @@ module.exports.getStorageResource = function(username, storagekey) {
     })
     .then(rid => rid && this.getResource(rid) || null);
 };
+
+module.exports.createUsergroup = function(name) {
+  return promisedQuery('select get_or_add_user( ?, true) as uid', [name])
+    .then(res => res.rows[0].uid);
+};
+
 
 module.exports.info = function(username, callback) {
   return callback(new Exception('NOT YET IMPLEMENTED'));
