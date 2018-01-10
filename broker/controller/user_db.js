@@ -13,6 +13,7 @@ module.exports = {
 // requires
 const
   fs = require('fs'),
+  path = require('path'),
   nodeCleanup = require('node-cleanup'),
   sqlite3 = require('sqlite3').verbose(),
   logger = require('./log')(module)
@@ -26,7 +27,7 @@ let dbconn;
  * @param callback = function(err)
  */
 function initdb(callback) {
-  dbconn = new sqlite3.Database(`${__dirname}/../data/user.sqlite3.db`, (err) => {
+  dbconn = new sqlite3.Database(path.resolve(global.__datadir && path.join(global.__datadir, 'user.sqlite3.db') || 'user.sqlite3.db'), (err) => {
     if (err) {
       return callback(err);
     }
@@ -127,6 +128,6 @@ function get_users(callback_service, callback_done) {
       return err;
     }
     callback_service(service);
-  }, () => { return callback_done() } );
+  }, () => { return callback_done(); } );
 }
 

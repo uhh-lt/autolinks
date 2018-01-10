@@ -1,16 +1,9 @@
 'use strict';
 
 /* some global settings and requirements */
+require('./serversetup')(module);
 process.setMaxListeners(0); // prevent: (node:308) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 uncaughtException listeners added. Use emitter.setMaxListeners() to increase limit
 require('events').EventEmitter.defaultMaxListeners = 100; // prevent: (node:24) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 error listeners added. Use emitter.setMaxListeners() to increase limit
-
-/* make sure the data directory exists */
-const fs = require('fs'), path = require('path');
-const datadir = process.env.DATA_DIR || '../data/broker';
-global.__datadir = path.resolve(path.join(__dirname, datadir));
-if (!fs.existsSync(global.__datadir)) { fs.mkdirSync(global.__datadir); }
-global.__basedir = path.resolve(__dirname);
-
 
 /* imports */
 const

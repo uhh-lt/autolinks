@@ -17,6 +17,7 @@ module.exports = {
 // requires
 const
   fs = require('fs'),
+  path = require('path'),
   nodeCleanup = require('node-cleanup'),
   sqlite3 = require('sqlite3').verbose(),
   logger = require('./log')(module)
@@ -30,7 +31,7 @@ let dbconn;
  * @param callback = function(err)
  */
 function initdb(callback) {
-  dbconn = new sqlite3.Database(`${__dirname}/../data/service.sqlite3.db`, (err) => {
+  dbconn = new sqlite3.Database(path.resolve(global.__datadir && path.join(global.__datadir, 'service.sqlite3.db') || 'service.sqlite3.db'), (err) => {
     if (err) {
       return callback(err);
     }
