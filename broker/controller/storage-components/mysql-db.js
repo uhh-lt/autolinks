@@ -293,7 +293,7 @@ module.exports.getListResource = function(rid) {
 };
 
 module.exports.getStorageResource = function(username, storagekey) {
-  return promisedQuery('select s2r.rid as rid from storageItems s, users u, storageItemToResource s2r where s2r.sid = s.sid and s.uid = u.uid and s.storagekey = ? and u.name = ?', [storagekey, username])
+  return promisedQuery('select s2r.rid as rid from storageItems s, storageItemToResource s2r where s2r.sid = s.sid and s.storagekey = ? and s.uid = (select get_uid(?))', [storagekey, username])
     .then(res => {
       if(!res.rows.length){
         logger.debug(`Storage item '${storagekey}' for user '${username}' does not exist`);

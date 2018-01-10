@@ -95,6 +95,8 @@ drop function if exists get_or_add_storageItem;
 
 drop function if exists create_storageItemToResourceMapping;
 
+drop function if exists get_uid;
+
 drop function if exists get_or_add_user;
 
 DELIMITER //
@@ -192,7 +194,7 @@ BEGIN
   return mapping_existed;
 END //
 
-create function get_or_add_user ( name_ varchar(32), isgroup_ boolean )
+create function get_uid ( name_ varchar(32) )
 RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
 BEGIN
   declare uid_ int unsigned default 0;
@@ -200,6 +202,17 @@ BEGIN
     return uid_;
   end if;
   select uid into uid_ from users where name = name_ limit 1;
+  return uid_;
+END //
+
+create function get_or_add_user ( name_ varchar(32), isgroup_ boolean )
+RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
+BEGIN
+  declare uid_ int unsigned default 0;
+  if name_ is NULL then
+    return uid_;
+  end if;
+  select get_uid( name_ ) into uid_;
   if uid_ = 0 then
     insert into users set name = name_, isgroup = isgroup_;
   end if;
