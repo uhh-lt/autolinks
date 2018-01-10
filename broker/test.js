@@ -131,23 +131,23 @@ mysqldb.init((err, r) => {
 
   // mysqldb.createUsergroup('me').then(console.log, console.error);
 
-  // mysqldb.write('me', '12345',
-  //   [
-  //     'hello',
-  //     ['hallo hallo', new Triple('i','am','goof')],
-  //     new Triple('I', 'save', [ 'world',
-  //       new Triple('I', [ new Triple('You', 'saved', 'me') ], 'you')
-  //     ]),
-  //     new Triple('You', 'save', 'the world'),
-  //     new Triple('He', 'save', 'me'),
-  //     new Triple('ME', 'save', 'He'),
-  //     'hallo welt'
-  //   ], function(err, res) {
-  //     if(err){
-  //       return console.log(err);
-  //     }
-  //     return console.log(res);
-  //   });
+  mysqldb.write('me', '12345',
+    [
+      'hello',
+      ['hallo hallo', new Triple('i','am','goof')],
+      new Triple('I', 'save', [ 'world',
+        new Triple('I', [ new Triple('You', 'saved', 'me') ], 'you')
+      ]),
+      new Triple('You', 'save', 'the world'),
+      new Triple('He', 'save', 'me'),
+      new Triple('ME', 'save', 'He'),
+      'hallo welt'
+    ], function(err, res) {
+      if(err){
+        return console.log(err);
+      }
+      return console.log(res);
+    });
 
   // mysqldb.getTriple(2).then(console.log,console.err);
   // mysqldb.getResource(12).then(console.log,console.err);

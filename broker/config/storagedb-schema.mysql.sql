@@ -172,7 +172,7 @@ RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
 BEGIN
   declare uid_ int unsigned default 0;
   declare sid_ int unsigned default 0;
-  -- get the user first (user must exist)
+  -- get the user first (if user does not exist default user with id 0 will be used)
   select uid into uid_ from users where name = name_ limit 1;
   -- then get the sid
   select sid into sid_ from storageItems where uid = uid_ and storagekey = storagekey_ limit 1;

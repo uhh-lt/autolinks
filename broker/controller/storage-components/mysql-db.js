@@ -93,13 +93,20 @@ module.exports.read = function(username, storagekey, callback) {
 
 
 module.exports.write = function(username, storagekey, resources, callback) {
-  return this.saveResource(resources)
-    .then(rid => this.saveStorageItem(username, storagekey).then(sid => Object({sid:sid, rid:rid})))
-    .then(ids => this.saveStorageItemToResourceMapping(ids.sid, ids.rid))
-    .then(
-      res => callback(null, res),
-      err => callback(err, null)
-    );
+  return this.getStorageResourceId(username, storagekey)
+    .then(rid => {
+      if(rid){
+        logger.debug(`Resource for storagekey '${storagekey}' and user '${username}' was already stored, skipping write action.`);
+        return true;
+      }
+      return this.saveResource(resources)
+        .then(rid => this.saveStorageItem(username, storagekey).then(sid => Object({sid:sid, rid:rid})))
+        .then(ids => this.saveStorageItemToResourceMapping(ids.sid, ids.rid))
+        .then(
+          res => callback(null, res),
+          err => callback(err, null)
+        );
+    });
 };
 
 /**
@@ -292,7 +299,7 @@ module.exports.getListResource = function(rid) {
     .then(item_rids => Promise.all(item_rids.map(item_rid => this.getResource(item_rid))));
 };
 
-module.exports.getStorageResource = function(username, storagekey) {
+module.exports.getStorageResourceId = function(username, storagekey) {
   return promisedQuery('select s2r.rid as rid from storageItems s, storageItemToResource s2r where s2r.sid = s.sid and s.storagekey = ? and s.uid = (select get_uid(?))', [storagekey, username])
     .then(res => {
       if(!res.rows.length){
@@ -300,7 +307,11 @@ module.exports.getStorageResource = function(username, storagekey) {
         return null;
       }
       return res.rows[0].rid;
-    })
+    });
+};
+
+module.exports.getStorageResource = function(username, storagekey) {
+  return module.exports.getStorageResourceId(username, storagekey)
     .then(rid => rid && this.getResource(rid) || null);
 };
 
