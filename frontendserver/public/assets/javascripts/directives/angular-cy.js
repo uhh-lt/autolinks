@@ -186,8 +186,17 @@ define([
                           var evtTarget = e.target;
                           var nodeId = evtTarget.id();
                           scope.selectedEntity = evtTarget;
+
+                          var eventIsDirect = evtTarget.same(this);
+                          console.log(nodeId);
+                          if( eventIsDirect ){
+                            this.emit('directtap');
+                          }
                           // scope.cyClick({value:nodeId});
                           // scope.$parent.EntityService.openSideNav(evtTarget);
+                      })
+                      .on('directtap', function(e) {
+                        e.stopPropagation();
                       });
 
                       scope.coordinate = {};
@@ -255,7 +264,10 @@ define([
                             cy.$('#'+ n.data('id')).qtip({
                               content: {
                                   text: function(event, api) {
+                                    event.preventDefault();
+                                    event.stopPropagation();
                                     scope.selectedEntity = n;
+                                    console.log(scope.selectedEntity.id());
                                     return (
                                     '<div class="node-buttons">' +
                                     '<button id="readMode" class="node-button"><i class="fa fa-book fa-2x"/></button>' +
@@ -264,6 +276,9 @@ define([
                                     '</div>'
                                     )
                                   }
+                              },
+                              show: {
+                                event: 'directtap'
                               },
                               position: {
                                 my: 'bottom center',
@@ -440,13 +455,13 @@ define([
                               if (_.isArray(n.subject)) {
                                 var s = extractSubject(n);
                                 var subject = {
-                                    id: s.subject + '_as_parent',
+                                    id: (s.subject + '_as_parent').replace(/\s/g, ''),
                                     name: s.subject,
                                     parent: parent ? parent.id : null
                                 };
                               } else {
                                 var subject = {
-                                    id: n.subject,
+                                    id: (n.subject).replace(/\s/g, ''),
                                     name: n.subject,
                                     parent: parent ? parent.id : null
                                 };
@@ -455,13 +470,13 @@ define([
                               if (_.isArray(n.object)) {
                                 var o = extractObject(n);
                                 var object = {
-                                    id: o.subject + '_as_parent',
+                                    id: (o.subject + '_as_parent').replace(/\s/g, ''),
                                     name: o.subject,
                                     parent: parent ? parent.id : null
                                 };
                               } else {
                                 var object = {
-                                    id: n.object,
+                                    id: (n.object).replace(/\s/g, ''),
                                     name: n.object,
                                     parent: parent ? parent.id : null
                                 };
@@ -473,9 +488,9 @@ define([
                                   group: "edges",
                                   data:
                                   {
-                                    id: ( subject.id + object.id ),
-                                    source: subject.name,
-                                    target: object.name,
+                                    id: ( subject.id + object.id ).replace(/\s/g, ''),
+                                    source: (subject.name).replace(/\s/g, ''),
+                                    target: (object.name).replace(/\s/g, ''),
                                     name: p.subject
                                   }
                                 }
@@ -484,15 +499,13 @@ define([
                                   group: "edges",
                                   data:
                                   {
-                                    id: ( subject.id + object.id ),
-                                    source: subject.name,
-                                    target: object.name,
+                                    id: ( subject.id + object.id ).replace(/\s/g, ''),
+                                    source: (subject.name).replace(/\s/g, ''),
+                                    target: (object.name).replace(/\s/g, ''),
                                     name: n.predicate
                                   }
                                 };
                               }
-
-
 
                               newEdge.push(edge);
                               newNode.push(subject, object);
