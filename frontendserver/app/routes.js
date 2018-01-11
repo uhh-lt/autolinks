@@ -123,7 +123,7 @@ module.exports = function (app) {
                       "offsets": [
                         {
                           "from": 0,
-                          "length": 6
+                          "length": 15
                         }
                       ]
                     },
