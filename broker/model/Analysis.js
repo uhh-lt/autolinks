@@ -9,7 +9,6 @@ module.exports = Analysis;
 Analysis.prototype.text = '';
 Analysis.prototype.source = 'unk';
 Analysis.prototype.lang = 'en';
-Analysis.prototype.availableTypes = [];
 Analysis.prototype.annotations = [];
 
 /**
@@ -19,7 +18,6 @@ function Analysis() {
   /*
    * The analysis object
    */
-  this.availableTypes = [ ];
   this.annotations = [ ];
 }
 
@@ -58,6 +56,23 @@ Analysis.fromText = function(text){
   const analysis = new Analysis();
   analysis.text = text;
   return analysis;
-}
+};
+
+/**
+ *
+ * @param {Array}
+ */
+Analysis.prototype.addAnnotations = function(annotations) {
+  this.annotations = this.annotations.concat(annotations);
+};
+
+/**
+ * @return {Set}
+ */
+Analysis.prototype.getAvailableTypes = function() {
+  return new Set(this.annotations.map(a => a.type));
+};
+
+
 
 

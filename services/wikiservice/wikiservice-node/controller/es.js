@@ -77,7 +77,7 @@ module.exports.search = function(text, callback, callbackDone) {
       if(esIndices > 0) {
         return searchRecursive(i-1);
       }
-      callbackDone(null);
+      return callbackDone(null);
     });
   })(esIndices.length-1);
 
