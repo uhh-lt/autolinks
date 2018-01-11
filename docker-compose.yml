@@ -46,6 +46,7 @@ services:
     image: node:9.3
     volumes:
       - ${PWD}/broker:/opt/project/broker
+      - ${PWD}/data:/opt/project/data
     ports:
       - 20000:10010
     networks:
@@ -107,6 +108,7 @@ services:
     volumes:
       - ${PWD}/services/dummy:/opt/project/services/dummy
       - ${PWD}/broker:/opt/project/broker
+      - ${PWD}/data:/opt/project/data
     networks:
       - anet
     working_dir: /opt/project/services/dummy
@@ -134,6 +136,7 @@ services:
     volumes:
       - ${PWD}/services/wikiservice/wikiservice-node:/opt/project/services/wikiservice/wikiservice-node
       - ${PWD}/broker:/opt/project/broker
+      - ${PWD}/data:/opt/project/data
     networks:
       - anet
     stdin_open: true
