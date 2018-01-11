@@ -89,6 +89,7 @@ const i = Object.assign(new Analysis(), h);
 console.log(h instanceof Analysis);
 console.log(i instanceof Analysis);
 console.log(i);
+console.log(i.getAvailableTypes());
 console.log(i.annotations[0] instanceof Annotation);
 
 const j = new Analysis().assign(h);

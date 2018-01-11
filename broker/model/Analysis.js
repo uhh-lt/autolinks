@@ -69,7 +69,7 @@ Analysis.prototype.addAnnotations = function(annotations) {
 /**
  * @return {Set}
  */
-Analysis.prototype.availableTypes = function() {
+Analysis.prototype.getAvailableTypes = function() {
   return new Set(this.annotations.map(a => a.type));
 };
 
