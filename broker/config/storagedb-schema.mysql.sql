@@ -1,6 +1,7 @@
 -- create and use the database if it doesn't exist
 -- CREATE DATABASE IF NOT EXISTS autolinks DEFAULT CHARACTER SET binary;
 -- USE autolinks;
+
 -- create the tables
 CREATE TABLE IF NOT EXISTS resources (
   rid         int unsigned NOT NULL AUTO_INCREMENT,

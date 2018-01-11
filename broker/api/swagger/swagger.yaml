@@ -102,10 +102,6 @@ definitions:
         type: string
       lang:
         type: string
-      availabletypes:
-        type: array
-        items:
-          type: string
       annotations:
         type: array
         items:
