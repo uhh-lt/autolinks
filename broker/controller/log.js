@@ -11,7 +11,6 @@ function getLabel(callingModule) {
   return parts[parts.length - 2] + '/' + parts.pop();
 }
 
-
 module.exports = function(callingModule) {
 
   const aModulesLabel = getLabel(callingModule);
