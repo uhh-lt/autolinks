@@ -83,12 +83,13 @@ services:
   ##
   # Services and their dependencies
   ##
-  # BEGIN: dummy service
-  dummy:
+  # BEGIN: demo service
+  demo:
     image: remstef/node-swagger:latest
     volumes:
-      - ${PWD}/services/dummy:/opt/project/services/dummy
+      - ${PWD}/services/demo:/opt/project/services/demo
       - ${PWD}/broker:/opt/project/broker
+      - ${PWD}/data:/opt/project/data
     ports:
       - 10010:10010
       - 3010:3001
@@ -96,7 +97,7 @@ services:
       - anet
     stdin_open: true
     tty: true
-    working_dir: /opt/project/services/dummy
+    working_dir: /opt/project/services/demo
     entrypoint: bash
     environment:
       - NODE_ENV=development
@@ -110,6 +111,7 @@ services:
     volumes:
       - ${PWD}/services/wikiservice/wikiservice-node:/opt/project/services/wikiservice/wikiservice-node
       - ${PWD}/broker:/opt/project/broker
+      - ${PWD}/data:/opt/project/data
     ports:
       - 10011:10010
       - 3011:3001

@@ -17,8 +17,7 @@ const
   storage = require('./controller/storage_wrapper'),
   nlp = require('./controller/nlp_wrapper'),
   auth = require('./controller/auth'),
-  logger = require('./controller/log')(module)
-  ;
+  logger = require('./controller/log')(module);
 
 /*
  * init databases, exit on error

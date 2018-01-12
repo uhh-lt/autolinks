@@ -1,20 +1,21 @@
 'use strict';
 
 /* some global settings and requirements */
+require('../../broker/serversetup')(module);
 // process.setMaxListeners(0); // prevent: (node:308) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 uncaughtException listeners added. Use emitter.setMaxListeners() to increase limit
 
 /**
  * imports
  **/
-const SwaggerExpress = require('swagger-express-mw'),
-  swaggerUi = require('swagger-ui-express'),
+const
+  SwaggerExpress = require('swagger-express-mw'),
   app = require('express')(),
-  util = require('util'),
+  swaggerUi = require('swagger-ui-express'),
   yaml = require('yamljs'),
+  util = require('util'),
   nodeCleanup = require('node-cleanup'),
   os = require('os'),
-  request = require('request')
-;
+  request = require('request');
 
 /**
  * init swagger ui

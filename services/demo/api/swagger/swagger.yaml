@@ -1,14 +1,14 @@
 ##
 #
-# API description of autolinks dummy service
+# API description of autolinks demo service
 #
 ##
 swagger: '2.0'
 info:
-  version: '0.0.1'
-  title: Dummy
+  version: '0.0.2'
+  title: Demo
   description: |
-    Autolinks Dummy Service:
+    Autolinks Demo Service:
     This service is only here for demonstration
     and testing purposes
 
@@ -38,10 +38,6 @@ definitions:
         type: string
       lang:
         type: string
-      availabletypes:
-        type: array
-        items:
-          type: string
       annotations:
         type: array
         items:
@@ -110,7 +106,7 @@ definitions:
         type: object
 
 tags:
-  - name: Dummy
+  - name: Demo
     description: Everything about the service
   - name: Restricted
     description: Paths that require a username
@@ -120,13 +116,13 @@ tags:
 paths:
   # here are the endpoints to what the service does
   /demo:
-    x-swagger-router-controller: dummy
+    x-swagger-router-controller: demo
     post:
       operationId: demo
       tags:
-        - Dummy
+        - Demo
       description: | 
-        Do something 
+        Example of a service method
         requires: [ner]
       parameters:
         - name: data
@@ -134,6 +130,11 @@ paths:
           description: The service parameter
           schema:
             $ref: '#/definitions/ServiceParameter'
+        - name: getkey
+          in: query
+          description: Compute and only return storagekey based on the ServiceParameter
+          type: boolean
+          allowEmptyValue: true
       responses:
         200:
           description: Success
@@ -149,15 +150,20 @@ paths:
     post:
       operationId: foo
       tags:
-        - Dummy
+        - Demo
         - Restricted
-      description: Do something
+      description: Another example service method
       parameters:
         - name: data
           in: body
           description: The service parameter
           schema:
             $ref: '#/definitions/ServiceParameter'
+        - name: getkey
+          in: query
+          description: Compute and only return storagekey based on the ServiceParameter
+          type: boolean
+          allowEmptyValue: true
       responses:
         200:
           description: Success
@@ -173,10 +179,15 @@ paths:
     get:
       operationId: bar
       tags:
-        - Dummy
+        - Demo
         - Restricted
-      description: Do something
-      parameters: []
+      description: A service that has no parameter and always returns the same data
+      parameters:
+        - name: getkey
+          in: query
+          description: Compute and only return storagekey
+          type: boolean
+          allowEmptyValue: true
       responses:
         200:
           description: Success
@@ -192,9 +203,9 @@ paths:
     post:
       operationId: baz
       tags:
-        - Dummy
+        - Demo
         - Restricted
-      description: Do something
+      description: A service that needs a username (autorization needs to be done elsewhere)
       parameters:
         - name: username
           required: true
@@ -206,6 +217,11 @@ paths:
           description: The service parameter
           schema:
             $ref: '#/definitions/ServiceParameter'
+        - name: getkey
+          in: query
+          description: Compute and only return storagekey based on the ServiceParameter
+          type: boolean
+          allowEmptyValue: true
       responses:
         200:
           description: Success

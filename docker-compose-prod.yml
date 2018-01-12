@@ -102,16 +102,16 @@ services:
   ##
   # Services and their dependencies
   ##
-  # BEGIN: dummy service
-  dummy:
+  # BEGIN: demo service
+  demo:
     image: node:9.3
     volumes:
-      - ${PWD}/services/dummy:/opt/project/services/dummy
+      - ${PWD}/services/demo:/opt/project/services/demo
       - ${PWD}/broker:/opt/project/broker
       - ${PWD}/data:/opt/project/data
     networks:
       - anet
-    working_dir: /opt/project/services/dummy
+    working_dir: /opt/project/services/demo
     entrypoint:
       - /bin/sh
       - -c
@@ -128,7 +128,7 @@ services:
     depends_on:
       broker:
         condition: service_healthy
-  # END: dummy service
+  # END: demo service
 
   # BEGIN: wikiservice
   wiki:
