@@ -27,6 +27,8 @@ var server = app.listen(port, function () {
 
 // routes ==================================================
 app.use('/login', require('./controllers/loginController'));
+app.use('/register', require('./controllers/registerController'));
+
 app.get('/', function (req, res) {
     res.redirect('/login'); // load the single view file (angular will handle the page changes on the front-end)
 });
