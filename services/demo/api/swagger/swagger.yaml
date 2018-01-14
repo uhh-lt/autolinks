@@ -86,11 +86,21 @@ definitions:
         type: object
         description: the object of the triple is either a string or a triple
         
-  Triples:
+  Resources:
     type: array
-    description: a list of triples
+    description: a list of resources
     items:
-      $ref: '#/definitions/Triple'
+      $ref: '#/definitions/Resource'
+
+  Resource:
+    type: object
+    properties:
+      label:
+        type: string
+        description: the label of the resource (optional)
+      value:
+        type: object
+        description: the actual resource (can be a list of resources, a triple, or a string)
 
   # in case of error return this object schema
   Exception:
@@ -139,7 +149,7 @@ paths:
         200:
           description: Success
           schema:
-            $ref: '#/definitions/Triples'
+            $ref: '#/definitions/Resources'
         default:
           description: Error
           schema:
@@ -168,7 +178,7 @@ paths:
         200:
           description: Success
           schema:
-            $ref: '#/definitions/Triples'
+            $ref: '#/definitions/Resources'
         default:
           description: Error
           schema:
@@ -192,7 +202,7 @@ paths:
         200:
           description: Success
           schema:
-            $ref: '#/definitions/Triples'
+            $ref: '#/definitions/Resources'
         default:
           description: Error
           schema:
@@ -226,7 +236,7 @@ paths:
         200:
           description: Success
           schema:
-            $ref: '#/definitions/Triples'
+            $ref: '#/definitions/Resources'
         default:
           description: Error
           schema:

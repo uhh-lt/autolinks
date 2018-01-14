@@ -152,14 +152,16 @@ mysqldb.init((err, r) => {
 
   // mysqldb.getTriple(2).then(console.log,console.err);
   // mysqldb.getResource(12).then(console.log,console.err);
+  setTimeout(function(){
+    mysqldb.getStorageResource('me', '12345').then(console.log, console.err);
+  }, 1500);
 
-  mysqldb.getStorageResource('me', '12345').then(console.log, console.err);
 
   setTimeout(function(){
     mysqldb.close((err) => {});
   }, 3000);
 
-});
+}, true);
 
 
 

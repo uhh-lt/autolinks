@@ -7,6 +7,7 @@ const
   mysql = require('mysql'),
   Exception = require('../../model/Exception'),
   Triple = require('../../model/Triple'),
+  Resource = require('../../model/Resource'),
   utils = require('../utils/utils'),
   logger = require('../log')(module);
 
@@ -50,7 +51,7 @@ function promisedQuery(query, values){
   });
 }
 
-module.exports.init = function(callback) {
+module.exports.init = function(callback, resetdata) {
 
   // read the script
   fs.readFile('config/storagedb-schema.mysql.sql', 'utf8', function (err,data) {
@@ -74,6 +75,12 @@ module.exports.init = function(callback) {
 
     // resolve queries sequentially
     utils.sequentialPromise(queries, promisedQuery)
+      .then(res => {
+        if(resetdata){
+          return module.exports.resetDatabase().then(_ignore => res);
+        }
+        return res;
+      })
       .then(
         res => callback(null, res),
         err => callback(err)
@@ -252,51 +259,60 @@ module.exports.getResource = function(rid) {
         return null;
       }
       const r = res.rows[0];
+      const newresource = new Resource(rid, r.label);
       if(r.istriple){
         logger.debug(`Requesting triple resource '${rid}'.`);
-        return this.getTripleResource(rid);
+        return this.fillTripleResource(newresource);
       }
       if(r.islist){
         logger.debug(`Requesting list resource '${rid}'.`);
-        return this.getListResource(rid);
+        return this.fillListResource(newresource);
       }
       if(r.isstring){
         logger.debug(`Requesting string resource '${rid}'.`);
-        return this.getStringResource(rid);
+        return this.fillStringResource(newresource);
       }
       throw new Error('This is impossible, a resource has to be one of {list,triple,string}.');
     });
 };
 
-module.exports.getStringResource = function(rid) {
-  return promisedQuery('select surfaceform from stringResources where rid = ?', [rid])
+module.exports.fillStringResource = function(resource) {
+  return promisedQuery('select surfaceform from stringResources where rid = ?', [resource.rid])
     .then(res => {
       if(!res.rows.length){
-        logger.debug(`String resource '${rid}' does not exist`);
+        logger.debug(`String resource '${resource.rid}' does not exist`);
         return null;
       }
-      return res.rows[0].surfaceform;
+      resource.value = res.rows[0].surfaceform;
+      return resource;
     });
 };
 
-module.exports.getTripleResource = function(rid) {
-  return promisedQuery('select * from tripleResources where rid = ?;', [rid])
+module.exports.fillTripleResource = function(resource) {
+  return promisedQuery('select * from tripleResources where rid = ?;', [resource.rid])
     .then(res => {
       if(!res.rows.length){
-        logger.debug(`Triple resource '${rid}' does not exist`);
+        logger.debug(`Triple resource '${resource.rid}' does not exist`);
         return null;
       }
       return Promise.resolve(res.rows[0])
         .then(row => [row.subj, row.pred, row.obj])
         .then(rids => Promise.all(rids.map(rid => this.getResource(rid))))
-        .then(resources => new Triple(resources[0], resources[1], resources[2]));
+        .then(resources => {
+          resource.value = new Triple(resources[0], resources[1], resources[2]);
+          return resource;
+        });
     });
 };
 
-module.exports.getListResource = function(rid) {
-  return promisedQuery('select * from listResourceItems where rid = ?', rid)
+module.exports.fillListResource = function(resource) {
+  return promisedQuery('select * from listResourceItems where rid = ?', [resource.rid])
     .then(res => res.rows.map(r => r.itemrid))
-    .then(item_rids => Promise.all(item_rids.map(item_rid => this.getResource(item_rid))));
+    .then(item_rids => Promise.all(item_rids.map(item_rid => this.getResource(item_rid))))
+    .then(item_resources => {
+      resource.value = item_resources;
+      return resource;
+    });
 };
 
 module.exports.getStorageResourceId = function(username, storagekey) {
@@ -316,13 +332,17 @@ module.exports.getStorageResource = function(username, storagekey) {
 };
 
 module.exports.createUsergroup = function(name) {
-  return promisedQuery('select get_or_add_user( ?, true) as uid', [name])
+  return promisedQuery('select get_or_add_user(?, true) as uid', [name])
     .then(res => res.rows[0].uid);
 };
 
-
 module.exports.info = function(username, callback) {
   return callback(new Exception('NOT YET IMPLEMENTED'));
+};
+
+module.exports.resetDatabase = function(){
+  logger.debug('Resetting database.');
+  return promisedQuery('call reset_database');
 };
 
 module.exports.close = function(callback){
