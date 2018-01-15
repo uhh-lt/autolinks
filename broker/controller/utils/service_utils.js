@@ -177,7 +177,7 @@ module.exports.call_service = function(location, path, method, data, req, res, n
 
   request_utils.promisedRequest(options)
     .then(result => {
-        logger.debug(`Sucessfully called service '${location}'.`);
+        logger.debug(`Sucessfully called service '${location}${path}'.`);
         res.header('Content-Type', result.response.headers['content-type']);
         res.send(result.body);
         res.end(next);
