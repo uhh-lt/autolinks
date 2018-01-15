@@ -29,54 +29,53 @@ module.exports.ping_service = function(service, callback) {
 
   const url = `${location}/ping`;
   request_utils.promisedRequest(url)
-    .then(
-      res => {
-        const now = new Date().getTime();
-        logger.debug(`ping service '${service.name}' success.`);
-        // if service was not active before print an info, otherwise ignore it
-        if(!service.active) {
-          logger.info(`Service '${service.name}' is now available.`);
-        }
-        return db.update_service(
-          service.name,
-          service.version,
-          {
-            lastseenactive: now,
-            lastcheck: now,
-            active: true
-          },
-          function(err){
-            if(err){
-              // log err but ignore in callback
-              logger.warn(`Could not update service: '${service.name}:${service.version}'.`);
-              logger.warn(err);
-            }
-            callback();
+    .then(res => {
+      const now = new Date().getTime();
+      logger.debug(`ping service '${service.name}' success.`);
+      // if service was not active before print an info, otherwise ignore it
+      if(!service.active) {
+        logger.info(`Service '${service.name}' is now available.`);
+      }
+      return db.update_service(
+        service.name,
+        service.version,
+        {
+          lastseenactive: now,
+          lastcheck: now,
+          active: true
+        },
+        function(err){
+          if(err){
+            // log err but ignore in callback
+            logger.warn(`Could not update service: '${service.name}:${service.version}'.`);
+            logger.warn(err);
           }
-        );
-      },
-      err => {
-        const now = new Date().getTime();
-        // if service was active before print a warning, otherwise ignore it
-        if(service.active) {
-          logger.warn(`Cannot reach service '${service.name}:${service.version}'`, { service : service , error: err });
-          logger.warn(`Setting service '${service.name}:${service.version}' to defunct.`);
+          callback();
         }
-        logger.warn(`ping service '${service.name}:${service.version}' failed.`);
-        return db.update_service(
-          service.name,
-          service.version,
-          {
-            lastcheck: now,
-            active: false
-          },
-          function(err2) {
-            if(err2){
-              err.message = err.message + ' AND ' + err2.message;
-            }
-            callback(err);
-          });
-      });
+      );
+    })
+    .catch(err => {
+      const now = new Date().getTime();
+      // if service was active before print a warning, otherwise ignore it
+      if(service.active) {
+        logger.warn(`Cannot reach service '${service.name}:${service.version}'`, { service : service , error: err });
+        logger.warn(`Setting service '${service.name}:${service.version}' to defunct.`);
+      }
+      logger.warn(`ping service '${service.name}:${service.version}' failed.`);
+      return db.update_service(
+        service.name,
+        service.version,
+        {
+          lastcheck: now,
+          active: false
+        },
+        function(err2) {
+          if(err2){
+            err.message = err.message + ' AND ' + err2.message;
+          }
+          callback(err);
+        });
+    });
 
 };
 
