@@ -133,7 +133,7 @@ module.exports.get_service_endpoint = function(serviceref, endpointref, callback
     });
 
   //run sql statement
-  const sqlstmnt = `select * from services as s left join endpoints as e on (s.name=e.service) where ${keys.join(' AND ')};`;
+  const sqlstmnt = `select * from services as s left join endpoints as e on (s.name=e.service AND s.version=e.version) where ${keys.join(' AND ')};`;
   dbconn.get(sqlstmnt, vals, callback);
 };
 

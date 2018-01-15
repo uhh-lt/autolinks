@@ -106,17 +106,17 @@ module.exports.call_service = function(req, res, next) {
     return new Exception('MissingInformation', `Make sure 'service', 'version', 'path' and 'method' are provided.`).handleResponse(res).end(next);
   }
 
-  const serviceref = {name: data.service};
+  const serviceref = {name: data.service, version: data.version};
   const endpointref = {path: data.path, method: data.method};
   service_db.get_service_endpoint(
     serviceref,
     endpointref,
     function(err, row){
       if (err) {
-        return Exception.fromError(err, 'Error retrieving service endpoint.', {data : data}).handleResponse(res).end(next);
+        return Exception.fromError(err, 'Error retrieving service endpoint.', {data : data}).log(logger.warn).handleResponse(res).end(next);
       }
       if(!row) {
-        return new Exception('IllegalState', `Service endpoint not found: service: '${serviceref}', endpoint: '${endpointref}'.`, {data: data}).handleResponse(res).end(next);
+        return new Exception('IllegalState', `Service endpoint not found: service '${serviceref.name}:${serviceref.version}', endpoint: '${endpointref.path}'.`, {data: data}).log(logger.warn).handleResponse(res).end(next);
       }
       if(row.requireslogin){
         return auth.handle_authenticated_request(req, res, function(user) {

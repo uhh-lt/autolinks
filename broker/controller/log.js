@@ -21,14 +21,16 @@ module.exports = function(callingModule) {
 
       new (winston.transports.Console)({
         level: loglevel,
-        prettyPrint: true,
+        prettyPrint: false,
         colorize: true,
         timestamp: true,
-        label: aModulesLabel,
+        label: aModulesLabel
       }),
 
       new (winston.transports.File)({
         level: 'debug',
+        maxsize:'10000000',
+        maxFiles: 10,
         filename: path.resolve(global.__datadir && path.join(global.__datadir, 'server.log') || 'server.log'),
         handleExceptions: true,
         humanReadableUnhandledException: true,
