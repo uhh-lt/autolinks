@@ -132,37 +132,6 @@ module.exports.get_service_and_endpoints = function(servicename, callback) {
   });
 };
 
-
-/**
- *
- * @param rows
- */
-function remap_joined_service_endpoint_rows(rows) {
-  return _(rows).groupBy(r => r.name) // group by service name
-    .map((v,k) => { // reformat row
-      return {
-        name : k,
-        version : v[0].version,
-        location : v[0].location,
-        description : v[0].description,
-        registeredsince : v[0].registeredsince,
-        lastseenactive : v[0].lastseenactive,
-        lastcheck : v[0].lastcheck,
-        active : v[0].active,
-        endpoints : _(v).filter(e => e.path).map(e => {
-          return {
-            path : e.path,
-            url : `${v[0].location}${e.path}`,
-            method: e.method,
-            requirements: e.requirements,
-            requireslogin : e.requireslogin,
-            lastcalled : e.lastcalled,
-          };
-        }).value(),
-      };
-    }).value();
-}
-
 module.exports.call_service = function(location, path, method, data, req, res, next) {
 
   const options = {
@@ -206,6 +175,36 @@ module.exports.get_service_details = function(servicename, extended, callback) {
         });
   });
 };
+
+/**
+ *
+ * @param rows
+ */
+function remap_joined_service_endpoint_rows(rows) {
+  return _(rows).groupBy(r => r.name) // group by service name
+    .map((v,k) => { // reformat row
+      return {
+        name : k,
+        version : v[0].version,
+        location : v[0].location,
+        description : v[0].description,
+        registeredsince : v[0].registeredsince,
+        lastseenactive : v[0].lastseenactive,
+        lastcheck : v[0].lastcheck,
+        active : v[0].active,
+        endpoints : _(v).filter(e => e.path).map(e => {
+          return {
+            path : e.path,
+            url : `${v[0].location}${e.path}`,
+            method: e.method,
+            requirements: e.requirements,
+            requireslogin : e.requireslogin,
+            lastcalled : e.lastcalled,
+          };
+        }).value(),
+      };
+    }).value();
+}
 
 // execute ping_services function every 10 seconds
 (function ping_services_at_intervals(){
