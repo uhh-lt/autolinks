@@ -72,6 +72,6 @@ Resource.prototype.isTripleResource = function(){
 
 
 Resource.prototype.isStringResource = function(){
-  return !this.isListResource() && !this.isTripleResource();
+  return !(this.isListResource() || this.isTripleResource());
 };
 
