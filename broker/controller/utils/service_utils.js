@@ -6,6 +6,7 @@ const
   db = require('../service_db'),
   request_utils = require('./request_utils'),
   Exception = require('../../model/Exception'),
+  storage = require('../storage_wrapper'),
   logger = require('../log')(module)
 ;
 
@@ -183,6 +184,7 @@ module.exports.call_service = function(location, path, method, data, req, res, n
         res.end(next);
       }
     ).catch(err => Exception.fromError(err, err.message).log(logger.warn).handleResponse(res).end(next));
+
 };
 
 module.exports.get_service_details = function(servicename, extended, callback) {

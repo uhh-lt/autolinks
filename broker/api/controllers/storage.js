@@ -3,64 +3,43 @@
 const
   auth = require('../../controller/auth'),
   storage = require('../../controller/storage_wrapper'),
-  logger = require('../../controller/log')(module)
-  ;
+  Exception = require('../../model/Exception'),
+  logger = require('../../controller/log')(module);
 
-module.exports = {
-  info: getInfo,
-  read: readData,
-  write: writeData,
-};
-
-function handleError(newmessage, err, res){
-  res.header('Content-Type', 'application/json; charset=utf-8');
-  const newerr = new Error(newmessage);
-  newerr.cause = err;
-  logger.warn(newerr.message, err, {});
-  res.json(err);
-  return res.end();
-}
-
-
-function getInfo(req, res) {
-
+module.exports.info = function(req, res, next) {
   auth.handle_authenticated_request(req, res, function(user){
     res.header('Content-Type', 'application/json; charset=utf-8');
     storage.info(user.name, function(err, info){
       if(err) {
-        return handleError('Could not get info.', err, res);
+        return Exception.fromError(err, 'Could not get info.').log(logger.warn).handleResponse(res).end(next);
       }
       res.json(info);
-      res.end();
+      res.end(next);
     });
   });
+};
 
-}
-
-function readData(req, res) {
-
-    auth.handle_authenticated_request(req, res, function(user){
-      res.header('Content-Type', 'application/json; charset=utf-8');
-      const key = req.swagger.params.key.value;
-      // console.log(Buffer.from("Hello World").toString('base64'));
-      // console.log(Buffer.from("SGVsbG8gV29ybGQ=", 'base64').toString('ascii'));
-      storage.read(user.name, key, function(err, result){
-        if(err) {
-          return handleError('Could not read data.', err, res);
-        }
-        if(result) {
-          res.json(result);
-        } else {
-          res.status(204);
-        }
-        res.end();
-      });
+module.exports.read = function(req, res, next) {
+  auth.handle_authenticated_request(req, res, function(user){
+    res.header('Content-Type', 'application/json; charset=utf-8');
+    const key = req.swagger.params.key.value;
+    // console.log(Buffer.from("Hello World").toString('base64'));
+    // console.log(Buffer.from("SGVsbG8gV29ybGQ=", 'base64').toString('ascii'));
+    storage.read(user.name, key, function(err, result){
+      if(err) {
+        return Exception.fromError(err, 'Could not read data.').log(logger.warn).handleResponse(res).end(next);
+      }
+      if(result) {
+        res.json(result);
+      } else {
+        res.status(204);
+      }
+      res.end(next);
     });
+  });
+};
 
-}
-
-function writeData(req, res) {
-
+module.exports.write = function(req, res, next) {
   auth.handle_authenticated_request(req, res, function(user){
     res.header('Content-Type', 'application/json; charset=utf-8');
     const kvp = req.swagger.params.kvp.value;
@@ -70,12 +49,11 @@ function writeData(req, res) {
     // console.log(Buffer.from("SGVsbG8gV29ybGQ=", 'base64').toString('ascii'));
     storage.write(user.name, key, value, function(err){
       if(err) {
-        return handleError('Could not write data.', err, res);
+        return Exception.fromError(err, 'Could not write data.').log(logger.warn).handleResponse(res).end(next);
       }
-      res.end();
+      res.end(next);
     });
   });
-
-}
+};
 
 
