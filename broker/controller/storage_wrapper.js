@@ -2,13 +2,6 @@
 
 const logger = require('./log')(module);
 
-module.exports = {
-  init : init,
-  read : read,
-  write : write,
-  info : info,
-};
-
 const explicitStorage  = (() => {
   switch (process.env.STORAGE) {
     case 'mysql':
@@ -26,9 +19,9 @@ const explicitStorage  = (() => {
  *
  * @param callback = function(err)
  */
-function init(callback) {
+module.exports.init = function(callback) {
   return explicitStorage.init(callback);
-}
+};
 
 /**
  *
@@ -36,9 +29,9 @@ function init(callback) {
  * @param storagekey
  * @param callback = function(err, info)
  */
-function read(username, storagekey, callback) {
+module.exports.read = function(username, storagekey, callback) {
   return explicitStorage.read(username, storagekey, callback);
-}
+};
 
 /**
  *
@@ -47,15 +40,15 @@ function read(username, storagekey, callback) {
  * @param storagevalue = { subj, pred, obj }
  * @param callback = function(err)
  */
-function write(username, storagekey, storagevalue, callback) {
+module.expports.write = function(username, storagekey, storagevalue, callback) {
   return explicitStorage.write(username, storagekey, storagevalue, callback);
-}
+};
 
 /**
  *
  * @param username
  * @param callback = function(err, info)
  */
-function info(username, callback) {
+module.exports.info = function(username, callback) {
   return explicitStorage.info(username, callback);
-}
+};
