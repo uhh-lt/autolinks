@@ -30,6 +30,9 @@ function Exception(type, message) {
  * @returns {Exception}
  */
 Exception.fromError = function(err, newMessage, fields) {
+  if(err instanceof Exception){
+    return err;
+  }
   const ex = new Exception();
   ex.message = newMessage || err.message;
   ex.cause = err;
@@ -43,6 +46,11 @@ Exception.fromError = function(err, newMessage, fields) {
   return ex;
 };
 
+Exception.prototype.log = function(logfun) {
+  logfun(this.message, this.cause, this.fields);
+  return this;
+};
+
 /**
  *
  * @param err
@@ -54,12 +62,10 @@ Exception.handleErrorResponse = function(err, res){
   if(!res.headersSent) {
     res.header('Content-Type', 'application/json; charset=utf-8');
   }
-  if (err instanceof Exception) {
-    res.write(JSON.stringify(err));
-  } else {
-    const exc = Exception.fromError(err, err.message, null);
-    res.write(JSON.stringify(exc));
-  }
+
+  const exc = Exception.fromError(err, err.message, null);
+  res.write(JSON.stringify(exc));
+
   return res;
 };
 
