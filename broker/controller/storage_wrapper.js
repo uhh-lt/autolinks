@@ -8,7 +8,7 @@ const explicitStorage  = (() => {
       logger.info('Using mysql-db');
       return require('./storage-components/mysql-db');
     case 'none': // fall-through
-    case '/dev/null': // fall-through
+    case '/dev/null':  // fall-through
     default:
       logger.info('No storage used (/dev/null).');
       return require('./storage-components/devnull-storage');
@@ -40,7 +40,7 @@ module.exports.read = function(username, storagekey, callback) {
  * @param storagevalue = { subj, pred, obj }
  * @param callback = function(err)
  */
-module.expports.write = function(username, storagekey, storagevalue, callback) {
+module.exports.write = function(username, storagekey, storagevalue, callback) {
   return explicitStorage.write(username, storagekey, storagevalue, callback);
 };
 

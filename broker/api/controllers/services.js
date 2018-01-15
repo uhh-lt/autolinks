@@ -102,8 +102,8 @@ module.exports.call_service = function(req, res, next) {
   }
 
   const data = req.swagger.params.data.value;
-  if(!data.name){
-    return new Exception('MissingInformation', 'No path or method provided.').handleResponse(res).end(next);
+  if(!(data.service && data.version && data.path && data.method)){
+    return new Exception('MissingInformation', `Make sure 'service', 'version', 'path' and 'method' are provided.`).handleResponse(res).end(next);
   }
 
   const serviceref = {name: data.service};

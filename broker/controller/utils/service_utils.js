@@ -5,6 +5,7 @@ const
   _ = require('lodash'),
   db = require('../service_db'),
   request_utils = require('./request_utils'),
+  Exception = require('../../model/Exception'),
   logger = require('../log')(module)
 ;
 
@@ -176,18 +177,13 @@ module.exports.call_service = function(location, path, method, data, req, res, n
   };
 
   request_utils.promisedRequest(options)
-    .then(
-      res => {
+    .then(result => {
         logger.debug(`Sucessfully called service '${location}'.`);
-        res.header('Content-Type', res.response.headers['content-type']);
-        res.send(res.body);
+        res.header('Content-Type', result.response.headers['content-type']);
+        res.send(result.body);
         res.end(next);
-      },
-      err => {
-        logger.warn(err);
-        err.handleResponse(res);
       }
-    );
+    ).catch(err => Exception.fromError(err, err.message).log(logger.warn).handleResponse(res).end(next));
 };
 
 module.exports.get_service_details = function(servicename, extended, callback) {

@@ -30,7 +30,7 @@ function Exception(type, message) {
  * @returns {Exception}
  */
 Exception.fromError = function(err, newMessage, fields) {
-  if(err instanceof Exception){
+  if(err instanceof Exception && err.message === newMessage){
     return err;
   }
   const ex = new Exception();

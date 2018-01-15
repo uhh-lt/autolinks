@@ -11,7 +11,7 @@ const
   utils = require('../utils/utils'),
   logger = require('../log')(module);
 
-// connection string: mysql://user:pass@host:port/database?optionkey=optionvalue&optionkey=optionvalue&...
+/* connection string: mysql://user:pass@host:port/database?optionkey=optionvalue&optionkey=optionvalue&... */
 const connectionString = process.env.MYSQL || 'mysql://autolinks:autolinks1@mysql:3306/autolinks?debug=false&connectionLimit=100';
 const pool = mysql.createPool(connectionString);
 logger.info(`Using ${pool.config.connectionLimit} connections.`);
