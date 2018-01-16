@@ -91,15 +91,26 @@ module.exports.init = function(callback, resetdata) {
 };
 
 module.exports.read = function(username, storagekey, callback) {
-  return this.getStorageResource(username, storagekey)
+  return this.promisedRead(username, storagekey)
     .then(
       resource => callback(null, resource),
       err => callback(err, null)
     );
 };
 
+module.exports.promisedRead = function(username, storagekey) {
+  return this.getStorageResource(username, storagekey);
+};
 
 module.exports.write = function(username, storagekey, resourceList, callback) {
+  return this.promisedWrite(username, storagekey, resourceList)
+    .then(
+      res => callback(null, res),
+      err => callback(err, null)
+    );
+};
+
+module.exports.promisedWrite = function(username, storagekey, resourceList) {
   return this.getStorageResourceId(username, storagekey)
     .then(rid => {
       if(rid){
@@ -111,11 +122,7 @@ module.exports.write = function(username, storagekey, resourceList, callback) {
         .then(obj => {
           this.saveStorageItemToResourceMapping(obj.sid, obj.resource.rid);
           return obj.resource;
-        })
-        .then(
-          res => callback(null, res),
-          err => callback(err, null)
-        );
+        });
     });
 };
 

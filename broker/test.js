@@ -164,7 +164,7 @@ mysqldb.init((err, r) => {
     mysqldb.close((err) => {});
   }, 3000);
 
-}, false);
+}, true);
 
 
 

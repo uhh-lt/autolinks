@@ -37,11 +37,31 @@ module.exports.read = function(username, storagekey, callback) {
  *
  * @param username
  * @param storagekey
- * @param storagevalue = { subj, pred, obj }
+ */
+module.exports.promisedRead = function(username, storagekey) {
+  return explicitStorage.promisedRead(username, storagekey);
+};
+
+
+/**
+ *
+ * @param username
+ * @param storagekey
+ * @param resourceValue
  * @param callback = function(err)
  */
-module.exports.write = function(username, storagekey, storagevalue, callback) {
-  return explicitStorage.write(username, storagekey, storagevalue, callback);
+module.exports.write = function(username, storagekey, resourceValue, callback) {
+  return explicitStorage.write(username, storagekey, resourceValue, callback);
+};
+
+/**
+ *
+ * @param username
+ * @param storagekey
+ * @param resourceValue
+ */
+module.exports.promisedWrite = function(username, storagekey, resourceValue) {
+  return explicitStorage.promisedWrite(username, storagekey, resourceValue);
 };
 
 /**

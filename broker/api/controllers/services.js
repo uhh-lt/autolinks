@@ -120,10 +120,10 @@ module.exports.call_service = function(req, res, next) {
       }
       if(row.requireslogin){
         return auth.handle_authenticated_request(req, res, function(user) {
-          return service_utils.call_service(row.location, row.path.replace(/\{username\}/,user.name), row.method, data.data, req, res, next);
+          return service_utils.call_service(row.location, row.path.replace(/\{username\}/,user.name), row.method, user.name, data.data, req, res, next);
         });
       }
-      return service_utils.call_service(row.location, row.path, row.method, data.data, req, res, next);
+      return service_utils.call_service(row.location, row.path, row.method, null, data.data, req, res, next);
     });
 };
 

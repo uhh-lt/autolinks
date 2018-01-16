@@ -132,9 +132,19 @@ module.exports.get_service_and_endpoints = function(servicename, callback) {
   });
 };
 
-module.exports.call_service = function(location, path, method, data, req, res, next) {
+function getRandomStorageKey(){
+  return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+}
 
-  const options = {
+function sendData(data, res){
+  res.header('Content-Type', 'application/json');
+  res.send(data);
+  return res;
+}
+
+module.exports.call_service = function(location, path, method, username, data, req, res, next) {
+
+  const requestDataOptions = {
     url : path,
     baseUrl : location,
     method : method === 'get' && 'get' || 'post',
@@ -144,16 +154,46 @@ module.exports.call_service = function(location, path, method, data, req, res, n
     },
     body : data && JSON.stringify(data) || null,
   };
+  const requestKeyOptions = Object.assign({}, requestDataOptions);
+  requestKeyOptions.url = `${path}?getStorageKey`;
 
-  request_utils.promisedRequest(options)
-    .then(result => {
-        logger.debug(`Sucessfully called service '${location}${path}'.`);
-        res.header('Content-Type', result.response.headers['content-type']);
-        res.send(result.body);
-        res.end(next);
-      }
-    ).catch(err => Exception.fromError(err, err.message).log(logger.warn).handleResponse(res).end(next));
-
+  // get the storage key
+  request_utils.promisedRequest(requestKeyOptions)
+    .then(
+      result => {
+        const mimeType = result.response.headers['Content-Type'];
+        if(mimeType && mimeType.includes('text/plain')){
+          const key = result.body;
+          logger.debug(`Successfully recevied storagekey: ${key}`);
+          return key;
+        }
+        throw new Error('Unable to get key.');
+      })
+    .catch(
+      err => {
+        const key = getRandomStorageKey();
+        Exception.fromError(err, `Could not get storagekey from service endpoint. Using random storagekey '${key}'.`, {request: requestKeyOptions}).log(logger.warn);
+        return key;
+      })
+    .then(key => {
+      // if data for key exists in DB use it, otherwise get it from service call and store it
+      return storage.promisedRead(username, key)
+        .then(data => {
+          if(data){ // data exists in DB
+            return data;
+          }
+          // get the data from service, then save it (save returns the data itself)
+          return request_utils.promisedRequest(requestDataOptions)
+            .then(result => {
+              logger.debug(`Sucessfully called service '${location}${path}'.`);
+              const rawdata = JSON.parse(result.body);
+              return rawdata;
+            })
+            .then(rawdata => storage.promisedWrite(username, key, rawdata));
+        });
+    })
+    .then(data => sendData(data, res).end(next))
+    .catch(err => Exception.fromError(err, err.message).log(logger.warn).handleResponse(res).end(next));
 };
 
 module.exports.get_service_details = function(servicename, extended, callback) {
