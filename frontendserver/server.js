@@ -16,6 +16,7 @@ app.use('/assets', express.static(__dirname + '/assets/'));
 app.use(bodyParser.urlencoded({'extended': 'true'})); // parse application/x-www-form-urlencoded
 app.use(bodyParser.json()); // parse application/json
 app.use(bodyParser.json({type: 'application/vnd.api+json'})); // parse application/vnd.api+json as json
+app.use(session({ secret: config.secret, resave: false, saveUninitialized: true }));
 
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/public');
@@ -28,9 +29,10 @@ var server = app.listen(port, function () {
 // routes ==================================================
 app.use('/login', require('./controllers/loginController'));
 app.use('/register', require('./controllers/registerController'));
+app.use('/app', require('./controllers/appController'));
 
 app.get('/', function (req, res) {
-    res.redirect('/login'); // load the single view file (angular will handle the page changes on the front-end)
+    res.redirect('/app'); // load the single view file (angular will handle the page changes on the front-end)
 });
 
 require('app/routes')(app); // pass our application into our routes
