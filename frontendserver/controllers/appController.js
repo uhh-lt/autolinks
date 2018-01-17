@@ -7,7 +7,7 @@ router.use('/', function (req, res, next) {
     console.log(req.path);
     if (req.path !== '/login' && !req.session.token) {
         debugger;
-        return res.redirect('/login?returnUrl=' + encodeURIComponent('/app.html'));
+        return res.redirect('/login?returnUrl=' + encodeURIComponent('/app' + req.path));
     }
 
     next();
