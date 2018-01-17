@@ -163,9 +163,9 @@ module.exports = function (app) {
     // Basic Authorization
     // curl -X POST "http://localhost:10000/service/call" -H "accept: application/json" -H "Content-Type: application/json" -d "{ \"service\": \"Dummy\", \"path\": \"/baz/{username}\", \"method\": \"post\", \"data\": {}}" -H "authorization: Basic am9objpkb2U="
 
-    // application -------------------------------------------------------------
-    app.get('/', function (req, res) {
-        //make app/index.html default route
-        res.redirect('app/index.html'); // load the single view file (angular will handle the page changes on the front-end)
-    });
+    // // application -------------------------------------------------------------
+    // app.get('/', function (req, res) {
+    //     //make app/index.html default route
+    //     res.redirect('app/index.html'); // load the single view file (angular will handle the page changes on the front-end)
+    // });
 };

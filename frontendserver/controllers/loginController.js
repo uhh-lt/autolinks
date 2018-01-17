@@ -24,7 +24,6 @@ router.post('/', function (req, res) {
         // form: req.body,
         json: true
     }, function (error, response, body) {
-        debugger;
         if (error) {
             return res.render('login', { error: 'An error occurred' });
         }
@@ -32,7 +31,7 @@ router.post('/', function (req, res) {
         // body.token = response.
 
         if (!body.active) {
-            return res.render('login', { error: body, username: req.body.username });
+            return res.render('login', { error: body.message, name: req.body.name });
         }
 
         // CURL:
