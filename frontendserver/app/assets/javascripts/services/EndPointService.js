@@ -7,8 +7,8 @@ define([
 
             return {
               fetchService: function() {
-                $http.get('/api/data')
-                 .then(function(response){
+                debugger;
+                $http.get('/api/service/listServices').then(function(response){
                    console.log(response);
                   //  $scope.details = response.data;
                  });
@@ -54,7 +54,7 @@ define([
               fetchData: function(text) {
                 var promise = $q.defer();
                 var data = {};
-                return $http.post('/service/call', { text: text }).then(function(response) {
+                return $http.post('/api/service/call', { text: text }).then(function(response) {
                   return data = response.data;
                 });
                 // return promise.promise;

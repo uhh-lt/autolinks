@@ -56,13 +56,14 @@ define([
         $urlRouterProvider.otherwise('/');
     }]);
 
-    app.controller('AppController', ['$scope', '$state', '$mdSidenav', 'EntityService',
-        function ($scope, $state, $mdSidenav, EntityService) {
+    app.controller('AppController', ['$scope', '$state', '$mdSidenav', 'EntityService', 'EndPointService',
+        function ($scope, $state, $mdSidenav, EntityService, EndPointService) {
 
             init();
 
             function init() {
               $state.go('layout');
+              EndPointService.fetchService();
             }
 
             function buildToggler(navID) {

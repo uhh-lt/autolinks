@@ -1,0 +1,1 @@
+// storageService.js init

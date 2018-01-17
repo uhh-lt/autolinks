@@ -1,7 +1,6 @@
 var request = require('request');
 ﻿var config = require('config.json');
 var express = require('express');
-var serviceList = require('api/endpoints/serviceList');
 var router = express.Router();
 
 
@@ -16,7 +15,6 @@ var router = express.Router();
 
 
 module.exports = function (app) {
-    debugger;
     app.get('/api/data/', function (req, res) {
 
       var resp = [];
@@ -168,4 +166,5 @@ module.exports = function (app) {
     //     //make app/index.html default route
     //     res.redirect('app/index.html'); // load the single view file (angular will handle the page changes on the front-end)
     // });
+    require('api/service/listServices')(app); // pass our application into our routes
 };
