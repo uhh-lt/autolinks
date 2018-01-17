@@ -1,20 +1,25 @@
 // set up ======================================================================
 require('rootpath')();
-var express = require('express');
-var app = express(); 						// create our app w/ express
-var port = process.env.PORT || 9090; 				// set the port
-var session = require('express-session');
-var bodyParser = require('body-parser');
-var expressJwt = require('express-jwt');
-var config = require('config.json');
+const express = require('express');
+const app = express(); 						// create our app w/ express
+const port = process.env.PORT || 9090; 				// set the port
+const session = require('express-session');
+const bodyParser = require('body-parser');
+const expressJwt = require('express-jwt');
+const config = require('config.json');
 
 
-app.use(express.static(__dirname + '/public')); 		// set the static files location /public/img will be /img for users
-app.use(express.static(__dirname + '/assets'));
-app.use('/assets', express.static(__dirname + '/assets/'));
+// app.use(express.static(__dirname + '/app')); 		// set the static files location /app/img will be /img for users
+// app.use(express.static(__dirname + '/assets'));
+// app.use('/assets', express.static(__dirname + '/assets/'));
 
 app.set('view engine', 'ejs');
-app.set('views', __dirname + '/public');
+app.set('views', __dirname + '/views');
+
+app.use(bodyParser.urlencoded({'extended': 'true'})); // parse application/x-www-form-urlencoded
+app.use(bodyParser.json()); // parse application/json
+app.use(bodyParser.json({type: 'application/vnd.api+json'})); // parse application/vnd.api+json as json
+app.use(session({ secret: config.secret, resave: false, saveUninitialized: true }));
 
 // start server
 var server = app.listen(port, function () {
@@ -23,8 +28,11 @@ var server = app.listen(port, function () {
 
 // routes ==================================================
 app.use('/login', require('./controllers/loginController'));
+app.use('/register', require('./controllers/registerController'));
+app.use('/app', require('./controllers/appController'));
+
 app.get('/', function (req, res) {
-    res.redirect('/login'); // load the single view file (angular will handle the page changes on the front-end)
+    res.redirect('/app'); // load the single view file (angular will handle the page changes on the front-end)
 });
 
-require('app/routes')(app); // pass our application into our routes
+require('api/routes')(app); // pass our application into our routes

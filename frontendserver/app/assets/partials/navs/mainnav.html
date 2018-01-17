@@ -3,7 +3,7 @@
   md-component-id="left"
   hide-print
   md-is-locked-open="lockLeft && $mdMedia('gt-md')"
-  style="min-height: 100%"
+  style="min-height: 100%; z-index: 999;"
   >
        <md-toolbar class="md-theme-light">
          <h1 class="md-toolbar-tools">
@@ -16,9 +16,9 @@
        </h3>
      </md-content>
      <md-toolbar class="md-scroll-shrink">
-      <div layout="row" layout-align="center center" ng-click="logout()" flex>
+      <a ng-href="/login" target="_self" layout="row" layout-align="center center" flex style="cursor: pointer;">
         Logout
-      </div>
+      </a>
     </md-toolbar>
    </div>
 </md-sidenav>

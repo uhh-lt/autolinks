@@ -94,17 +94,17 @@ define([
                {
                 selector: 'node',
                 css: {
-                    'shape': 'roundrectangle',
-                    'width': '120',
-                    'height': '50',
-                    // 'background-color': 'rgba(102, 127, 227, 0.84)',
+                    'shape': 'ellipse',
+                    'width': '35',
+                    'height': '35',
+                    'background-color': 'rgba(102, 127, 227, 0.84)',
                     'background-fit': 'cover',
                     'content':
                       function(e) {
                         return e.data('name');
                       },
-                    'text-valign': 'center',
-                    // 'color': 'white',
+                    'text-valign': 'bottom',
+                    'color': 'rgba(35, 35, 35, 0.84)',
                     // 'text-outline-width': 2,
                     // 'text-outline-color': 'data(typeColor)'
                   }
@@ -119,6 +119,7 @@ define([
                       },
                     'curve-style': 'bezier',
                     'target-arrow-shape': 'triangle',
+                    'color': 'rgba(35, 35, 35, 0.84)'
                   }
                 },
                 {

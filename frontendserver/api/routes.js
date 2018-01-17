@@ -1,7 +1,7 @@
 var request = require('request');
 ﻿var config = require('config.json');
 var express = require('express');
-var serviceList = require('app/endpoints/serviceList');
+var serviceList = require('api/endpoints/serviceList');
 var router = express.Router();
 
 
@@ -93,10 +93,10 @@ module.exports = function (app) {
     //     });
     // });
 
-    app.get('/service/call/', function (req, res) {
+    app.post('/service/call', function (req, res) {
 
-      var resp = [];
-
+          var resp = [];
+          debugger;
           var options = {
                 url: config.apiUrl + '/service/call',
                 method: 'POST',
@@ -106,12 +106,52 @@ module.exports = function (app) {
                    'authorization': 'Basic am9objpkb2U='
                  },
                 json: true,
-                body: {
-                  "service": "Dummy",
-                  "path": "/baz/{username}",
+                body:
+                // {
+                //   "service": "Dummy",
+                //   "path": "/baz/{username}",
+                //   "method": "post",
+                //   "data": {}
+                //  }
+                {
+                  "service": "Wiki",
+                  "version": "0.0.1",
+                  "path": "/findarticles",
                   "method": "post",
-                  "data": {}
-                 }
+                  "data": {
+                    "focus": {
+                      "offsets": [
+                        {
+                          "from": 0,
+                          "length": 15
+                        }
+                      ]
+                    },
+                    "context": {
+                      "text": req.body.text,
+                      "source": "string",
+                      "lang": "string",
+                      "availabletypes": [
+                        "string"
+                      ],
+                      "annotations": [
+                        {
+                          "type": "string",
+                          "doffset": {
+                            "offsets": [
+                              {
+                                "from": 0,
+                                "length": 0
+                              }
+                            ]
+                          },
+                          "properties": {},
+                          "analyzer": "string"
+                        }
+                      ]
+                    }
+                  }
+                }
               }
 
         console.log('service call');
@@ -123,9 +163,9 @@ module.exports = function (app) {
     // Basic Authorization
     // curl -X POST "http://localhost:10000/service/call" -H "accept: application/json" -H "Content-Type: application/json" -d "{ \"service\": \"Dummy\", \"path\": \"/baz/{username}\", \"method\": \"post\", \"data\": {}}" -H "authorization: Basic am9objpkb2U="
 
-    // application -------------------------------------------------------------
-    app.get('/', function (req, res) {
-        //make public/index.html default route
-        res.redirect('public/index.html'); // load the single view file (angular will handle the page changes on the front-end)
-    });
+    // // application -------------------------------------------------------------
+    // app.get('/', function (req, res) {
+    //     //make app/index.html default route
+    //     res.redirect('app/index.html'); // load the single view file (angular will handle the page changes on the front-end)
+    // });
 };
