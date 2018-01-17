@@ -110,15 +110,15 @@ mysqldb.init((err, r) => {
 //
 //
 // // const x = Promise.all([
-// //   mysqldb.saveResource(null),
-// //   mysqldb.saveResource('hello new world'),
-// //   mysqldb.saveResource('hello funny world'),
-// //   mysqldb.saveResource('hello world')
+// //   mysqldb.saveResourceValue(null),
+// //   mysqldb.saveResourceValue('hello new world'),
+// //   mysqldb.saveResourceValue('hello funny world'),
+// //   mysqldb.saveResourceValue('hello world')
 // // ]).then((i) => console.log(`fullfilled ${i}`), (err) => console.log(`rejected ${err}`));
 //
 // const y = mysqldb.saveTriple(new Triple('You', 'save', 'the world'));
 //
-//   const z = mysqldb.saveResource([
+//   const z = mysqldb.saveResourceValue([
 //     new Triple('I','am','God')
 //   ]);
 //
@@ -131,35 +131,40 @@ mysqldb.init((err, r) => {
   // mysqldb.saveStorageItemToResourceMapping('me','asdjbao').then(console.log, console.error);
 
   // mysqldb.createUsergroup('me').then(console.log, console.error);
+  const arr = [
+    'hello',
+    ['hallo hallo', new Triple('i','am','goof')],
+    new Triple('I', 'save', [ 'world',
+      new Triple('I', [ new Triple('You', 'saved', 'me') ], 'you')
+    ]),
+    new Triple('You', 'save', 'the world'),
+    new Triple('He', 'save', 'me'),
+    new Triple('ME', 'save', 'He'),
+    'hallo welt'
+  ];
 
-  mysqldb.write('me', '12345',
-    [
-      'hello',
-      ['hallo hallo', new Triple('i','am','goof')],
-      new Triple('I', 'save', [ 'world',
-        new Triple('I', [ new Triple('You', 'saved', 'me') ], 'you')
-      ]),
-      new Triple('You', 'save', 'the world'),
-      new Triple('He', 'save', 'me'),
-      new Triple('ME', 'save', 'He'),
-      'hallo welt'
-    ], function(err, res) {
+  // try writing
+  mysqldb.write('me', '12345', arr,
+    function(err, res) {
       if(err){
         return console.log(err);
       }
-      return console.log(res);
+      return console.log(JSON.stringify(res, null, 2));
     });
+
 
   // mysqldb.getTriple(2).then(console.log,console.err);
   // mysqldb.getResource(12).then(console.log,console.err);
+  setTimeout(function(){
+    mysqldb.getStorageResource('me', '12345').then(r => JSON.stringify(r, null, 2)).then(console.log, console.err);
+  }, 1500);
 
-  mysqldb.getStorageResource('me', '12345').then(console.log, console.err);
 
   setTimeout(function(){
     mysqldb.close((err) => {});
   }, 3000);
 
-});
+}, true);
 
 
 

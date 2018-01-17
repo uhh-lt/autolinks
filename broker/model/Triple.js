@@ -1,10 +1,14 @@
 'use strict';
 
+/* imports */
+const
+  Resource = require('./Resource');
+
 module.exports = Triple;
 
-Triple.prototype.subject = "";
-Triple.prototype.predicate = "";
-Triple.prototype.object = "";
+Triple.prototype.subject = null;
+Triple.prototype.predicate = null;
+Triple.prototype.object = null;
 
 /**
  * @constructor
@@ -37,19 +41,10 @@ Triple.prototype.resolve = function(){
  */
 Triple.prototype.deepAssign = function(obj) {
   this.assign(obj);
-  const castResource = resource => {
-    if(Array.isArray(resource)) {
-      return resource.map(tripleObj => {
-        if(tripleObj instanceof Triple) {
-          return tripleObj;
-        }
-        return new Triple().deepAssign(tripleObj);
-      });
-    }
-  };
-  this.subject = castResource(this.subject);
-  this.predicate = castResource(this.predicate);
-  this.object = castResource(this.object);
+
+  this.subject = new Resource().deepAssign(this.subject);
+  this.predicate = new Resource().deepAssign(this.predicate);
+  this.object = new Resource().deepAssign(this.object);
 };
 
 /**
@@ -67,5 +62,6 @@ Triple.asTriple = function(obj){
   }
   return new Triple().assign(obj);
 };
+
 
 

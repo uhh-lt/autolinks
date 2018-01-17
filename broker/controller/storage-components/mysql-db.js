@@ -7,10 +7,11 @@ const
   mysql = require('mysql'),
   Exception = require('../../model/Exception'),
   Triple = require('../../model/Triple'),
+  Resource = require('../../model/Resource'),
   utils = require('../utils/utils'),
   logger = require('../log')(module);
 
-// connection string: mysql://user:pass@host:port/database?optionkey=optionvalue&optionkey=optionvalue&...
+/* connection string: mysql://user:pass@host:port/database?optionkey=optionvalue&optionkey=optionvalue&... */
 const connectionString = process.env.MYSQL || 'mysql://autolinks:autolinks1@mysql:3306/autolinks?debug=false&connectionLimit=100';
 const pool = mysql.createPool(connectionString);
 logger.info(`Using ${pool.config.connectionLimit} connections.`);
@@ -50,7 +51,7 @@ function promisedQuery(query, values){
   });
 }
 
-module.exports.init = function(callback) {
+module.exports.init = function(callback, resetdata) {
 
   // read the script
   fs.readFile('config/storagedb-schema.mysql.sql', 'utf8', function (err,data) {
@@ -74,6 +75,12 @@ module.exports.init = function(callback) {
 
     // resolve queries sequentially
     utils.sequentialPromise(queries, promisedQuery)
+      .then(res => {
+        if(resetdata){
+          return module.exports.resetDatabase().then(_ignore => res);
+        }
+        return res;
+      })
       .then(
         res => callback(null, res),
         err => callback(err)
@@ -84,28 +91,38 @@ module.exports.init = function(callback) {
 };
 
 module.exports.read = function(username, storagekey, callback) {
-  return this.getStorageResource(username, storagekey)
+  return this.promisedRead(username, storagekey)
     .then(
       resource => callback(null, resource),
       err => callback(err, null)
     );
 };
 
+module.exports.promisedRead = function(username, storagekey) {
+  return this.getStorageResource(username, storagekey);
+};
 
-module.exports.write = function(username, storagekey, resources, callback) {
+module.exports.write = function(username, storagekey, resourceList, callback) {
+  return this.promisedWrite(username, storagekey, resourceList)
+    .then(
+      res => callback(null, res),
+      err => callback(err, null)
+    );
+};
+
+module.exports.promisedWrite = function(username, storagekey, resourceList) {
   return this.getStorageResourceId(username, storagekey)
     .then(rid => {
       if(rid){
         logger.debug(`Resource for storagekey '${storagekey}' and user '${username}' was already stored, skipping write action.`);
         return true;
       }
-      return this.saveResource(resources)
-        .then(rid => this.saveStorageItem(username, storagekey).then(sid => Object({sid:sid, rid:rid})))
-        .then(ids => this.saveStorageItemToResourceMapping(ids.sid, ids.rid))
-        .then(
-          res => callback(null, res),
-          err => callback(err, null)
-        );
+      return this.saveResourceValue(resourceList)
+        .then(resource => this.saveStorageItem(username, storagekey).then(sid => Object({sid:sid, resource: resource})))
+        .then(obj => {
+          this.saveStorageItemToResourceMapping(obj.sid, obj.resource.rid);
+          return obj.resource;
+        });
     });
 };
 
@@ -114,19 +131,22 @@ module.exports.write = function(username, storagekey, resources, callback) {
  * @param resource
  * @return {Promise}
  */
-module.exports.saveResource = function(resource) {
+module.exports.saveResourceValue = function(resourceValue) {
+  const resource = new Resource(-1, null, resourceValue);
   // a resource can be an array of resources, a triple or a string
-  if(Array.isArray(resource)) {
+  if(resource.isListResource()) {
     logger.debug('Resource is an array.');
     return this.saveListResource(resource);
   }
-  if(resource === Object(resource)){
+  if(resource.isTripleResource()){
     logger.debug('Resource is a triple.');
     return this.saveTripleResource(resource);
   }
-  // else
-  logger.debug('Resource is a string.');
-  return this.saveStringResource(resource);
+  if(resource.isStringResource()){
+    logger.debug('Resource is a string.');
+    return this.saveStringResource(resource);
+  }
+  throw new Error('This is impossible, a resource has to be one of {list,triple,string}.');
 };
 
 /**
@@ -136,19 +156,24 @@ module.exports.saveResource = function(resource) {
  */
 module.exports.saveTripleResource = function(tripleResource) {
   return new Promise((resolve, reject) => {
-    const tripleObj = Triple.asTriple(tripleResource);
+    tripleResource.value = Triple.asTriple(tripleResource.value);
     // save resources
     Promise.all([
-      this.saveResource(tripleObj.subject),
-      this.saveResource(tripleObj.predicate),
-      this.saveResource(tripleObj.object),
+      this.saveResourceValue(tripleResource.value.subject),
+      this.saveResourceValue(tripleResource.value.predicate),
+      this.saveResourceValue(tripleResource.value.object),
     ]).then(
-      rids => { // on success add triple
-        const rid_s = rids[0];
-        const rid_p = rids[1];
-        const rid_o = rids[2];
+      resources => { // on success add triple
+        tripleResource.value.subject = resources[0];
+        tripleResource.value.predicate = resources[1];
+        tripleResource.value.object = resources[2];
+        const rids = resources.map(r => r.rid);
         logger.debug(`Saving triple ${rids}.`);
-        return promisedQuery('select get_or_add_tripleResource(?,?,?) as rid', [rid_s, rid_p, rid_o]).then(res => resolve(res.rows[0].rid));
+        return promisedQuery('select get_or_add_tripleResource(?,?,?) as rid', rids)
+          .then(res => {
+            tripleResource.rid = res.rows[0].rid;
+            return resolve(tripleResource);
+          });
       },
       err => reject(err) // on failure return the respective error
     );
@@ -157,18 +182,23 @@ module.exports.saveTripleResource = function(tripleResource) {
 
 module.exports.saveListResource = function(listResource) {
 
-  const promises = listResource.map(resource => this.saveResource(resource));
-  return Promise.all(promises)
+  const resourcePromises = listResource.value.map(resource => this.saveResourceValue(resource));
+  return Promise.all(resourcePromises)
     .then(
-      item_rids => {
+      item_resources => {
+        const item_rids = item_resources.map(r => r.rid);
         logger.debug(`Saved resources ${item_rids}.`);
         return this.saveListResourceDescriptor(item_rids)
-          .then(desc_rid => Object({desc_rid: desc_rid, item_rids: item_rids}));
+          .then(desc_rid => {
+            listResource.rid = desc_rid;
+            listResource.value = item_resources;
+            return item_rids;
+          });
       }
     ).then(
-      ids => Promise
-        .all(ids.item_rids.map(item_rid => this.saveListResourceItem(ids.desc_rid, item_rid)))
-        .then(ignore_ => ids.desc_rid) // return list descriptor rid
+      item_rids => Promise
+        .all(item_rids.map(item_rid => this.saveListResourceItem(listResource.rid, item_rid)))
+        .then(ignore_ => listResource) // return list resource
     );
 
 };
@@ -204,12 +234,13 @@ module.exports.saveListResourceItem = function(desc_rid, item_rid) {
 
 module.exports.saveStringResource = function(stringResource) {
   return new Promise((resolve, reject) => {
-    logger.debug(`Saving resource ${stringResource}.`);
-    promisedQuery('select get_or_add_stringResource(?) as rid', [stringResource]).then(
+    logger.debug(`Saving resource value '${stringResource.value}'.`);
+    promisedQuery('select get_or_add_stringResource(?) as rid', [stringResource.value]).then(
       res => {
         const rid = res.rows[0].rid;
-        logger.debug(`Successfully saved resource '${stringResource}' with id ${rid}.`);
-        return resolve(rid);
+        logger.debug(`Successfully saved resource value '${stringResource.value}' with rid '${rid}'.`);
+        stringResource.rid = rid;
+        return resolve(stringResource);
       },
       err => reject(err)
     );
@@ -252,51 +283,60 @@ module.exports.getResource = function(rid) {
         return null;
       }
       const r = res.rows[0];
+      const newresource = new Resource(rid, r.label);
       if(r.istriple){
         logger.debug(`Requesting triple resource '${rid}'.`);
-        return this.getTripleResource(rid);
+        return this.fillTripleResource(newresource);
       }
       if(r.islist){
         logger.debug(`Requesting list resource '${rid}'.`);
-        return this.getListResource(rid);
+        return this.fillListResource(newresource);
       }
       if(r.isstring){
         logger.debug(`Requesting string resource '${rid}'.`);
-        return this.getStringResource(rid);
+        return this.fillStringResource(newresource);
       }
       throw new Error('This is impossible, a resource has to be one of {list,triple,string}.');
     });
 };
 
-module.exports.getStringResource = function(rid) {
-  return promisedQuery('select surfaceform from stringResources where rid = ?', [rid])
+module.exports.fillStringResource = function(resource) {
+  return promisedQuery('select surfaceform from stringResources where rid = ?', [resource.rid])
     .then(res => {
       if(!res.rows.length){
-        logger.debug(`String resource '${rid}' does not exist`);
+        logger.debug(`String resource '${resource.rid}' does not exist`);
         return null;
       }
-      return res.rows[0].surfaceform;
+      resource.value = res.rows[0].surfaceform;
+      return resource;
     });
 };
 
-module.exports.getTripleResource = function(rid) {
-  return promisedQuery('select * from tripleResources where rid = ?;', [rid])
+module.exports.fillTripleResource = function(resource) {
+  return promisedQuery('select * from tripleResources where rid = ?;', [resource.rid])
     .then(res => {
       if(!res.rows.length){
-        logger.debug(`Triple resource '${rid}' does not exist`);
+        logger.debug(`Triple resource '${resource.rid}' does not exist`);
         return null;
       }
       return Promise.resolve(res.rows[0])
         .then(row => [row.subj, row.pred, row.obj])
         .then(rids => Promise.all(rids.map(rid => this.getResource(rid))))
-        .then(resources => new Triple(resources[0], resources[1], resources[2]));
+        .then(resources => {
+          resource.value = new Triple(resources[0], resources[1], resources[2]);
+          return resource;
+        });
     });
 };
 
-module.exports.getListResource = function(rid) {
-  return promisedQuery('select * from listResourceItems where rid = ?', rid)
+module.exports.fillListResource = function(resource) {
+  return promisedQuery('select * from listResourceItems where rid = ?', [resource.rid])
     .then(res => res.rows.map(r => r.itemrid))
-    .then(item_rids => Promise.all(item_rids.map(item_rid => this.getResource(item_rid))));
+    .then(item_rids => Promise.all(item_rids.map(item_rid => this.getResource(item_rid))))
+    .then(item_resources => {
+      resource.value = item_resources;
+      return resource;
+    });
 };
 
 module.exports.getStorageResourceId = function(username, storagekey) {
@@ -316,13 +356,17 @@ module.exports.getStorageResource = function(username, storagekey) {
 };
 
 module.exports.createUsergroup = function(name) {
-  return promisedQuery('select get_or_add_user( ?, true) as uid', [name])
+  return promisedQuery('select get_or_add_user(?, true) as uid', [name])
     .then(res => res.rows[0].uid);
 };
 
-
 module.exports.info = function(username, callback) {
   return callback(new Exception('NOT YET IMPLEMENTED'));
+};
+
+module.exports.resetDatabase = function(){
+  logger.debug('Resetting database.');
+  return promisedQuery('call reset_database');
 };
 
 module.exports.close = function(callback){

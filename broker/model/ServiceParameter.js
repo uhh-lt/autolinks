@@ -66,14 +66,12 @@ ServiceParameter.fromRequest = function(req, callback) {
     return callback(Exception.fromError(null, 'Parameter \'context\' (Analysis) missing.', {data: service_parameter}), null);
   }
 
-  let sp = null;
   try {
-    sp = new ServiceParameter().deepAssign(service_parameter);
+    const sp = new ServiceParameter().deepAssign(service_parameter);
+    return callback(null, sp);
   } catch(err) {
     return callback(Exception.fromError(err, 'Casting ServiceParameter failed.', {data: service_parameter}), null);
   }
-
-  callback(null, sp);
 
 };
 

@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS resources (
   istriple    boolean DEFAULT NULL,
   islist      boolean DEFAULT NULL,
   label       varchar(64) DEFAULT NULL,
+  lastedit    int unsigned DEFAULT NULL,
   PRIMARY KEY (rid)
 ) ENGINE=MyISAM;
 
@@ -82,6 +83,8 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- DEFINE SOME HELPER FUNCTIONS
 
+drop procedure if exists reset_database;
+
 drop function if exists add_resource;
 
 drop function if exists get_or_add_stringResource;
@@ -101,6 +104,22 @@ drop function if exists get_uid;
 drop function if exists get_or_add_user;
 
 DELIMITER //
+
+create procedure reset_database( )
+MODIFIES SQL DATA
+BEGIN
+  START TRANSACTION ;
+    truncate stringResources;
+    truncate tripleResources;
+    truncate listResources;
+    truncate listResourceItems;
+    truncate resources;
+    truncate users;
+    truncate resourcePermission;
+    truncate storageItemToResource;
+    truncate storageItems;
+  COMMIT ;
+END //
 
 create function add_resource ( isstring_ boolean, istriple_ boolean, islist_ boolean )
 RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA

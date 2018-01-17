@@ -4,7 +4,9 @@
 const
   _ = require('lodash'),
   db = require('../service_db'),
-  request = require('request'),
+  request_utils = require('./request_utils'),
+  Exception = require('../../model/Exception'),
+  storage = require('../storage_wrapper'),
   logger = require('../log')(module)
 ;
 
@@ -27,12 +29,37 @@ module.exports.ping_service = function(service, callback) {
   }
 
   const url = `${location}/ping`;
-  request(url, function (error, response, body) {
-    const now = new Date().getTime();
-    if(error || response.statusCode !== 200){
+  request_utils.promisedRequest(url)
+    .then(res => {
+      const now = new Date().getTime();
+      logger.debug(`ping service '${service.name}' success.`);
+      // if service was not active before print an info, otherwise ignore it
+      if(!service.active) {
+        logger.info(`Service '${service.name}' is now available.`);
+      }
+      return db.update_service(
+        service.name,
+        service.version,
+        {
+          lastseenactive: now,
+          lastcheck: now,
+          active: true
+        },
+        function(err){
+          if(err){
+            // log err but ignore in callback
+            logger.warn(`Could not update service: '${service.name}:${service.version}'.`);
+            logger.warn(err);
+          }
+          callback();
+        }
+      );
+    })
+    .catch(err => {
+      const now = new Date().getTime();
       // if service was active before print a warning, otherwise ignore it
       if(service.active) {
-        logger.warn(`Cannot reach service '${service.name}:${service.version}'`, { service : service , error: error || response }, {});
+        logger.warn(`Cannot reach service '${service.name}:${service.version}'`, { service : service , error: err });
         logger.warn(`Setting service '${service.name}:${service.version}' to defunct.`);
       }
       logger.warn(`ping service '${service.name}:${service.version}' failed.`);
@@ -45,39 +72,12 @@ module.exports.ping_service = function(service, callback) {
         },
         function(err2) {
           if(err2){
-            if(error){
-              error.message = error.message + ' AND ' + err2.message;
-            } else {
-              error  = err2
-            }
+            err.message = err.message + ' AND ' + err2.message;
           }
-          callback(error)
+          callback(err);
         });
-    }
+    });
 
-    logger.debug(`ping service '${service.name}' success.`);
-    // if service was not active before print an info, otherwise ignore it
-    if(!service.active) {
-      logger.info(`Service '${service.name}' is now available.`);
-    }
-    return db.update_service(
-      service.name,
-      service.version,
-      {
-        lastseenactive: now,
-        lastcheck: now,
-        active: true
-      },
-      function(err){
-        if(err){
-          // log err but ignore in callback
-          logger.warn(`Could not update service: '${service.name}:${service.version}'.`);
-          logger.warn(err);
-        }
-        callback();
-      }
-    );
-  });
 };
 
 // ping all registered services
@@ -122,16 +122,99 @@ module.exports.get_service_and_endpoints = function(servicename, callback) {
       return callback(newerr, null);
     }
     const services = remap_joined_service_endpoint_rows(rows);
-    if(services.length < 1){
+    if(services.length < 1) {
       // TODO: no service found
     }
-    if(services.length > 1){
+    if(services.length > 1) {
       // TODO: too many services found, why??
     }
     callback(null, services[0]);
   });
 };
 
+function getRandomStorageKey(){
+  return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+}
+
+function sendData(data, res){
+  res.header('Content-Type', 'application/json');
+  res.send(data);
+  return res;
+}
+
+module.exports.call_service = function(location, path, method, username, data, req, res, next) {
+
+  const requestDataOptions = {
+    url : path,
+    baseUrl : location,
+    method : method === 'get' && 'get' || 'post',
+    headers : {
+      'accept' : 'application/json',
+      'Content-Type' : 'application/json',
+    },
+    body : data && JSON.stringify(data) || null,
+  };
+  const requestKeyOptions = Object.assign({}, requestDataOptions);
+  requestKeyOptions.url = `${path}?getStorageKey`;
+
+  // get the storage key
+  request_utils.promisedRequest(requestKeyOptions)
+    .then(
+      result => {
+        const mimeType = result.response.headers['Content-Type'];
+        if(mimeType && mimeType.includes('text/plain')){
+          const key = result.body;
+          logger.debug(`Successfully recevied storagekey: ${key}`);
+          return key;
+        }
+        throw new Error('Unable to get key.');
+      })
+    .catch(
+      err => {
+        const key = getRandomStorageKey();
+        Exception.fromError(err, `Could not get storagekey from service endpoint. Using random storagekey '${key}'.`, {request: requestKeyOptions}).log(logger.warn);
+        return key;
+      })
+    .then(key => {
+      // if data for key exists in DB use it, otherwise get it from service call and store it
+      return storage.promisedRead(username, key)
+        .then(data => {
+          if(data){ // data exists in DB
+            return data;
+          }
+          // get the data from service, then save it (save returns the data itself)
+          return request_utils.promisedRequest(requestDataOptions)
+            .then(result => {
+              logger.debug(`Sucessfully called service '${location}${path}'.`);
+              const rawdata = JSON.parse(result.body);
+              return rawdata;
+            })
+            .then(rawdata => storage.promisedWrite(username, key, rawdata));
+        });
+    })
+    .then(data => sendData(data, res).end(next))
+    .catch(err => Exception.fromError(err, err.message).log(logger.warn).handleResponse(res).end(next));
+};
+
+module.exports.get_service_details = function(servicename, extended, callback) {
+  if (!extended) {
+    return module.exports.get_service_and_endpoints(servicename, callback);
+  }
+
+  return module.exports.get_service_and_endpoints(servicename, function (err, service) {
+    const location = `${service.location}/swagger`;
+    request_utils.promisedRequest(location)
+      .then(
+        res => {
+          service.swagger = JSON.parse(res.body);
+          callback(null, service);
+        },
+        err => {
+          logger.warn(err.message);
+          callback(err);
+        });
+  });
+};
 
 /**
  *
@@ -162,59 +245,6 @@ function remap_joined_service_endpoint_rows(rows) {
       };
     }).value();
 }
-
-module.exports.call_service = function(location, path, method, data, req, res, next) {
-
-  const options = {
-    url : path,
-    baseUrl : location,
-    method : method === 'get' && 'get' || 'post',
-    headers : {
-      'accept' : 'application/json',
-      'Content-Type' : 'application/json',
-    },
-    body : data && JSON.stringify(data) || null,
-  };
-  request(options, function (error, response, body) {
-    if(error || response.statusCode !== 200){
-      const msg = `Requesting service '${location}' failed.`;
-      logger.warn(msg);
-      logger.error(error || response);
-      res.header('Content-Type', 'application/json; charset=utf-8');
-      res.status(500);
-      res.send(JSON.stringify({ message: msg, fields: error.message || response }));
-      return res.end(next);
-    }
-    logger.debug(`Sucessfully called service '${location}'.`);
-    res.header('Content-Type', response.headers['content-type']);
-    res.send(body);
-    res.end(next);
-  });
-
-};
-
-
-module.exports.get_service_details = function(servicename, extended, callback) {
-  if (!extended) {
-    return module.exports.get_service_and_endpoints(servicename, callback);
-  }
-
-  return module.exports.get_service_and_endpoints(servicename, function (err, service) {
-    const location = `${service.location}/swagger`;
-    request(location, function (error, response, body) {
-      if (error || response.statusCode !== 200) {
-        const msg = `Requesting service details from '${location}' failed.`;
-        logger.warn(msg);
-        logger.error(error || response);
-        const newerr = new Error(msg);
-        newerr.cause = err;
-        return callback(newerr, null);
-      }
-      service.swagger = JSON.parse(body);
-      callback(null, service);
-    });
-  });
-};
 
 // execute ping_services function every 10 seconds
 (function ping_services_at_intervals(){
