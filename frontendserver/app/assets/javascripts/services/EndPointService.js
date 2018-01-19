@@ -51,6 +51,13 @@ define([
                 // });
               },
 
+              annotateText: function(text) {
+                return $http.post('/api/nlp/analyze', { text: text }).then(function(response) {
+                  debugger;
+                  // return data = response.data;
+                });
+              },
+
               fetchData: function(text) {
                 var promise = $q.defer();
                 var data = {};

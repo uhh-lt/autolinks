@@ -1,7 +1,18 @@
-module.exports = function(text) {
+module.exports = function(url, text) {
   return {
-    "data": text,
-    "content-type": "string",
-    "source": "string"
+    url: url + '/nlp/analyze',
+    method: 'POST',
+    headers: {
+       'Content-Type': 'application/json',
+       'Accept': 'application/json',
+      //  'authorization': 'Basic am9objpkb2U='
+       },
+    json: true,
+    body:
+    {
+      "data": text,
+      "content-type": "string",
+      "source": "string"
+    }
   }
 }

@@ -44,9 +44,12 @@ define([
 
             // for (var i=0; i<inputs.length; i++) {
             // if (_.includes(inputs, 'Simon')) {
-              EndPointService.fetchData(inputs[0]).then(function(response) {
-                  EntityService.addEntity(response);
-              });
+            EndPointService.annotateText(inputs[0]).then(function(response) {
+                console.log(response);
+            });
+            EndPointService.fetchData(inputs[0]).then(function(response) {
+                EntityService.addEntity(response);
+            });
             // }
               // getPageName(encodeURI(inputs[i]), addStart);
             // }

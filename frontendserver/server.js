@@ -27,7 +27,7 @@ app.use('/register', require('./controllers/registerController'));
 app.use('/app', require('./controllers/appController'));
 
 // Autolinks Broker Service
-app.use('/api/service', require('./api/service/servicesEndpoint'));
+app.use('/api/service', require('./api/service/serviceEndpoint'));
 app.use('/api/nlp', require('./api/nlp/nlpEndpoint'));
 
 app.get('/', function (req, res) {
