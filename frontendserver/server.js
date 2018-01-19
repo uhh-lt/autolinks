@@ -25,7 +25,10 @@ app.use(session({ secret: config.secret, resave: false, saveUninitialized: true 
 app.use('/login', require('./controllers/loginController'));
 app.use('/register', require('./controllers/registerController'));
 app.use('/app', require('./controllers/appController'));
-app.use('/api/service', require('./api/service/services'));
+
+// Autolinks Broker Service
+app.use('/api/service', require('./api/service/servicesEndpoint'));
+app.use('/api/nlp', require('./api/nlp/nlpEndpoint'));
 
 app.get('/', function (req, res) {
     res.redirect('/app'); // load the single view file (angular will handle the page changes on the front-end)
