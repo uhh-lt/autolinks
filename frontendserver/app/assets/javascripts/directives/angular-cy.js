@@ -427,9 +427,9 @@ define([
                         var newNode = [];
                         var newEdge = [];
 
-                        debugger;
                         if (entity) {
-                          _.forEach(entity, function(n) {
+                          _.forEach(entity.value, function(n) {
+                            debugger;
                             function extractEntity(n, parent = null) {
                               function extractSubject(n) {
                                 if (_.isArray(n.subject)) {
