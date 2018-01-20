@@ -435,24 +435,6 @@ define([
                               let p = n.value.predicate;
                               let o = n.value.object;
 
-                              if (_.isArray(s.value)) {
-                                _.forEach(s.value, function(n) {
-                                  extractEntity(n, subject);
-                                });
-                              };
-
-                              if (_.isArray(o.value)) {
-                                _.forEach(o.value, function(n) {
-                                  extractEntity(n, object);
-                                });
-                              };
-
-                              if (_.isArray(p.value)) {
-                                _.forEach(p.value, function(n) {
-                                  extractEntity(n, object);
-                                });
-                              };
-
                               function extractSubject(n) {
                                 if (_.isArray(n)) {
                                   return n[0];
@@ -477,8 +459,8 @@ define([
                               if (_.isArray(s.value)) {
                                 var s1 = extractSubject(o.value);
                                 var subject = {
-                                    id: (s1.value + '_as_parent').replace(/\s/g, ''),
-                                    name: s1.value + '',
+                                    id: (s1.rid + '_as_parent').replace(/\s/g, ''),
+                                    name: s1.rid + '',
                                     parent: parent ? parent.id : null
                                 };
                               } else if (_.isObject(s.value)) {
@@ -545,6 +527,24 @@ define([
 
                               newEdge.push(edge);
                               newNode.push(subject, object);
+
+                              if (_.isArray(s.value)) {
+                                _.forEach(s.value, function(n) {
+                                  extractEntity(n, subject);
+                                });
+                              };
+
+                              if (_.isArray(o.value)) {
+                                _.forEach(o.value, function(n) {
+                                  extractEntity(n, object);
+                                });
+                              };
+
+                              if (_.isArray(p.value)) {
+                                _.forEach(p.value, function(n) {
+                                  extractEntity(n, object);
+                                });
+                              };
 
                               // if (_.isArray(s.value)) {
                               //   _.forEach(s.value, function(n) {
