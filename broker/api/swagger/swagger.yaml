@@ -620,22 +620,26 @@ paths:
       tags:
         - Storage
       description: |
-        Edit a resource. Specifically, provide the old and a new resource. Create a resource by setting the old resource parameter to null, remove a resource by setting the new resource parameter to null.
+        Edit a resource. Specifically, provide the old and a new resource.
+        Create a resource by setting the old resource parameter to null,
+        remove a resource by setting the new resource parameter to null.
       parameters:
         - name: data
           in: body
           schema:
             type: object
             properties:
-              oldresource: 
+              before:
                 $ref: "#/definitions/Resource"
-              newresource: 
+              after:
                 $ref: "#/definitions/Resource"
       security:
         - broker_auth: []
       responses:
         200:
-          description: Success
+          description: Success. Return the new resource. 
+          schema:
+            $ref: "#/definitions/Resource"
         default:
           description: Error
           schema:

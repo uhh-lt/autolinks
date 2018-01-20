@@ -66,6 +66,17 @@ module.exports.promisedWrite = function(username, storagekey, resourceValue) {
 
 /**
  *
+ * @param resourceBefore
+ * @param resourceAfter
+ * @param username
+ * @return {Resource}
+ */
+module.exports.promisedEditResource = function(resourceBefore, resourceAfter, username) {
+  return explicitStorage.promisedEditResource(resourceBefore, resourceAfter, username);
+};
+
+/**
+ *
  * @param username
  * @param callback = function(err, info)
  */

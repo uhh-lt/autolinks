@@ -33,8 +33,19 @@ module.exports.write = function(req, res, next) {
 };
 
 module.exports.editresource = function(req, res, next) {
+  const data = req.swagger.params.data.value;
+  if(!data) {
+    return Exception.fromError(null, 'No data object provided.', {data: data}).handleResponse(res).end(next);
+  }
   auth.handle_authenticated_request(req, res, function(user) {
-    new Exception('NOT IMPLEMENTED', 'not yet implemented').handleResponse(res).end(next);
+    storage.promisedEditResource(data.before, data.after, user).then(
+      result => {
+        res.header('Content-Type', 'application/json; charset=utf-8');
+        res.write(JSON.stringify(result));
+        res.end(next);
+      },
+      err => Exception.fromError(err, 'Editing resource failed.').handleResponse(res).end(next)
+    );
   });
 };
 

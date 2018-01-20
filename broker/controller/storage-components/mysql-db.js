@@ -205,10 +205,7 @@ module.exports.saveListResource = function(listResource) {
 };
 
 function propagateApplyCid(resource, cid) {
-  if(!resource) {
-    throw new Error(`undefined resource cid: ${cid}`);
-  }
-  logger.debug(`Propagating cid '${cid}' to rid '${resource.rid}'. (value !== null? ${resource.value !== null})`)
+  logger.debug(`Propagating cid '${cid}' to rid '${resource.rid}'. (value !== null? ${resource.value !== null})`);
   resource.cid = cid;
   if(resource.isTripleResource()){
     propagateApplyCid(resource.value.subject, cid);
@@ -381,6 +378,16 @@ module.exports.info = function(username, callback) {
 module.exports.resetDatabase = function(){
   logger.debug('Resetting database.');
   return promisedQuery('call reset_database');
+};
+
+module.exports.promisedEditResource = function(resourceBefore, resourceAfter, username) {
+  // check what kind of edit needs to be performed, possible actions are:
+  // 1. create a new resource
+  // 2. delete a resource
+  // 3. change container
+  // 4. change metadata (label, etc)
+  // 5. change value
+  return Promise.reject(new Exception('NOT IMPLEMENTED','not yet implemented'));
 };
 
 module.exports.close = function(callback){
