@@ -429,61 +429,97 @@ define([
 
                         if (entity) {
                           _.forEach(entity.value, function(n) {
-                            debugger;
                             function extractEntity(n, parent = null) {
+
+                              let s = n.value.subject;
+                              let p = n.value.predicate;
+                              let o = n.value.object;
+
+                              if (_.isArray(s.value)) {
+                                _.forEach(s.value, function(n) {
+                                  extractEntity(n, subject);
+                                });
+                              };
+
+                              if (_.isArray(o.value)) {
+                                _.forEach(o.value, function(n) {
+                                  extractEntity(n, object);
+                                });
+                              };
+
+                              if (_.isArray(p.value)) {
+                                _.forEach(p.value, function(n) {
+                                  extractEntity(n, object);
+                                });
+                              };
+
                               function extractSubject(n) {
-                                if (_.isArray(n.subject)) {
-                                  return extractSubject(n.subject[0]);
+                                if (_.isArray(n)) {
+                                  return n[0];
                                 }
-                                return n;
+                                return n.subject;
                               }
 
                               function extractObject(n) {
-                                if (_.isArray(n.object)) {
-                                  return extractSubject(n.object[0]);
+                                if (_.isArray(n)) {
+                                  return n[0];
                                 }
-                                return n;
+                                return n.object;
                               }
 
                               function extractPredicate(n) {
-                                if (_.isArray(n.predicate)) {
-                                  return extractSubject(n.predicate[0]);
+                                if (_.isArray(n)) {
+                                  return n[0];
                                 }
-                                return n;
+                                return n.predicate;
                               }
 
-                              if (_.isArray(n.subject)) {
-                                var s = extractSubject(n);
+                              if (_.isArray(s.value)) {
+                                var s1 = extractSubject(o.value);
                                 var subject = {
-                                    id: (s.subject + '_as_parent').replace(/\s/g, ''),
-                                    name: s.subject,
+                                    id: (s1.value + '_as_parent').replace(/\s/g, ''),
+                                    name: s1.value + '',
+                                    parent: parent ? parent.id : null
+                                };
+                              } else if (_.isObject(s.value)) {
+                                // var s = extractSubject(n.value);
+                                var subject = {
+                                    id: (s.value + '_as_parent').replace(/\s/g, ''),
+                                    name: s.value + '',
                                     parent: parent ? parent.id : null
                                 };
                               } else {
                                 var subject = {
-                                    id: (n.subject).replace(/\s/g, ''),
-                                    name: n.subject,
+                                    id: (s.value + '').replace(/\s/g, ''),
+                                    name: s.value + '',
                                     parent: parent ? parent.id : null
                                 };
                               }
 
-                              if (_.isArray(n.object)) {
-                                var o = extractObject(n);
+                              if (_.isArray(o.value)) {
+                                var o1 = extractObject(o.value);
                                 var object = {
-                                    id: (o.subject + '_as_parent').replace(/\s/g, ''),
-                                    name: o.subject,
+                                    id: (o1.value + '_as_parent').replace(/\s/g, ''),
+                                    name: o1.value + '',
+                                    parent: parent ? parent.id : null
+                                };
+                              } else if (_.isObject(o.value)) {
+                                // var o = extractObject(n.value);
+                                var object = {
+                                    id: (o.value + '_as_parent').replace(/\s/g, ''),
+                                    name: o.value + '',
                                     parent: parent ? parent.id : null
                                 };
                               } else {
                                 var object = {
-                                    id: (n.object).replace(/\s/g, ''),
-                                    name: n.object,
+                                    id: (o.value + '').replace(/\s/g, ''),
+                                    name: o.value + '',
                                     parent: parent ? parent.id : null
                                 };
                               }
 
-                              if (_.isArray(n.predicate)) {
-                                var p = extractPredicate(n);
+                              if (_.isArray(p.value)) {
+                                var p1 = extractPredicate(p.value);
                                 var edge = {
                                   group: "edges",
                                   data:
@@ -491,7 +527,7 @@ define([
                                     id: ( subject.id + object.id ).replace(/\s/g, ''),
                                     source: (subject.name).replace(/\s/g, ''),
                                     target: (object.name).replace(/\s/g, ''),
-                                    name: p.subject
+                                    name: p1.value
                                   }
                                 }
                               } else {
@@ -502,7 +538,7 @@ define([
                                     id: ( subject.id + object.id ).replace(/\s/g, ''),
                                     source: (subject.name).replace(/\s/g, ''),
                                     target: (object.name).replace(/\s/g, ''),
-                                    name: n.predicate
+                                    name: p.value
                                   }
                                 };
                               }
@@ -510,17 +546,17 @@ define([
                               newEdge.push(edge);
                               newNode.push(subject, object);
 
-                              if (_.isArray(n.subject)) {
-                                _.forEach(n.subject, function(n) {
-                                  extractEntity(n, subject);
-                                });
-                              };
-
-                              if (_.isArray(n.object)) {
-                                _.forEach(n.object, function(n) {
-                                  extractEntity(n, object);
-                                });
-                              };
+                              // if (_.isArray(s.value)) {
+                              //   _.forEach(s.value, function(n) {
+                              //     extractEntity(n, subject);
+                              //   });
+                              // };
+                              //
+                              // if (_.isArray(o.value)) {
+                              //   _.forEach(o.value, function(n) {
+                              //     extractEntity(n, object);
+                              //   });
+                              // };
                             }
                             extractEntity(n);
                           });
