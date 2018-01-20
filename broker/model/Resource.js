@@ -7,16 +7,18 @@ const
 module.exports = Resource;
 
 Resource.prototype.rid = -1;
+Resource.prototype.cid = -1;
 Resource.prototype.label = null;
 Resource.prototype.value = null;
 
 /**
  * @constructor
  */
-function Resource(rid, label, value) {
+function Resource(rid, label, value, cid) {
   this.rid = rid;
   this.label = label;
   this.value = value;
+  this.cid = cid;
 }
 
 Resource.prototype.resolve = function(){
@@ -67,11 +69,9 @@ Resource.prototype.isListResource = function(){
 };
 
 Resource.prototype.isTripleResource = function(){
-  return this.value === Object(this.value);
+  return this.value === Object(this.value) && !this.isListResource();
 };
-
 
 Resource.prototype.isStringResource = function(){
   return !(this.isListResource() || this.isTripleResource());
 };
-

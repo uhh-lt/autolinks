@@ -162,6 +162,25 @@ definitions:
 
   StorageInfo:
     type: object
+    
+  Resource:
+    type: object
+    properties:
+      rid:
+        type: integer
+        description: the id of the resource, set to 0 if unknown
+      container:
+        type: integer
+        description: the rid of the container resource
+      label:
+        type: string
+        description: the label of the resource
+      value:
+        type: object
+        description: the actual value of the resource, this is either a string, or a list of resources, or a triple
+      cid:
+        type: integer
+        description: the id of the container resource, set to 0 if unknown
 
   # in case of error return this object schema
   Exception:
@@ -261,7 +280,10 @@ paths:
         200:
           description: Success
           schema:
-            type: object
+            type: array
+            description: A list of type requirements
+            items:
+              $ref: '#/definitions/Resource'
         default:
           description: Error
           schema:
@@ -610,6 +632,30 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Exception"
+            
+  /storage/createResource:
+    x-swagger-router-controller: storage
+    post:
+      operationId: createResource
+      tags:
+        - Storage
+      description: create a new resource
+      parameters:
+        - name: data
+          in: body
+          description: the data object which contains the new resource
+          schema:
+            $ref: "#/definitions/Resource"
+      security:
+        - broker_auth: []
+      responses:
+        200:
+          description: Success
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Exception"
+  
 
   /storage/info:
     x-swagger-router-controller: storage

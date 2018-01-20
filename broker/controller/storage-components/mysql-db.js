@@ -132,7 +132,7 @@ module.exports.promisedWrite = function(username, storagekey, resourceList) {
  * @return {Promise}
  */
 module.exports.saveResourceValue = function(resourceValue) {
-  const resource = new Resource(-1, null, resourceValue);
+  const resource = new Resource(null, null, resourceValue);
   // a resource can be an array of resources, a triple or a string
   if(resource.isListResource()) {
     logger.debug('Resource is an array.');
@@ -191,6 +191,7 @@ module.exports.saveListResource = function(listResource) {
         return this.saveListResourceDescriptor(item_rids)
           .then(desc_rid => {
             listResource.rid = desc_rid;
+            item_resources.forEach(itemResource => propagateApplyCid(itemResource, listResource.rid));
             listResource.value = item_resources;
             return item_rids;
           });
@@ -202,6 +203,19 @@ module.exports.saveListResource = function(listResource) {
     );
 
 };
+
+function propagateApplyCid(resource, cid) {
+  if(!resource) {
+    throw new Error(`undefined resource cid: ${cid}`);
+  }
+  logger.debug(`Propagating cid '${cid}' to rid '${resource.rid}'. (value !== null? ${resource.value !== null})`)
+  resource.cid = cid;
+  if(resource.isTripleResource()){
+    propagateApplyCid(resource.value.subject, cid);
+    propagateApplyCid(resource.value.predicate, cid);
+    propagateApplyCid(resource.value.object, cid);
+  }
+}
 
 module.exports.saveListResourceDescriptor = function(rids) {
   return new Promise((resolve, reject) => {
@@ -275,7 +289,7 @@ module.exports.saveStorageItemToResourceMapping = function(sid, rid) {
   });
 };
 
-module.exports.getResource = function(rid) {
+module.exports.getResource = function(rid, cid) {
   return promisedQuery('select * from resources where rid = ?', [rid])
     .then(res => {
       if(!res.rows.length){
@@ -283,7 +297,7 @@ module.exports.getResource = function(rid) {
         return null;
       }
       const r = res.rows[0];
-      const newresource = new Resource(rid, r.label);
+      const newresource = new Resource(rid, r.label, null, cid);
       if(r.istriple){
         logger.debug(`Requesting triple resource '${rid}'.`);
         return this.fillTripleResource(newresource);
@@ -321,7 +335,7 @@ module.exports.fillTripleResource = function(resource) {
       }
       return Promise.resolve(res.rows[0])
         .then(row => [row.subj, row.pred, row.obj])
-        .then(rids => Promise.all(rids.map(rid => this.getResource(rid))))
+        .then(rids => Promise.all(rids.map(rid => this.getResource(rid, resource.cid))))
         .then(resources => {
           resource.value = new Triple(resources[0], resources[1], resources[2]);
           return resource;
@@ -332,7 +346,7 @@ module.exports.fillTripleResource = function(resource) {
 module.exports.fillListResource = function(resource) {
   return promisedQuery('select * from listResourceItems where rid = ?', [resource.rid])
     .then(res => res.rows.map(r => r.itemrid))
-    .then(item_rids => Promise.all(item_rids.map(item_rid => this.getResource(item_rid))))
+    .then(item_rids => Promise.all(item_rids.map(item_rid => this.getResource(item_rid, resource.rid))))
     .then(item_resources => {
       resource.value = item_resources;
       return resource;
@@ -352,7 +366,7 @@ module.exports.getStorageResourceId = function(username, storagekey) {
 
 module.exports.getStorageResource = function(username, storagekey) {
   return module.exports.getStorageResourceId(username, storagekey)
-    .then(rid => rid && this.getResource(rid) || null);
+    .then(rid => rid && this.getResource(rid, -1) || null);
 };
 
 module.exports.createUsergroup = function(name) {
