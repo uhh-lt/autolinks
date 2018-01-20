@@ -136,30 +136,6 @@ definitions:
       length:
         type: integer
 
-  # objects related to storage
-  StorageKVP:
-    type: object
-    properties:
-      key:
-        $ref: "#/definitions/StorageKey"
-      value:
-        $ref: "#/definitions/StorageValue"
-
-  StorageKey:
-    type: object
-    properties:
-      username:
-        type: string
-      servicename:
-        type: string
-      endpointname:
-        type: string
-      parameters:
-        type: object
-
-  StorageValue:
-    type: object
-
   StorageInfo:
     type: object
     
@@ -169,18 +145,20 @@ definitions:
       rid:
         type: integer
         description: the id of the resource, set to 0 if unknown
-      container:
+      cid:
         type: integer
-        description: the rid of the container resource
+        description: the id of the container resource, set to 0 if unknown
       label:
         type: string
         description: the label of the resource
       value:
         type: object
         description: the actual value of the resource, this is either a string, or a list of resources, or a triple
-      cid:
-        type: integer
-        description: the id of the container resource, set to 0 if unknown
+        
+  Resources:
+    type: array
+    items:
+      $ref: "#/definitions/Resource"
 
   # in case of error return this object schema
   Exception:
@@ -280,10 +258,7 @@ paths:
         200:
           description: Success
           schema:
-            type: array
-            description: A list of type requirements
-            items:
-              $ref: '#/definitions/Resource'
+            $ref: '#/definitions/Resources'
         default:
           description: Error
           schema:
@@ -591,13 +566,13 @@ paths:
       operationId: read
       tags:
         - Storage
-      description: Get the data for a particular key
+      description: Get resources for a particular key
       parameters:
         - name: key
           in: body
           description: The key of the data to read
           schema:
-            $ref: "#/definitions/StorageKey"
+            type: string
       security:
         - broker_auth: []
       responses:
@@ -618,11 +593,16 @@ paths:
         - Storage
       description: Write data for a particular key
       parameters:
-        - name: kvp
+        - name: data
           in: body
           description: The key and value of the data to be written
           schema:
-            $ref: "#/definitions/StorageKVP"
+            type: object
+            properties:
+              key:
+                type: string
+              resources:
+                $ref: "#/definitions/Resources"
       security:
         - broker_auth: []
       responses:
@@ -633,19 +613,24 @@ paths:
           schema:
             $ref: "#/definitions/Exception"
             
-  /storage/createResource:
+  /storage/editresource:
     x-swagger-router-controller: storage
     post:
-      operationId: createResource
+      operationId: editresource
       tags:
         - Storage
-      description: create a new resource
+      description: |
+        Edit a resource. Specifically, provide the old and a new resource. Create a resource by setting the old resource parameter to null, remove a resource by setting the new resource parameter to null.
       parameters:
         - name: data
           in: body
-          description: the data object which contains the new resource
           schema:
-            $ref: "#/definitions/Resource"
+            type: object
+            properties:
+              oldresource: 
+                $ref: "#/definitions/Resource"
+              newresource: 
+                $ref: "#/definitions/Resource"
       security:
         - broker_auth: []
       responses:
