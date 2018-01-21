@@ -148,9 +148,9 @@ definitions:
       cid:
         type: integer
         description: the id of the container resource, set to 0 if unknown
-      label:
-        type: string
-        description: the label of the resource
+      metadata:
+        type: object
+        description: some metadata the resource, e.g. label
       value:
         type: object
         description: the actual value of the resource, this is either a string, or a list of resources, or a triple
