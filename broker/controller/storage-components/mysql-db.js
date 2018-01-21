@@ -30,24 +30,32 @@ function withConnection(callback) {
 
 function promisedQuery(query, values){
   return new Promise((resolve, reject) => {
-    withConnection(function(err, connection){
-      if(err){
-        return reject(err);
-      }
-      if(query !== Object(query)){
-        query = {
-          sql: query,
-          values: values,
-        };
-      }
-      connection.query(query, function(err, rows, fields){
-        connection.release();
+    try {
+      withConnection(function(err, connection){
         if(err){
-          return reject(Exception.fromError(err, `Query failed: '${query.sql}'.`, query));
+          return reject(err);
         }
-        return resolve({rows: rows, fields: fields});
+        if(query !== Object(query)){
+          query = {
+            sql: query,
+            values: values,
+          };
+        }
+        try {
+          connection.query(query, function (err, rows, fields) {
+            connection.release();
+            if (err) {
+              return reject(Exception.fromError(err, `Query failed: '${query.sql}'.`, query));
+            }
+            return resolve({rows: rows, fields: fields});
+          });
+        } catch(e) {
+          return reject(Exception.fromError(e, `Query failed: '${query.sql}'.`, query));
+        }
       });
-    });
+    } catch(e) {
+      return reject(Exception.fromError(e, `Query failed: '${query.sql}'.`, query));
+    }
   });
 }
 
@@ -354,7 +362,7 @@ module.exports.fillListResource = function(resource) {
 module.exports.fillMetadata = function(resource) {
   return promisedQuery('select * from resourceMetadata where rid = ?', [resource.rid])
     .then(res => res.rows.map(r => Object({key : r.mkey, val : r.mvalue})))
-    .then(kvps => kvps.reduce((acc, kvp) => {acc[Object.keys(kvp)[0]] = Object.values(kvp)[0]; return acc;}, {}))
+    .then(kvps => kvps.reduce((acc, kvp) => {acc[kvp.key] = kvp.val; return acc;}, {}))
     .then(metadata => {
       resource.metadata = metadata;
       return resource;
@@ -394,17 +402,22 @@ module.exports.moveResource = function(rid, cid_before, cid_after) {
 };
 
 module.exports.updateMetadata = function(rid, metadataBefore, metadataAfter) {
-  // prepare sql statement and values
-  const promises = [];
-  // updates or creations
-  Object.keys(metadataAfter)
-    .filter(k => metadataBefore[k] !== metadataAfter[k])
-    .forEach(k => promises.push(promisedQuery('update resourceMetadata set mkey = ?, mvalue = ? where rid = ?', [k, metadataAfter[k]])));
-  // deletions
-  Object.keys(metadataBefore)
-    .filter(k => metadataAfter[k] === null)
-    .forEach(k => promises.push(promisedQuery('delete from resourceMetadata where rid = ? and mkey = ?', [k, metadataAfter[k]])));
-  return Promise.all(promises);
+  return Promise.resolve(1)
+    // updates or creations
+    .then(_ignore_ => {
+        return Promise.all(Object.keys(metadataAfter)
+          .filter(k => metadataBefore[k] !== metadataAfter[k])
+          .map(k => promisedQuery('replace into resourceMetadata (rid, mkey, mvalue) values(?, ?, ?)', [rid, k, metadataAfter[k]]))
+        );
+      }
+    ).then(_ignore_ => {
+        // deletions
+        return Promise.all(Object.keys(metadataBefore)
+          .filter(k => metadataAfter[k] == null)
+          .map(k => promisedQuery('delete from resourceMetadata where rid = ? and mkey = ?', [rid, k]))
+        );
+      }
+    );
 };
 
 module.exports.createUsergroup = function(name) {
@@ -460,14 +473,14 @@ module.exports.promisedEditResource = function(resourceBefore, resourceAfter, us
   }
 
   // 4. change metadata
-  if(resourceBefore.label !== resourceAfter.label) {
+  if(resourceBefore.metadata !== resourceAfter.metadata) {
     logger.debug("Changing resource's metadata.");
     return this.updateMetadata(resourceBefore.rid, resourceBefore.metadata, resourceAfter.metadata)
       .then(_ignore_ => resourceAfter);
   }
 
   // 5. change value
-  if(resourceBefore.metadata !== resourceAfter.metadata){
+  if(resourceBefore.value !== resourceAfter.value){
     return Promise.reject(new Exception('IllegalOperation', 'Changing the value of a resource is not permitted!'));
   }
 

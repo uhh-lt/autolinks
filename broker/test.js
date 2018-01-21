@@ -178,10 +178,14 @@ mysqldb.init((err, r) => {
       .then(r => mysqldb.getResource(r.rid))
       .then(r => JSON.stringify(r, null, 2))
       .then(console.log)
-      .then(r => mysqldb.promisedEditResource({rid: 1, metadata : {}}, {rid: 1, metadata : {label : "hallo"}}))
+      .then(r => mysqldb.promisedEditResource({rid: 1, metadata : {}}, {rid: 1, metadata : {labely : "hallo"}}))
       .then(r => mysqldb.getResource(r.rid))
       .then(r => JSON.stringify(r, null, 2))
-      .then(console.log);
+      .then(console.log)
+      .then(r => mysqldb.promisedEditResource({rid: 1, metadata : {labely : "hallo"}}, {rid: 1, metadata : {label : "hallo", label1 : "hallo"}}))
+      .then(r => mysqldb.getResource(r.rid))
+      .then(r => JSON.stringify(r, null, 2))
+      .then(console.log, console.err);
 
 
 

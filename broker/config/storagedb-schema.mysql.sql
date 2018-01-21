@@ -129,6 +129,7 @@ BEGIN
     truncate tripleResources;
     truncate listResources;
     truncate listResourceItems;
+    truncate resourceMetadata;
     truncate resources;
     truncate users;
     truncate resourcePermission;
