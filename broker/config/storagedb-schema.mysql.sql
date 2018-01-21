@@ -8,9 +8,15 @@ CREATE TABLE IF NOT EXISTS resources (
   isstring    boolean DEFAULT NULL,
   istriple    boolean DEFAULT NULL,
   islist      boolean DEFAULT NULL,
-  label       varchar(64) DEFAULT NULL,
   lastedit    int unsigned DEFAULT NULL,
   PRIMARY KEY (rid)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS resourceMetadata (
+  rid         int unsigned NOT NULL AUTO_INCREMENT,
+  mkey         varchar(64) NOT NULL,
+  mvalue       varchar(512) NOT NULL,
+  PRIMARY KEY (rid, mkey)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS stringResources (
@@ -103,6 +109,16 @@ drop function if exists get_uid;
 
 drop function if exists get_or_add_user;
 
+drop procedure if exists full_delete_resource;
+
+drop procedure if exists remove_stringResourceFromContainer;
+
+drop procedure if exists remove_tripleResourceFromContainer;
+
+drop procedure if exists remove_listResourceFromContainer;
+
+drop procedure if exists edit_resourceContainer;
+
 DELIMITER //
 
 create procedure reset_database( )
@@ -147,6 +163,26 @@ BEGIN
     insert into stringResources set rid = rid_, surfaceform = surfaceform_;
   end if;
   return rid_;
+END //
+
+create procedure full_delete_resource( IN rid_ int unsigned )
+MODIFIES SQL DATA
+BEGIN
+  START TRANSACTION ;
+    -- delete the resource from every possible entry there might be
+    delete from resources where rid = rid_;
+    delete from listResourceItems where itemrid = rid_;
+    delete from tripleResources where subj = rid_;
+    delete from tripleResources where pred = rid_;
+    delete from tripleResources where obj = rid_;
+    -- only for stringResources
+    delete from stringResources where rid = rid_;
+    -- only for tripleResources
+    delete from tripleResources where rid = rid_;
+    -- only for listResources
+    delete from listResources where rid = rid_;
+    delete from storageItemToResource where rid = rid_;
+  COMMIT ;
 END //
 
 create function get_or_add_tripleResource ( subj_ int unsigned, pred_ int unsigned, obj_ int unsigned )
@@ -238,5 +274,62 @@ BEGIN
   end if;
   return uid_;
 END //
+
+create procedure remove_stringResourceFromContainer( IN rid_ int unsigned, IN cid_ int unsigned )
+MODIFIES SQL DATA
+BEGIN
+  DECLARE rid__ int unsigned;
+  DECLARE done BOOLEAN DEFAULT FALSE;
+  --
+  DECLARE triplecur CURSOR FOR SELECT rid FROM tripleResources WHERE subj = rid_ OR pred = rid_ OR obj = rid_;
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done := TRUE;
+  --
+  START TRANSACTION ;
+    -- find triples associated with rid_ and delete them from container with rid = cid_
+    OPEN triplecur;
+      tripleloop: LOOP
+        FETCH triplecur INTO rid__;
+        IF done THEN
+          LEAVE tripleloop;
+        END IF;
+        call remove_tripleResourceFromContainer(rid__, cid_);
+      END LOOP tripleloop;
+    CLOSE triplecur;
+    -- delete the resource rid_ from the current view / container with rid = cid_
+    delete from listResourceItems where rid = cid_ and itemrid = rid_;
+  COMMIT ;
+END //
+
+create procedure remove_tripleResourceFromContainer( IN rid_ int unsigned, IN cid_ int unsigned )
+MODIFIES SQL DATA
+BEGIN
+  START TRANSACTION ;
+    -- delete the resource rid_ from the current view / container with rid = cid_
+    delete from listResourceItems where rid = cid_ and itemrid = rid_;
+    -- get subj and obj and make an entry for them in the list if it doesn't exist yet
+    select add_listResourceItem(cid_, subj), add_listResourceItem(cid_, obj) from tripleResources where rid = rid_;
+  COMMIT ;
+END //
+
+create procedure remove_listResourceFromContainer( IN rid_ int unsigned, IN cid_ int unsigned )
+MODIFIES SQL DATA
+BEGIN
+  -- since a hypernode is also a node, we treat it the same way
+  -- NOTE: this also removes the childs from the current view!
+  call remove_stringResourceFromContainer(rid_, cid_);
+END //
+
+create procedure edit_resourceContainer( IN rid_ int unsigned, IN cid_old int unsigned, IN cid_new int unsigned)
+MODIFIES SQL DATA
+BEGIN
+  START TRANSACTION ;
+    -- delete the resource rid_ from the current view / container with rid = cid_old
+    delete from listResourceItems where rid = cid_old and itemrid = rid_;
+    -- make an entry for the rid_ in the list of the new container with rid = cid_new
+    select add_listResourceItem(cid_new, rid_);
+    -- TODO: think what should happen with tripleResources, and triple resources connected to rid_!
+  COMMIT ;
+END //
+
 
 DELIMITER ;

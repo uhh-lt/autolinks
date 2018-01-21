@@ -117,7 +117,7 @@ module.exports.promisedWrite = function(username, storagekey, resourceList) {
         logger.debug(`Resource for storagekey '${storagekey}' and user '${username}' was already stored, skipping write action.`);
         return true;
       }
-      return this.saveResourceValue(resourceList)
+      return this.saveNewResourceValue(resourceList)
         .then(resource => this.saveStorageItem(username, storagekey).then(sid => Object({sid:sid, resource: resource})))
         .then(obj => {
           this.saveStorageItemToResourceMapping(obj.sid, obj.resource.rid);
@@ -131,8 +131,8 @@ module.exports.promisedWrite = function(username, storagekey, resourceList) {
  * @param resource
  * @return {Promise}
  */
-module.exports.saveResourceValue = function(resourceValue) {
-  const resource = new Resource(null, null, resourceValue);
+module.exports.saveNewResourceValue = function(resourceValue, username, cid) {
+  const resource = new Resource(null, null, resourceValue, cid);
   // a resource can be an array of resources, a triple or a string
   if(resource.isListResource()) {
     logger.debug('Resource is an array.');
@@ -151,7 +151,7 @@ module.exports.saveResourceValue = function(resourceValue) {
 
 /**
  * work with Promises here
- * @param triple
+ * @param tripleResource
  * @return {Promise}
  */
 module.exports.saveTripleResource = function(tripleResource) {
@@ -159,9 +159,9 @@ module.exports.saveTripleResource = function(tripleResource) {
     tripleResource.value = Triple.asTriple(tripleResource.value);
     // save resources
     Promise.all([
-      this.saveResourceValue(tripleResource.value.subject),
-      this.saveResourceValue(tripleResource.value.predicate),
-      this.saveResourceValue(tripleResource.value.object),
+      this.saveNewResourceValue(tripleResource.value.subject),
+      this.saveNewResourceValue(tripleResource.value.predicate),
+      this.saveNewResourceValue(tripleResource.value.object),
     ]).then(
       resources => { // on success add triple
         tripleResource.value.subject = resources[0];
@@ -182,7 +182,7 @@ module.exports.saveTripleResource = function(tripleResource) {
 
 module.exports.saveListResource = function(listResource) {
 
-  const resourcePromises = listResource.value.map(resource => this.saveResourceValue(resource));
+  const resourcePromises = listResource.value.map(resource => this.saveNewResourceValue(resource));
   return Promise.all(resourcePromises)
     .then(
       item_resources => {
@@ -366,6 +366,36 @@ module.exports.getStorageResource = function(username, storagekey) {
     .then(rid => rid && this.getResource(rid, -1) || null);
 };
 
+module.exports.deleteResource = function(resource, username) {
+  const r = Resource.asResource(resource);
+  if(r.isListResource()){
+    return promisedQuery('call remove_listResourceFromContainer(?,?)', [resource.rid, resource.cid]);
+  }
+  if(r.isTripleResource()){
+    return promisedQuery('call remove_tripleResourceFromContainer(?,?)', [resource.rid, resource.cid]);
+  }
+  // else its a string resource
+  return promisedQuery('call remove_stringResourceFromContainer(?,?)', [resource.rid, resource.cid]);
+};
+
+module.exports.moveResource = function(rid, cid_before, cid_after) {
+  return promisedQuery('call edit_resourceContainer(?,?,?)', [rid, cid_before, cid_after]);
+};
+
+module.exports.updateMetadata = function(rid, metadataBefore, metadataAfter) {
+  // prepare sql statement and values
+  const promises = [];
+  // updates or creations
+  Object.keys(metadataAfter)
+    .filter(k => metadataBefore[k] !== metadataAfter[k])
+    .forEach(k => promises.push(promisedQuery('update resourceMetadata set mkey = ?, mvalue = ? where rid = ?', [k, metadataAfter[k]])));
+  // deletions
+  Object.keys(metadataBefore)
+    .filter(k => metadataAfter[k] === null)
+    .forEach(k => promises.push(promisedQuery('delete from resourceMetadata where rid = ? and mkey = ?', [k, metadataAfter[k]])));
+  return Promise.all(promises);
+};
+
 module.exports.createUsergroup = function(name) {
   return promisedQuery('select get_or_add_user(?, true) as uid', [name])
     .then(res => res.rows[0].uid);
@@ -381,13 +411,54 @@ module.exports.resetDatabase = function(){
 };
 
 module.exports.promisedEditResource = function(resourceBefore, resourceAfter, username) {
-  // check what kind of edit needs to be performed, possible actions are:
-  // 1. create a new resource
-  // 2. delete a resource
-  // 3. change container
-  // 4. change metadata (label, etc)
+
+  /*
+   * check what kind of edit needs to be performed, possible actions are:
+   * 1. create a new resource
+   * 2. delete a resource
+   * 3. change container
+   * 4. change metadata properties, eg. "label"
+   * 5. (change value) -- TODO: think about if that actually should be possible!
+   */
+
+  // 1: create a new resource if resourceBefore does not exist
+  if(!resourceBefore){
+    if(!resourceAfter){
+      return null;
+    }
+    return this.saveNewResourceValue(resourceAfter.value, username, resourceAfter.cid);
+  }
+
+  // 2: delete resource if resourceAfter is null
+  if(!resourceAfter) {
+    return this.deleteResource(resourceBefore, username).then(_ignore_ => null);
+  }
+
+  // make sure resourceBefore and resourceAfter are the same, i.e. they have the same rid
+  if(resourceBefore.rid !== resourceAfter.rid) {
+    return Promise.reject(new Exception(`Illegal State', 'Resources after and before must have the same rid, but is: ${resourceBefore.rid} and ${resourceAfter.rid}`));
+  }
+
+  // 3. move resource from old cid to new cid
+  if(resourceBefore.cid !== resourceAfter.cid) {
+    return this.moveResource(resourceBefore.rid, resourceBefore.cid, resourceAfter.cid)
+      .then(_ignore_ => resourceAfter);
+  }
+
+  // 4. change metadata
+  if(resourceBefore.label !== resourceAfter.label) {
+    return this.updateMetadata(resourceBefore.rid, resourceBefore.metadata, resourceAfter.metadata)
+      .then(_ignore_ => resourceAfter);
+  }
+
   // 5. change value
-  return Promise.reject(new Exception('NOT IMPLEMENTED','not yet implemented'));
+  if(resourceBefore.metadata !== resourceAfter.metadata){
+    return Promise.reject(new Exception('IllegalOperation', 'Changing the value of a resource is not permitted!'));
+  }
+
+  // otherwise nothing has changed
+  logger.debug('Resource is unchanged.');
+  return Promise.accept(resourceAfter);
 };
 
 module.exports.close = function(callback){

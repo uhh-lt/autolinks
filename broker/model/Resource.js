@@ -8,17 +8,20 @@ module.exports = Resource;
 
 Resource.prototype.rid = -1;
 Resource.prototype.cid = -1;
-Resource.prototype.label = null;
+Resource.prototype.metadata = null;
 Resource.prototype.value = null;
 
 /**
  * @constructor
  */
-function Resource(rid, label, value, cid) {
+function Resource(rid, label, value, cid, metadata) {
   this.rid = rid;
   this.label = label;
   this.value = value;
   this.cid = cid;
+  if(!metadata) {
+    this.metadata = {};
+  }
 }
 
 Resource.prototype.resolve = function(){
@@ -62,7 +65,6 @@ Resource.asResource = function(obj){
   }
   return new Resource().assign(obj);
 };
-
 
 Resource.prototype.isListResource = function(){
   return Array.isArray(this.value);
