@@ -308,7 +308,8 @@ module.exports.getResource = function(rid, cid) {
         return this.fillStringResource(newresource);
       }
       throw new Error('This is impossible, a resource has to be one of {list,triple,string}.');
-    });
+    })
+    .then(this.fillMetadata);
 };
 
 module.exports.fillStringResource = function(resource) {
@@ -346,6 +347,16 @@ module.exports.fillListResource = function(resource) {
     .then(item_rids => Promise.all(item_rids.map(item_rid => this.getResource(item_rid, resource.rid))))
     .then(item_resources => {
       resource.value = item_resources;
+      return resource;
+    });
+};
+
+module.exports.fillMetadata = function(resource) {
+  return promisedQuery('select * from resourceMetadata where rid = ?', [resource.rid])
+    .then(res => res.rows.map(r => Object({key : r.mkey, val : r.mvalue})))
+    .then(kvps => kvps.reduce((acc, kvp) => {acc[Object.keys(kvp)[0]] = Object.values(kvp)[0]; return acc;}, {}))
+    .then(metadata => {
+      resource.metadata = metadata;
       return resource;
     });
 };
@@ -426,11 +437,13 @@ module.exports.promisedEditResource = function(resourceBefore, resourceAfter, us
     if(!resourceAfter){
       return null;
     }
+    logger.debug('Creating new resource.');
     return this.saveNewResourceValue(resourceAfter.value, username, resourceAfter.cid);
   }
 
   // 2: delete resource if resourceAfter is null
   if(!resourceAfter) {
+    logger.debug('Removing resource.');
     return this.deleteResource(resourceBefore, username).then(_ignore_ => null);
   }
 
@@ -441,12 +454,14 @@ module.exports.promisedEditResource = function(resourceBefore, resourceAfter, us
 
   // 3. move resource from old cid to new cid
   if(resourceBefore.cid !== resourceAfter.cid) {
+    logger.debug('Moving resource.');
     return this.moveResource(resourceBefore.rid, resourceBefore.cid, resourceAfter.cid)
       .then(_ignore_ => resourceAfter);
   }
 
   // 4. change metadata
   if(resourceBefore.label !== resourceAfter.label) {
+    logger.debug("Changing resource's metadata.");
     return this.updateMetadata(resourceBefore.rid, resourceBefore.metadata, resourceAfter.metadata)
       .then(_ignore_ => resourceAfter);
   }

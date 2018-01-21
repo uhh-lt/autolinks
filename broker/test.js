@@ -163,7 +163,27 @@ mysqldb.init((err, r) => {
 
   setTimeout(function(){
 
-    mysqldb.getResource(1).then(r => JSON.stringify(r, null, 2)).then(console.log);
+    mysqldb.getResource(1)
+      .then(r => JSON.stringify(r, null, 2))
+      .then(console.log)
+      .then(mysqldb.promisedEditResource({rid: 1, value: 'hello'}, null))
+      .then(mysqldb.getResource(1))
+      .then(r => JSON.stringify(r, null, 2))
+      .then(console.log)
+      .then(r => mysqldb.promisedEditResource(null, {value: 'ashdoiahs'}))
+      .then(r => mysqldb.getResource(r.rid))
+      .then(r => JSON.stringify(r, null, 2))
+      .then(console.log)
+      .then(r => mysqldb.promisedEditResource({rid: 18, cid : 3}, {rid: 18, cid : 27}))
+      .then(r => mysqldb.getResource(r.rid))
+      .then(r => JSON.stringify(r, null, 2))
+      .then(console.log)
+      .then(r => mysqldb.promisedEditResource({rid: 1, metadata : {}}, {rid: 1, metadata : {label : "hallo"}}))
+      .then(r => mysqldb.getResource(r.rid))
+      .then(r => JSON.stringify(r, null, 2))
+      .then(console.log);
+
+
 
   }, 1500);
 
