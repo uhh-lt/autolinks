@@ -436,31 +436,38 @@ define([
                               let o = n.value.object;
 
                               function extractSubject(n) {
-                                if (_.isArray(n)) {
-                                  return n[0];
+                                if (_.isArray(n[0].value)) {
+                                  return extractSubject(n[0].value);
                                 }
-                                return n.subject;
+                                return n[0].value;
                               }
 
                               function extractObject(n) {
-                                if (_.isArray(n)) {
-                                  return n[0];
+                                // debugger;
+                                if (_.isArray(n[0].value)) {
+                                  return extractObject(n[0].value);
                                 }
-                                return n.object;
+                                if(_.isObject(n[0].value)) {
+                                  return n[0].value.subject;
+                                }
+                                return n[0].value;
                               }
 
                               function extractPredicate(n) {
-                                if (_.isArray(n)) {
-                                  return n[0];
+                                if (_.isArray(n[0].value)) {
+                                  return extractPredicate(n[0].value);
                                 }
-                                return n.predicate;
+                                if(_.isObject(n[0].value)) {
+                                  return n[0].value.subject;
+                                }
+                                return n[0].value;
                               }
 
                               if (_.isArray(s.value)) {
                                 var s1 = extractSubject(o.value);
                                 var subject = {
-                                    id: (s1.rid + '_as_parent').replace(/\s/g, ''),
-                                    name: s1.rid + '',
+                                    id: (s1.value + '_as_parent').replace(/\s/g, ''),
+                                    name: s1.value + '',
                                     parent: parent ? parent.id : null
                                 };
                               } else if (_.isObject(s.value)) {
@@ -524,7 +531,7 @@ define([
                                   }
                                 };
                               }
-
+  
                               newEdge.push(edge);
                               newNode.push(subject, object);
 
