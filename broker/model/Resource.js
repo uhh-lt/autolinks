@@ -14,9 +14,8 @@ Resource.prototype.value = null;
 /**
  * @constructor
  */
-function Resource(rid, label, value, cid, metadata) {
+function Resource(rid, value, cid, metadata) {
   this.rid = rid;
-  this.label = label;
   this.value = value;
   this.cid = cid;
   if(!metadata) {

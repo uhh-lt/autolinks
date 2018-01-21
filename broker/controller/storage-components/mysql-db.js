@@ -132,7 +132,7 @@ module.exports.promisedWrite = function(username, storagekey, resourceList) {
  * @return {Promise}
  */
 module.exports.saveNewResourceValue = function(resourceValue, username, cid) {
-  const resource = new Resource(null, null, resourceValue, cid);
+  const resource = new Resource(null, resourceValue, cid);
   // a resource can be an array of resources, a triple or a string
   if(resource.isListResource()) {
     logger.debug('Resource is an array.');
@@ -294,7 +294,7 @@ module.exports.getResource = function(rid, cid) {
         return null;
       }
       const r = res.rows[0];
-      const newresource = new Resource(rid, r.label, null, cid);
+      const newresource = new Resource(rid, null, cid);
       if(r.istriple){
         logger.debug(`Requesting triple resource '${rid}'.`);
         return this.fillTripleResource(newresource);

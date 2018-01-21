@@ -155,16 +155,25 @@ mysqldb.init((err, r) => {
 
   // mysqldb.getTriple(2).then(console.log,console.err);
   // mysqldb.getResource(12).then(console.log,console.err);
-  setTimeout(function(){
-    mysqldb.getStorageResource('me', '12345').then(r => JSON.stringify(r, null, 2)).then(console.log, console.err);
-  }, 1500);
+  // setTimeout(function(){
+  //   mysqldb.getStorageResource('me', '12345').then(r => JSON.stringify(r, null, 2)).then(console.log, console.err);
+  // }, 1500);
 
+
+
+  setTimeout(function(){
+
+    mysqldb.getResource(1).then(r => JSON.stringify(r, null, 2)).then(console.log);
+
+  }, 1500);
 
   setTimeout(function(){
     mysqldb.close((err) => {});
-  }, 3000);
+  }, 4000);
 
 }, true);
+
+
 
 
 
