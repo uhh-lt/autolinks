@@ -481,7 +481,7 @@ module.exports.promisedEditResource = function(resourceBefore, resourceAfter, us
 
   // 5. change value
   if(resourceBefore.value !== resourceAfter.value){
-    return Promise.reject(new Exception('IllegalOperation', 'Changing the value of a resource is not permitted!'));
+    return Promise.reject(new Exception('NotImplemented', 'This operation is currently not implemented!'));
   }
 
   // otherwise nothing has changed
