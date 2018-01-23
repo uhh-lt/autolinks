@@ -2,7 +2,11 @@
 fronendserver/node_modules/*
 frontendserver/app/assets/javascripts/libs/*
 data/
+
+### VisualStudioCode ###
 *.code-workspace
+.vscode
+.history
 
 # Created by https://www.gitignore.io/api/node,bower,webstorm,intellij+all
 
