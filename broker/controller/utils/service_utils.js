@@ -156,7 +156,6 @@ module.exports.ping_service = function(service, callback) {
     };
     const requestKeyOptions = Object.assign({}, requestDataOptions);
     requestKeyOptions.url = `${path}?getStorageKey`;
-    
     // get the storage key
     request_utils.promisedRequest(requestKeyOptions)
     .then(
