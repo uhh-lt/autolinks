@@ -2,6 +2,7 @@
 fronendserver/node_modules/*
 frontendserver/app/assets/javascripts/libs/*
 data/
+*.code-workspace
 
 # Created by https://www.gitignore.io/api/node,bower,webstorm,intellij+all
 
