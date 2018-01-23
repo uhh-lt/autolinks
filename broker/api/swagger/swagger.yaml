@@ -620,9 +620,13 @@ paths:
       tags:
         - Storage
       description: |
-        Edit a resource. Specifically, provide the old and a new resource.
-        Create a resource by setting the old resource parameter to null,
-        remove a resource by setting the new resource parameter to null.
+        Edit a resource. Specifically, provide an old resources and a new resource, the changes will be written.
+        - Create a resource by setting the old resource parameter to null,
+        - Remove a resource by setting the new resource parameter to null.
+        - For editing, resources must have the same rid!
+
+        NOTE that only one change at a time will be written, e.g. if you change the metadata object and the cid in the new resource only one of the changes will be processed.
+        The new resource will be returned on success.
       parameters:
         - name: data
           in: body
@@ -644,7 +648,6 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Exception"
-  
 
   /storage/info:
     x-swagger-router-controller: storage
