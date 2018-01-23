@@ -1,5 +1,5 @@
 {
-  "name": "AutolinksBroker",
+  "name": "autolinks-broker",
   "version": "0.0.1",
   "private": true,
   "description": "",
@@ -9,7 +9,6 @@
   "main": "app.js",
   "dependencies": {
     "basic-auth": "^2.0.0",
-    "bcrypt": "^1.0.3",
     "events": "^1.1.1",
     "express": "^4.12.3",
     "lodash": "^4.17.4",
