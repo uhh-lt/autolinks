@@ -8,7 +8,7 @@ const
   Exception = require('../../model/Exception'),
   storage = require('../storage_wrapper'),
   logger = require('../log')(module)
-  ;
+;
 
 // ping a service
 module.exports.ping_service = function (service, callback) {
@@ -83,15 +83,15 @@ module.exports.ping_service = function (service, callback) {
 // ping all registered services
 module.exports.ping_services = function () {
   db.get_services(function (err, service) {
-    if (err) {
-      /* ignore */
-      return;
-    }
-    module.exports.ping_service(service, function (err) {
-      /* ignore */
-      return;
-    });
-  },
+      if (err) {
+        /* ignore */
+        return;
+      }
+      module.exports.ping_service(service, function (err) {
+        /* ignore */
+        return;
+      });
+    },
     function (err, numrows) {
       /* ignore */
     });
@@ -195,21 +195,21 @@ module.exports.get_service_details = function (servicename, extended, callback) 
     const location = `${service.location}/swagger`;
     request_utils.promisedRequest(location)
       .then(
-      res => {
-        service.swagger = JSON.parse(res.body);
-        callback(null, service);
-      },
-      err => {
-        logger.warn(err.message);
-        callback(err);
-      });
+        res => {
+          service.swagger = JSON.parse(res.body);
+          callback(null, service);
+        },
+        err => {
+          logger.warn(err.message);
+          callback(err);
+        });
   });
 };
 
 /**
-*
-* @param rows
-*/
+ *
+ * @param rows
+ */
 function remap_joined_service_endpoint_rows(rows) {
   return _(rows).groupBy(r => r.name) // group by service name
     .map((v, k) => { // reformat row

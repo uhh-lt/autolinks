@@ -90,8 +90,8 @@ module.exports.init = function (callback, resetdata) {
         return res;
       })
       .then(
-      res => callback(null, res),
-      err => callback(err)
+        res => callback(null, res),
+        err => callback(err)
       );
 
   }); // end fs.readFile
@@ -101,8 +101,8 @@ module.exports.init = function (callback, resetdata) {
 module.exports.read = function (username, storagekey, callback) {
   return this.promisedRead(username, storagekey)
     .then(
-    resource => callback(null, resource),
-    err => callback(err, null)
+      resource => callback(null, resource),
+      err => callback(err, null)
     );
 };
 
@@ -113,8 +113,8 @@ module.exports.promisedRead = function (username, storagekey) {
 module.exports.write = function (username, storagekey, resourceList, callback) {
   return this.promisedWrite(username, storagekey, resourceList)
     .then(
-    res => callback(null, res),
-    err => callback(err, null)
+      res => callback(null, res),
+      err => callback(err, null)
     );
 };
 
@@ -148,10 +148,10 @@ module.exports.promisedWrite = function (username, storagekey, resourceList) {
 };
 
 /**
-* work with Promises here
-* @param resource
-* @return {Promise}
-*/
+ * work with Promises here
+ * @param resource
+ * @return {Promise}
+ */
 module.exports.saveNewResourceValue = function (resourceValue, username, cid) {
   const resource = new Resource(null, resourceValue, cid);
   // a resource can be an array of resources, a triple or a string
@@ -171,10 +171,10 @@ module.exports.saveNewResourceValue = function (resourceValue, username, cid) {
 };
 
 /**
-* work with Promises here
-* @param tripleResource
-* @return {Promise}
-*/
+ * work with Promises here
+ * @param tripleResource
+ * @return {Promise}
+ */
 module.exports.saveTripleResource = function (tripleResource) {
   return new Promise((resolve, reject) => {
     tripleResource.value = Triple.asTriple(tripleResource.value);
@@ -197,7 +197,7 @@ module.exports.saveTripleResource = function (tripleResource) {
           });
       },
       err => reject(err) // on failure return the respective error
-      );
+    );
   });
 };
 
@@ -206,21 +206,21 @@ module.exports.saveListResource = function (listResource) {
   const resourcePromises = listResource.value.map(resource => this.saveNewResourceValue(resource));
   return Promise.all(resourcePromises)
     .then(
-    item_resources => {
-      const item_rids = item_resources.map(r => r.rid);
-      logger.debug(`Saved resources ${item_rids}.`);
-      return this.saveListResourceDescriptor(item_rids)
-        .then(desc_rid => {
-          listResource.rid = desc_rid;
-          item_resources.forEach(itemResource => propagateApplyCid(itemResource, listResource.rid));
-          listResource.value = item_resources;
-          return item_rids;
-        });
-    }
+      item_resources => {
+        const item_rids = item_resources.map(r => r.rid);
+        logger.debug(`Saved resources ${item_rids}.`);
+        return this.saveListResourceDescriptor(item_rids)
+          .then(desc_rid => {
+            listResource.rid = desc_rid;
+            item_resources.forEach(itemResource => propagateApplyCid(itemResource, listResource.rid));
+            listResource.value = item_resources;
+            return item_rids;
+          });
+      }
     ).then(
-    item_rids => Promise
-      .all(item_rids.map(item_rid => this.saveListResourceItem(listResource.rid, item_rid)))
-      .then(ignore_ => listResource) // return list resource
+      item_rids => Promise
+        .all(item_rids.map(item_rid => this.saveListResourceItem(listResource.rid, item_rid)))
+        .then(ignore_ => listResource) // return list resource
     );
 
 };
@@ -416,7 +416,7 @@ module.exports.moveResource = function (rid, cid_before, cid_after) {
 
 module.exports.updateMetadata = function (rid, metadataBefore, metadataAfter) {
   return Promise.resolve(1)
-    // updates or creations
+  // updates or creations
     .then(_ignore_ => {
       return Promise.all(Object.keys(metadataAfter)
         .filter(k => metadataBefore[k] !== metadataAfter[k])
