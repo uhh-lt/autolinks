@@ -78,7 +78,6 @@ const config = {
   }
 };
 
-
 /*
  * start api with swagger-express
  */
@@ -102,44 +101,10 @@ nodeCleanup(function (exitCode, signal) {
   logger.info('Shutdown server.');
 });
 
-app.get('/test', function(req, res){
-  //servicedb.add_service('asadsasd','adasdan', null, [{'name':'asd'}, {'name':'asdad'}]);
-  // servicedb.update_service('wikiservice', {
-  //   lastseenactive: new Date().getTime(),
-  //   active: true
-  // });
-
-
-  // servicedb.delete_service('asadsasd');
-
-  //() => { servicedb.get_services((service) => {
-  //   //console.log(`${service.name} ${service.location} ${service.lastseenactive}`);
-  //   res.write(JSON.stringify(service));
-  // }}
-
-  // async.waterfall([
-  //   function(callback) {
-  //     res.write('[');
-  //     let startedwriting = false;
-  //     servicedb.get_services(
-  //       (service) => {
-  //         startedwriting && res.write(',');
-  //         res.write(JSON.stringify(service));
-  //         startedwriting = true;
-  //       },
-  //       () => {
-  //         callback(null, 'OK')
-  //       });
-  //   }
-  // ], function (err, result) {
-  //     console.log(result);
-  //     res.write(']');
-  //     res.end();
-  //     // result now equals 'done'
-  // });
-
-  res.end();
-
+// some test function
+app.get('/test', function(req, res, next){
+  res.write('Hello test');
+  res.end(next);
 });
 
 

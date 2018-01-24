@@ -59,6 +59,29 @@ services:
       - LOGLEVEL=debug
   # END: broker
 
+  # BEGIN: frontend-minimal
+  frontend-min:
+    image: remstef/node-swagger:latest
+    volumes:
+      - ${PWD}/debug:/opt/project/debug
+      - ${PWD}/broker:/opt/project/broker
+      - ${PWD}/data:/opt/project/data
+    ports:
+      - 10001:10010
+      - 3001:3001
+    networks:
+      - anet
+    stdin_open: true
+    tty: true
+    working_dir: /opt/project/debug
+    entrypoint: bash
+    environment:
+      - NODE_ENV=development
+      - COOKIE_SECRET=YOUR_COOKIE_SECRET
+      - BROKER_URL=http://broker:10010
+      - LOGLEVEL=debug
+  # END: frontend-minimal
+
   # BEGIN: mysql
   mysql:
     image: "mysql:5.7"
