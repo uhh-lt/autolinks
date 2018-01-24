@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: '0.0.1'
+  version: '0.0.2'
   title: Autolinks Broker Service
 
 ## the domain of the service
@@ -155,10 +155,10 @@ definitions:
         type: object
         description: the actual value of the resource, this is either a string, or a list of resources, or a triple
         
-  Resources:
-    type: array
-    items:
-      $ref: "#/definitions/Resource"
+  # Resources:
+  #   type: array
+  #   items:
+  #     $ref: "#/definitions/Resource"
 
   # in case of error return this object schema
   Exception:
@@ -258,7 +258,7 @@ paths:
         200:
           description: Success
           schema:
-            $ref: '#/definitions/Resources'
+            $ref: '#/definitions/Resource'
         default:
           description: Error
           schema:
@@ -560,59 +560,6 @@ paths:
           schema:
             $ref: "#/definitions/Exception"
 
-  /storage/read:
-    x-swagger-router-controller: storage
-    post:
-      operationId: read
-      tags:
-        - Storage
-      description: Get resources for a particular key
-      parameters:
-        - name: key
-          in: body
-          description: The key of the data to read
-          schema:
-            type: string
-      security:
-        - broker_auth: []
-      responses:
-        200:
-          description: Success, user data was found and will be returned
-        204:
-          description: Success, no data not found
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/Exception"
-
-  /storage/write:
-    x-swagger-router-controller: storage
-    post:
-      operationId: write
-      tags:
-        - Storage
-      description: Write data for a particular key
-      parameters:
-        - name: data
-          in: body
-          description: The key and value of the data to be written
-          schema:
-            type: object
-            properties:
-              key:
-                type: string
-              resources:
-                $ref: "#/definitions/Resources"
-      security:
-        - broker_auth: []
-      responses:
-        200:
-          description: Success
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/Exception"
-            
   /storage/editresource:
     x-swagger-router-controller: storage
     post:
