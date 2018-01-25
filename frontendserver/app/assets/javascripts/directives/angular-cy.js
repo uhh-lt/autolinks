@@ -426,7 +426,7 @@ define([
                         var edges = scope.data.edges;
                         var newNode = [];
                         var newEdge = [];
-
+                        debugger;
                         if (entity) {
                           _.forEach(entity.value, function(n) {
                             function extractEntity(n, parent = null) {
@@ -531,7 +531,7 @@ define([
                                   }
                                 };
                               }
-  
+
                               newEdge.push(edge);
                               newNode.push(subject, object);
 
@@ -547,11 +547,11 @@ define([
                                 });
                               };
 
-                              if (_.isArray(p.value)) {
-                                _.forEach(p.value, function(n) {
-                                  extractEntity(n, object);
-                                });
-                              };
+                              // if (_.isArray(p.value)) {
+                              //   _.forEach(p.value, function(n) {
+                              //     extractEntity(n, object);
+                              //   });
+                              // };
 
                               // if (_.isArray(s.value)) {
                               //   _.forEach(s.value, function(n) {

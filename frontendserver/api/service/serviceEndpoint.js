@@ -18,7 +18,8 @@ function list(req, res){
 }
 
 function call(req, res) {
-    const options = serviceCall(config.apiUrl, req.body.text);
+    let data = req.body.data;
+    const options = serviceCall(config.apiUrl, data);
     request(options, function (error, response, body) {
       res.send(body);
     });

@@ -1,4 +1,9 @@
-module.exports = function(url, text) {
+module.exports = function(url, data) {
+  const name = data.name;
+  const version = data.version;
+  const text = data.text;
+  const path = data.endpoint.path;
+  const method = data.endpoint.method;
   return {
     url: url + '/service/call',
     method: 'POST',
@@ -10,10 +15,10 @@ module.exports = function(url, text) {
     json: true,
     body:
     {
-      "service": "Wiki",
-      "version": "0.0.1",
-      "path": "/findarticles",
-      "method": "post",
+      "service": name,
+      "version": version,
+      "path": path,
+      "method": method,
       "data": {
         "focus": {
           "offsets": [

@@ -19,17 +19,21 @@ define([
 
           // == HELPER FUNCTIONS == //
 
+          $scope.listServices = EndPointService.fetchService();
+
           // An onclick function that removes the element clicked
           function removeThis() {
             this.parentElement.removeChild(this);
           }
 
           $scope.submit = function() {
-            resetNetworkFromInput();
+            EndPointService.fetchService().then(function(response){
+              resetNetworkFromInput(response);
+            });
           }
 
           // Reset the network with the content from the input box.
-          function resetNetworkFromInput() {
+          function resetNetworkFromInput(response) {
             // Network should be reset
             var needsreset = true;
             var cf = document.getElementsByClassName("commafield")[0];
@@ -44,11 +48,25 @@ define([
 
             // for (var i=0; i<inputs.length; i++) {
             // if (_.includes(inputs, 'Simon')) {
-            EndPointService.annotateText(inputs[0]).then(function(response) {
-                console.log(response);
-            });
-            EndPointService.fetchData(inputs[0]).then(function(response) {
-                EntityService.addEntity(response);
+            // EndPointService.annotateText(inputs[0]).then(function(response) {
+            //     console.log(response);
+            // });
+
+            const list = response.data;
+            _.forEach(list, function(l) {
+              $scope.serviceName = l.name;
+              $scope.serviceVersion = l.version;
+              _.forEach(l.endpoints, function(e) {
+                let data = {
+                  text: inputs[0],
+                  name: $scope.serviceName,
+                  version: $scope.serviceVersion,
+                  endpoint: e
+                };
+                EndPointService.fetchData(data).then(function(response) {
+                    EntityService.addEntity(response);
+                });
+              });
             });
             // }
               // getPageName(encodeURI(inputs[i]), addStart);
