@@ -46,28 +46,39 @@ define([
               return;
             }
 
+            $scope.list = response.data;
+
             // for (var i=0; i<inputs.length; i++) {
             // if (_.includes(inputs, 'Simon')) {
-            // EndPointService.annotateText(inputs[0]).then(function(response) {
-            //     console.log(response);
-            // });
+            EndPointService.annotateText(inputs[0]).then(function(response) {
 
-            const list = response.data;
-            _.forEach(list, function(l) {
-              $scope.serviceName = l.name;
-              $scope.serviceVersion = l.version;
-              _.forEach(l.endpoints, function(e) {
-                let data = {
-                  text: inputs[0],
-                  name: $scope.serviceName,
-                  version: $scope.serviceVersion,
-                  endpoint: e
-                };
-                EndPointService.fetchData(data).then(function(response) {
-                    EntityService.addEntity(response);
+                const annotations = response.data.annotations;
+
+                _.forEach(annotations, function(anno) {
+
+                  const text = anno.properties.surface;
+                  _.forEach($scope.list, function(l) {
+
+                    $scope.serviceName = l.name;
+                    $scope.serviceVersion = l.version;
+
+                    _.forEach(l.endpoints, function(e) {
+                      let data = {
+                        text: text,
+                        name: $scope.serviceName,
+                        version: $scope.serviceVersion,
+                        endpoint: e
+                      };
+
+                      EndPointService.fetchData(data).then(function(response) {
+                          EntityService.addEntity(response);
+                      });
+                    });
+                  });
                 });
-              });
             });
+
+
             // }
               // getPageName(encodeURI(inputs[i]), addStart);
             // }

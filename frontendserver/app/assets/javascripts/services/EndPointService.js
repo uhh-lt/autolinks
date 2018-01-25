@@ -18,6 +18,7 @@ define([
 
               annotateText: function(text) {
                 return $http.post('/api/nlp/analyze', { text: text }).then(function(response) {
+                  return response;
                 });
               },
 
