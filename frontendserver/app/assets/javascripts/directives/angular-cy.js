@@ -439,6 +439,9 @@ define([
                                 if (_.isArray(n[0].value)) {
                                   return extractSubject(n[0].value);
                                 }
+                                if(_.isObject(n[0].value)) {
+                                  return n[0].value.subject;
+                                }
                                 return n[0].value;
                               }
 
@@ -464,7 +467,7 @@ define([
                               }
 
                               if (_.isArray(s.value)) {
-                                var s1 = extractSubject(o.value);
+                                var s1 = extractSubject(s.value);
                                 var subject = {
                                     id: (s1.value + '_as_parent').replace(/\s/g, ''),
                                     name: s1.value + '',
