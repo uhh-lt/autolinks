@@ -69,19 +69,15 @@ module.exports.ping = function(callback){
  * @param callback
  * @param callbackDone
  */
-module.exports.search = function(text, callback, callbackDone) {
-  const query = { query_string: { query: `title:(${text})` } };
-  // const query = { term : { title : text } };
+module.exports.search = function(text, itemCallback, callbackDone) {
   (function searchRecursive(i){
-    module.exports.query(esIndices[i], query, 0, 2, callback, () => {
-      if(esIndices > 0) {
+    module.exports.query(esIndices[i], text, 0, 2, itemCallback, () => {
+      if(i > 0) {
         return searchRecursive(i-1);
       }
       return callbackDone(null);
     });
   })(esIndices.length-1);
-
-
 };
 
 module.exports.transformSearchResults = function(text, searchResult){
@@ -159,7 +155,9 @@ module.exports.get = function(index, type, id, callback){
  * @param query
  * @param callback
  */
-module.exports.query = function(index, query, offset, limitResults, callback, callbackDone){
+module.exports.query = function(index, text, offset, limitResults, itemCallback, callbackDone){
+  const query = { query_string: { query: `title:(${text})` } };
+  // const query = { term : { title : text } };
   const queryBody = {
     query : query,
     from : offset,
@@ -171,14 +169,13 @@ module.exports.query = function(index, query, offset, limitResults, callback, ca
   esClient.search({
     index: index, //esIndices, //index
     body: queryBody
-  }).then(
+  }).catch (
+    err => callbackDone(err, null)
+  ).then(
     result => {
       logger.debug(`Found ${result.hits.total} hits for '${index}', returning ${limitResults}.`);
-      callback(null, result);
-    },
-    err => callback(err, null)
-  ).then(
-    result => callbackDone(null, result),
-    err => callbackDone(err, null)
-  );
+      this.transformSearchResults(text, result)
+        .forEach(triple => itemCallback(null, triple));
+    }
+  ).then(r => callbackDone(null, r));
 };
