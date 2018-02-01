@@ -24,7 +24,7 @@ module.exports = function(url, data) {
           "offsets": [
             {
               "from": 0,
-              "length": 15
+              "length": text.length
             }
           ]
         },
