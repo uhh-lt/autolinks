@@ -22,6 +22,7 @@
       'cytoscape': 'libs/cytoscape/dist/cytoscape.min',
       'cytoscape-cola': 'libs/cytoscape-cola/cytoscape-cola',
       'cytoscape-cose-bilkent': 'libs/cytoscape-cose-bilkent/cytoscape-cose-bilkent',
+      'cytoscape-klay': 'libs/cytoscape-klay/cytoscape-klay',
       'cytoscape-cxtmenu': 'libs/cytoscape-cxtmenu/cytoscape-cxtmenu',
       'cytoscape-panzoom': 'libs/cytoscape-panzoom/cytoscape-panzoom',
       'cytoscape.js-panzoom': 'libs/cytoscape-panzoom/cytoscape.js-panzoom',
@@ -32,7 +33,8 @@
       'qtip2': 'libs/qtip2/basic/jquery.qtip.min',
       'cola': 'libs/webcola/WebCola/cola.min',
       'ngMagnify': 'libs/ng-magnify/src/js/ng-magnify',
-      'less': 'libs/dist/less.min'
+      'less': 'libs/dist/less.min',
+      'klayjs': 'libs/klayjs/klay'
 		},
 		shim: {
 			'jquery': {
@@ -78,6 +80,9 @@
       },
       'ngMagnify': {
         deps: ['angular']
+      },
+      'cytoscape-klay': {
+        deps: ['cytoscape', 'klayjs']
       }
 		},
 		priority: [

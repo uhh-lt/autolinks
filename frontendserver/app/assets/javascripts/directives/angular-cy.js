@@ -5,6 +5,7 @@ define([
     'cytoscape',
     'cytoscape-cose-bilkent',
     'cytoscape-cola',
+    'cytoscape-klay',
     'cytoscape-cxtmenu',
     'cytoscape-panzoom',
     'cytoscape-qtip',
@@ -13,7 +14,7 @@ define([
     'cytoscape.js-undo-redo',
     'qtip2',
     'bootstrap',
-], function(angular, $, cola, cytoscape, regCose, cycola, cxtmenu, panzoom, cyqtip, expandCollapse,edgehandles, undoRedo, qtip2) {
+], function(angular, $, cola, cytoscape, regCose, cycola, klay, cxtmenu, panzoom, cyqtip, expandCollapse,edgehandles, undoRedo, qtip2) {
     'use strict';
 
     angular.module('ngCy', [])
@@ -53,6 +54,7 @@ define([
 
                 var cy = null;
 
+                // klay(cytoscape);
                 panzoom(cytoscape, $);
                 expandCollapse(cytoscape, $);
                 undoRedo(cytoscape);
@@ -61,6 +63,7 @@ define([
                 cyqtip(cytoscape, $);
                 cxtmenu(cytoscape);
                 edgehandles(cytoscape);
+
 
                 scope.ehListeners = [];
 
