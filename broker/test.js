@@ -46,7 +46,7 @@ c.resolve()
 const d = new Annotation();
 const e = new Annotation();
 console.log(d)
-d.doffset.push(new Offset(1,10));
+d.doffset.offsets.push(new Offset(1,10));
 console.log(d.doffset)
 console.log(e.doffset)
 

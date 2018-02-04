@@ -40,11 +40,10 @@ CREATE TABLE IF NOT EXISTS tripleResources (
 
 CREATE TABLE IF NOT EXISTS listResources (
   rid            int unsigned NOT NULL,
-  listdescriptor varchar(1000) NOT NULL,
-  --PRIMARY KEY (rid, listdescriptor),
-  PRIMARY KEY (rid)
-  --KEY (rid)
-  --KEY (listdescriptor(333))
+  listdescriptor varchar(256) NOT NULL,
+  PRIMARY KEY (rid, listdescriptor),
+  KEY (rid),
+  KEY (listdescriptor)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS listResourceItems (

@@ -9,6 +9,7 @@ const
   Triple = require('../../model/Triple'),
   Resource = require('../../model/Resource'),
   utils = require('../utils/utils'),
+  murmurhashNative = require('murmurhash-native'),
   logger = require('../log')(module);
 
 /* connection string: mysql://user:pass@host:port/database?optionkey=optionvalue&optionkey=optionvalue&... */
@@ -237,7 +238,8 @@ function propagateApplyCid(resource, cid) {
 
 module.exports.saveListResourceDescriptor = function (rids) {
   return new Promise((resolve, reject) => {
-    const listResourceDescriptor = 'l:[' + rids.join(',') + ']';
+    const listResourceDescriptorString = 'l:[' + rids.join(',') + ']';
+    const listResourceDescriptor = murmurhashNative.murmurHash128x64(listResourceDescriptorString);
     logger.debug(`Saving listResourceDesriptor ${listResourceDescriptor}.`);
     promisedQuery('select get_or_add_listResource(?) as rid', [listResourceDescriptor]).then(
       res => {
