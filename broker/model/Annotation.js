@@ -19,7 +19,7 @@ function Annotation() {
    * The analysis object
    */
   this.properties = {};
-  this.doffset = [];
+  this.doffset = new DOffset([]);
 }
 
 /**

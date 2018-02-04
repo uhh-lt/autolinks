@@ -2,6 +2,7 @@
 
 const
   Offset = require('../../model/Offset'),
+  DOffset = require('../../model/DOffset'),
   Annotation = require('../../model/Annotation'),
   Analysis = require('../../model/Analysis'),
   utils = require('../utils/utils'),
@@ -51,7 +52,7 @@ module.exports = {
         const anno = new Annotation();
         anno.analyzer = label;
         anno.type = 'NamedEntity';
-        anno.doffset.push(new Offset(offset_start, offset_end - offset_start));
+        anno.doffset.offsets.push(new Offset(offset_start, offset_end - offset_start));
         anno.properties.surface = word;
         anno.properties.type = 'UNK';
         logger.debug(`Found an entity: '${offset_start}:${offset_end}:${word}'.`, anno);
