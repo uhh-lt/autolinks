@@ -53,18 +53,25 @@ define([
             EndPointService.annotateText(inputs[0]).then(function(response) {
 
                 const annotations = response.data.annotations;
+                $scope.context = response.data;
 
                 _.forEach(annotations, function(anno) {
 
-                  const text = anno.properties.surface;
+                  const offsets = anno.doffset.offsets;
                   _.forEach($scope.list, function(l) {
 
                     $scope.serviceName = l.name;
                     $scope.serviceVersion = l.version;
 
                     _.forEach(l.endpoints, function(e) {
+
                       let data = {
-                        text: text,
+                        offsets:
+                        {
+                          from: offsets[0].from ? offsets[0].from : 0,
+                          length: offsets.length
+                        },
+                        context: $scope.context,
                         name: $scope.serviceName,
                         version: $scope.serviceVersion,
                         endpoint: e

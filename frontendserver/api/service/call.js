@@ -1,9 +1,11 @@
 module.exports = function(url, data) {
   const name = data.name;
   const version = data.version;
-  const text = data.text;
+  const context = data.context;
+  const offsets = data.offsets;
   const path = data.endpoint.path;
   const method = data.endpoint.method;
+  debugger;
   return {
     url: url + '/service/call',
     method: 'POST',
@@ -23,34 +25,12 @@ module.exports = function(url, data) {
         "focus": {
           "offsets": [
             {
-              "from": 0,
-              "length": text.length
+              "from": offsets.from,
+              "length": offsets.length
             }
           ]
         },
-        "context": {
-          "text": text,
-          "source": "string",
-          "lang": "string",
-          "availabletypes": [
-            "string"
-          ],
-          "annotations": [
-            {
-              "type": "string",
-              "doffset": {
-                "offsets": [
-                  {
-                    "from": 0,
-                    "length": 0
-                  }
-                ]
-              },
-              "properties": {},
-              "analyzer": "string"
-            }
-          ]
-        }
+        "context": context
       }
     }
   }
