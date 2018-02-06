@@ -154,21 +154,23 @@ module.exports.promisedWrite = function (username, storagekey, resourceList) {
  * @return {Promise}
  */
 module.exports.saveNewResourceValue = function (resourceValue, username, cid) {
-  const resource = new Resource(null, resourceValue, cid);
-  // a resource can be an array of resources, a triple or a string
-  if (resource.isListResource()) {
-    logger.debug('Resource is an array.');
-    return this.saveListResource(resource);
-  }
-  if (resource.isTripleResource()) {
-    logger.debug('Resource is a triple.');
-    return this.saveTripleResource(resource);
-  }
-  if (resource.isStringResource()) {
-    logger.debug('Resource is a string.');
-    return this.saveStringResource(resource);
-  }
-  throw new Error('This is impossible, a resource has to be one of {list,triple,string}.');
+  return new Promise((resolve, reject) => {
+    const resource = new Resource(null, resourceValue, cid);
+    // a resource can be an array of resources, a triple or a string
+    if (resource.isListResource()) {
+      logger.debug('Resource is an array.');
+      return resolve(this.saveListResource(resource));
+    }
+    if (resource.isTripleResource()) {
+      logger.debug('Resource is a triple.');
+      return resolve(this.saveTripleResource(resource));
+    }
+    if (resource.isStringResource()) {
+      logger.debug('Resource is a string.');
+      return resolve(this.saveStringResource(resource));
+    }
+    reject(new Error('This is impossible, a resource has to be one of {list,triple,string}.'));
+  }).then(this.fillMetadata);
 };
 
 /**
