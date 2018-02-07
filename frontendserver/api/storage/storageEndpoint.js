@@ -9,7 +9,8 @@ router.post('/editresource', editResource);
 module.exports = router;
 
 function editResource(req, res){
-    const options = storageEdit(config.apiUrl, req.body.text);
+    const data = req.body.data;
+    const options = storageEdit(config.apiUrl, data);
     request(options, function (error, response, body) {
       res.send(body);
     });
