@@ -1,0 +1,23 @@
+{
+  "name": "autolinks-frontend-min",
+  "version": "0.0.1",
+  "main": "server.js",
+  "repository": "xyz",
+  "license": "Apache-2.0",
+  "scripts": {
+    "bundle": "echo 'bundling app' && browserify ./browser/main.js -o ./public/javascripts/bundle.js",
+    "bundle-inapp": "echo 'bundling app' && node browserify-app.js",
+    "bundle-continuous": "watchify ./browser/main.js -o ./public/javascripts/bundle.js",
+    "bundle-continuous-inapp": "node watchify-app.js"
+  },
+  "dependencies": {
+    "express": "^4.16.2",
+    "jquery": "^3.3.1",
+    "winston": "^2.4.0"
+  },
+  "devDependencies": {
+    "browserify": "^15.2.0",
+    "hbs": "^4.0.1",
+    "watchify": "^3.9.0"
+  }
+}

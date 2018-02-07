@@ -59,11 +59,11 @@ services:
       - LOGLEVEL=debug
   # END: broker
 
-  # BEGIN: frontend-minimal
-  frontend-min:
+  # BEGIN: minimal frontend
+  uimin:
     image: remstef/node-swagger:latest
     volumes:
-      - ${PWD}/debug:/opt/project/debug
+      - ${PWD}/debug:/opt/project/uimin
       - ${PWD}/broker:/opt/project/broker
       - ${PWD}/data:/opt/project/data
     ports:
@@ -73,14 +73,14 @@ services:
       - anet
     stdin_open: true
     tty: true
-    working_dir: /opt/project/debug
+    working_dir: /opt/project/uimin
     entrypoint: bash
     environment:
       - NODE_ENV=development
       - COOKIE_SECRET=YOUR_COOKIE_SECRET
       - BROKER_URL=http://broker:10010
       - LOGLEVEL=debug
-  # END: frontend-minimal
+  # END: minimal frontend
 
   # BEGIN: mysql
   mysql:
