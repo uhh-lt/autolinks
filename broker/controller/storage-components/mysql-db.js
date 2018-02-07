@@ -430,7 +430,7 @@ module.exports.updateMetadata = function (rid, metadataBefore, metadataAfter) {
     .then(_ignore_ => {
       // deletions
       return Promise.all(Object.keys(metadataBefore)
-        .filter(k => metadataAfter[k] == null)
+        .filter(k => !(k in metadataAfter) || metadataAfter[k] === null)
         .map(k => promisedQuery('delete from resourceMetadata where rid = ? and mkey = ?', [rid, k])));
     });
 };

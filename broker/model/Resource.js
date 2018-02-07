@@ -6,8 +6,8 @@ const
 
 module.exports = Resource;
 
-Resource.prototype.rid = -1;
-Resource.prototype.cid = -1;
+Resource.prototype.rid = 0;
+Resource.prototype.cid = 0;
 Resource.prototype.metadata = null;
 Resource.prototype.value = null;
 
