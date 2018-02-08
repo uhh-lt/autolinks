@@ -7,6 +7,7 @@ module.exports = function (app) {
   // Autolinks Broker Service
   app.use('/api/service', require('./service/serviceEndpoint'));
   app.use('/api/nlp', require('./nlp/nlpEndpoint'));
+  app.use('/api/storage', require('./storage/storageEndpoint'));
 
   app.get('/', function (req, res) {
       res.redirect('/app'); // load the single view file (angular will handle the page changes on the front-end)
