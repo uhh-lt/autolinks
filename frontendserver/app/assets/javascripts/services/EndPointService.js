@@ -22,6 +22,12 @@ define([
                 });
               },
 
+              editResource: function(data) {
+                return $http.post('/api/storage/editResource', { data }).then(function(response) {
+                  return response;
+                });
+              },
+
               fetchData: function(data) {
                 const promise = $q.defer();
                 // let data = [];

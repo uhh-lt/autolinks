@@ -46,6 +46,9 @@
          <md-button ng-click="delete()" class="md-warn" ng-if="selectedEntity !== 'createCompound'">
            Delete
          </md-button>
+         <md-button ng-click="update()" class="md-primary" ng-if="selectedEntity !== 'createCompound'">
+           Update
+         </md-button>
          <md-button ng-click="createCompound()" class="md-primary" ng-if="selectedEntity === 'createCompound'">
            Create
          </md-button>
