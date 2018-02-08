@@ -69,7 +69,7 @@ define([
                         offsets:
                         {
                           from: offsets[0].from ? offsets[0].from : 0,
-                          length: offsets.length
+                          length: offsets[0].length
                         },
                         context: $scope.context,
                         name: $scope.serviceName,
