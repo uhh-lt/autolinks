@@ -2,6 +2,7 @@
 fronendserver/node_modules/*
 frontendserver/app/assets/javascripts/libs/*
 data/
+docker-compose.yml
 
 ### VisualStudioCode ###
 *.code-workspace
