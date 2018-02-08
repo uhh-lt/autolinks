@@ -469,24 +469,34 @@ define([
                                 return n[0].value;
                               }
 
+                              debugger;
                               if (_.isArray(s.value)) {
                                 var s1 = extractSubject(s.value);
                                 var subject = {
+                                    cid: s1.cid,
+                                    rid: s1.rid,
+                                    metadata: s1.metadata,
                                     id: (s1.value + '_as_parent').replace(/\s/g, ''),
-                                    name: s1.value + '',
+                                    name: s1.metadata.label ? s1.metadata.label : s1.value + '',
                                     parent: parent ? parent.id : null
                                 };
                               } else if (_.isObject(s.value)) {
                                 // var s = extractSubject(n.value);
                                 var subject = {
+                                    cid: s.cid,
+                                    rid: s.rid,
+                                    metadata: s.metadata,
                                     id: (s.value + '_as_parent').replace(/\s/g, ''),
-                                    name: s.value + '',
+                                    name: s.metadata.label ? s.metadata.label : s.value + '',
                                     parent: parent ? parent.id : null
                                 };
                               } else {
                                 var subject = {
+                                    cid: s.cid,
+                                    rid: s.rid,
+                                    metadata: s.metadata,
                                     id: (s.value + '').replace(/\s/g, ''),
-                                    name: s.value + '',
+                                    name: s.metadata.label ? s.metadata.label : s.value + '',
                                     parent: parent ? parent.id : null
                                 };
                               }
@@ -494,21 +504,30 @@ define([
                               if (_.isArray(o.value)) {
                                 var o1 = extractObject(o.value);
                                 var object = {
+                                    cid: o1.cid,
+                                    rid: o1.rid,
+                                    metadata: o1.metadata,
                                     id: (o1.value + '_as_parent').replace(/\s/g, ''),
-                                    name: o1.value + '',
+                                    name: o1.metadata.label ? o1.metadata.label : o1.value + '',
                                     parent: parent ? parent.id : null
                                 };
                               } else if (_.isObject(o.value)) {
                                 // var o = extractObject(n.value);
                                 var object = {
+                                    cid: o.cid,
+                                    rid: o.rid,
+                                    metadata: o.metadata,
                                     id: (o.value + '_as_parent').replace(/\s/g, ''),
-                                    name: o.value + '',
+                                    name: o.metadata.label ? o.metadata.label : o.value + '',
                                     parent: parent ? parent.id : null
                                 };
                               } else {
                                 var object = {
+                                    cid: o.cid,
+                                    rid: o.rid,
+                                    metadata: o.metadata,
                                     id: (o.value + '').replace(/\s/g, ''),
-                                    name: o.value + '',
+                                    name: o.metadata.label ? o.metadata.label : o.value + '',
                                     parent: parent ? parent.id : null
                                 };
                               }
@@ -519,10 +538,13 @@ define([
                                   group: "edges",
                                   data:
                                   {
+                                    cid: p1.cid,
+                                    rid: p1.rid,
+                                    metadata: p1.metadata,
                                     id: ( subject.id + object.id ).replace(/\s/g, ''),
-                                    source: (subject.name).replace(/\s/g, ''),
-                                    target: (object.name).replace(/\s/g, ''),
-                                    name: p1.value
+                                    source: (subject.id).replace(/\s/g, ''),
+                                    target: (object.id).replace(/\s/g, ''),
+                                    name: p1.metadata.label ? p1.metadata.label : p1.value
                                   }
                                 }
                               } else {
@@ -530,10 +552,13 @@ define([
                                   group: "edges",
                                   data:
                                   {
+                                    cid: p.cid,
+                                    rid: p.rid,
+                                    metadata: p.metadata,
                                     id: ( subject.id + object.id ).replace(/\s/g, ''),
-                                    source: (subject.name).replace(/\s/g, ''),
-                                    target: (object.name).replace(/\s/g, ''),
-                                    name: p.value
+                                    source: (subject.id).replace(/\s/g, ''),
+                                    target: (object.id).replace(/\s/g, ''),
+                                    name: p.metadata.label ? p.metadata.label : p.value
                                   }
                                 };
                               }
