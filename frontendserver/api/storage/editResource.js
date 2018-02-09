@@ -8,6 +8,7 @@ module.exports = function(url, data) {
     headers: {
        'Content-Type': 'application/json',
        'Accept': 'application/json',
+       'authorization': 'Basic am9objpkb2U='
        },
     json: true,
     body:
