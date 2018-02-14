@@ -4,7 +4,7 @@ const
   auth = require('../../controller/auth'),
   service_db = require('../../controller/service_db'),
   service_utils = require('../../controller/utils/service_utils'),
-  Exception = require('../../model/Exception'),
+  Exception = require('../../model/Exception').model,
   logger = require('../../controller/log')(module);
 
 module.exports.register_service = function(req, res, next) {

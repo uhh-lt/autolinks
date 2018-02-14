@@ -57,13 +57,13 @@ ServiceParameter.fromRequest = function(req, callback) {
 
   const service_parameter = req.swagger.params.data.value;
   if(!service_parameter) {
-    return callback(Exception.fromError(null, 'No data object provided.', {data: service_parameter}), null);
+    return callback(Exception.model.fromError(null, 'No data object provided.', {data: service_parameter}), null);
   }
   if(!service_parameter.focus) {
-    return callback(Exception.fromError(null, 'Parameter \'focus\' (DOffset) missing.', {data: service_parameter}), null);
+    return callback(Exception.model.fromError(null, 'Parameter \'focus\' (DOffset) missing.', {data: service_parameter}), null);
   }
   if(!service_parameter.context) {
-    return callback(Exception.fromError(null, 'Parameter \'context\' (Analysis) missing.', {data: service_parameter}), null);
+    return callback(Exception.model.fromError(null, 'Parameter \'context\' (Analysis) missing.', {data: service_parameter}), null);
   }
 
   try {
