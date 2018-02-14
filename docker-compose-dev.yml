@@ -11,6 +11,9 @@ version: '2.3'
 networks:
   anet:
 
+volumes:
+  node_modules:
+
 services:
 
   ##

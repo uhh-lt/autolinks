@@ -5,9 +5,9 @@ const
   fs = require('fs'),
   nodeCleanup = require('node-cleanup'),
   mysql = require('mysql'),
-  Exception = require('../../model/Exception'),
-  Triple = require('../../model/Triple'),
-  Resource = require('../../model/Resource'),
+  Exception = require('../../model/Exception').model,
+  Triple = require('../../model/Triple').model,
+  Resource = require('../../model/Resource').model,
   utils = require('../utils/utils'),
   murmurhashNative = require('murmurhash-native'),
   logger = require('../log')(module);

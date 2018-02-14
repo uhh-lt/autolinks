@@ -4,7 +4,7 @@
 const
   Offset = require('./Offset');
 
-module.exports = DOffset;
+module.exports.model = DOffset;
 
 DOffset.prototype.offsets = [];
 
@@ -41,7 +41,7 @@ DOffset.prototype.deepAssign = function(obj) {
     if(os_obj instanceof Offset) {
       return os_obj;
     }
-    return new Offset().deepAssign(os_obj);
+    return new Offset.model().deepAssign(os_obj);
   });
   return this;
 };

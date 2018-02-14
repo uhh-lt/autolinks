@@ -4,7 +4,7 @@
 const
   Triple = require('./Triple');
 
-module.exports = Resource;
+module.exports.model = Resource;
 
 Resource.prototype.rid = 0;
 Resource.prototype.cid = 0;
@@ -41,7 +41,7 @@ Resource.prototype.deepAssign = function(obj) {
       return this.value.map(resourceObj => new Resource().deepAssign(resourceObj));
     }
     if(this.isTripleResource()){
-      return new Triple().deepAssign(this.value);
+      return new Triple.model().deepAssign(this.value);
     }
     // else isStringResource
     return this.value;

@@ -7,7 +7,7 @@ const
   Analysis = require('./Analysis'),
   Exception = require('./Exception');
 
-module.exports = ServiceParameter;
+module.exports.model = ServiceParameter;
 
 ServiceParameter.prototype.focus = null;
 ServiceParameter.prototype.context = null;
@@ -31,10 +31,10 @@ function ServiceParameter() {
 ServiceParameter.prototype.deepAssign = function(obj) {
   this.assign(obj);
   if(!(this.focus instanceof DOffset)){
-    this.focus = new DOffset().deepAssign(this.focus);
+    this.focus = new DOffset.model().deepAssign(this.focus);
   }
   if(!(this.context instanceof Analysis)){
-    this.context = new Analysis().deepAssign(this.context);
+    this.context = new Analysis.model().deepAssign(this.context);
   }
   return this;
 };
@@ -82,7 +82,7 @@ ServiceParameter.fromRequest = function(req, callback) {
  */
 ServiceParameter.simpleText = function(text){
   const sp = new ServiceParameter();
-  sp.context = Analysis.fromText(text);
-  sp.focus = new DOffset([new Offset(0,text.length)]);
+  sp.context = Analysis.model.fromText(text);
+  sp.focus = new DOffset.model([new Offset.model(0,text.length)]);
   return sp;
 };

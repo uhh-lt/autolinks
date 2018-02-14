@@ -3,13 +3,13 @@
 
 /* imports */
 const
-  Exception = require('../../model/Exception'),
-  Triple = require('../../model/Triple'),
-  Offset = require('../../model/Offset'),
-  Annotation = require('../../model/Annotation'),
+  Exception = require('../../model/Exception').model,
+  Triple = require('../../model/Triple').model,
+  Offset = require('../../model/Offset').model,
+  Annotation = require('../../model/Annotation').model,
   mysqldb = require('../../controller/storage-components/mysql-db'),
   utils = require('../../controller/utils/utils'),
-  Analysis = require('../../model/Analysis');
+  Analysis = require('../../model/Analysis').model;
 
 const o = new Offset(3,10);
 

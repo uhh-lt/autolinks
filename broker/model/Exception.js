@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = Exception;
+module.exports.model = Exception;
 
 Exception.prototype.type = null;
 Exception.prototype.message = null;

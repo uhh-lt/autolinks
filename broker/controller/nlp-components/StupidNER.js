@@ -1,10 +1,10 @@
 'use strict';
 
 const
-  Offset = require('../../model/Offset'),
-  DOffset = require('../../model/DOffset'),
-  Annotation = require('../../model/Annotation'),
-  Analysis = require('../../model/Analysis'),
+  Offset = require('../../model/Offset').model,
+  DOffset = require('../../model/DOffset').model,
+  Annotation = require('../../model/Annotation').model,
+  Analysis = require('../../model/Analysis').model,
   utils = require('../utils/utils'),
   logger = require('../log')(module);
 
