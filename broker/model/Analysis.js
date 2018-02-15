@@ -4,7 +4,7 @@
 const
   Annotation = require('./Annotation');
 
-module.exports = Analysis;
+module.exports.model = Analysis;
 
 Analysis.prototype.text = '';
 Analysis.prototype.source = 'unk';
@@ -26,7 +26,7 @@ function Analysis() {
  * Deep copy from ordinary object
  *
  * @param obj
- * @returns {Annotation}
+ * @returns {Analysis}
  */
 Analysis.prototype.deepAssign = function(obj) {
   this.assign(obj);
@@ -34,7 +34,7 @@ Analysis.prototype.deepAssign = function(obj) {
     if(anno_obj instanceof Annotation) {
       return anno_obj;
     }
-    return new Annotation().deepAssign(anno_obj);
+    return new Annotation.model().deepAssign(anno_obj);
   });
   return this;
 };

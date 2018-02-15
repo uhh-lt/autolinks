@@ -3,7 +3,7 @@
 const
   auth = require('../../controller/auth'),
   storage = require('../../controller/storage_wrapper'),
-  Exception = require('../../model/Exception'),
+  Exception = require('../../model/Exception').model,
   logger = require('../../controller/log')(module);
 
 module.exports.info = function(req, res, next) {
