@@ -1,10 +1,8 @@
 define([
     'angular',
     'jquery',
-    'cola',
     'cytoscape',
     'cytoscape-cose-bilkent',
-    'cytoscape-cola',
     'cytoscape-klay',
     'cytoscape-cxtmenu',
     'cytoscape-panzoom',
@@ -14,7 +12,7 @@ define([
     'cytoscape.js-undo-redo',
     'qtip2',
     'bootstrap',
-], function(angular, $, cola, cytoscape, regCose, cycola, klay, cxtmenu, panzoom, cyqtip, expandCollapse,edgehandles, undoRedo, qtip2) {
+], function(angular, $, cytoscape, regCose, klay, cxtmenu, panzoom, cyqtip, expandCollapse,edgehandles, undoRedo, qtip2) {
     'use strict';
 
     angular.module('ngCy', [])
