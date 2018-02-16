@@ -28,17 +28,15 @@ router.post('/', function (req, res) {
             return res.render('login', { error: 'An error occurred' });
         }
 
-        // body.token = response.
-
         if (!body.active) {
             return res.render('login', { error: body.message, name: req.body.name });
         }
 
-        // CURL:
-        // curl -X GET "http://john:doe@ltdemos.informatik.uni-hamburg.de:8093/user/info" -H "accept: application/json" | jq
+        const token = body.name + '@' + body.password;
+        const tokenBase64 = 'Basic ' + new Buffer(token).toString('base64')
 
         // save JWT token in the session to make it available to the angular app
-        req.session.token = body.name + body.password; //body.token;
+        req.session.token = tokenBase64; //body.token;
 
         // redirect to returnUrl
         var returnUrl = req.query.returnUrl && decodeURIComponent(req.query.returnUrl) || '/';

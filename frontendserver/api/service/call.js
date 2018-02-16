@@ -1,18 +1,17 @@
-module.exports = function(url, data) {
+module.exports = function(url, token, data) {
   const name = data.name;
   const version = data.version;
   const context = data.context;
   const offsets = data.offsets;
   const path = data.endpoint.path;
   const method = data.endpoint.method;
-  debugger;
   return {
     url: url + '/service/call',
     method: 'POST',
     headers: {
        'Content-Type': 'application/json',
        'Accept': 'application/json',
-       'authorization': 'Basic am9objpkb2U='
+       'authorization': token
      },
     json: true,
     body:

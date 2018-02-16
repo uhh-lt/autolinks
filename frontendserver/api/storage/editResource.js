@@ -1,5 +1,4 @@
-module.exports = function(url, data) {
-  debugger;
+module.exports = function(url, token, data) {
   const before = data.before;
   const after = data.after;
   return {
@@ -8,7 +7,7 @@ module.exports = function(url, data) {
     headers: {
        'Content-Type': 'application/json',
        'Accept': 'application/json',
-       'authorization': 'Basic am9objpkb2U='
+       'authorization': token
        },
     json: true,
     body:
