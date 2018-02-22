@@ -4,7 +4,7 @@
   hide-print
   md-is-locked-open="lockLeft && $mdMedia('gt-md')"
   style="min-height: 100%; z-index: 999;"
-  >
+>
        <md-toolbar class="md-theme-light">
          <h1 class="md-toolbar-tools">
            Autolinks
@@ -14,6 +14,19 @@
        <h3 class="md-toolbar-tools">
          <label>Welcome Max Mustermann</label>
        </h3>
+       <md-list ng-cloak>
+
+        <md-divider></md-divider>
+
+        <md-subheader class="md-no-sticky">Service lists</md-subheader>
+        <md-list-item ng-click="navigateTo(setting.extraScreen, $event)" ng-repeat="setting in settings">
+          <md-icon md-svg-icon="{{setting.icon}}"></md-icon>
+          <p> {{ setting.name }} </p>
+          <md-switch class="md-secondary" ng-model="setting.enabled"></md-switch>
+        </md-list-item>
+        <md-divider></md-divider>
+
+      </md-list>
      </md-content>
      <md-toolbar class="md-scroll-shrink">
       <a ng-href="/login" target="_self" layout="row" layout-align="center center" flex style="cursor: pointer;">
