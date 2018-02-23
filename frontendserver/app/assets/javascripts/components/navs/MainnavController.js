@@ -33,9 +33,14 @@ define([
             ];
 
             _.forEach($scope.list, function(l) {
+              _.forEach(l.endpoints, function(e) {
+                e["enabled"] = true;
+              });
               const list = {
                 name: l.name,
-                enabled: true
+                description: l.description,
+                endpoints: l.endpoints
+                // enabled: true
               };
               $scope.settings.push(list);
             });

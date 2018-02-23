@@ -18,12 +18,29 @@
 
         <md-divider></md-divider>
 
-        <md-subheader class="md-no-sticky">Service lists</md-subheader>
-        <md-list-item ng-click="navigateTo(setting.extraScreen, $event)" ng-repeat="setting in settings">
-          <md-icon md-svg-icon="{{setting.icon}}"></md-icon>
-          <p> {{ setting.name }} </p>
-          <md-switch class="md-secondary" ng-model="setting.enabled"></md-switch>
-        </md-list-item>
+        <md-subheader class="md-no-sticky"><h4>Service lists:</h4></md-subheader>
+        <md-divider></md-divider>
+        <div ng-repeat="setting in settings">
+          <!-- <div class="md-list-item-text" layout="column"> -->
+          <md-subheader class="md-no-sticky">
+            <h5>{{ setting.name }}</h5>
+            <!-- <h4>{{ item.what }}</h4> -->
+            <p>{{ setting.description }}</p>
+          </md-subheader>
+          <!-- </div> -->
+          <!-- <md-icon md-svg-icon="{{setting.icon}}"></md-icon>
+          <p> {{ setting.name }} </p> -->
+
+
+          <md-list-item ng-click="navigateTo(setting.extraScreen, $event)" ng-repeat="endpoint in setting.endpoints">
+            <p>{{ endpoint.path }}</p>
+            <!-- <h4>{{ item.what }}</h4> -->
+            <!-- <p>{{ setting.description }}</p> -->
+            <md-switch class="md-secondary" ng-model="endpoint.enabled"></md-switch>
+          </md-list-item>
+          <md-divider></md-divider>
+          <!-- <div> {{ setting.description }}</div> -->
+        </div>
         <md-divider></md-divider>
 
       </md-list>
