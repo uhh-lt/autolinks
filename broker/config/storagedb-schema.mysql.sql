@@ -8,12 +8,11 @@ CREATE TABLE IF NOT EXISTS resources (
   isstring    boolean DEFAULT NULL,
   istriple    boolean DEFAULT NULL,
   islist      boolean DEFAULT NULL,
-  lastedit    int unsigned DEFAULT NULL,
   PRIMARY KEY (rid)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS resourceMetadata (
-  rid         int unsigned NOT NULL AUTO_INCREMENT,
+  rid          int unsigned NOT NULL,
   mkey         varchar(64) NOT NULL,
   mvalue       varchar(512) NOT NULL,
   PRIMARY KEY (rid, mkey)
@@ -224,14 +223,11 @@ BEGIN
   return list_item_existed;
 END //
 
-create function get_or_add_storageItem ( name_ varchar(32), storagekey_ varchar(512) )
+create function get_or_add_storageItem ( uid_ int unsigned, storagekey_ varchar(512) )
 RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
 BEGIN
-  declare uid_ int unsigned default 0;
   declare sid_ int unsigned default 0;
-  -- get the user first (if user does not exist default user with id 0 will be used)
-  select uid into uid_ from users where name = name_ limit 1;
-  -- then get the sid
+  -- get the sid
   select sid into sid_ from storageItems where uid = uid_ and storagekey = storagekey_ limit 1;
   if sid_ = 0 then
     insert into storageItems set uid = uid_, storagekey = storagekey_;

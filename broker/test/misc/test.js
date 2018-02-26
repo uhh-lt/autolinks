@@ -110,15 +110,15 @@ mysqldb.init((err, r) => {
 //
 //
 // // const x = Promise.all([
-// //   mysqldb.saveNewResourceValue(null),
-// //   mysqldb.saveNewResourceValue('hello new world'),
-// //   mysqldb.saveNewResourceValue('hello funny world'),
-// //   mysqldb.saveNewResourceValue('hello world')
+// //   mysqldb.saveNewResourceOrValue(null),
+// //   mysqldb.saveNewResourceOrValue('hello new world'),
+// //   mysqldb.saveNewResourceOrValue('hello funny world'),
+// //   mysqldb.saveNewResourceOrValue('hello world')
 // // ]).then((i) => console.log(`fullfilled ${i}`), (err) => console.log(`rejected ${err}`));
 //
 // const y = mysqldb.saveTriple(new Triple('You', 'save', 'the world'));
 //
-//   const z = mysqldb.saveNewResourceValue([
+//   const z = mysqldb.saveNewResourceOrValue([
 //     new Triple('I','am','God')
 //   ]);
 //

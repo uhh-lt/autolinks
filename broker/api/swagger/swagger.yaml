@@ -24,6 +24,10 @@ produces:
 # define complex objects which can be references with $ref: "#/definitions/X"
 definitions:
 
+  # helper object to describe strings, arrays, or objects
+  Any:
+    description: 'Can be anything: string, number, array, object, etc.'
+
   # objects related for service maintenance
   Service:
     type: object
@@ -152,8 +156,7 @@ definitions:
         type: object
         description: some metadata the resource, e.g. label
       value:
-        type: object
-        description: the actual value of the resource, this is either a string, or a list of resources, or a triple
+        $ref: '#/definitions/Any'
         
   # Resources:
   #   type: array

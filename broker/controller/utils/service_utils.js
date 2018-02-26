@@ -165,13 +165,13 @@ module.exports.call_service = function (location, path, method, username, data, 
         logger.debug(`Successfully recevied storagekey: ${key}`);
         return key;
       }
-      logger.warn(`Unable to get storagekey from service endpoint '${requestKeyOptions.baseUrl}${requestKeyOptions.url}'. Using rid as storagekey.`)
+      logger.warn(`Unable to get storagekey from service endpoint '${requestKeyOptions.baseUrl}${requestKeyOptions.url}'. Using rid as storagekey.`);
       return null;
-    })
+    }, err => null)
     .then(key => {
       // if data for key exists in DB use it, otherwise get it from service call and store it
       if (key) {
-        return storage.promisedRead(username, key)
+        return storage.promisedRead(username, key);
       }
       // get the data from service, then save it (save returns the data itself)
       return request_utils.promisedRequest(requestDataOptions)
