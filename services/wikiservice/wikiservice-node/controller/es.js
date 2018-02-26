@@ -86,45 +86,49 @@ module.exports.transformSearchResults = function(text, searchResult){
   return _(searchResult.hits.hits)
     .map(h =>
       new Resource(null,
-      new Triple(
-        text,
-        [
-          new Triple (
-            'appears_in',
-            'has_score',
-            h._score
-          ),
-          new Triple (
-            'appears_in',
-            'has_index',
-            h._index
-          )
-        ],
-        [
-          new Triple (
-            h._id,
-            'has_title',
-            h._source.title
-          )
-        ].concat(
-          _(h._source.category).map(c =>
-            new Triple(
-              h._id,
-              'has_category',
-              c
+        new Triple(
+            new Resource(null,text),
+            new Resource(null, [
+              new Resource(null, new Triple(
+                  new Resource(null, "appears_in"),
+                  new Resource(null, "has_score"),
+                  new Resource(null, h._score)
+              )),
+              new Resource(null, new Triple(
+                  new Resource(null, "appears_in"),
+                  new Resource(null, "has_index"),
+                  new Resource(null, h._index)
+              ))
+            ]),
+            new Resource(null, [
+              new Resource(null, new Triple(
+                  new Resource(null, h._id),
+                  new Resource(null, "has_title"),
+                  new Resource(null, h._source.title)
+              ))
+              ]
+              .concat(
+                _(h._source.category).map(c =>
+                    new Resource(null, new Triple(
+                        new Resource(null, h._id),
+                        new Resource(null, "has_category"),
+                        new Resource(null, c)
+                    ))
+                ).value()
+              )
+              .concat(
+                _(h._source.redirect).map(r =>
+                    new Triple(
+                        h._id,
+                        'has_redirect',
+                        r.title
+                    )
+                ).value()
+              )
             )
-          ).value()
-        ).concat(
-          _(h._source.redirect).map(r =>
-            new Triple(
-              h._id,
-              'has_redirect',
-              r.title
-            )
-          ).value()
+          )
         )
-      )
-    ).value();
+      ).value();
 };
 
 /**

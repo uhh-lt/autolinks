@@ -25,18 +25,13 @@ module.exports.findArticles = function(req, res, next) {
     es.search(
       text,
       function(err, result){
-        if (writtenAtLeastOneResult) {
-          res.write(',');
-        } else {
-          res.write('[');
-        }
         if (err) {
           const exc = Exception.fromError(err, 'Failed to query elasticsearch.', { serviceParameter : serviceParameter, text : text });
           logger.warn(exc.message, exc);
           return exc.handleResponse(res).end(next);
         }
 
-        res.write(JSON.stringify(result));
+        res.json(result);
 
         writtenAtLeastOneResult = true;
 
@@ -47,7 +42,7 @@ module.exports.findArticles = function(req, res, next) {
           logger.warn(exc.message, exc);
           exc.handleResponse(res);
         }
-        res.end(']', next);
+        res.end(next);
       }
     );
   });
