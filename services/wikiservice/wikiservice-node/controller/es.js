@@ -85,7 +85,6 @@ module.exports.transformSearchResults = function(text, searchResult){
   // for each hit create a triple
   return _(searchResult.hits.hits)
     .map(h =>
-      new Resource(null,
       new Triple(
         text,
         [
