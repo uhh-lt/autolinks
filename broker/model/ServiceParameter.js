@@ -30,10 +30,10 @@ function ServiceParameter() {
  */
 ServiceParameter.prototype.deepAssign = function(obj) {
   this.assign(obj);
-  if(!(this.focus instanceof DOffset)){
+  if(!(this.focus instanceof DOffset.model)){
     this.focus = new DOffset.model().deepAssign(this.focus);
   }
-  if(!(this.context instanceof Analysis)){
+  if(!(this.context instanceof Analysis.model)){
     this.context = new Analysis.model().deepAssign(this.context);
   }
   return this;
@@ -70,7 +70,7 @@ ServiceParameter.fromRequest = function(req, callback) {
     const sp = new ServiceParameter().deepAssign(service_parameter);
     return callback(null, sp);
   } catch(err) {
-    return callback(Exception.fromError(err, 'Casting ServiceParameter failed.', {data: service_parameter}), null);
+    return callback(Exception.model.fromError(err, 'Casting ServiceParameter failed.', {data: service_parameter}), null);
   }
 
 };

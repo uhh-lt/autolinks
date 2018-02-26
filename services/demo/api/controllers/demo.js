@@ -11,9 +11,10 @@
   It is a good idea to list the modules that your application depends on in the package.json in the project root
  */
 const
-  ServiceParameter = require('../../../../broker/model/ServiceParameter'),
-  Exception = require('../../../../broker/model/Exception'),
-  Triple = require('../../../../broker/model/Triple'),
+  ServiceParameter = require('../../../../broker/model/ServiceParameter').model,
+  Exception = require('../../../../broker/model/Exception').model,
+  Triple = require('../../../../broker/model/Triple').model,
+  Resource = require('../../../../broker/model/Resource').model,
   util = require('util');
 
 /*
@@ -47,11 +48,95 @@ module.exports.demo = function(req, res, next) {
 
     // get the text for the offset
     const text = serviceParameter.focus.getText(serviceParameter.context.text) || 'Simon';
-    let triples = [
-      new Triple(text, 'says', 'hello')
+
+    let result = new Resource();
+
+      let resource_listitem1 = new Resource();
+      resource_listitem1.value = new Triple();
+      resource_listitem1.value.subject = new Resource();
+      resource_listitem1.value.predicate = new Resource();
+      resource_listitem1.value.object = new Resource();
+      resource_listitem1.value.subject.value = "BCR";
+      resource_listitem1.value.predicate.value = "is synonym of";
+      resource_listitem1.value.object.value = "B-cell receptor'";
+
+      let resource_listitem2 = new Resource();
+      resource_listitem2.value = new Triple();
+      resource_listitem2.value.subject = new Resource();
+      resource_listitem2.value.predicate = new Resource();
+      resource_listitem2.value.object = new Resource();
+      resource_listitem2.value.subject.value = "B-cell receptor'";
+      resource_listitem2.value.predicate.value = "binds";
+      resource_listitem2.value.object.value = "Antigen";
+
+
+      let resource_triple = new Resource();
+    resource_triple.value = new Triple();
+    resource_triple.value.subject = new Resource();
+    resource_triple.value.predicate = new Resource();
+    resource_triple.value.object = new Resource();
+      resource_triple.value.subject.value = [
+          resource_listitem1,
+          resource_listitem2,
+      ];
+      resource_triple.value.predicate.value = "part-of";
+      resource_triple.value.object.value = "B Cell";
+
+    let resource_triple1 = new Resource();
+    resource_triple1.value = new Triple();
+      resource_triple1.value.subject = new Resource();
+      resource_triple1.value.predicate = new Resource();
+      resource_triple1.value.object = new Resource();
+      resource_triple1.value.subject.value = "B_CLL";
+      resource_triple1.value.predicate.value = "affects";
+      resource_triple1.value.object.value = "B Cell";
+
+    let resource_triple2 = new Resource();
+    resource_triple2.value = new Triple();
+      resource_triple2.value.subject = new Resource();
+      resource_triple2.value.predicate = new Resource();
+      resource_triple2.value.object = new Resource();
+      resource_triple2.value.subject.value = "B_CLL";
+      resource_triple2.value.predicate.value = "is a";
+      resource_triple2.value.object.value = "Disease";
+
+    let resource_triple3 = new Resource();
+    resource_triple3.value = new Triple();
+      resource_triple3.value.subject = new Resource();
+      resource_triple3.value.predicate = new Resource();
+      resource_triple3.value.object = new Resource();
+      resource_triple3.value.subject.value = "B_CLL";
+      resource_triple3.value.predicate.value = "affects";
+      resource_triple3.value.object.value = "Caucasian race";
+
+    let resource_triple4 = new Resource();
+    resource_triple4.value = new Triple();
+      resource_triple4.value.subject = new Resource();
+      resource_triple4.value.predicate = new Resource();
+      resource_triple4.value.object = new Resource();
+      resource_triple4.value.subject.value = "V(D)J recombination";
+      resource_triple4.value.predicate.value = "affects";
+      resource_triple4.value.object.value = "B-cell receptor";
+
+    let resource_triple5 = new Resource();
+    resource_triple5.value = new Triple();
+      resource_triple5.value.subject = new Resource();
+      resource_triple5.value.predicate = new Resource();
+      resource_triple5.value.object = new Resource();
+      resource_triple5.value.subject.value = "IgVH Mutation";
+      resource_triple5.value.predicate.value = "causes";
+      resource_triple5.value.object.value = "V(D)J recombination";
+
+    result.value = [
+        resource_triple,
+        resource_triple1,
+        resource_triple2,
+        resource_triple3,
+        resource_triple4,
+        resource_triple5,
     ];
-    if(text.replace(/(\s|-)+/g,'').toLocaleLowerCase() === 'bcell'){
-      triples =
+
+    let triples =
         [
           new Triple(
             [
@@ -67,11 +152,10 @@ module.exports.demo = function(req, res, next) {
           new Triple('V(D)J recombination', 'affects', 'B-cell receptor'),
           new Triple('IgVH Mutation', 'causes', 'V(D)J recombination'),
         ];
-    }
 
     // this sends back a JSON response and ends the response
     res.header('Content-Type', 'application/json; charset=utf-8');
-    res.json(triples);
+    res.json(result);
     res.end(next);
 
   });
