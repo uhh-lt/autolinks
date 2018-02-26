@@ -99,54 +99,51 @@ module.exports.init = function (callback, resetdata) {
 
 };
 
-module.exports.read = function (username, storagekey, callback) {
-  return this.promisedRead(username, storagekey)
+module.exports.read = function (userid, storagekey, callback) {
+  return this.promisedRead(userid, storagekey)
     .then(
       resource => callback(null, resource),
       err => callback(err, null)
     );
 };
 
-module.exports.promisedRead = function (username, storagekey) {
-  return this.getStorageResource(username, storagekey);
+module.exports.promisedRead = function (userid, storagekey) {
+  return this.getStorageResource(userid, storagekey);
 };
 
-module.exports.write = function (username, storagekey, resourceList, callback) {
-  return this.promisedWrite(username, storagekey, resourceList)
+module.exports.write = function (userid, storagekey, resourceList, callback) {
+  return this.promisedWrite(userid, storagekey, resourceList)
     .then(
       res => callback(null, res),
       err => callback(err, null)
     );
 };
 
-module.exports.promisedWrite = function (username, storagekey, resourceList) {
-  return this.getUserId(username)
-    .then(uid => {
-      // if storagekey is known check if a resource exists for it, otherwise save it.
-      if (storagekey) {
-        this.getStorageResourceId(uid, storagekey)
-          .then(rid => {
-            if (rid) {
-              logger.debug(`Resource for storagekey '${storagekey}' and user '${username} (${uid})' was already stored, skipping write action.`);
-              return true;
-            }
-            return this.saveNewResourceOrValue(resourceList, uid)
-              .then(resource => this.saveStorageItem(username, storagekey)
-                .then(sid => Object({ sid: sid, resource: resource }))
-              ).then(obj => {
-                this.saveStorageItemToResourceMapping(obj.sid, obj.resource.rid);
-                return obj.resource;
-              });
+module.exports.promisedWrite = function (userid, storagekey, resourceList) {
+  // if storagekey is known check if a resource exists for it, otherwise save it.
+  if (storagekey) {
+    this.getStorageResourceId(userid, storagekey)
+      .then(rid => {
+        if (rid) {
+          logger.debug(`Resource for storagekey '${storagekey}' and user with id '${userid}' was already stored, skipping write action.`);
+          return true;
+        }
+        return this.saveNewResourceOrValue(resourceList, userid)
+          .then(resource => this.saveStorageItem(userid, storagekey)
+            .then(sid => Object({ sid: sid, resource: resource }))
+          ).then(obj => {
+            this.saveStorageItemToResourceMapping(obj.sid, obj.resource.rid);
+            return obj.resource;
           });
-      }
-      // if storagekey is unknown save the resource, then use the rid as storagekey
-      return this.saveNewResourceOrValue(resourceList, uid)
-        .then(resource => this.saveStorageItem(username, resource.rid)
-          .then(sid => Object({ sid: sid, resource: resource })))
-        .then(obj => {
-          this.saveStorageItemToResourceMapping(obj.sid, obj.resource.rid);
-          return obj.resource;
-        });
+      });
+  }
+  // if storagekey is unknown save the resource, then use the rid as storagekey
+  return this.saveNewResourceOrValue(resourceList, userid)
+    .then(resource => this.saveStorageItem(userid, resource.rid)
+      .then(sid => Object({ sid: sid, resource: resource })))
+    .then(obj => {
+      this.saveStorageItemToResourceMapping(obj.sid, obj.resource.rid);
+      return obj.resource;
     });
 };
 
@@ -295,29 +292,25 @@ module.exports.saveStringResource = function (stringResource, uid) {
   });
 };
 
-module.exports.saveStorageItem = function (username, storagekey) {
-  return new Promise((resolve, reject) => {
-    logger.debug(`Saving storage '${storagekey}' for user '${username}'.`);
-    this.getUserId(username)
-      .then(uid => promisedQuery('select get_or_add_storageItem(?,?) as sid', [uid, storagekey]))
-      .then(
-        res => {
-          const sid = res.rows[0].sid;
-          logger.debug(`Successfully saved storgae '${storagekey}' for user '${username}'.`);
-          return resolve(sid);
-        },
-        err => reject(err)
-      );
-  });
-};
-
-module.exports.getUserId = function(username) {
-  return promisedQuery('select get_uid(?) as uid', [username])
+module.exports.saveStorageItem = function (userid, storagekey) {
+  logger.debug(`Saving storage '${storagekey}' for user with id '${userid}'.`);
+  return promisedQuery('select get_or_add_storageItem(?,?) as sid', [userid, storagekey])
     .then(
-      res => res.rows[0].uid,
-      err => 0
+      res => {
+        const sid = res.rows[0].sid;
+        logger.debug(`Successfully saved storgae '${storagekey}' for user with id '${userid}'.`);
+        return sid;
+      }
     );
 };
+
+// module.exports.getUserId = function(username) {
+//   return promisedQuery('select get_uid(?) as uid', [username])
+//     .then(
+//       res => res.rows[0].uid,
+//       err => 0
+//     );
+// };
 
 module.exports.saveStorageItemToResourceMapping = function (sid, rid) {
   return new Promise((resolve, reject) => {
@@ -419,13 +412,12 @@ module.exports.getStorageResourceId = function (uid, storagekey) {
     });
 };
 
-module.exports.getStorageResource = function (username, storagekey) {
-  return this.getUserId(username)
-    .then(uid => this.getStorageResourceId(uid, storagekey))
+module.exports.getStorageResource = function (userid, storagekey) {
+  this.getStorageResourceId(userid, storagekey)
     .then(rid => rid && this.getResource(rid, -1) || null);
 };
 
-module.exports.deleteResource = function (resource, username) {
+module.exports.deleteResource = function (resource, userid) {
   const r = Resource.asResource(resource);
   if (r.isListResource()) {
     return promisedQuery('call remove_listResourceFromContainer(?,?)', [resource.rid, resource.cid]);
@@ -458,12 +450,12 @@ module.exports.updateMetadata = function (rid, metadataBefore, metadataAfter) {
     });
 };
 
-module.exports.createUsergroup = function (name) {
-  return promisedQuery('select get_or_add_user(?, true) as uid', [name])
-    .then(res => res.rows[0].uid);
-};
+// module.exports.createUsergroup = function (name) {
+//   return promisedQuery('select get_or_add_user(?, true) as uid', [name])
+//     .then(res => res.rows[0].uid);
+// };
 
-module.exports.info = function (username, callback) {
+module.exports.info = function (userid, callback) {
   return callback(new Exception('NOT YET IMPLEMENTED'));
 };
 
@@ -472,7 +464,7 @@ module.exports.resetDatabase = function () {
   return promisedQuery('call reset_database');
 };
 
-module.exports.promisedEditResource = function (username, resourceBefore, resourceAfter) {
+module.exports.promisedEditResource = function (userid, resourceBefore, resourceAfter) {
 
   /*
    * check what kind of edit needs to be performed, possible actions are:
@@ -488,14 +480,13 @@ module.exports.promisedEditResource = function (username, resourceBefore, resour
       return null;
     }
     logger.debug('Creating new resource.');
-    return this.getUserId(username)
-      .then(uid => this.saveNewResourceOrValue(resourceAfter.value, uid, resourceAfter.cid));
+    return this.saveNewResourceOrValue(resourceAfter.value, userid, resourceAfter.cid);
   }
 
   // 2: delete resource if resourceAfter is null
   if (!resourceAfter) {
     logger.debug('Removing resource.');
-    return this.deleteResource(resourceBefore, username).then(_ignore_ => null);
+    return this.deleteResource(resourceBefore, userid).then(_ignore_ => null);
   }
 
   // make sure resourceBefore and resourceAfter are the same, i.e. they have the same rid

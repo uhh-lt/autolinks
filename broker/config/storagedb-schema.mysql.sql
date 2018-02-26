@@ -81,13 +81,13 @@ CREATE TABLE IF NOT EXISTS storageItemToResource (
   KEY (rid)
 ) ENGINE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS users (
-  uid         int unsigned NOT NULL AUTO_INCREMENT,
-  name        varchar(32),
-  isgroup     boolean DEFAULT NULL,
-  PRIMARY KEY (uid),
-  UNIQUE (name)
-) ENGINE=MyISAM;
+-- CREATE TABLE IF NOT EXISTS users (
+--  uid         int unsigned NOT NULL AUTO_INCREMENT,
+--  name        varchar(32),
+--  isgroup     boolean DEFAULT NULL,
+--  PRIMARY KEY (uid),
+--  UNIQUE (name)
+-- ) ENGINE=MyISAM;
 
 -- CREATE HELPER VIEWS
 
@@ -117,9 +117,9 @@ drop function if exists get_or_add_storageItem;
 
 drop function if exists create_storageItemToResourceMapping;
 
-drop function if exists get_uid;
+-- drop function if exists get_uid;
 
-drop function if exists get_or_add_user;
+-- drop function if exists get_or_add_user;
 
 drop procedure if exists full_delete_resource;
 
@@ -143,7 +143,6 @@ BEGIN
     truncate listResourceItems;
     truncate resourceMetadata;
     truncate resources;
-    truncate users;
     truncate resourcePermission;
     truncate storageItemToResource;
     truncate storageItems;
@@ -260,30 +259,30 @@ BEGIN
   return mapping_existed;
 END //
 
-create function get_uid ( name_ varchar(32) )
-RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
-BEGIN
-  declare uid_ int unsigned default 0;
-  if name_ is NULL then
-    return uid_;
-  end if;
-  select uid into uid_ from users where name = name_ limit 1;
-  return uid_;
-END //
+--create function get_uid ( name_ varchar(32) )
+--RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
+--BEGIN
+--  declare uid_ int unsigned default 0;
+--  if name_ is NULL then
+--    return uid_;
+--  end if;
+--  select uid into uid_ from users where name = name_ limit 1;
+--  return uid_;
+--END //
 
-create function get_or_add_user ( name_ varchar(32), isgroup_ boolean )
-RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
-BEGIN
-  declare uid_ int unsigned default 0;
-  if name_ is NULL then
-    return uid_;
-  end if;
-  select get_uid( name_ ) into uid_;
-  if uid_ = 0 then
-    insert into users set name = name_, isgroup = isgroup_;
-  end if;
-  return uid_;
-END //
+--create function get_or_add_user ( name_ varchar(32), isgroup_ boolean )
+--RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
+--BEGIN
+--  declare uid_ int unsigned default 0;
+--  if name_ is NULL then
+--    return uid_;
+--  end if;
+--  select get_uid( name_ ) into uid_;
+--  if uid_ = 0 then
+--    insert into users set name = name_, isgroup = isgroup_;
+--  end if;
+--  return uid_;
+--END //
 
 create procedure remove_stringResourceFromContainer( IN rid_ int unsigned, IN cid_ int unsigned )
 MODIFIES SQL DATA

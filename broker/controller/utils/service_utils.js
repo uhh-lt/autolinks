@@ -142,7 +142,7 @@ function sendData(data, res) {
   return res;
 }
 
-module.exports.call_service = function (location, path, method, username, data, req, res, next) {
+module.exports.call_service = function (location, path, method, userid, data, req, res, next) {
 
   const requestDataOptions = {
     url: path,
@@ -171,7 +171,7 @@ module.exports.call_service = function (location, path, method, username, data, 
     .then(key => {
       // if data for key exists in DB use it, otherwise get it from service call and store it
       if (key) {
-        return storage.promisedRead(username, key);
+        return storage.promisedRead(userid, key);
       }
       // get the data from service, then save it (save returns the data itself)
       return request_utils.promisedRequest(requestDataOptions)
@@ -180,7 +180,7 @@ module.exports.call_service = function (location, path, method, username, data, 
           const rawdata = JSON.parse(result.body);
           return rawdata;
         })
-        .then(rawdata => storage.promisedWrite(username, key, rawdata));
+        .then(rawdata => storage.promisedWrite(userid, key, rawdata));
     })
     .then(data => sendData(data, res).end(next))
     .catch(err => Exception.fromError(err, err.message).log(logger.warn).handleResponse(res).end(next));

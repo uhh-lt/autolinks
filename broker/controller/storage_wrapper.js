@@ -25,61 +25,61 @@ module.exports.init = function(callback) {
 
 /**
  *
- * @param username
+ * @param userid
  * @param storagekey
  * @param callback = function(err, info)
  */
-module.exports.read = function(username, storagekey, callback) {
-  return explicitStorage.read(username, storagekey, callback);
+module.exports.read = function(userid, storagekey, callback) {
+  return explicitStorage.read(userid, storagekey, callback);
 };
 
 /**
  *
- * @param username
+ * @param userid
  * @param storagekey
  */
-module.exports.promisedRead = function(username, storagekey) {
-  return explicitStorage.promisedRead(username, storagekey);
+module.exports.promisedRead = function(userid, storagekey) {
+  return explicitStorage.promisedRead(userid, storagekey);
 };
 
 
 /**
  *
- * @param username
+ * @param userid
  * @param storagekey
  * @param resourceValue
  * @param callback = function(err)
  */
-module.exports.write = function(username, storagekey, resourceValue, callback) {
-  return explicitStorage.write(username, storagekey, resourceValue, callback);
+module.exports.write = function(userid, storagekey, resourceValue, callback) {
+  return explicitStorage.write(userid, storagekey, resourceValue, callback);
 };
 
 /**
  *
- * @param username
+ * @param userid
  * @param storagekey
  * @param resourceValue
  */
-module.exports.promisedWrite = function(username, storagekey, resourceValue) {
-  return explicitStorage.promisedWrite(username, storagekey, resourceValue);
+module.exports.promisedWrite = function(userid, storagekey, resourceValue) {
+  return explicitStorage.promisedWrite(userid, storagekey, resourceValue);
 };
 
 /**
  *
- * @param username
+ * @param userid
  * @param resourceBefore
  * @param resourceAfter
  * @return {Resource}
  */
-module.exports.promisedEditResource = function(username, resourceBefore, resourceAfter) {
-  return explicitStorage.promisedEditResource(username, resourceBefore, resourceAfter);
+module.exports.promisedEditResource = function(userid, resourceBefore, resourceAfter) {
+  return explicitStorage.promisedEditResource(userid, resourceBefore, resourceAfter);
 };
 
 /**
  *
- * @param username
+ * @param userid
  * @param callback = function(err, info)
  */
-module.exports.info = function(username, callback) {
-  return explicitStorage.info(username, callback);
+module.exports.info = function(userid, callback) {
+  return explicitStorage.info(userid, callback);
 };
