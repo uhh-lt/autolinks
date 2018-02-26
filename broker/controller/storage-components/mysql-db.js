@@ -128,7 +128,7 @@ module.exports.promisedWrite = function (username, storagekey, resourceList) {
           logger.debug(`Resource for storagekey '${storagekey}' and user '${username}' was already stored, skipping write action.`);
           return true;
         }
-        return this.saveNewResourceValue(resourceList)
+        return this.saveNewResourceOrValue(resourceList)
           .then(resource => this.saveStorageItem(username, storagekey)
             .then(sid => Object({ sid: sid, resource: resource })))
           .then(obj => {
@@ -138,7 +138,7 @@ module.exports.promisedWrite = function (username, storagekey, resourceList) {
       });
   }
   // if storagekey is unknown save the resource, then use the rid as storagekey
-  return this.saveNewResourceValue(resourceList)
+  return this.saveNewResourceOrValue(resourceList)
     .then(resource => this.saveStorageItem(username, resource.rid)
       .then(sid => Object({ sid: sid, resource: resource })))
     .then(obj => {
@@ -153,9 +153,18 @@ module.exports.promisedWrite = function (username, storagekey, resourceList) {
  * @param resource
  * @return {Promise}
  */
-module.exports.saveNewResourceValue = function (resourceValue, username, cid) {
+module.exports.saveNewResourceOrValue = function (resourceOrValue, username, cid) {
   return new Promise((resolve, reject) => {
-    const resource = new Resource(null, resourceValue, cid);
+    let resource = null;
+    if(resourceOrValue.value){
+      if(resource instanceof Resource){
+        resource = resourceOrValue;
+      }else {
+        resource = new Resource().deepAssign(resourceOrValue);
+      }
+    } else {
+      resource = new Resource(null, resourceOrValue, cid);
+    }
     // a resource can be an array of resources, a triple or a string
     if (resource.isListResource()) {
       logger.debug('Resource is an array.');
@@ -183,9 +192,9 @@ module.exports.saveTripleResource = function (tripleResource) {
     tripleResource.value = Triple.asTriple(tripleResource.value);
     // save resources
     Promise.all([
-      this.saveNewResourceValue(tripleResource.value.subject),
-      this.saveNewResourceValue(tripleResource.value.predicate),
-      this.saveNewResourceValue(tripleResource.value.object),
+      this.saveNewResourceOrValue(tripleResource.value.subject),
+      this.saveNewResourceOrValue(tripleResource.value.predicate),
+      this.saveNewResourceOrValue(tripleResource.value.object),
     ]).then(
       resources => { // on success add triple
         tripleResource.value.subject = resources[0];
@@ -206,7 +215,7 @@ module.exports.saveTripleResource = function (tripleResource) {
 
 module.exports.saveListResource = function (listResource) {
 
-  const resourcePromises = listResource.value.map(resource => this.saveNewResourceValue(resource));
+  const resourcePromises = listResource.value.map(resource => this.saveNewResourceOrValue(resource));
   return Promise.all(resourcePromises)
     .then(
       item_resources => {
@@ -286,15 +295,25 @@ module.exports.saveStringResource = function (stringResource) {
 module.exports.saveStorageItem = function (username, storagekey) {
   return new Promise((resolve, reject) => {
     logger.debug(`Saving storage '${storagekey}' for user '${username}'.`);
-    promisedQuery('select get_or_add_storageItem(?,?) as sid', [username, storagekey]).then(
-      res => {
-        const sid = res.rows[0].sid;
-        logger.debug(`Successfully saved storgae '${storagekey}' for user '${username}'.`);
-        return resolve(sid);
-      },
-      err => reject(err)
-    );
+    this.getUserId(username)
+      .then(uid => promisedQuery('select get_or_add_storageItem(?,?) as sid', [uid, storagekey]))
+      .then(
+        res => {
+          const sid = res.rows[0].sid;
+          logger.debug(`Successfully saved storgae '${storagekey}' for user '${username}'.`);
+          return resolve(sid);
+        },
+        err => reject(err)
+      );
   });
+};
+
+module.exports.getUserId = function(username) {
+  return promisedQuery('select get_uid(?) as uid', [username])
+    .then(
+      res => res.rows[0].uid,
+      err => 0
+    );
 };
 
 module.exports.saveStorageItemToResourceMapping = function (sid, rid) {
@@ -376,8 +395,8 @@ module.exports.fillListResource = function (resource) {
     });
 };
 
-module.exports.fillMetadata = function (resource) {
-  return promisedQuery('select * from resourceMetadata where rid = ?', [resource.rid])
+module.exports.fillMetadata = function (resource, uid=0) {
+  return promisedQuery('select * from resourceMetadata where uid = ? and rid = ?', [uid, resource.rid])
     .then(res => res.rows.map(r => Object({ key: r.mkey, val: r.mvalue })))
     .then(kvps => kvps.reduce((acc, kvp) => { acc[kvp.key] = kvp.val; return acc; }, {}))
     .then(metadata => {
@@ -418,20 +437,20 @@ module.exports.moveResource = function (rid, cid_before, cid_after) {
   return promisedQuery('call edit_resourceContainer(?,?,?)', [rid, cid_before, cid_after]);
 };
 
-module.exports.updateMetadata = function (rid, metadataBefore, metadataAfter) {
+module.exports.updateMetadata = function (rid, metadataBefore, metadataAfter, uid=0) {
   return Promise.resolve(1)
-  // updates or creations
+     // updates or creations
     .then(_ignore_ => {
       return Promise.all(Object.keys(metadataAfter)
         .filter(k => metadataBefore[k] !== metadataAfter[k])
-        .map(k => promisedQuery('replace into resourceMetadata (rid, mkey, mvalue) values(?, ?, ?)', [rid, k, metadataAfter[k]]))
+        .map(k => promisedQuery('replace into resourceMetadata (uid, rid, mkey, mvalue) values(?, ?, ?, ?)', [uid, rid, k, metadataAfter[k]]))
       );
     })
     .then(_ignore_ => {
       // deletions
       return Promise.all(Object.keys(metadataBefore)
         .filter(k => !(k in metadataAfter) || metadataAfter[k] === null)
-        .map(k => promisedQuery('delete from resourceMetadata where rid = ? and mkey = ?', [rid, k])));
+        .map(k => promisedQuery('delete from resourceMetadata where uid = ? and rid = ? and mkey = ?', [uid, rid, k])));
     });
 };
 
@@ -466,7 +485,7 @@ module.exports.promisedEditResource = function (resourceBefore, resourceAfter, u
       return null;
     }
     logger.debug('Creating new resource.');
-    return this.saveNewResourceValue(resourceAfter.value, username, resourceAfter.cid);
+    return this.saveNewResourceOrValue(resourceAfter.value, username, resourceAfter.cid);
   }
 
   // 2: delete resource if resourceAfter is null
