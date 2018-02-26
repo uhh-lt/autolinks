@@ -12,11 +12,10 @@ CREATE TABLE IF NOT EXISTS resources (
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS resourceMetadata (
-  uid          int unsigned NOT NULL,
   rid          int unsigned NOT NULL,
   mkey         varchar(64) NOT NULL,
   mvalue       varchar(512) NOT NULL,
-  PRIMARY KEY (uid, rid, mkey)
+  PRIMARY KEY (rid, mkey)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS stringResources (

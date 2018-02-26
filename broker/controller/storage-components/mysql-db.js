@@ -395,8 +395,8 @@ module.exports.fillListResource = function (resource) {
     });
 };
 
-module.exports.fillMetadata = function (resource, uid=0) {
-  return promisedQuery('select * from resourceMetadata where uid = ? and rid = ?', [uid, resource.rid])
+module.exports.fillMetadata = function (resource) {
+  return promisedQuery('select * from resourceMetadata where rid = ?', [resource.rid])
     .then(res => res.rows.map(r => Object({ key: r.mkey, val: r.mvalue })))
     .then(kvps => kvps.reduce((acc, kvp) => { acc[kvp.key] = kvp.val; return acc; }, {}))
     .then(metadata => {
@@ -437,20 +437,20 @@ module.exports.moveResource = function (rid, cid_before, cid_after) {
   return promisedQuery('call edit_resourceContainer(?,?,?)', [rid, cid_before, cid_after]);
 };
 
-module.exports.updateMetadata = function (rid, metadataBefore, metadataAfter, uid=0) {
+module.exports.updateMetadata = function (rid, metadataBefore, metadataAfter) {
   return Promise.resolve(1)
      // updates or creations
     .then(_ignore_ => {
       return Promise.all(Object.keys(metadataAfter)
         .filter(k => metadataBefore[k] !== metadataAfter[k])
-        .map(k => promisedQuery('replace into resourceMetadata (uid, rid, mkey, mvalue) values(?, ?, ?, ?)', [uid, rid, k, metadataAfter[k]]))
+        .map(k => promisedQuery('replace into resourceMetadata (rid, mkey, mvalue) values(?, ?, ?)', [rid, k, metadataAfter[k]]))
       );
     })
     .then(_ignore_ => {
       // deletions
       return Promise.all(Object.keys(metadataBefore)
         .filter(k => !(k in metadataAfter) || metadataAfter[k] === null)
-        .map(k => promisedQuery('delete from resourceMetadata where uid = ? and rid = ? and mkey = ?', [uid, rid, k])));
+        .map(k => promisedQuery('delete from resourceMetadata where rid = ? and mkey = ?', [rid, k])));
     });
 };
 
