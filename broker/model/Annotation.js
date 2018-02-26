@@ -31,7 +31,7 @@ function Annotation() {
  */
 Annotation.prototype.deepAssign = function(obj) {
   this.assign(obj);
-  if(!(this.doffset instanceof DOffset)){
+  if(!(this.doffset instanceof DOffset.model)){
     this.doffset = new DOffset.model().deepAssign(this.doffset);
   }
   return this;

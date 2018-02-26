@@ -31,7 +31,7 @@ function Analysis() {
 Analysis.prototype.deepAssign = function(obj) {
   this.assign(obj);
   this.annotations = this.annotations.map(anno_obj => {
-    if(anno_obj instanceof Annotation) {
+    if(anno_obj instanceof Annotation.model) {
       return anno_obj;
     }
     return new Annotation.model().deepAssign(anno_obj);

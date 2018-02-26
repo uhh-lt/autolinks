@@ -45,6 +45,7 @@ Triple.prototype.deepAssign = function(obj) {
   this.subject = new Resource.model().deepAssign(this.subject);
   this.predicate = new Resource.model().deepAssign(this.predicate);
   this.object = new Resource.model().deepAssign(this.object);
+  return this;
 };
 
 /**

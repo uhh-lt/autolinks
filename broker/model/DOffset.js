@@ -38,7 +38,7 @@ DOffset.prototype.getText = function (text, separator = ' ') {
 DOffset.prototype.deepAssign = function(obj) {
   this.assign(obj);
   this.offsets = this.offsets.map(os_obj => {
-    if(os_obj instanceof Offset) {
+    if(os_obj instanceof Offset.model) {
       return os_obj;
     }
     return new Offset.model().deepAssign(os_obj);
