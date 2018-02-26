@@ -49,51 +49,41 @@ module.exports.demo = function(req, res, next) {
     // get the text for the offset
     const text = serviceParameter.focus.getText(serviceParameter.context.text) || 'Simon';
 
-    let resource_triple = new Resource(null, new Triple(
+    let resource = new Resource(null, [
+      new Resource(null, new Triple(new Resource(null, text), new Resource(null,'says'), new Resource(null,'hello')))
+    ]);
+
+    if(text.replace(/(\s|-)+/g,'').toLocaleLowerCase() === 'bcell') {
+
+      const resource_triple0 = new Resource(null, new Triple(
         new Resource(null, [
-            new Resource(null, new Triple(new Resource(null, "BCR"), new Resource(null, "is synonym of"), new Resource(null, "B-cell receptor"))),
-            new Resource(null, new Triple(new Resource(null, "B-cell receptor"), new Resource(null, "binds"), new Resource(null, "Antigen"))),
+          new Resource(null, new Triple(new Resource(null, "BCR"), new Resource(null, "is synonym of"), new Resource(null, "B-cell receptor"))),
+          new Resource(null, new Triple(new Resource(null, "B-cell receptor"), new Resource(null, "binds"), new Resource(null, "Antigen"))),
 
         ]),
         new Resource(null, "part-of"),
         new Resource(null, "B Cell")));
 
-    let resource_triple1 = new Resource(null, new Triple(new Resource(null, "B_CLL"), new Resource(null, "affects"), new Resource(null, "B Cell")));
-    let resource_triple2 = new Resource(null, new Triple(new Resource(null, "B_CLL"), new Resource(null, "is a"), new Resource(null, "Disease")));
-    let resource_triple3 = new Resource(null, new Triple(new Resource(null, "B_CLL"), new Resource(null, "affects"), new Resource(null, "Caucasian race")));
-    let resource_triple4 = new Resource(null, new Triple(new Resource(null, "V(D)J recombination"), new Resource(null, "affects"), new Resource(null, "B-cell receptor")));
-    let resource_triple5 = new Resource(null, new Triple(new Resource(null, "IgVH Mutation"), new Resource(null, "causes"), new Resource(null, "V(D)J recombination")));
+      const resource_triple1 = new Resource(null, new Triple(new Resource(null, "B_CLL"), new Resource(null, "affects"), new Resource(null, "B Cell")));
+      const resource_triple2 = new Resource(null, new Triple(new Resource(null, "B_CLL"), new Resource(null, "is a"), new Resource(null, "Disease")));
+      const resource_triple3 = new Resource(null, new Triple(new Resource(null, "B_CLL"), new Resource(null, "affects"), new Resource(null, "Caucasian race")));
+      const resource_triple4 = new Resource(null, new Triple(new Resource(null, "V(D)J recombination"), new Resource(null, "affects"), new Resource(null, "B-cell receptor")));
+      const resource_triple5 = new Resource(null, new Triple(new Resource(null, "IgVH Mutation"), new Resource(null, "causes"), new Resource(null, "V(D)J recombination")));
 
-    let result = new Resource();
-    result.value = [
-        resource_triple,
+      resource = new Resource(null, [
+        resource_triple0,
         resource_triple1,
         resource_triple2,
         resource_triple3,
         resource_triple4,
         resource_triple5,
-    ];
+      ]);
 
-    let triples =
-        [
-          new Triple(
-            [
-              new Triple('BCR', 'is synonym', 'B-cell receptor'),
-              new Triple('B-cell receptor', 'binds', 'Antigen')
-            ],
-            'part-of',
-            'B Cell'
-          ),
-          new Triple('B_CLL', 'affects', 'B Cell'),
-          new Triple('B_CLL', 'is a', 'Disease'),
-          new Triple('B_CLL', 'affects', 'Caucasian race'),
-          new Triple('V(D)J recombination', 'affects', 'B-cell receptor'),
-          new Triple('IgVH Mutation', 'causes', 'V(D)J recombination'),
-        ];
+    }
 
     // this sends back a JSON response and ends the response
     res.header('Content-Type', 'application/json; charset=utf-8');
-    res.json(result);
+    res.json(resource);
     res.end(next);
 
   });
