@@ -6,7 +6,7 @@ module.exports = {
   init: init,
   authenticate_request: authenticate_request,
   handle_authenticated_request: handle_authenticated_request,
-  handle_authenticated_fallback_request: handle_authenticated_request
+  handle_authenticated_fallback_request: handle_authenticated_fallback_request
 };
 
 
