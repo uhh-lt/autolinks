@@ -78,15 +78,6 @@ Resource.prototype.isStringResource = function(){
   return !(this.isListResource() || this.isTripleResource());
 };
 
-Resource.prototype.fromTriple = function(obj) {
-  let r = new Resource();
-  r.value = new Triple.model();
-  r.value.subject = new Resource().fromString(obj.subject);
-  r.value.predicate = new Resource().fromString(obj.predicate);
-  r.value.object = new Resource().fromString(obj.object);
-  return r;
-};
-
 Resource.prototype.fromString = function(string) {
     let r = new Resource();
     r.value = string;

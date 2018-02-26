@@ -49,84 +49,22 @@ module.exports.demo = function(req, res, next) {
     // get the text for the offset
     const text = serviceParameter.focus.getText(serviceParameter.context.text) || 'Simon';
 
+    let resource_triple = new Resource(null, new Triple(
+        new Resource(null, [
+            new Resource(null, new Triple(new Resource(null, "BCR"), new Resource(null, "is synonym of"), new Resource(null, "B-cell receptor"))),
+            new Resource(null, new Triple(new Resource(null, "B-cell receptor"), new Resource(null, "binds"), new Resource(null, "Antigen"))),
+
+        ]),
+        new Resource(null, "part-of"),
+        new Resource(null, "B Cell")));
+
+    let resource_triple1 = new Resource(null, new Triple(new Resource(null, "B_CLL"), new Resource(null, "affects"), new Resource(null, "B Cell")));
+    let resource_triple2 = new Resource(null, new Triple(new Resource(null, "B_CLL"), new Resource(null, "is a"), new Resource(null, "Disease")));
+    let resource_triple3 = new Resource(null, new Triple(new Resource(null, "B_CLL"), new Resource(null, "affects"), new Resource(null, "Caucasian race")));
+    let resource_triple4 = new Resource(null, new Triple(new Resource(null, "V(D)J recombination"), new Resource(null, "affects"), new Resource(null, "B-cell receptor")));
+    let resource_triple5 = new Resource(null, new Triple(new Resource(null, "IgVH Mutation"), new Resource(null, "causes"), new Resource(null, "V(D)J recombination")));
+
     let result = new Resource();
-
-      let resource_listitem1 = new Resource();
-      resource_listitem1.value = new Triple();
-      resource_listitem1.value.subject = new Resource();
-      resource_listitem1.value.predicate = new Resource();
-      resource_listitem1.value.object = new Resource();
-      resource_listitem1.value.subject.value = "BCR";
-      resource_listitem1.value.predicate.value = "is synonym of";
-      resource_listitem1.value.object.value = "B-cell receptor'";
-
-      let resource_listitem2 = new Resource();
-      resource_listitem2.value = new Triple();
-      resource_listitem2.value.subject = new Resource();
-      resource_listitem2.value.predicate = new Resource();
-      resource_listitem2.value.object = new Resource();
-      resource_listitem2.value.subject.value = "B-cell receptor'";
-      resource_listitem2.value.predicate.value = "binds";
-      resource_listitem2.value.object.value = "Antigen";
-
-
-      let resource_triple = new Resource();
-    resource_triple.value = new Triple();
-    resource_triple.value.subject = new Resource();
-    resource_triple.value.predicate = new Resource();
-    resource_triple.value.object = new Resource();
-      resource_triple.value.subject.value = [
-          resource_listitem1,
-          resource_listitem2,
-      ];
-      resource_triple.value.predicate.value = "part-of";
-      resource_triple.value.object.value = "B Cell";
-
-    let resource_triple1 = new Resource();
-    resource_triple1.value = new Triple();
-      resource_triple1.value.subject = new Resource();
-      resource_triple1.value.predicate = new Resource();
-      resource_triple1.value.object = new Resource();
-      resource_triple1.value.subject.value = "B_CLL";
-      resource_triple1.value.predicate.value = "affects";
-      resource_triple1.value.object.value = "B Cell";
-
-    let resource_triple2 = new Resource();
-    resource_triple2.value = new Triple();
-      resource_triple2.value.subject = new Resource();
-      resource_triple2.value.predicate = new Resource();
-      resource_triple2.value.object = new Resource();
-      resource_triple2.value.subject.value = "B_CLL";
-      resource_triple2.value.predicate.value = "is a";
-      resource_triple2.value.object.value = "Disease";
-
-    let resource_triple3 = new Resource();
-    resource_triple3.value = new Triple();
-      resource_triple3.value.subject = new Resource();
-      resource_triple3.value.predicate = new Resource();
-      resource_triple3.value.object = new Resource();
-      resource_triple3.value.subject.value = "B_CLL";
-      resource_triple3.value.predicate.value = "affects";
-      resource_triple3.value.object.value = "Caucasian race";
-
-    let resource_triple4 = new Resource();
-    resource_triple4.value = new Triple();
-      resource_triple4.value.subject = new Resource();
-      resource_triple4.value.predicate = new Resource();
-      resource_triple4.value.object = new Resource();
-      resource_triple4.value.subject.value = "V(D)J recombination";
-      resource_triple4.value.predicate.value = "affects";
-      resource_triple4.value.object.value = "B-cell receptor";
-
-    let resource_triple5 = new Resource();
-    resource_triple5.value = new Triple();
-      resource_triple5.value.subject = new Resource();
-      resource_triple5.value.predicate = new Resource();
-      resource_triple5.value.object = new Resource();
-      resource_triple5.value.subject.value = "IgVH Mutation";
-      resource_triple5.value.predicate.value = "causes";
-      resource_triple5.value.object.value = "V(D)J recombination";
-
     result.value = [
         resource_triple,
         resource_triple1,
