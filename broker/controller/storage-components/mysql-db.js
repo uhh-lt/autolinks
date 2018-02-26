@@ -468,16 +468,15 @@ module.exports.resetDatabase = function () {
   return promisedQuery('call reset_database');
 };
 
-module.exports.promisedEditResource = function (resourceBefore, resourceAfter, username) {
+module.exports.promisedEditResource = function (username, resourceBefore, resourceAfter) {
 
   /*
-  * check what kind of edit needs to be performed, possible actions are:
-  * 1. create a new resource
-  * 2. delete a resource
-  * 3. change container
-  * 4. change metadata properties, eg. "label"
-  * 5. (change value) -- TODO: think about if that actually should be possible!
-  */
+   * check what kind of edit needs to be performed, possible actions are:
+   * 1. create a new resource
+   * 2. delete a resource
+   * 3. change container
+   * 4. change metadata properties, eg. "label"
+   */
 
   // 1: create a new resource if resourceBefore does not exist
   if (!resourceBefore) {
