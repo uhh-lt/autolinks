@@ -120,32 +120,34 @@ module.exports.write = function (username, storagekey, resourceList, callback) {
 };
 
 module.exports.promisedWrite = function (username, storagekey, resourceList) {
-  // if storagekey is known check if a resource exists for it, otherwise save it.
-  if (storagekey) {
-    return this.getStorageResourceId(username, storagekey)
-      .then(rid => {
-        if (rid) {
-          logger.debug(`Resource for storagekey '${storagekey}' and user '${username}' was already stored, skipping write action.`);
-          return true;
-        }
-        return this.saveNewResourceOrValue(resourceList)
-          .then(resource => this.saveStorageItem(username, storagekey)
-            .then(sid => Object({ sid: sid, resource: resource })))
-          .then(obj => {
-            this.saveStorageItemToResourceMapping(obj.sid, obj.resource.rid);
-            return obj.resource;
+  return this.getUserId(username)
+    .then(uid => {
+      // if storagekey is known check if a resource exists for it, otherwise save it.
+      if (storagekey) {
+        this.getStorageResourceId(uid, storagekey)
+          .then(rid => {
+            if (rid) {
+              logger.debug(`Resource for storagekey '${storagekey}' and user '${username} (${uid})' was already stored, skipping write action.`);
+              return true;
+            }
+            return this.saveNewResourceOrValue(resourceList, uid)
+              .then(resource => this.saveStorageItem(username, storagekey)
+                .then(sid => Object({ sid: sid, resource: resource }))
+              ).then(obj => {
+                this.saveStorageItemToResourceMapping(obj.sid, obj.resource.rid);
+                return obj.resource;
+              });
           });
-      });
-  }
-  // if storagekey is unknown save the resource, then use the rid as storagekey
-  return this.saveNewResourceOrValue(resourceList)
-    .then(resource => this.saveStorageItem(username, resource.rid)
-      .then(sid => Object({ sid: sid, resource: resource })))
-    .then(obj => {
-      this.saveStorageItemToResourceMapping(obj.sid, obj.resource.rid);
-      return obj.resource;
+      }
+      // if storagekey is unknown save the resource, then use the rid as storagekey
+      return this.saveNewResourceOrValue(resourceList, uid)
+        .then(resource => this.saveStorageItem(username, resource.rid)
+          .then(sid => Object({ sid: sid, resource: resource })))
+        .then(obj => {
+          this.saveStorageItemToResourceMapping(obj.sid, obj.resource.rid);
+          return obj.resource;
+        });
     });
-
 };
 
 /**
@@ -153,7 +155,7 @@ module.exports.promisedWrite = function (username, storagekey, resourceList) {
  * @param resource
  * @return {Promise}
  */
-module.exports.saveNewResourceOrValue = function (resourceOrValue, username, cid) {
+module.exports.saveNewResourceOrValue = function (resourceOrValue, uid, cid) {
   return new Promise((resolve, reject) => {
     let resource = null;
     if(resourceOrValue.value){
@@ -163,20 +165,21 @@ module.exports.saveNewResourceOrValue = function (resourceOrValue, username, cid
         resource = new Resource().deepAssign(resourceOrValue);
       }
     } else {
-      resource = new Resource(null, resourceOrValue, cid);
+      resource = new Resource(null, resourceOrValue);
     }
+    resource.cid = cid;
     // a resource can be an array of resources, a triple or a string
     if (resource.isListResource()) {
       logger.debug('Resource is an array.');
-      return resolve(this.saveListResource(resource));
+      return resolve(this.saveListResource(resource, uid));
     }
     if (resource.isTripleResource()) {
       logger.debug('Resource is a triple.');
-      return resolve(this.saveTripleResource(resource));
+      return resolve(this.saveTripleResource(resource, uid));
     }
     if (resource.isStringResource()) {
       logger.debug('Resource is a string.');
-      return resolve(this.saveStringResource(resource));
+      return resolve(this.saveStringResource(resource, uid));
     }
     reject(new Error('This is impossible, a resource has to be one of {list,triple,string}.'));
   }).then(this.fillMetadata);
@@ -187,22 +190,22 @@ module.exports.saveNewResourceOrValue = function (resourceOrValue, username, cid
  * @param tripleResource
  * @return {Promise}
  */
-module.exports.saveTripleResource = function (tripleResource) {
+module.exports.saveTripleResource = function (tripleResource, uid) {
   return new Promise((resolve, reject) => {
     tripleResource.value = Triple.asTriple(tripleResource.value);
     // save resources
     Promise.all([
-      this.saveNewResourceOrValue(tripleResource.value.subject),
-      this.saveNewResourceOrValue(tripleResource.value.predicate),
-      this.saveNewResourceOrValue(tripleResource.value.object),
+      this.saveNewResourceOrValue(tripleResource.value.subject, uid),
+      this.saveNewResourceOrValue(tripleResource.value.predicate, uid),
+      this.saveNewResourceOrValue(tripleResource.value.object, uid),
     ]).then(
       resources => { // on success add triple
         tripleResource.value.subject = resources[0];
         tripleResource.value.predicate = resources[1];
         tripleResource.value.object = resources[2];
         const rids = resources.map(r => r.rid);
-        logger.debug(`Saving triple ${rids}.`);
-        return promisedQuery('select get_or_add_tripleResource(?,?,?) as rid', rids)
+        logger.debug(`Saving triple ${rids} for user with id '${uid}'.`);
+        return promisedQuery('select get_or_add_tripleResource(?,?,?,?) as rid', rids.concat(uid))
           .then(res => {
             tripleResource.rid = res.rows[0].rid;
             return resolve(tripleResource);
@@ -213,15 +216,15 @@ module.exports.saveTripleResource = function (tripleResource) {
   });
 };
 
-module.exports.saveListResource = function (listResource) {
+module.exports.saveListResource = function (listResource, uid) {
 
-  const resourcePromises = listResource.value.map(resource => this.saveNewResourceOrValue(resource));
+  const resourcePromises = listResource.value.map(resource => this.saveNewResourceOrValue(resource, uid));
   return Promise.all(resourcePromises)
     .then(
       item_resources => {
         const item_rids = item_resources.map(r => r.rid);
         logger.debug(`Saved resources ${item_rids}.`);
-        return this.saveListResourceDescriptor(item_rids)
+        return this.saveListResourceDescriptor(item_rids, uid)
           .then(desc_rid => {
             listResource.rid = desc_rid;
             item_resources.forEach(itemResource => propagateApplyCid(itemResource, listResource.rid));
@@ -238,7 +241,7 @@ module.exports.saveListResource = function (listResource) {
 };
 
 function propagateApplyCid(resource, cid) {
-  logger.debug(`Propagating cid '${cid}' to rid '${resource.rid}'. (value !== null? ${resource.value !== null})`);
+  logger.debug(`Propagating cid '${cid}' to rid '${resource.rid}' (value !== null? ${resource.value !== null}).`);
   resource.cid = cid;
   if (resource.isTripleResource()) {
     propagateApplyCid(resource.value.subject, cid);
@@ -247,12 +250,12 @@ function propagateApplyCid(resource, cid) {
   }
 }
 
-module.exports.saveListResourceDescriptor = function (rids) {
+module.exports.saveListResourceDescriptor = function (rids, uid) {
   return new Promise((resolve, reject) => {
     const listResourceDescriptorString = 'l:[' + rids.join(',') + ']';
     const listResourceDescriptor = murmurhashNative.murmurHash128x64(listResourceDescriptorString);
-    logger.debug(`Saving listResourceDesriptor ${listResourceDescriptor}.`);
-    promisedQuery('select get_or_add_listResource(?) as rid', [listResourceDescriptor]).then(
+    logger.debug(`Saving listResourceDesriptor '${listResourceDescriptor}' for user with id '${uid}'.`);
+    promisedQuery('select get_or_add_listResource(?, ?) as rid', [listResourceDescriptor, uid]).then(
       res => {
         const rid = res.rows[0].rid;
         logger.debug(`Successfully saved resource '${listResourceDescriptor}' with id ${rid}.`);
@@ -266,7 +269,7 @@ module.exports.saveListResourceDescriptor = function (rids) {
 module.exports.saveListResourceItem = function (desc_rid, item_rid) {
   return new Promise((resolve, reject) => {
     logger.debug(`Saving list resource item (${desc_rid},${item_rid}).`);
-    promisedQuery('select add_listResourceItem(?,?) as existed', [desc_rid, item_rid]).then(
+    promisedQuery('select add_listResourceItem(?, ?) as existed', [desc_rid, item_rid]).then(
       res => {
         const existed = res.rows[0].existed;
         logger.debug(`Successfully saved list resource item (${desc_rid},${item_rid}). Existed before: ${existed}.`);
@@ -277,10 +280,10 @@ module.exports.saveListResourceItem = function (desc_rid, item_rid) {
   });
 };
 
-module.exports.saveStringResource = function (stringResource) {
+module.exports.saveStringResource = function (stringResource, uid) {
   return new Promise((resolve, reject) => {
-    logger.debug(`Saving resource value '${stringResource.value}'.`);
-    promisedQuery('select get_or_add_stringResource(?) as rid', [stringResource.value]).then(
+    logger.debug(`Saving resource value '${stringResource.value}' for user with id '${uid}'.`);
+    promisedQuery('select get_or_add_stringResource(?, ?) as rid', [stringResource.value, uid]).then(
       res => {
         const rid = res.rows[0].rid;
         logger.debug(`Successfully saved resource value '${stringResource.value}' with rid '${rid}'.`);
@@ -405,11 +408,11 @@ module.exports.fillMetadata = function (resource) {
     });
 };
 
-module.exports.getStorageResourceId = function (username, storagekey) {
-  return promisedQuery('select s2r.rid as rid from storageItems s, storageItemToResource s2r where s2r.sid = s.sid and s.storagekey = ? and s.uid = (select get_uid(?))', [storagekey, username])
+module.exports.getStorageResourceId = function (uid, storagekey) {
+  return promisedQuery('select s2r.rid as rid from storageItems s, storageItemToResource s2r where s2r.sid = s.sid and s.storagekey = ? and s.uid = uid', [storagekey, uid])
     .then(res => {
       if (!res.rows.length) {
-        logger.debug(`Storage item '${storagekey}' for user '${username}' does not exist`);
+        logger.debug(`Storage item '${storagekey}' for user with id '${uid}' does not exist`);
         return null;
       }
       return res.rows[0].rid;
@@ -417,7 +420,8 @@ module.exports.getStorageResourceId = function (username, storagekey) {
 };
 
 module.exports.getStorageResource = function (username, storagekey) {
-  return module.exports.getStorageResourceId(username, storagekey)
+  return this.getUserId(username)
+    .then(uid => this.getStorageResourceId(uid, storagekey))
     .then(rid => rid && this.getResource(rid, -1) || null);
 };
 
@@ -484,7 +488,8 @@ module.exports.promisedEditResource = function (username, resourceBefore, resour
       return null;
     }
     logger.debug('Creating new resource.');
-    return this.saveNewResourceOrValue(resourceAfter.value, username, resourceAfter.cid);
+    return this.getUserId(username)
+      .then(uid => this.saveNewResourceOrValue(resourceAfter.value, uid, resourceAfter.cid));
   }
 
   // 2: delete resource if resourceAfter is null

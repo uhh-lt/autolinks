@@ -23,9 +23,9 @@ CREATE TABLE IF NOT EXISTS resourceMetadata (
 
 CREATE TABLE IF NOT EXISTS stringResources (
   rid         int unsigned NOT NULL,
-  surfaceform varchar(512) NOT NULL,
+  surfaceform varchar(256) NOT NULL,
   PRIMARY KEY (rid),
-  UNIQUE (surfaceform(333))
+  UNIQUE (rid, surfaceform)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS tripleResources (
@@ -37,15 +37,15 @@ CREATE TABLE IF NOT EXISTS tripleResources (
   KEY (subj),
   KEY (pred),
   KEY (obj),
-  UNIQUE spo (subj, pred, obj)
+  UNIQUE spo (rid, subj, pred, obj)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS listResources (
   rid            int unsigned NOT NULL,
   listdescriptor varchar(256) NOT NULL,
-  PRIMARY KEY (rid, listdescriptor),
-  KEY (rid),
-  KEY (listdescriptor)
+  PRIMARY KEY (rid),
+  KEY (listdescriptor),
+  UNIQUE (rid, listdescriptor)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS listResourceItems (
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS resourcePermission (
   uid         int unsigned NOT NULL,
   r           boolean DEFAULT TRUE,
   w           boolean DEFAULT NULL,
-  PRIMARY KEY (rid,uid),
+  PRIMARY KEY (rid, uid),
   KEY (uid),
   KEY (rid)
 ) ENGINE=MyISAM;
@@ -91,10 +91,13 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- CREATE HELPER VIEWS
 
-CREATE VIEW userResourceMetadata AS SELECT r1.uid, r2.* FROM resources r1 JOIN resourceMetadata r2 ON (r1.rid = r2.rid);
-CREATE VIEW userStringResources  AS SELECT r1.uid, r2.* FROM resources r1 JOIN stringResources  r2 ON (r1.rid = r2.rid);
-CREATE VIEW userTripleResources  AS SELECT r1.uid, r2.* FROM resources r1 JOIN tripleResources  r2 ON (r1.rid = r2.rid);
-CREATE VIEW userListResources    AS SELECT r1.uid, r2.* FROM resources r1 JOIN listResources    r2 ON (r1.rid = r2.rid);
+CREATE OR REPLACE VIEW userResourceMetadata AS SELECT r1.uid, r2.* FROM resources r1 JOIN resourceMetadata r2 ON (r1.rid = r2.rid);
+
+CREATE OR REPLACE VIEW userStringResources  AS SELECT r1.uid, r2.* FROM resources r1 JOIN stringResources  r2 ON (r1.rid = r2.rid);
+
+CREATE OR REPLACE VIEW userTripleResources  AS SELECT r1.uid, r2.* FROM resources r1 JOIN tripleResources  r2 ON (r1.rid = r2.rid);
+
+CREATE OR REPLACE VIEW userListResources    AS SELECT r1.uid, r2.* FROM resources r1 JOIN listResources    r2 ON (r1.rid = r2.rid);
 
 -- DEFINE SOME HELPER FUNCTIONS
 
@@ -187,7 +190,7 @@ BEGIN
   if surfaceform_ is NULL then
     return rid_;
   end if;
-  select rid into rid_ from stringResources where surfaceform = surfaceform_ limit and uid = uid_ 1;
+  select rid into rid_ from userStringResources where surfaceform = surfaceform_ and uid = uid_ limit 1;
   if rid_ = 0 then
     select add_resource(TRUE, NULL, NULL, uid_) into rid_;
     insert into stringResources set rid = rid_, surfaceform = surfaceform_;
