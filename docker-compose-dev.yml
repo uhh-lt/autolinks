@@ -66,7 +66,7 @@ services:
   uimin:
     image: remstef/node-swagger:latest
     volumes:
-      - ${PWD}/debug:/opt/project/uimin
+      - ${PWD}/uimin:/opt/project/uimin
       - ${PWD}/broker:/opt/project/broker
       - ${PWD}/data:/opt/project/data
     ports:
@@ -81,7 +81,8 @@ services:
     environment:
       - NODE_ENV=development
       - COOKIE_SECRET=YOUR_COOKIE_SECRET
-      - BROKER_URL=http://broker:10010
+      #- BROKER_URL=http://broker:10010
+      - BROKER_URL=http://ltdemos.informatik.uni-hamburg.de:8093
       - LOGLEVEL=debug
   # END: minimal frontend
 

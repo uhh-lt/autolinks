@@ -7,3 +7,5 @@ require('browserify')({
   })
   .bundle()
   .pipe(fs.createWriteStream('public/javascripts/bundle.js'));
+
+console.log('Bundled browser content.');

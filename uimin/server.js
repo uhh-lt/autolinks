@@ -2,7 +2,8 @@
 
 /* some global settings and requirements */
 require('../broker/serversetup')(module);
-/* browserify browser components */
+
+/* browserify browser components, require runs methods */
 require('./browserify-app');
 
 /* imports */
@@ -12,21 +13,20 @@ const
   logger = require('../broker/controller/log')(module);
 
 /*
- * init swagger ui
+ * serve static
  */
 app.use(express.static(__dirname + '/public'));
 
-// // redirect root to swaggers api docs
-// app.get('/', function(req, res){
-//   res.redirect('api-docs');
-// });
 
-
-app.get('/test', function(req, res){
-
-  res.end();
-
+/*
+ * serve dynamic content
+ */
+app.get('/test', function(req, res, next) {
+  res.end(next);
 });
 
+/*
+ * start server on port
+ */
 app.listen(10010);
 

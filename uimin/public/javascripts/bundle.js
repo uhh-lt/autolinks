@@ -1,123 +1,13 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
-module.exports = Exception;
-
-Exception.prototype.type = null;
-Exception.prototype.message = null;
-Exception.prototype.cause = null;
-Exception.prototype.fields = null;
-
-/**
- * @constructor
- */
-function Exception(type, message) {
-  /*
-   * The Exception object
-   */
-  if (!message) { // if two parameters provided 1st is type, second is message, otherwise first is message
-    this.message = type;
-  }else {
-    this.type = type;
-    this.message = message;
-  }
-}
-
-/**
- *
- * @param err
- * @param newMessage
- * @param fields
- * @returns {Exception}
- */
-Exception.fromError = function(err, newMessage, fields) {
-  if(err instanceof Exception && err.message === newMessage){
-    return err;
-  }
-  const ex = new Exception();
-  ex.message = newMessage || err.message;
-  ex.cause = err;
-  ex.cause = {}; // serialize error to normal json object
-  if (err) {
-    Object.getOwnPropertyNames(err).forEach(function (key) {
-      ex.cause[key] = this[key];
-    }, err);
-  }
-  ex.fields = fields;
-  return ex;
-};
-
-Exception.prototype.log = function(logfun) {
-  logfun(this.message, this.fields, this.cause);
-  return this;
-};
-
-/**
- *
- * @param err
- * @param res
- * @returns {*}
- */
-Exception.handleErrorResponse = function(err, res){
-  res.status(500);
-  if(!res.headersSent) {
-    res.header('Content-Type', 'application/json; charset=utf-8');
-  }
-
-  const exc = Exception.fromError(err, err.message, null);
-  res.write(JSON.stringify(exc));
-
-  return res;
-};
-
-/**
- *
- * @param res server response
- * @returns {ServerResponse}
- */
-Exception.prototype.handleResponse = function(res){
-  res.status(500);
-  if(!res.headersSent) {
-    res.header('Content-Type', 'application/json; charset=utf-8');
-  }
-  res.write(JSON.stringify(this));
-  return res;
-};
-
-/**
- *
- * Deep copy from ordinary object
- *
- * @param obj
- * @returns {Exception}
- */
-Exception.prototype.deepAssign = function(obj) {
-  return this.assign(obj);
-};
-
-/**
- *
- * @param obj
- * @returns {Exception}
- */
-Exception.prototype.assign = function(obj) {
-  return Object.assign(this, obj);
-};
-
-
-
-},{}],2:[function(require,module,exports){
-'use strict';
-
 /**
  *
  * THIS FILE WILL BE BUNDLED BY BROWSERIFY INTO bundle.js
  *
  */
 
-const
-  Exception = require('../../broker/model/Exception'),
-  jq = require('jquery');
+const jq = require('jquery');
 
 window.$ = jq;
 
@@ -127,8 +17,21 @@ window.init = function () {
   console.log('Initializing autlinks minimized frontend.');
 };
 
+window.renderServices = function() {
+  const broker = jq('#BROKER_URL').val() || 'http://localhost:10000';
+  console.log(`Broker url: '${broker}/service/listServices'`);
+  const html_list = jq('#service_list');
+  html_list.empty();
+  jq.getJSON(`${broker}/service/listServices`, function( data ) {
+    jq.each(data, function(i, val) {
+      console.log(`${i}, ${val}`);
+      const html_service = `<li id='service_${i}'>${val.name}</li>`;
+      html_list.append(html_service);
+    });
+  });
+};
 
-},{"../../broker/model/Exception":1,"jquery":3}],3:[function(require,module,exports){
+},{"jquery":2}],2:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.3.1
  * https://jquery.com/
@@ -10494,4 +10397,4 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}]},{},[2]);
+},{}]},{},[1]);
