@@ -3,7 +3,8 @@
 const
   _ = require('lodash'),
   elasticsearch = require('elasticsearch'),
-  Triple = require('../../../../broker/model/Triple'),
+  Triple = require('../../../../broker/model/Triple').model,
+  Resource = require('../../../../broker/model/Resource').model,
   logger = require('../../../../broker/controller/log')(module);
 
 const esIndices = [];
@@ -84,6 +85,7 @@ module.exports.transformSearchResults = function(text, searchResult){
   // for each hit create a triple
   return _(searchResult.hits.hits)
     .map(h =>
+      new Resource(null,
       new Triple(
         text,
         [

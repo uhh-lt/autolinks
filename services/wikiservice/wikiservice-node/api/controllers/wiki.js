@@ -2,8 +2,8 @@
 
 /* imports */
 const
-  ServiceParameter = require('../../../../../broker/model/ServiceParameter'),
-  Exception = require('../../../../../broker/model/Exception'),
+  ServiceParameter = require('../../../../../broker/model/ServiceParameter').model,
+  Exception = require('../../../../../broker/model/Exception').model,
   es = require('../../controller/es'),
   logger = require('../../../../../broker/controller/log')(module);
 
