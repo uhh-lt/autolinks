@@ -206,8 +206,6 @@ mysqldb.init((err, r) => {
 
   }, 1500);
 
-  select count(*) from userStringResources where uid =1;
-
   setTimeout(function(){
     mysqldb.close((err) => {});
   }, 4000);
