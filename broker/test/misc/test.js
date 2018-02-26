@@ -131,6 +131,7 @@ mysqldb.init((err, r) => {
   // mysqldb.saveStorageItemToResourceMapping('me','asdjbao').then(console.log, console.error);
 
   // mysqldb.createUsergroup('me').then(console.log, console.error);
+
   const arr = [
     'hello',
     ['hallo hallo', new Triple('i','am','goof')],
@@ -143,14 +144,28 @@ mysqldb.init((err, r) => {
     'hallo welt'
   ];
 
-  // try writing
-  mysqldb.write('me', '12345', arr,
-    function(err, res) {
-      if(err){
-        return console.log(err);
-      }
-      return console.log(JSON.stringify(res, null, 2));
-    });
+  mysqldb.createUsergroup('batman')
+    .then(res => mysqldb.createUsergroup('superman'))
+    .then(res => {
+    // try writing
+    mysqldb.write('batman', '12345', arr,
+      function(err, res) {
+        if(err){
+          return console.log(err);
+        }
+        return console.log(JSON.stringify(res, null, 2));
+      });
+
+    // try writing
+    mysqldb.write('superman', '12345', arr,
+      function(err, res) {
+        if(err){
+          return console.log(err);
+        }
+        return console.log(JSON.stringify(res, null, 2));
+      });
+  });
+
 
 
   // mysqldb.getTriple(2).then(console.log,console.err);
@@ -190,6 +205,8 @@ mysqldb.init((err, r) => {
 
 
   }, 1500);
+
+  select count(*) from userStringResources where uid =1;
 
   setTimeout(function(){
     mysqldb.close((err) => {});
