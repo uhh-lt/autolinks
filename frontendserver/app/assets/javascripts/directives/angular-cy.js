@@ -422,180 +422,157 @@ define([
                         ]
                       });
 
-                      $rootScope.$on('addEntity', function(event, entity){
+                      $rootScope.$on('addEntity', function(event, entity) {
                         var nodes = scope.data.nodes;
                         var edges = scope.data.edges;
                         var newNode = [];
                         var newEdge = [];
-                        debugger;
-                        if (entity) {
-                          _.forEach(entity.value, function(n) {
-                            function extractEntity(n, parent = null) {
 
-                              let s = n.value.subject;
-                              let p = n.value.predicate;
-                              let o = n.value.object;
+                        function extractEntity(n, parent = null) {
 
-                              function extractSubject(n) {
-                                if (_.isArray(n[0].value)) {
-                                  return extractSubject(n[0].value);
-                                }
-                                if(_.isObject(n[0].value)) {
-                                  return n[0].value.subject;
-                                }
-                                return n[0].value;
-                              }
+                          let s = n.value.subject;
+                          let p = n.value.predicate;
+                          let o = n.value.object;
 
-                              function extractObject(n) {
-                                // debugger;
-                                if (_.isArray(n[0].value)) {
-                                  return extractObject(n[0].value);
-                                }
-                                if(_.isObject(n[0].value)) {
-                                  return n[0].value.subject;
-                                }
-                                return n[0].value;
-                              }
+                          function extractResource(n) {
+                            return n.value.subject;
+                          }
 
-                              function extractPredicate(n) {
-                                if (_.isArray(n[0].value)) {
-                                  return extractPredicate(n[0].value);
-                                }
-                                if(_.isObject(n[0].value)) {
-                                  return n[0].value.subject;
-                                }
-                                return n[0].value;
-                              }
-
-                              debugger;
-                              if (_.isArray(s.value)) {
-                                var s1 = extractSubject(s.value);
-                                var subject = {
-                                    cid: s1.cid,
-                                    rid: s1.rid,
-                                    metadata: s1.metadata,
-                                    id: (s1.value + '_as_parent').replace(/\s/g, ''),
-                                    name: s1.metadata.label ? s1.metadata.label : s1.value + '',
-                                    parent: parent ? parent.id : null
-                                };
-                              } else if (_.isObject(s.value)) {
-                                // var s = extractSubject(n.value);
-                                var subject = {
-                                    cid: s.cid,
-                                    rid: s.rid,
-                                    metadata: s.metadata,
-                                    id: (s.value + '_as_parent').replace(/\s/g, ''),
-                                    name: s.metadata.label ? s.metadata.label : s.value + '',
-                                    parent: parent ? parent.id : null
-                                };
-                              } else {
-                                var subject = {
-                                    cid: s.cid,
-                                    rid: s.rid,
-                                    metadata: s.metadata,
-                                    id: (s.value + '').replace(/\s/g, ''),
-                                    name: s.metadata.label ? s.metadata.label : s.value + '',
-                                    parent: parent ? parent.id : null
-                                };
-                              }
-
-                              if (_.isArray(o.value)) {
-                                var o1 = extractObject(o.value);
-                                var object = {
-                                    cid: o1.cid,
-                                    rid: o1.rid,
-                                    metadata: o1.metadata,
-                                    id: (o1.value + '_as_parent').replace(/\s/g, ''),
-                                    name: o1.metadata.label ? o1.metadata.label : o1.value + '',
-                                    parent: parent ? parent.id : null
-                                };
-                              } else if (_.isObject(o.value)) {
-                                // var o = extractObject(n.value);
-                                var object = {
-                                    cid: o.cid,
-                                    rid: o.rid,
-                                    metadata: o.metadata,
-                                    id: (o.value + '_as_parent').replace(/\s/g, ''),
-                                    name: o.metadata.label ? o.metadata.label : o.value + '',
-                                    parent: parent ? parent.id : null
-                                };
-                              } else {
-                                var object = {
-                                    cid: o.cid,
-                                    rid: o.rid,
-                                    metadata: o.metadata,
-                                    id: (o.value + '').replace(/\s/g, ''),
-                                    name: o.metadata.label ? o.metadata.label : o.value + '',
-                                    parent: parent ? parent.id : null
-                                };
-                              }
-
-                              if (_.isArray(p.value)) {
-                                var p1 = extractPredicate(p.value);
-                                var edge = {
-                                  group: "edges",
-                                  data:
-                                  {
-                                    cid: p1.cid,
-                                    rid: p1.rid,
-                                    metadata: p1.metadata,
-                                    id: ( subject.id + object.id ).replace(/\s/g, ''),
-                                    source: (subject.id).replace(/\s/g, ''),
-                                    target: (object.id).replace(/\s/g, ''),
-                                    name: p1.metadata.label ? p1.metadata.label : p1.value
-                                  }
-                                }
-                              } else {
-                                var edge = {
-                                  group: "edges",
-                                  data:
-                                  {
-                                    cid: p.cid,
-                                    rid: p.rid,
-                                    metadata: p.metadata,
-                                    id: ( subject.id + object.id ).replace(/\s/g, ''),
-                                    source: (subject.id).replace(/\s/g, ''),
-                                    target: (object.id).replace(/\s/g, ''),
-                                    name: p.metadata.label ? p.metadata.label : p.value
-                                  }
-                                };
-                              }
-
-                              newEdge.push(edge);
-                              newNode.push(subject, object);
-
-                              if (_.isArray(s.value)) {
-                                _.forEach(s.value, function(n) {
-                                  extractEntity(n, subject);
-                                });
-                              };
-
-                              if (_.isArray(o.value)) {
-                                _.forEach(o.value, function(n) {
-                                  extractEntity(n, object);
-                                });
-                              };
-
-                              // if (_.isArray(p.value)) {
-                              //   _.forEach(p.value, function(n) {
-                              //     extractEntity(n, object);
-                              //   });
-                              // };
-
-                              // if (_.isArray(s.value)) {
-                              //   _.forEach(s.value, function(n) {
-                              //     extractEntity(n, subject);
-                              //   });
-                              // };
-                              //
-                              // if (_.isArray(o.value)) {
-                              //   _.forEach(o.value, function(n) {
-                              //     extractEntity(n, object);
-                              //   });
-                              // };
+                          function extractList(n) {
+                            if (_.isArray(n[0].value)) {
+                              return extractList(n[0].value);
                             }
-                            extractEntity(n);
-                          });
+                            if(_.isObject(n[0].value)) {
+                              return n[0].value.subject;
+                            }
+                            return n[0].value;
+                          }
+
+
+                          if (_.isArray(s.value)) {
+                            var s1 = extractList(s.value);
+                            var subject = {
+                                cid: s1.cid,
+                                rid: s1.rid,
+                                metadata: s1.metadata,
+                                id: (s1.value + '_as_parent').replace(/\s/g, ''),
+                                name: s1.metadata.label ? s1.metadata.label : s1.value + '',
+                                parent: parent ? parent.id : null
+                            };
+                          } else if (_.isObject(s.value)) {
+                            var s1 = extractResource(s);
+                            var subject = {
+                                cid: s1.cid,
+                                rid: s1.rid,
+                                metadata: s1.metadata,
+                                id: (s1.value + '_as_parent').replace(/\s/g, ''),
+                                name: s1.metadata.label ? s1.metadata.label : s1.value + '',
+                                parent: parent ? parent.id : null
+                            };
+                          } else {
+                            var subject = {
+                                cid: s.cid,
+                                rid: s.rid,
+                                metadata: s.metadata,
+                                id: (s.value + '').replace(/\s/g, ''),
+                                name: s.metadata.label ? s.metadata.label : s.value + '',
+                                parent: parent ? parent.id : null
+                            };
+                          }
+
+                          if (_.isArray(o.value)) {
+                            var o1 = extractList(o.value);
+                            debugger;
+                            var object = {
+                                cid: o1.cid,
+                                rid: o1.rid,
+                                metadata: o1.metadata,
+                                id: (o1.value + '_as_parent').replace(/\s/g, ''),
+                                name: o1.metadata.label ? o1.metadata.label : o1.value + '',
+                                parent: parent ? parent.id : null
+                            };
+                          } else if (_.isObject(o.value)) {
+                            var o1 = extractResource(o);
+                            var object = {
+                                cid: o1.cid,
+                                rid: o1.rid,
+                                metadata: o1.metadata,
+                                id: (o1.value + '_as_parent').replace(/\s/g, ''),
+                                name: o1.metadata.label ? o1.metadata.label : o1.value + '',
+                                parent: parent ? parent.id : null
+                            };
+                          } else {
+                            var object = {
+                                cid: o.cid,
+                                rid: o.rid,
+                                metadata: o.metadata,
+                                id: (o.value + '').replace(/\s/g, ''),
+                                name: o.metadata.label ? o.metadata.label : o.value + '',
+                                parent: parent ? parent.id : null
+                            };
+                          }
+
+                          if (_.isArray(p.value)) {
+                            var p1 = extractList(p.value);
+                            var edge = {
+                              group: "edges",
+                              data:
+                              {
+                                cid: p1.cid,
+                                rid: p1.rid,
+                                metadata: p1.metadata,
+                                id: ( subject.id + object.id ).replace(/\s/g, ''),
+                                source: (subject.id).replace(/\s/g, ''),
+                                target: (object.id).replace(/\s/g, ''),
+                                name: p1.metadata.label ? p1.metadata.label : p1.value
+                              }
+                            }
+                          } else {
+                            var edge = {
+                              group: "edges",
+                              data:
+                              {
+                                cid: p.cid,
+                                rid: p.rid,
+                                metadata: p.metadata,
+                                id: ( subject.id + object.id ).replace(/\s/g, ''),
+                                source: (subject.id).replace(/\s/g, ''),
+                                target: (object.id).replace(/\s/g, ''),
+                                name: p.metadata.label ? p.metadata.label : p.value
+                              }
+                            };
+                          };
+
+                          newEdge.push(edge);
+                          newNode.push(subject, object);
+
+                          if (_.isArray(s.value)) {
+                            _.forEach(s.value, function(n) {
+                              extractEntity(n, subject);
+                            });
+                          } else if (_.isObject(s.value)) {
+                            extractEntity(s, subject);
+                          };
+
+                          if (_.isArray(o.value)) {
+                            _.forEach(o.value, function(n) {
+                              extractEntity(n, object);
+                            });
+                          } else if (_.isObject(o.value)) {
+                            extractEntity(o, object);
+                          };
+
+                        };
+
+                        if (entity) {
+
+                          if (_.isArray(entity.value)) {
+                            _.forEach(entity.value, function(n) {
+                              extractEntity(n);
+                            });
+                          } else if (_.isObject(entity.value)) {
+                            extractEntity(entity);
+                          }
 
                           var filterNode = [];
                           _.forEach(_.uniqBy(newNode, 'id'), function(n) {
@@ -620,11 +597,10 @@ define([
                           cy.layout(scope.options.layout).run();
                         }
                       });
-                      // debugger;
+
                       if (!$rootScope.$$listenerCount.addEdge) {
                         if ($rootScope.$$listenerCount.addEdge === 1) {
                           $rootScope.$$listenerCount.addEdge = 0;
-                          // debugger;
                           return;
                         } else {
                           $rootScope.$on('addEdge', function(e){

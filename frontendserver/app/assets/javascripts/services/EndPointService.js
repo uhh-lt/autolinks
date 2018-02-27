@@ -4,6 +4,7 @@ define([
     'use strict';
     angular.module('autolinks.endpointservice', [])
         .factory('EndPointService', ['$rootScope', '$http', '$q', '_', function ($rootScope, $http, $q, _) {
+            $rootScope.activeService = [];
             $rootScope.listServices = {};
             $rootScope.serviceName = "";
             $rootScope.serviceVersion = "";
@@ -11,9 +12,27 @@ define([
             return {
               fetchService: function() {
                 return $http.get('/api/service/listServices').then(function(response) {
+                  _.forEach(response.data, function(l) {
+                    _.forEach(l.endpoints, function(e) {
+                      e["enabled"] = false;
+                    });
+                  });
                   $rootScope.listServices = response.data;
                   return response;
                  });
+              },
+
+              toggleService: function(service) {
+                if (service.enabled) {
+                  $rootScope.activeService.push(service.path);
+                } else {
+                  _.pull($rootScope.activeService, service.path);
+                }
+                // return $rootScope.listServices;
+              },
+
+              getActiveService: function() {
+                return $rootScope.activeService;
               },
 
               annotateText: function(text) {

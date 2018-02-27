@@ -4,7 +4,7 @@
   hide-print
   md-is-locked-open="lockLeft && $mdMedia('gt-md')"
   style="min-height: 100%; z-index: 999;"
-  >
+>
        <md-toolbar class="md-theme-light">
          <h1 class="md-toolbar-tools">
            Autolinks
@@ -14,6 +14,36 @@
        <h3 class="md-toolbar-tools">
          <label>Welcome Max Mustermann</label>
        </h3>
+       <md-list ng-cloak>
+
+        <md-divider></md-divider>
+
+        <md-subheader class="md-no-sticky"><h4>Service lists:</h4></md-subheader>
+        <md-divider></md-divider>
+        <div ng-repeat="list in lists">
+          <!-- <div class="md-list-item-text" layout="column"> -->
+          <md-subheader class="md-no-sticky">
+            <h5>{{ list.name }}</h5>
+            <!-- <h4>{{ item.what }}</h4> -->
+            <p>{{ list.description }}</p>
+          </md-subheader>
+          <!-- </div> -->
+          <!-- <md-icon md-svg-icon="{{setting.icon}}"></md-icon>
+          <p> {{ setting.name }} </p> -->
+
+
+          <md-list-item ng-repeat="endpoint in list.endpoints">
+            <p>{{ endpoint.path }}</p>
+            <!-- <h4>{{ item.what }}</h4> -->
+            <!-- <p>{{ setting.description }}</p> -->
+            <md-switch class="md-secondary" ng-model="endpoint.enabled" ng-model-options="{ getterSetter: true, updateOn: 'default' }" ng-change="navigateTo(endpoint)"></md-switch>
+          </md-list-item>
+          <md-divider></md-divider>
+          <!-- <div> {{ setting.description }}</div> -->
+        </div>
+        <md-divider></md-divider>
+
+      </md-list>
      </md-content>
      <md-toolbar class="md-scroll-shrink">
       <a ng-href="/login" target="_self" layout="row" layout-align="center center" flex style="cursor: pointer;">

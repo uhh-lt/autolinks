@@ -32,11 +32,11 @@ router.post('/', function (req, res) {
             return res.render('login', { error: body.message, name: req.body.name });
         }
 
-        const token = body.name + '@' + body.password;
-        const tokenBase64 = 'Basic ' + new Buffer(token).toString('base64')
+        const token = body.name + ':' + body.password;
+        const tokenBase64 = 'Basic ' + new Buffer(token).toString('base64');
 
         // save JWT token in the session to make it available to the angular app
-        req.session.token = tokenBase64; //body.token;
+        req.session.token = tokenBase64;
 
         // redirect to returnUrl
         var returnUrl = req.query.returnUrl && decodeURIComponent(req.query.returnUrl) || '/';
