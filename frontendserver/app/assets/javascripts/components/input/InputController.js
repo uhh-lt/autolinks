@@ -27,7 +27,7 @@ define([
           }
 
           $scope.submit = function() {
-            EndPointService.fetchService().then(function(response){
+            EndPointService.fetchService().then(function(response) {
               resetNetworkFromInput(response);
             });
           }
@@ -53,7 +53,8 @@ define([
             EndPointService.annotateText(inputs[0]).then(function(response) {
 
                 const annotations = response.data.annotations;
-                $scope.context = response.data;
+                $scope.context = response.data
+                $scope.active = EndPointService.getActiveService();
 
                 _.forEach(annotations, function(anno) {
 
@@ -64,22 +65,25 @@ define([
                     $scope.serviceVersion = l.version;
 
                     _.forEach(l.endpoints, function(e) {
+                      debugger;
+                      if (_.includes($scope.active, e.path)) {
+                        let data = {
+                          offsets:
+                          {
+                            from: offsets[0].from ? offsets[0].from : 0,
+                            length: offsets[0].length
+                          },
+                          context: $scope.context,
+                          name: $scope.serviceName,
+                          version: $scope.serviceVersion,
+                          endpoint: e
+                        };
 
-                      let data = {
-                        offsets:
-                        {
-                          from: offsets[0].from ? offsets[0].from : 0,
-                          length: offsets[0].length
-                        },
-                        context: $scope.context,
-                        name: $scope.serviceName,
-                        version: $scope.serviceVersion,
-                        endpoint: e
+                        EndPointService.fetchData(data).then(function(response) {
+                            EntityService.addEntity(response);
+                        });
                       };
 
-                      EndPointService.fetchData(data).then(function(response) {
-                          EntityService.addEntity(response);
-                      });
                     });
                   });
                 });
