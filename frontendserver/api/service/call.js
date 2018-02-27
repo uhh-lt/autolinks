@@ -5,13 +5,14 @@ module.exports = function(url, token, data) {
   const offsets = data.offsets;
   const path = data.endpoint.path;
   const method = data.endpoint.method;
+
   return {
     url: url + '/service/call',
     method: 'POST',
     headers: {
-       'Content-Type': 'application/json',
-       'Accept': 'application/json',
-       'authorization': token
+       "Content-Type": "application/json",
+       "accept": "application/json",
+       "authorization": token
      },
     json: true,
     body:
