@@ -65,7 +65,6 @@ define([
                     $scope.serviceVersion = l.version;
 
                     _.forEach(l.endpoints, function(e) {
-                      debugger;
                       if (_.includes($scope.active, e.path)) {
                         let data = {
                           offsets:

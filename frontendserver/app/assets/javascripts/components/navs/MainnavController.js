@@ -30,7 +30,6 @@ define([
               $scope.lists = EndPointService.fetchService().then(function(response) {
                 $scope.lists = response.data;
               });
-              debugger;
               // var entity = $scope.selectedEntity;
               // if (entity._private) {
               //   $scope.label = entity._private.data.name;
