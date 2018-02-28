@@ -4,7 +4,7 @@
 const
   DOffset = require('./DOffset');
 
-module.exports = Annotation;
+module.exports.model = Annotation;
 
 Annotation.prototype.type = null;
 Annotation.prototype.properties = {};
@@ -19,7 +19,7 @@ function Annotation() {
    * The analysis object
    */
   this.properties = {};
-  this.doffset = [];
+  this.doffset = new DOffset.model([]);
 }
 
 /**
@@ -31,8 +31,8 @@ function Annotation() {
  */
 Annotation.prototype.deepAssign = function(obj) {
   this.assign(obj);
-  if(!(this.doffset instanceof DOffset)){
-    this.doffset = new DOffset().deepAssign(this.doffset);
+  if(!(this.doffset instanceof DOffset.model)){
+    this.doffset = new DOffset.model().deepAssign(this.doffset);
   }
   return this;
 };

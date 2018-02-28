@@ -5,7 +5,7 @@
  */
 const
   NLP = require('../../controller/nlp_wrapper'),
-  Exception = require('../../model/Exception'),
+  Exception = require('../../model/Exception').model,
   logger = require('../../controller/log')(module)
   ;
 

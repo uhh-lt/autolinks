@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: '0.0.1'
+  version: '0.0.2'
   title: Autolinks Broker Service
 
 ## the domain of the service
@@ -23,6 +23,10 @@ produces:
 
 # define complex objects which can be references with $ref: "#/definitions/X"
 definitions:
+
+  # helper object to describe strings, arrays, or objects
+  Any:
+    description: 'Can be anything: string, number, array, object, etc.'
 
   # objects related for service maintenance
   Service:
@@ -136,32 +140,28 @@ definitions:
       length:
         type: integer
 
-  # objects related to storage
-  StorageKVP:
-    type: object
-    properties:
-      key:
-        $ref: "#/definitions/StorageKey"
-      value:
-        $ref: "#/definitions/StorageValue"
-
-  StorageKey:
-    type: object
-    properties:
-      username:
-        type: string
-      servicename:
-        type: string
-      endpointname:
-        type: string
-      parameters:
-        type: object
-
-  StorageValue:
-    type: object
-
   StorageInfo:
     type: object
+    
+  Resource:
+    type: object
+    properties:
+      rid:
+        type: integer
+        description: the id of the resource, set to 0 if unknown
+      cid:
+        type: integer
+        description: the id of the container resource, set to 0 if unknown
+      metadata:
+        type: object
+        description: some metadata the resource, e.g. label
+      value:
+        $ref: '#/definitions/Any'
+        
+  # Resources:
+  #   type: array
+  #   items:
+  #     $ref: "#/definitions/Resource"
 
   # in case of error return this object schema
   Exception:
@@ -261,7 +261,7 @@ paths:
         200:
           description: Success
           schema:
-            type: object
+            $ref: '#/definitions/Resource'
         default:
           description: Error
           schema:
@@ -563,49 +563,37 @@ paths:
           schema:
             $ref: "#/definitions/Exception"
 
-  /storage/read:
+  /storage/editresource:
     x-swagger-router-controller: storage
     post:
-      operationId: read
+      operationId: editresource
       tags:
         - Storage
-      description: Get the data for a particular key
-      parameters:
-        - name: key
-          in: body
-          description: The key of the data to read
-          schema:
-            $ref: "#/definitions/StorageKey"
-      security:
-        - broker_auth: []
-      responses:
-        200:
-          description: Success, user data was found and will be returned
-        204:
-          description: Success, no data not found
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/Exception"
+      description: |
+        Edit a resource. Specifically, provide an old resources and a new resource, the changes will be written.
+        - Create a resource by setting the old resource parameter to null,
+        - Remove a resource by setting the new resource parameter to null.
+        - For editing, resources must have the same rid!
 
-  /storage/write:
-    x-swagger-router-controller: storage
-    post:
-      operationId: write
-      tags:
-        - Storage
-      description: Write data for a particular key
+        NOTE that only one change at a time will be written, e.g. if you change the metadata object and the cid in the new resource only one of the changes will be processed.
+        The new resource will be returned on success.
       parameters:
-        - name: kvp
+        - name: data
           in: body
-          description: The key and value of the data to be written
           schema:
-            $ref: "#/definitions/StorageKVP"
+            type: object
+            properties:
+              before:
+                $ref: "#/definitions/Resource"
+              after:
+                $ref: "#/definitions/Resource"
       security:
         - broker_auth: []
       responses:
         200:
-          description: Success
+          description: Success. Return the new resource. 
+          schema:
+            $ref: "#/definitions/Resource"
         default:
           description: Error
           schema:

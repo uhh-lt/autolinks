@@ -3,13 +3,13 @@
 
 /* imports */
 const
-  Exception = require('./model/Exception'),
-  Triple = require('./model/Triple'),
-  Offset = require('./model/Offset'),
-  Annotation = require('./model/Annotation'),
-  mysqldb = require('./controller/storage-components/mysql-db'),
-  utils = require('./controller/utils/utils'),
-  Analysis = require('./model/Analysis');
+  Exception = require('../../model/Exception').model,
+  Triple = require('../../model/Triple').model,
+  Offset = require('../../model/Offset').model,
+  Annotation = require('../../model/Annotation').model,
+  mysqldb = require('../../controller/storage-components/mysql-db'),
+  utils = require('../../controller/utils/utils'),
+  Analysis = require('../../model/Analysis').model;
 
 const o = new Offset(3,10);
 
@@ -46,7 +46,7 @@ c.resolve()
 const d = new Annotation();
 const e = new Annotation();
 console.log(d)
-d.doffset.push(new Offset(1,10));
+d.doffset.offsets.push(new Offset(1,10));
 console.log(d.doffset)
 console.log(e.doffset)
 
@@ -110,15 +110,15 @@ mysqldb.init((err, r) => {
 //
 //
 // // const x = Promise.all([
-// //   mysqldb.saveResourceValue(null),
-// //   mysqldb.saveResourceValue('hello new world'),
-// //   mysqldb.saveResourceValue('hello funny world'),
-// //   mysqldb.saveResourceValue('hello world')
+// //   mysqldb.saveNewResourceOrValue(null),
+// //   mysqldb.saveNewResourceOrValue('hello new world'),
+// //   mysqldb.saveNewResourceOrValue('hello funny world'),
+// //   mysqldb.saveNewResourceOrValue('hello world')
 // // ]).then((i) => console.log(`fullfilled ${i}`), (err) => console.log(`rejected ${err}`));
 //
 // const y = mysqldb.saveTriple(new Triple('You', 'save', 'the world'));
 //
-//   const z = mysqldb.saveResourceValue([
+//   const z = mysqldb.saveNewResourceOrValue([
 //     new Triple('I','am','God')
 //   ]);
 //
@@ -130,7 +130,7 @@ mysqldb.init((err, r) => {
   // mysqldb.saveStorageResourceMapping(23,21).then(console.log,console.error);
   // mysqldb.saveStorageItemToResourceMapping('me','asdjbao').then(console.log, console.error);
 
-  // mysqldb.createUsergroup('me').then(console.log, console.error);
+
   const arr = [
     'hello',
     ['hallo hallo', new Triple('i','am','goof')],
@@ -143,8 +143,18 @@ mysqldb.init((err, r) => {
     'hallo welt'
   ];
 
+
   // try writing
-  mysqldb.write('me', '12345', arr,
+  mysqldb.write(42, '12345', arr,
+    function(err, res) {
+      if(err){
+        return console.log(err);
+      }
+      return console.log(JSON.stringify(res, null, 2));
+    });
+
+  // try writing
+  mysqldb.write(4711, '12345', arr,
     function(err, res) {
       if(err){
         return console.log(err);
@@ -153,18 +163,52 @@ mysqldb.init((err, r) => {
     });
 
 
+
   // mysqldb.getTriple(2).then(console.log,console.err);
   // mysqldb.getResource(12).then(console.log,console.err);
-  setTimeout(function(){
-    mysqldb.getStorageResource('me', '12345').then(r => JSON.stringify(r, null, 2)).then(console.log, console.err);
-  }, 1500);
+  // setTimeout(function(){
+  //   mysqldb.getStorageResource('me', '12345').then(r => JSON.stringify(r, null, 2)).then(console.log, console.err);
+  // }, 1500);
 
+
+
+  setTimeout(function(){
+
+    mysqldb.getResource(1)
+      .then(r => JSON.stringify(r, null, 2))
+      .then(console.log)
+      .then(mysqldb.promisedEditResource(42, {rid: 1, value: 'hello'}, null))
+      .then(mysqldb.getResource(1))
+      .then(r => JSON.stringify(r, null, 2))
+      .then(console.log)
+      .then(r => mysqldb.promisedEditResource(42, null, {value: 'ashdoiahs'}))
+      .then(r => mysqldb.getResource(r.rid))
+      .then(r => JSON.stringify(r, null, 2))
+      .then(console.log)
+      .then(r => mysqldb.promisedEditResource(42, {rid: 18, cid : 3}, {rid: 18, cid : 27}))
+      .then(r => mysqldb.getResource(r.rid))
+      .then(r => JSON.stringify(r, null, 2))
+      .then(console.log)
+      .then(r => mysqldb.promisedEditResource(42, {rid: 1, metadata : {}}, {rid: 1, metadata : {labely : "hallo"}}))
+      .then(r => mysqldb.getResource(r.rid))
+      .then(r => JSON.stringify(r, null, 2))
+      .then(console.log)
+      .then(r => mysqldb.promisedEditResource(42, {rid: 1, metadata : {labely : "hallo"}}, {rid: 1, metadata : {label : "hallo", label1 : "hallo"}}))
+      .then(r => mysqldb.getResource(r.rid))
+      .then(r => JSON.stringify(r, null, 2))
+      .then(console.log, console.err);
+
+
+
+  }, 1500);
 
   setTimeout(function(){
     mysqldb.close((err) => {});
-  }, 3000);
+  }, 4000);
 
 }, true);
+
+
 
 
 

@@ -4,7 +4,7 @@
 const
   Resource = require('./Resource');
 
-module.exports = Triple;
+module.exports.model = Triple;
 
 Triple.prototype.subject = null;
 Triple.prototype.predicate = null;
@@ -42,9 +42,10 @@ Triple.prototype.resolve = function(){
 Triple.prototype.deepAssign = function(obj) {
   this.assign(obj);
 
-  this.subject = new Resource().deepAssign(this.subject);
-  this.predicate = new Resource().deepAssign(this.predicate);
-  this.object = new Resource().deepAssign(this.object);
+  this.subject = new Resource.model().deepAssign(this.subject);
+  this.predicate = new Resource.model().deepAssign(this.predicate);
+  this.object = new Resource.model().deepAssign(this.object);
+  return this;
 };
 
 /**
