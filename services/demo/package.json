@@ -1,8 +1,8 @@
 {
-  "name": "dummy",
+  "name": "autolinks-service-demo",
   "version": "0.0.1",
   "private": true,
-  "description": "New Swagger API Project",
+  "description": "Autolinks Demo Service",
   "keywords": [],
   "author": "",
   "license": "",

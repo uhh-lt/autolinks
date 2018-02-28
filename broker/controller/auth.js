@@ -6,6 +6,7 @@ module.exports = {
   init: init,
   authenticate_request: authenticate_request,
   handle_authenticated_request: handle_authenticated_request,
+  handle_authenticated_fallback_request: handle_authenticated_fallback_request
 };
 
 
@@ -114,6 +115,27 @@ function handle_authenticated_request(req, res, next, strategy) {
         res.header('Content-Type', 'application/json; charset=utf-8');
         res.status(401);
         return res.end(JSON.stringify({message: err.message, fields: {error: err}}));
+      }
+      next(user);
+    },
+    strategy: strategy
+  });
+}
+
+/**
+ *
+ * @param req
+ * @param res
+ * @param next
+ * @param strategy (optional)
+ */
+function handle_authenticated_fallback_request(req, res, next, strategy) {
+  return authenticate_request({
+    req: req,
+    res: res,
+    next: function (err, user) {
+      if (err) {
+        return next({ id: 0, name: 'public user' });
       }
       next(user);
     },

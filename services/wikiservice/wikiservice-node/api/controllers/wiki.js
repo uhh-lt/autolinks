@@ -2,10 +2,10 @@
 
 /* imports */
 const
-  ServiceParameter = require('../../../../../broker/model/ServiceParameter'),
-  Exception = require('../../../../../broker/model/Exception'),
+  ServiceParameter = require('../../../../../broker/model/ServiceParameter').model,
+  Exception = require('../../../../../broker/model/Exception').model,
   es = require('../../controller/es'),
-  logger = require('../../../../../broker/controller/log');
+  logger = require('../../../../../broker/controller/log')(module);
 
 
 module.exports.findArticles = function(req, res, next) {
@@ -25,22 +25,13 @@ module.exports.findArticles = function(req, res, next) {
     es.search(
       text,
       function(err, result){
-        if (writtenAtLeastOneResult) {
-          res.write(',');
-        } else {
-          res.write('[');
-        }
         if (err) {
           const exc = Exception.fromError(err, 'Failed to query elasticsearch.', { serviceParameter : serviceParameter, text : text });
           logger.warn(exc.message, exc);
-          exc.handleResponse(res);
+          return exc.handleResponse(res).end(next);
         }
 
-        res.write(
-          es.transformSearchResults(text, result)
-            .map(triple => JSON.stringify(triple))
-            .join(',')
-        );
+        res.json(result);
 
         writtenAtLeastOneResult = true;
 
@@ -51,7 +42,7 @@ module.exports.findArticles = function(req, res, next) {
           logger.warn(exc.message, exc);
           exc.handleResponse(res);
         }
-        res.end(']', next);
+        res.end(next);
       }
     );
   });

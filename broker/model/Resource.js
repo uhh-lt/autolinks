@@ -4,19 +4,23 @@
 const
   Triple = require('./Triple');
 
-module.exports = Resource;
+module.exports.model = Resource;
 
-Resource.prototype.rid = -1;
-Resource.prototype.label = null;
+Resource.prototype.rid = 0;
+Resource.prototype.cid = 0;
+Resource.prototype.metadata = null;
 Resource.prototype.value = null;
 
 /**
  * @constructor
  */
-function Resource(rid, label, value) {
+function Resource(rid, value, cid, metadata) {
   this.rid = rid;
-  this.label = label;
   this.value = value;
+  this.cid = cid;
+  if(!metadata) {
+    this.metadata = {};
+  }
 }
 
 Resource.prototype.resolve = function(){
@@ -37,12 +41,13 @@ Resource.prototype.deepAssign = function(obj) {
       return this.value.map(resourceObj => new Resource().deepAssign(resourceObj));
     }
     if(this.isTripleResource()){
-      return new Triple().deepAssign(this.value);
+      return new Triple.model().deepAssign(this.value);
     }
     // else isStringResource
     return this.value;
   };
   this.value = castvalue();
+  return this;
 };
 
 /**
@@ -61,17 +66,20 @@ Resource.asResource = function(obj){
   return new Resource().assign(obj);
 };
 
-
 Resource.prototype.isListResource = function(){
   return Array.isArray(this.value);
 };
 
 Resource.prototype.isTripleResource = function(){
-  return this.value === Object(this.value);
+  return this.value === Object(this.value) && !this.isListResource();
 };
-
 
 Resource.prototype.isStringResource = function(){
   return !(this.isListResource() || this.isTripleResource());
 };
 
+Resource.prototype.fromString = function(string) {
+    let r = new Resource();
+    r.value = string;
+    return r;
+};
