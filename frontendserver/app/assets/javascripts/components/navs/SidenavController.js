@@ -21,9 +21,9 @@ define([
                 $scope.label = entity._private.data.name;
               }
               console.log($scope.selectedEntity);
-              // console.log($scope);
+              document.getElementById("propertify").innerHTML = JSON.stringify($scope.selectedEntity.data(), undefined, 4);
             }, 1000);
-          }
+          };
 
           $rootScope.$on('sidenavReinit', function (event, args) {
             $scope.init();
@@ -73,8 +73,10 @@ define([
             // Component lookup should always be available since we are not using `ng-if`
             // $route.reload();
             EndPointService.fetchData();
+
             $mdSidenav('right').close()
               .then(function () {
+                document.getElementById("propertify").innerHTML = '{}';
                 $log.debug("close RIGHT is done");
               });
           };
