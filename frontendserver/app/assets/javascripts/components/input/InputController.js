@@ -66,7 +66,7 @@ define([
 
                     _.forEach(l.endpoints, function(e) {
                       if (_.includes($scope.active, e.path)) {
-                        let data = {
+                        $scope.data = {
                           offsets:
                           {
                             from: offsets[0].from ? offsets[0].from : 0,
@@ -78,8 +78,8 @@ define([
                           endpoint: e
                         };
 
-                        EndPointService.fetchData(data).then(function(response) {
-                            EntityService.addEntity(response);
+                        EndPointService.fetchData($scope.data).then(function(response) {
+                            EntityService.addEntity(response, $scope.data);
                         });
                       };
 

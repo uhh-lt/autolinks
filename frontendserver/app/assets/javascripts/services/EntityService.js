@@ -30,8 +30,8 @@ define([
                 $rootScope.$broadcast('updateNode');
               },
 
-              addEntity: function(entity) {
-                $rootScope.$broadcast('addEntity', entity);
+              addEntity: function(entity, data) {
+                $rootScope.$broadcast('addEntity', { entity: entity, data: data });
               },
 
               deleteEntity: function() {

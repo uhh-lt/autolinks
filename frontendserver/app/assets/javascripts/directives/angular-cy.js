@@ -443,7 +443,8 @@ define([
                           metadata: e.metadata,
                           id: ( e.value + ( child ? '' : '_as_parent' ) + e.rid ).replace(/\s/g, ''),
                           name: e.metadata.label ? e.metadata.label : e.value + '',
-                          parent: parent ? parent.id : null
+                          parent: parent ? parent.id : null,
+                          path: scope.path
                         };
                       }
 
@@ -458,7 +459,8 @@ define([
                             id: ( subject.id + object.id + r.rid ).replace(/\s/g, ''),
                             source: (subject.id).replace(/\s/g, ''),
                             target: (object.id).replace(/\s/g, ''),
-                            name: r.metadata.label ? r.metadata.label : r.value
+                            name: r.metadata.label ? r.metadata.label : r.value,
+                            path: scope.path
                           }
                         };
                       }
@@ -518,9 +520,13 @@ define([
                         };
                       };
 
-                      $rootScope.$on('addEntity', function(event, entity) {
+                      $rootScope.$on('addEntity', function(event, res) {
+                        var entity = res.entity;
+
                         var nodes = scope.data.nodes;
                         var edges = scope.data.edges;
+
+                        scope.path = res.data.endpoint.path;
                         scope.newNode = [];
                         scope.newEdge = [];
 
@@ -586,6 +592,12 @@ define([
                       $rootScope.$on('deleteEntity', function(){
                         if (cy.$(":selected").length > 0) {
                             cy.$(":selected").remove();
+                        }
+                      });
+
+                      $rootScope.$on('disableEndpoint', function(event, path){
+                        if (cy.elements("[path = '" + path + "']").length > 0) {
+                            cy.elements("[path = '" + path + "']").remove();
                         }
                       });
 
