@@ -118,7 +118,7 @@ define([
               $scope.resultNodes = response.data.entities.map(function(n) {
                   var result = {};
 
-                  result = { data: { id: n.data.id, parent: n.data.parent, name: n.data.name, image: n.data.image, desc: n.data.desc }};
+                  result = { data: { id: n.data.id, parent: n.data.parent, name: n.data.name, image: n.data.image, desc: n.data.desc, metadata: n.data.metadata, path: n.data.path }};
 
                   if (n.position) {
                     result['position'] = { x: n.position.x, y: n.position.y }
@@ -141,7 +141,7 @@ define([
               self.nodes = [];
 
               $scope.resultRelations = response.data.relations.map(function(n) {
-                  return {  data: { id: n.data.id, source: n.data.source, target: n.data.target, name: n.data.name } };
+                  return {  data: { id: n.data.id, source: n.data.source, target: n.data.target, name: n.data.name, path: n.data.path  } };
               });
 
               self.edges = [];

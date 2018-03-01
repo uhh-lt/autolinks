@@ -27,6 +27,7 @@ define([
                   $rootScope.activeService.push(service.path);
                 } else {
                   _.pull($rootScope.activeService, service.path);
+                  $rootScope.$broadcast('disableEndpoint', service.path);
                 }
                 // return $rootScope.listServices;
               },

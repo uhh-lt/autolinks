@@ -18,6 +18,22 @@
 
         <md-divider></md-divider>
 
+        <md-list-item class="md-1-line" ng-click="null">
+          <div class="md-list-item-text" layout="column" style="width: 100%;text-align: center">
+            <i class="fa fa-sign-in fa-2x" aria-hidden="true"></i>
+          </div>
+        </md-list-item>
+
+        <md-divider></md-divider>
+
+        <md-list-item class="md-1-line" ng-click="null">
+          <div class="md-list-item-text" layout="column" style="width: 100%;text-align: center">
+            <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+          </div>
+        </md-list-item>
+
+        <md-divider></md-divider>
+
         <md-subheader class="md-no-sticky"><h4>Service lists:</h4></md-subheader>
         <md-divider></md-divider>
         <div ng-repeat="list in lists">
@@ -41,7 +57,15 @@
           <md-divider></md-divider>
           <!-- <div> {{ setting.description }}</div> -->
         </div>
+
+        <md-list-item class="md-1-line" ng-click="null">
+          <div class="md-list-item-text" layout="column" style="width: 100%;text-align: center">
+            <i class="fa fa-cog fa-2x" aria-hidden="true"></i>
+          </div>
+        </md-list-item>
+
         <md-divider></md-divider>
+
 
       </md-list>
      </md-content>

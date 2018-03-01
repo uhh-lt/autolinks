@@ -25,7 +25,7 @@
            <md-input-container
             ng-if="selectedEntity !== 'createCompound'"
            >
-             <label for="testInput">Description</label>
+             <label for="testInput">Label</label>
              <textarea
                 ng-model="selectedEntity.data().desc"
                 md-autofocus
@@ -52,6 +52,10 @@
          <md-button ng-click="createCompound()" class="md-primary" ng-if="selectedEntity === 'createCompound'">
            Create
          </md-button>
+         <md-divider></md-divider>
+         <h3>Properties:<h3>
+         <pre id="propertify">
+         </pre>
        </md-content>
      </form>
      <md-toolbar class="md-scroll-shrink">

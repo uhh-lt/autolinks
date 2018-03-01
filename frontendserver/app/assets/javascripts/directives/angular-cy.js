@@ -422,160 +422,127 @@ define([
                         ]
                       });
 
-                      $rootScope.$on('addEntity', function(event, entity) {
-                        var nodes = scope.data.nodes;
-                        var edges = scope.data.edges;
-                        var newNode = [];
-                        var newEdge = [];
+                      function extractResource(n) {
+                        return n.value.subject;
+                      }
 
-                        function extractEntity(n, parent = null) {
+                      function extractList(n) {
+                        if (_.isArray(n[0].value)) {
+                          return extractList(n[0].value);
+                        }
+                        if(_.isObject(n[0].value)) {
+                          return n[0].value.subject;
+                        }
+                        return n[0].value;
+                      }
 
-                          let s = n.value.subject;
-                          let p = n.value.predicate;
-                          let o = n.value.object;
+                      function assignEntity(e, parent, child = false) {
+                        return {
+                          cid: e.cid,
+                          rid: e.rid,
+                          metadata: e.metadata,
+                          id: ( e.value + ( child ? '' : '_as_parent' ) + e.rid ).replace(/\s/g, ''),
+                          name: e.metadata.label ? e.metadata.label : e.value + '',
+                          parent: parent ? parent.id : null,
+                          path: scope.path
+                        };
+                      }
 
-                          function extractResource(n) {
-                            return n.value.subject;
+                      function assignRelation(r, subject, object) {
+                        return {
+                          group: "edges",
+                          data:
+                          {
+                            cid: r.cid,
+                            rid: r.rid,
+                            metadata: r.metadata,
+                            id: ( subject.id + object.id + r.rid ).replace(/\s/g, ''),
+                            source: (subject.id).replace(/\s/g, ''),
+                            target: (object.id).replace(/\s/g, ''),
+                            name: r.metadata.label ? r.metadata.label : r.value,
+                            path: scope.path
                           }
+                        };
+                      }
 
-                          function extractList(n) {
-                            if (_.isArray(n[0].value)) {
-                              return extractList(n[0].value);
-                            }
-                            if(_.isObject(n[0].value)) {
-                              return n[0].value.subject;
-                            }
-                            return n[0].value;
-                          }
+                      function extractEntity(n, parent = null) {
+                        let s = n.value.subject;
+                        let p = n.value.predicate;
+                        let o = n.value.object;
 
+                        if (_.isArray(s.value)) {
+                          var es = extractList(s.value);
+                          var subject = assignEntity(es, parent);
+                        } else if (_.isObject(s.value)) {
+                          var es = extractResource(s);
+                          var subject = assignEntity(es, parent);
+                        } else {
+                          var subject = assignEntity(s, parent, true);
+                        }
 
-                          if (_.isArray(s.value)) {
-                            var s1 = extractList(s.value);
-                            var subject = {
-                                cid: s1.cid,
-                                rid: s1.rid,
-                                metadata: s1.metadata,
-                                id: (s1.value + '_as_parent').replace(/\s/g, ''),
-                                name: s1.metadata.label ? s1.metadata.label : s1.value + '',
-                                parent: parent ? parent.id : null
-                            };
-                          } else if (_.isObject(s.value)) {
-                            var s1 = extractResource(s);
-                            var subject = {
-                                cid: s1.cid,
-                                rid: s1.rid,
-                                metadata: s1.metadata,
-                                id: (s1.value + '_as_parent').replace(/\s/g, ''),
-                                name: s1.metadata.label ? s1.metadata.label : s1.value + '',
-                                parent: parent ? parent.id : null
-                            };
-                          } else {
-                            var subject = {
-                                cid: s.cid,
-                                rid: s.rid,
-                                metadata: s.metadata,
-                                id: (s.value + '').replace(/\s/g, ''),
-                                name: s.metadata.label ? s.metadata.label : s.value + '',
-                                parent: parent ? parent.id : null
-                            };
-                          }
+                        if (_.isArray(o.value)) {
+                          var eo = extractList(o.value);
+                          var object = assignEntity(eo, parent);
+                        } else if (_.isObject(o.value)) {
+                          var eo = extractResource(o);
+                          var object = assignEntity(eo, parent);
+                        } else {
+                          var object = assignEntity(o, parent, true);
+                        }
 
-                          if (_.isArray(o.value)) {
-                            var o1 = extractList(o.value);
-                            debugger;
-                            var object = {
-                                cid: o1.cid,
-                                rid: o1.rid,
-                                metadata: o1.metadata,
-                                id: (o1.value + '_as_parent').replace(/\s/g, ''),
-                                name: o1.metadata.label ? o1.metadata.label : o1.value + '',
-                                parent: parent ? parent.id : null
-                            };
-                          } else if (_.isObject(o.value)) {
-                            var o1 = extractResource(o);
-                            var object = {
-                                cid: o1.cid,
-                                rid: o1.rid,
-                                metadata: o1.metadata,
-                                id: (o1.value + '_as_parent').replace(/\s/g, ''),
-                                name: o1.metadata.label ? o1.metadata.label : o1.value + '',
-                                parent: parent ? parent.id : null
-                            };
-                          } else {
-                            var object = {
-                                cid: o.cid,
-                                rid: o.rid,
-                                metadata: o.metadata,
-                                id: (o.value + '').replace(/\s/g, ''),
-                                name: o.metadata.label ? o.metadata.label : o.value + '',
-                                parent: parent ? parent.id : null
-                            };
-                          }
-
-                          if (_.isArray(p.value)) {
-                            var p1 = extractList(p.value);
-                            var edge = {
-                              group: "edges",
-                              data:
-                              {
-                                cid: p1.cid,
-                                rid: p1.rid,
-                                metadata: p1.metadata,
-                                id: ( subject.id + object.id ).replace(/\s/g, ''),
-                                source: (subject.id).replace(/\s/g, ''),
-                                target: (object.id).replace(/\s/g, ''),
-                                name: p1.metadata.label ? p1.metadata.label : p1.value
-                              }
-                            }
-                          } else {
-                            var edge = {
-                              group: "edges",
-                              data:
-                              {
-                                cid: p.cid,
-                                rid: p.rid,
-                                metadata: p.metadata,
-                                id: ( subject.id + object.id ).replace(/\s/g, ''),
-                                source: (subject.id).replace(/\s/g, ''),
-                                target: (object.id).replace(/\s/g, ''),
-                                name: p.metadata.label ? p.metadata.label : p.value
-                              }
-                            };
-                          };
-
-                          newEdge.push(edge);
-                          newNode.push(subject, object);
-
-                          if (_.isArray(s.value)) {
-                            _.forEach(s.value, function(n) {
-                              extractEntity(n, subject);
-                            });
-                          } else if (_.isObject(s.value)) {
-                            extractEntity(s, subject);
-                          };
-
-                          if (_.isArray(o.value)) {
-                            _.forEach(o.value, function(n) {
-                              extractEntity(n, object);
-                            });
-                          } else if (_.isObject(o.value)) {
-                            extractEntity(o, object);
-                          };
-
+                        if (_.isArray(p.value)) {
+                          var ep = extractList(p.value);
+                          var edge = assignRelation(ep, subject, object);
+                        } else if (_.isObject(p.value)) {
+                          var ep = extractResource(p);
+                          var edge = assignEntity(ep, parent);
+                        } else {
+                          var edge = assignRelation(p, subject, object);
                         };
 
-                        if (entity) {
+                        scope.newEdge.push(edge);
+                        scope.newNode.push(subject, object);
 
+                        if (_.isArray(s.value)) {
+                          _.forEach(s.value, function(n) {
+                            extractEntity(n, subject);
+                          });
+                        } else if (_.isObject(s.value)) {
+                          extractEntity(s, subject);
+                        };
+
+                        if (_.isArray(o.value)) {
+                          _.forEach(o.value, function(n) {
+                            extractEntity(n, object);
+                          });
+                        } else if (_.isObject(o.value)) {
+                          extractEntity(o, object);
+                        };
+                      };
+
+                      $rootScope.$on('addEntity', function(event, res) {
+                        var entity = res.entity;
+
+                        var nodes = scope.data.nodes;
+                        var edges = scope.data.edges;
+
+                        scope.path = res.data.endpoint.path;
+                        scope.newNode = [];
+                        scope.newEdge = [];
+
+                        if (entity) {
                           if (_.isArray(entity.value)) {
                             _.forEach(entity.value, function(n) {
                               extractEntity(n);
                             });
                           } else if (_.isObject(entity.value)) {
                             extractEntity(entity);
+                          } else {
+                            return;
                           }
 
                           var filterNode = [];
-                          _.forEach(_.uniqBy(newNode, 'id'), function(n) {
+                          _.forEach(_.uniqBy(scope.newNode, 'id'), function(n) {
                             filterNode.push({
                               group: 'nodes',
                               data: n,
@@ -587,13 +554,13 @@ define([
                           });
 
                           var n = cy.add(filterNode);
-                          var e = cy.add(newEdge);
+                          var e = cy.add(scope.newEdge);
 
                           nodeTipExtension(n);
                           edgeTipExtension(e);
 
                           scope.data.nodes = _.union(nodes, filterNode);
-                          scope.data.edges = _.union(edges, newEdge);
+                          scope.data.edges = _.union(edges, scope.newEdge);
                           cy.layout(scope.options.layout).run();
                         }
                       });
@@ -625,6 +592,12 @@ define([
                       $rootScope.$on('deleteEntity', function(){
                         if (cy.$(":selected").length > 0) {
                             cy.$(":selected").remove();
+                        }
+                      });
+
+                      $rootScope.$on('disableEndpoint', function(event, path){
+                        if (cy.elements("[path = '" + path + "']").length > 0) {
+                            cy.elements("[path = '" + path + "']").remove();
                         }
                       });
 
