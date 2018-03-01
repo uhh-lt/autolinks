@@ -13,35 +13,43 @@ function getLabel(callingModule) {
 
 module.exports = function(callingModule) {
 
-  const aModulesLabel = getLabel(callingModule);
-
+  if( callingModule === Object(callingModule) ){
+    const aModulesLabel = getLabel(callingModule);
+    return new (winston.Logger)({
+      transports: [
+        new (winston.transports.Console)({
+          level: loglevel,
+          prettyPrint: false,
+          colorize: true,
+          timestamp: true,
+          label: aModulesLabel
+        }),
+        new (winston.transports.File)({
+          level: 'debug',
+          maxsize:'10000000',
+          maxFiles: 10,
+          filename: path.resolve(global.__datadir && path.join(global.__datadir, 'server.log') || 'server.log'),
+          handleExceptions: true,
+          humanReadableUnhandledException: true,
+          timestamp: true,
+          json: false,
+          prettyPrint: false,
+          label: aModulesLabel,
+        })
+      ]
+    });
+  }
+  // else
   return new (winston.Logger)({
-
     transports: [
-
       new (winston.transports.Console)({
         level: loglevel,
         prettyPrint: false,
         colorize: true,
         timestamp: true,
-        label: aModulesLabel
-      }),
-
-      new (winston.transports.File)({
-        level: 'debug',
-        maxsize:'10000000',
-        maxFiles: 10,
-        filename: path.resolve(global.__datadir && path.join(global.__datadir, 'server.log') || 'server.log'),
-        handleExceptions: true,
-        humanReadableUnhandledException: true,
-        timestamp: true,
-        json: false,
-        prettyPrint: false,
-        label: aModulesLabel,
+        label: callingModule
       })
-
     ]
-
   });
 
 };

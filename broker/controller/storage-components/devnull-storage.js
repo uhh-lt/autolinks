@@ -11,13 +11,13 @@ module.exports = {
     logger.info('Initializing /dev/null storage.');
     callback(null);
   },
-  read : function read(username, storagekey, callback) {
+  read : function read(userid, storagekey, callback) {
     // generate some random data
     const triples = [
       {
         subject: 'Simon',
         predicate: 'is',
-        object: username,
+        object: userid,
       },
       {
         subject: 'Simon',
@@ -25,12 +25,12 @@ module.exports = {
         object: randowords(1)[0],
       }
     ];
-    logger.info(`cowsay ( ${username}, ${JSON.stringify(storagekey)} ) : ${JSON.stringify(triples)}`);
+    logger.info(`cowsay ( ${userid}, ${JSON.stringify(storagekey)} ) : ${JSON.stringify(triples)}`);
     return callback(null, triples);
   },
-  promisedRead: function(username, storagekey){
+  promisedRead: function(userid, storagekey){
     return new Promise((resolve, reject) => {
-      this.read(username, storagekey, (result, err) =>{
+      this.read(userid, storagekey, (result, err) =>{
         if(err){
           return reject(err);
         }
@@ -38,13 +38,13 @@ module.exports = {
       });
     });
   },
-  write : function write(username, storagekey, storagevalue, callback) {
-    logger.info(`echo ( ${username}, ${JSON.stringify(storagekey)}, ${JSON.stringify(storagevalue)} ) > /dev/null`);
+  write : function write(userid, storagekey, storagevalue, callback) {
+    logger.info(`echo ( ${userid}, ${JSON.stringify(storagekey)}, ${JSON.stringify(storagevalue)} ) > /dev/null`);
     return callback(null);
   },
-  promisedWrite: function(username, storagekey, storagevalue){
+  promisedWrite: function(userid, storagekey, storagevalue){
     return new Promise((resolve, reject) => {
-      this.write(username, storagekey, storagevalue, (result, err) =>{
+      this.write(userid, storagekey, storagevalue, (result, err) =>{
         if(err){
           return reject(err);
         }
@@ -52,9 +52,9 @@ module.exports = {
       });
     });
   },
-  info : function info(username, callback) {
+  info : function info(userid, callback) {
     logger.info('Getting dummy info.');
-    return callback(null, { user: username, keys: 4711 });
+    return callback(null, { user: userid, keys: 4711 });
   },
 };
 

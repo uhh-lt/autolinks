@@ -1,7 +1,7 @@
 'use strict';
 
 const
-  Exception = require('../../../../../broker/model/Exception'),
+  Exception = require('../../../../../broker/model/Exception').model,
   es = require('../../controller/es'),
   logger = require('../../../../../broker/controller/log'),
   request = require('request');
@@ -16,7 +16,7 @@ module.exports.ping = function (req, res, next) {
 
   es.ping(function(err){
     if(err) {
-      return Exception
+      return new Exception
         .fromError(err, 'Elasticsearch is not available.')
         .handleResponse(res)
         .end(next);

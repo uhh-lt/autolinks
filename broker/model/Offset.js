@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = Offset;
+module.exports.model = Offset;
 
 Offset.prototype.from = 0;
 Offset.prototype.length = 0;

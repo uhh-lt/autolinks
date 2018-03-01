@@ -1,5 +1,5 @@
 {
-  "name": "AutolinksBroker",
+  "name": "autolinks-broker",
   "version": "0.0.1",
   "private": true,
   "description": "",
@@ -9,10 +9,10 @@
   "main": "app.js",
   "dependencies": {
     "basic-auth": "^2.0.0",
-    "bcrypt": "^1.0.3",
     "events": "^1.1.1",
     "express": "^4.12.3",
     "lodash": "^4.17.4",
+    "murmurhash-native": "^3.2.2",
     "mysql": "^2.15.0",
     "node-cleanup": "^2.1.2",
     "passport": "^0.4.0",
@@ -31,6 +31,7 @@
     "supertest": "^1.0.0"
   },
   "scripts": {
+    "start": "node app.js",
     "test": "swagger project test"
   }
 }

@@ -2,7 +2,7 @@
 
 /* imports */
 const
-  Exception = require('../../model/Exception'),
+  Exception = require('../../model/Exception').model,
   request = require('request');
 
 module.exports.promisedRequest = function(requestObj){
