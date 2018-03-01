@@ -441,7 +441,7 @@ define([
                           cid: e.cid,
                           rid: e.rid,
                           metadata: e.metadata,
-                          id: ( e.value + ( child ? '' : '_as_parent' ) ).replace(/\s/g, ''),
+                          id: ( e.value + ( child ? '' : '_as_parent' ) + e.rid ).replace(/\s/g, ''),
                           name: e.metadata.label ? e.metadata.label : e.value + '',
                           parent: parent ? parent.id : null
                         };
@@ -455,7 +455,7 @@ define([
                             cid: r.cid,
                             rid: r.rid,
                             metadata: r.metadata,
-                            id: ( subject.id + object.id ).replace(/\s/g, ''),
+                            id: ( subject.id + object.id + r.rid ).replace(/\s/g, ''),
                             source: (subject.id).replace(/\s/g, ''),
                             target: (object.id).replace(/\s/g, ''),
                             name: r.metadata.label ? r.metadata.label : r.value
