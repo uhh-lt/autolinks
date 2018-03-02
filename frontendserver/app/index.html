@@ -22,7 +22,7 @@
         <script data-main="assets/javascripts/main.js" type="text/javascript" src="assets/javascripts/libs/requirejs/require.js"></script>
     </head>
 
-    <body layout="row" ng-controller="AppController as app" ngsf-fullscreen>
+    <body layout="row" ng-controller="AppController as app" ngsf-fullscreen flex>
       <div id="mainnav" ui-view="mainnav"></div>
       <!-- <div id="network-popUp">
         <span id="operation">node</span> <br>
@@ -35,7 +35,7 @@
         <input type="button" value="save" id="saveButton" />
         <input type="button" value="cancel" id="cancelButton" />
       </div> -->
-      <div id="wrapper" layout="column" ng-cloak layout-fill flex>
+      <div id="wrapper" layout="row" ng-cloak layout-fill flex>
         <!-- <div id="viewer" ui-view="viewer"></div> -->
         <span class="graphs">
             <main id="center-box-entity" resizable r-directions="['right']" r-flex="true" flex="none">
