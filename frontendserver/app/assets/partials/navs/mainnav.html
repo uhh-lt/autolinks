@@ -1,8 +1,8 @@
 <md-sidenav
   class="md-sidenav-left md-whiteframe-z2"
   md-component-id="left"
-  hide-print
-  md-is-locked-open="lockLeft && $mdMedia('gt-md')"
+  md-is-open="lockLeft"
+  md-disable-backdrop
   style="min-height: 100%; z-index: 999;"
 >
        <md-toolbar class="md-theme-light">
@@ -65,7 +65,6 @@
         </md-list-item>
 
         <md-divider></md-divider>
-
 
       </md-list>
      </md-content>
