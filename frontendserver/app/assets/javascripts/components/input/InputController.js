@@ -1,14 +1,18 @@
 define([
     'angular',
+    'ngMaterial'
 ], function(angular) {
     'use strict';
     /**
      * input module:
      * Input form for the text query
      */
-    angular.module('autolinks.input', []);
-    angular.module('autolinks.input')
+    angular.module('autolinks.input', ['ngMaterial'])
+    // angular.module('autolinks.input')
         // Network Controller
+        .config(['$mdIconProvider', function($mdIconProvider) {
+          $mdIconProvider.icon('md-close', 'img/icons/ic_close_24px.svg', 24);
+        }])
         .controller('InputController', ['$scope', 'EndPointService', 'EntityService', '_', function ($scope, EndPointService, EntityService, _) {
 
           /* This contains the JavaScript code for the 'commafield,' which is basically
@@ -19,6 +23,15 @@ define([
 
           // == HELPER FUNCTIONS == //
 
+          var self = this;
+
+          self.readonly = false;
+
+          // Lists of fruit names and Vegetable objects
+          self.chipNames = [];
+          self.roChipNames = angular.copy(self.chipNames);
+          self.editableChipNames = angular.copy(self.chipNames);
+
           $scope.listServices = EndPointService.fetchService();
 
           // An onclick function that removes the element clicked
@@ -27,6 +40,7 @@ define([
           }
 
           $scope.submit = function() {
+            console.log("wow");
             EndPointService.fetchService().then(function(response) {
               resetNetworkFromInput(response);
             });
@@ -36,9 +50,9 @@ define([
           function resetNetworkFromInput(response) {
             // Network should be reset
             var needsreset = true;
-            var cf = document.getElementsByClassName("commafield")[0];
+            // var cf = self.roChipNames;
             // Items entered.
-            var inputs = getItems(cf);
+            var inputs = (self.roChipNames.length > 0) ? self.roChipNames : [document.getElementsByClassName('md-input')[0].value];
 
             // If no input is given, prompt user to enter articles
             if (!inputs[0]) {
@@ -50,44 +64,46 @@ define([
 
             // for (var i=0; i<inputs.length; i++) {
             // if (_.includes(inputs, 'Simon')) {
-            EndPointService.annotateText(inputs[0]).then(function(response) {
+            _.forEach(inputs, function(i) {
+              EndPointService.annotateText(i).then(function(response) {
 
-                const annotations = response.data.annotations;
-                $scope.context = response.data
-                $scope.active = EndPointService.getActiveService();
+                  const annotations = response.data.annotations;
+                  $scope.context = response.data
+                  $scope.active = EndPointService.getActiveService();
 
-                _.forEach(annotations, function(anno) {
+                  _.forEach(annotations, function(anno) {
 
-                  const offsets = anno.doffset.offsets;
-                  _.forEach($scope.list, function(l) {
+                    const offsets = anno.doffset.offsets;
+                    _.forEach($scope.list, function(l) {
 
-                    $scope.serviceName = l.name;
-                    $scope.serviceVersion = l.version;
+                      $scope.serviceName = l.name;
+                      $scope.serviceVersion = l.version;
 
-                    _.forEach(l.endpoints, function(e) {
-                      if (_.includes($scope.active, e.path)) {
-                        $scope.data = {
-                          offsets:
-                          {
-                            from: offsets[0].from ? offsets[0].from : 0,
-                            length: offsets[0].length
-                          },
-                          context: $scope.context,
-                          name: $scope.serviceName,
-                          version: $scope.serviceVersion,
-                          endpoint: e
+                      _.forEach(l.endpoints, function(e) {
+                        if (_.includes($scope.active, e.path)) {
+                          $scope.data = {
+                            offsets:
+                            {
+                              from: offsets[0].from ? offsets[0].from : 0,
+                              length: offsets[0].length
+                            },
+                            context: $scope.context,
+                            name: $scope.serviceName,
+                            version: $scope.serviceVersion,
+                            endpoint: e
+                          };
+
+                          EndPointService.fetchData($scope.data).then(function(response) {
+                              EntityService.addEntity(response, $scope.data);
+                          });
                         };
 
-                        EndPointService.fetchData($scope.data).then(function(response) {
-                            EntityService.addEntity(response, $scope.data);
-                        });
-                      };
-
+                      });
                     });
                   });
-                });
-            });
+              });
 
+            });
 
             // }
               // getPageName(encodeURI(inputs[i]), addStart);
@@ -163,6 +179,7 @@ define([
                /* falls through */ // This comment exists to get JSHint to shut up
              // Comma (sans-Alt), Enter, or Tab was pressed.
              case 13:
+
              case 9:
                e.preventDefault(); // Stop normal action
                // Add item and clear input if anything besides whitespace was entered
