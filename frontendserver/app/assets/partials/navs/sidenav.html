@@ -30,7 +30,7 @@
               style="width:200px;"
             />
             <h4>"metadata" :  {</h4>
-            <div layout="row" layout-xs="column" style="text-align: center">
+            <div layout="row" layout-xs="column" class="metadata-inputs">
               <div flex>
                 key
               </div>
@@ -39,13 +39,36 @@
                 value
               </div>
             </div>
-            <div layout="row" layout-xs="column" style="text-align: center">
+            <div layout="row" layout-xs="column" class="metadata-inputs">
               <div flex>
                 <md-input-container>
                   <input
                      style="text-align: center"
                      readonly
-                     value="{{metadata_key[0]}}"
+                     value="{{metadata_keys[0]}}"
+                   >
+                 </input>
+               </md-input-container>
+              </div>
+              <div flex>
+                <md-input-container>
+                  <input
+                     ng-model="selectedEntity.data().metadata.label"
+                     md-autofocus
+                     ng-model-options="{ getterSetter: true, updateOn: 'default' }"
+                     style="text-align: center"
+                   >
+                 </input>
+               </md-input-container>
+              </div>
+            </div>
+            <div layout="row" layout-xs="column" class="metadata-inputs">
+              <div flex>
+                <md-input-container>
+                  <input
+                     style="text-align: center"
+                     readonly
+                     value="{{metadata_keys[0]}}"
                    >
                  </input>
                </md-input-container>
@@ -72,11 +95,14 @@
               </input>
              </md-input-container> -->
            <h4>}</h4>
-           <md-button ng-click="delete()" class="md-warn">
-             Delete
+           <md-button ng-click="add()" class="md-primary" style="min-width: 50px">
+             <i class="fa fa-plus-circle fa-2x"></i>
            </md-button>
            <md-button ng-click="update()" class="md-primary">
              Update
+           </md-button>
+           <md-button ng-click="delete()" class="md-warn">
+             Delete
            </md-button>
            <md-divider></md-divider>
            <h3>Properties:<h3>
