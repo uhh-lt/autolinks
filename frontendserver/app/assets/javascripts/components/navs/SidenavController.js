@@ -18,11 +18,11 @@ define([
               $scope.selectedEntity = EntityService.getRootScopeEntity();
               var entity = $scope.selectedEntity;
               if (entity._private) {
-                $scope.label = entity._private.data.name;
+                $scope.label = entity._private.data.metadata.label;
+                $scope.metadata_key = Object.keys($scope.selectedEntity.data('metadata'));
                 document.getElementById("propertify").innerHTML = JSON.stringify($scope.selectedEntity._private.data, undefined, 4);
               }
               console.log($scope.selectedEntity);
-
             }, 1000);
           };
 
@@ -42,18 +42,18 @@ define([
               const before = {
                 "rid": entity.data('rid'),
                 "cid": entity.data('cid'),
-                "metadata": entity.data('metadata') ? entity.data('metadata') : {},
-                "value": entity.data('value') ? entity.data('value') : {}
+                "metadata": entity.data('metadata') ? { label: $scope.label} : {}
+                // "value": entity.data('value') ? entity.data('value') : {}
               };
               const after = {
                 "rid": entity.data('rid'),
                 "cid": entity.data('cid'),
-                "metadata": $scope.selectedEntity.data().name ? { label: $scope.selectedEntity.data().name } : {},
-                "value": entity.data('value') ? entity.data('value') : {}
+                "metadata": entity.data('metadata') ? entity.data('metadata') : {}
+                // "value": entity.data('value') ? entity.data('value') : {}
               };
               const data = { before: before, after: after};
               EndPointService.editResource(data);
-
+              $mdSidenav('right').close();
               // $scope.selectedEntity = EntityService.updateRootScopeEntity($scope.selectedEntity);
               // // broadcasting the event
               // // $rootScope.$broadcast('appChanged');
