@@ -67,8 +67,6 @@
                 <md-input-container>
                   <input
                      style="text-align: center"
-                     readonly
-                     value="{{metadata_keys[0]}}"
                    >
                  </input>
                </md-input-container>
@@ -76,7 +74,6 @@
               <div flex>
                 <md-input-container>
                   <input
-                     ng-model="selectedEntity.data().metadata.label"
                      md-autofocus
                      ng-model-options="{ getterSetter: true, updateOn: 'default' }"
                      style="text-align: center"

@@ -16,9 +16,10 @@ define([
           $scope.init = function() {
             $timeout( function() {
               $scope.selectedEntity = EntityService.getRootScopeEntity();
-              var entity = $scope.selectedEntity;
+              const entity = $scope.selectedEntity;
               if (entity._private) {
-                $scope.metadata = entity._private.data.metadata;
+                const metadata = _.clone(entity._private.data.metadata);
+                $scope.metadata = metadata;
                 $scope.metadata_keys = Object.keys($scope.metadata);
                 document.getElementById("propertify").innerHTML = JSON.stringify($scope.selectedEntity._private.data, undefined, 4);
               }
