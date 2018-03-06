@@ -441,9 +441,9 @@ define([
                           cid: e.cid,
                           rid: e.rid,
                           metadata: e.metadata,
-                          id: ( e.value + ( child ? '' : '_as_parent' ) + e.rid ).replace(/\s/g, ''),
+                          id: ( e.value + ( child ? '' : '_as_parent' ) + e.rid + e.cid ).replace(/\s/g, ''),
                           name: e.value + '',
-                          parent: parent ? parent.id : null,
+                          parent: parent ? parent.id : scope.outermostId,
                           path: scope.path
                         };
                       }
@@ -531,11 +531,27 @@ define([
 
                         if (entity) {
                           if (_.isArray(entity.value)) {
+                            scope.outermostId = entity.rid;
                             _.forEach(entity.value, function(n) {
                               extractEntity(n);
                             });
+                            var resource = {
+                              id: entity.rid,
+                              name: entity.rid,
+                              metadata: entity.metadata,
+                              path: scope.path
+                            };
+                            scope.newNode.push(resource);
                           } else if (_.isObject(entity.value)) {
+                            scope.outermostId = entity.rid;
                             extractEntity(entity);
+                            var resource = {
+                              id: entity.rid,
+                              name: entity.rid,
+                              metadata: entity.metadata,
+                              path: scope.path
+                            };
+                            scope.newNode.push(resource);
                           } else {
                             return;
                           }
@@ -569,8 +585,7 @@ define([
                           $rootScope.$$listenerCount.addEdge = 0;
                           return;
                         } else {
-                          $rootScope.$on('addEdge', function(e){
-                            debugger;
+                          $rootScope.$on('addEdge', function(e) {
                             eh.enabled = true;
                             // eh.active = true;
                             var nodeId = scope.selectedEntity.data('id');

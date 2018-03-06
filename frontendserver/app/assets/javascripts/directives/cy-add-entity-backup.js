@@ -1,108 +1,123 @@
-$rootScope.$on('addEntity', function(event, entity){
+function extractResource(n) {
+  return n.value.subject;
+}
+
+function extractList(n) {
+  if (_.isArray(n[0].value)) {
+    return extractList(n[0].value);
+  }
+  if(_.isObject(n[0].value)) {
+    return n[0].value.subject;
+  }
+  return n[0].value;
+}
+
+function assignEntity(e, parent, child = false) {
+  return {
+    cid: e.cid,
+    rid: e.rid,
+    metadata: e.metadata,
+    id: ( e.value + ( child ? '' : '_as_parent' ) + e.rid ).replace(/\s/g, ''),
+    name: e.value + '',
+    parent: parent ? parent.id : null,
+    path: scope.path
+  };
+}
+
+function assignRelation(r, subject, object) {
+  return {
+    group: "edges",
+    data:
+    {
+      cid: r.cid,
+      rid: r.rid,
+      metadata: r.metadata,
+      id: ( subject.id + object.id + r.rid ).replace(/\s/g, ''),
+      source: (subject.id).replace(/\s/g, ''),
+      target: (object.id).replace(/\s/g, ''),
+      name: r.value,
+      path: scope.path
+    }
+  };
+}
+
+function extractEntity(n, parent = null) {
+  let s = n.value.subject;
+  let p = n.value.predicate;
+  let o = n.value.object;
+
+  if (_.isArray(s.value)) {
+    var es = extractList(s.value);
+    var subject = assignEntity(es, parent);
+  } else if (_.isObject(s.value)) {
+    var es = extractResource(s);
+    var subject = assignEntity(es, parent);
+  } else {
+    var subject = assignEntity(s, parent, true);
+  }
+
+  if (_.isArray(o.value)) {
+    var eo = extractList(o.value);
+    var object = assignEntity(eo, parent);
+  } else if (_.isObject(o.value)) {
+    var eo = extractResource(o);
+    var object = assignEntity(eo, parent);
+  } else {
+    var object = assignEntity(o, parent, true);
+  }
+
+  if (_.isArray(p.value)) {
+    var ep = extractList(p.value);
+    var edge = assignRelation(ep, subject, object);
+  } else if (_.isObject(p.value)) {
+    var ep = extractResource(p);
+    var edge = assignEntity(ep, parent);
+  } else {
+    var edge = assignRelation(p, subject, object);
+  };
+
+  scope.newEdge.push(edge);
+  scope.newNode.push(subject, object);
+
+  if (_.isArray(s.value)) {
+    _.forEach(s.value, function(n) {
+      extractEntity(n, subject);
+    });
+  } else if (_.isObject(s.value)) {
+    extractEntity(s, subject);
+  };
+
+  if (_.isArray(o.value)) {
+    _.forEach(o.value, function(n) {
+      extractEntity(n, object);
+    });
+  } else if (_.isObject(o.value)) {
+    extractEntity(o, object);
+  };
+};
+
+$rootScope.$on('addEntity', function(event, res) {
+  var entity = res.entity;
   var nodes = scope.data.nodes;
   var edges = scope.data.edges;
-  var newNode = [];
-  var newEdge = [];
+
+  scope.path = res.data.endpoint.path;
+  scope.newNode = [];
+  scope.newEdge = [];
 
   if (entity) {
-    _.forEach(entity, function(n) {
-      function extractEntity(n, parent = null) {
-        function extractSubject(n) {
-          if (_.isArray(n.subject)) {
-            return extractSubject(n.subject[0]);
-          }
-          return n;
-        }
-
-        function extractObject(n) {
-          if (_.isArray(n.object)) {
-            return extractSubject(n.object[0]);
-          }
-          return n;
-        }
-
-        function extractPredicate(n) {
-          if (_.isArray(n.predicate)) {
-            return extractSubject(n.predicate[0]);
-          }
-          return n;
-        }
-
-        if (_.isArray(n.subject)) {
-          var s = extractSubject(n);
-          var subject = {
-              id: (s.subject + '_as_parent').replace(/\s/g, ''),
-              name: s.subject,
-              parent: parent ? parent.id : null
-          };
-        } else {
-          var subject = {
-              id: (n.subject).replace(/\s/g, ''),
-              name: n.subject,
-              parent: parent ? parent.id : null
-          };
-        }
-
-        if (_.isArray(n.object)) {
-          var o = extractObject(n);
-          var object = {
-              id: (o.subject + '_as_parent').replace(/\s/g, ''),
-              name: o.subject,
-              parent: parent ? parent.id : null
-          };
-        } else {
-          var object = {
-              id: (n.object).replace(/\s/g, ''),
-              name: n.object,
-              parent: parent ? parent.id : null
-          };
-        }
-
-        if (_.isArray(n.predicate)) {
-          var p = extractPredicate(n);
-          var edge = {
-            group: "edges",
-            data:
-            {
-              id: ( subject.id + object.id ).replace(/\s/g, ''),
-              source: (subject.name).replace(/\s/g, ''),
-              target: (object.name).replace(/\s/g, ''),
-              name: p.subject
-            }
-          }
-        } else {
-          var edge = {
-            group: "edges",
-            data:
-            {
-              id: ( subject.id + object.id ).replace(/\s/g, ''),
-              source: (subject.name).replace(/\s/g, ''),
-              target: (object.name).replace(/\s/g, ''),
-              name: n.predicate
-            }
-          };
-        }
-
-        newEdge.push(edge);
-        newNode.push(subject, object);
-
-        if (_.isArray(n.subject)) {
-          _.forEach(n.subject, function(n) {
-            extractEntity(n, subject);
-          });
-        };
-
-        if (_.isArray(n.object)) {
-          _.forEach(n.object, function(n) {
-            extractEntity(n, object);
-          });
-        };
-      }
-      extractEntity(n);
-    });
+    if (_.isArray(entity.value)) {
+      _.forEach(entity.value, function(n) {
+        extractEntity(n);
+      });
+    } else if (_.isObject(entity.value)) {
+      extractEntity(entity);
+    } else {
+      return;
+    }
 
     var filterNode = [];
-    _.forEach(_.uniqBy(newNode, 'id'), function(n) {
+    _.forEach(_.uniqBy(scope.newNode, 'id'), function(n) {
       filterNode.push({
         group: 'nodes',
         data: n,
@@ -114,13 +129,13 @@ $rootScope.$on('addEntity', function(event, entity){
     });
 
     var n = cy.add(filterNode);
-    var e = cy.add(newEdge);
+    var e = cy.add(scope.newEdge);
 
     nodeTipExtension(n);
     edgeTipExtension(e);
 
     scope.data.nodes = _.union(nodes, filterNode);
-    scope.data.edges = _.union(edges, newEdge);
+    scope.data.edges = _.union(edges, scope.newEdge);
     cy.layout(scope.options.layout).run();
   }
 });
