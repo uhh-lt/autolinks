@@ -16,10 +16,11 @@ define([
           $scope.init = function() {
             $timeout( function() {
               $scope.selectedEntity = EntityService.getRootScopeEntity();
-              var entity = $scope.selectedEntity;
+              const entity = $scope.selectedEntity;
               if (entity._private) {
-                $scope.label = entity._private.data.metadata.label;
-                $scope.metadata_key = Object.keys($scope.selectedEntity.data('metadata'));
+                const metadata = _.clone(entity._private.data.metadata);
+                $scope.metadata = metadata;
+                $scope.metadata_keys = Object.keys($scope.metadata);
                 document.getElementById("propertify").innerHTML = JSON.stringify($scope.selectedEntity._private.data, undefined, 4);
               }
               console.log($scope.selectedEntity);
@@ -42,7 +43,7 @@ define([
               const before = {
                 "rid": entity.data('rid'),
                 "cid": entity.data('cid'),
-                "metadata": entity.data('metadata') ? { label: $scope.label} : {}
+                "metadata": $scope.metadata ? $scope.metadata : {}
                 // "value": entity.data('value') ? entity.data('value') : {}
               };
               const after = {
