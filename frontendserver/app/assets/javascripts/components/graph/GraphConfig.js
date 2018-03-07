@@ -101,7 +101,12 @@ define([
                     'background-fit': 'cover',
                     'content':
                       function(e) {
-                        return e.data('metadata').label ? e.data('metadata').label : e.data('name');
+                        if (e.data('metadata')) {
+                          if (e.data('metadata').label) {
+                            return e.data('metadata').label;
+                          }
+                        }
+                        return e.data('name');
                       },
                     'text-valign': 'bottom',
                     'color': 'rgba(35, 35, 35, 0.84)',
@@ -115,7 +120,12 @@ define([
                     'width': '2',
                     'content':
                       function(e) {
-                        return e.data('metadata').label ? e.data('metadata').label : (e.data('name') ? e.data('name') : 'has relation');
+                        if (e.data('metadata')) {
+                          if (e.data('metadata').label) {
+                            return e.data('metadata').label;
+                          }
+                        }
+                        return (e.data('name') ? e.data('name') : 'has relation');
                       },
                     'curve-style': 'bezier',
                     'target-arrow-shape': 'triangle',
