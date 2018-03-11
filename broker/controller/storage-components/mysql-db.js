@@ -122,11 +122,11 @@ module.exports.write = function (userid, storagekey, resourceList, callback) {
 module.exports.promisedWrite = function (userid, storagekey, resourceList) {
   // if storagekey is known check if a resource exists for it, otherwise save it.
   if (storagekey) {
-    this.getStorageResourceId(userid, storagekey)
+    return this.getStorageResourceId(userid, storagekey)
       .then(rid => {
         if (rid) {
           logger.debug(`Resource for storagekey '${storagekey}' and user with id '${userid}' was already stored, skipping write action.`);
-          return true;
+          return this.getResource(rid);
         }
         return this.saveNewResourceOrValue(resourceList, userid)
           .then(resource => this.saveStorageItem(userid, storagekey)

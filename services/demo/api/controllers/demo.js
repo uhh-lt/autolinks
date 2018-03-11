@@ -49,6 +49,10 @@ module.exports.demo = function(req, res, next) {
     // get the text for the offset
     const text = serviceParameter.focus.getText(serviceParameter.context.text) || 'Simon';
 
+    if(req.swagger.params.getkey.value){
+      return res.header('Content-Type', 'text/plain; charset=utf-8').end(text, next);
+    }
+
     let resource = new Resource(null, [
       new Resource(null, new Triple(new Resource(null, text), new Resource(null,'says'), new Resource(null,'hello')))
     ]);
