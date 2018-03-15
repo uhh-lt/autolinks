@@ -1,6 +1,18 @@
 module.exports = function(url, token, data) {
   const before = data.before;
-  const after = data.after;
+  let after = data.after;
+
+  if (after !== null) {
+    after = {
+      "after": {
+        "rid": after.rid,
+        "cid": after.cid,
+        "metadata": after.metadata ? after.metadata : {},
+        "value": after.value ? after.value : {}
+      }
+    };
+  }
+
   return {
     url: url + '/storage/editresource',
     method: 'POST',
@@ -18,12 +30,7 @@ module.exports = function(url, token, data) {
         "metadata": before.metadata ? before.metadata : {},
         "value": before.value ? before.value : {}
       },
-      "after": {
-        "rid": after.rid,
-        "cid": after.cid,
-        "metadata": after.metadata ? after.metadata : {},
-        "value": after.value ? after.value : {}
-      }
+      after
     }
   }
 }
