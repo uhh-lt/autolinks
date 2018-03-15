@@ -40,7 +40,6 @@ define([
           }
 
           $scope.submit = function() {
-            console.log("wow");
             EndPointService.fetchService().then(function(response) {
               resetNetworkFromInput(response);
             });

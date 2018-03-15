@@ -437,6 +437,14 @@ define([
                       }
 
                       function assignEntity(e, parent, child = false) {
+                        if ( parent === 'outermostParentEntity' ) {
+                          return {
+                              id: e.rid,
+                              name: e.rid,
+                              metadata: e.metadata,
+                              path: scope.path
+                          };
+                        }
                         return {
                           cid: e.cid,
                           rid: e.rid,
@@ -535,25 +543,17 @@ define([
                             _.forEach(entity.value, function(n) {
                               extractEntity(n);
                             });
-                            var resource = {
-                              id: entity.rid,
-                              name: entity.rid,
-                              metadata: entity.metadata,
-                              path: scope.path
-                            };
-                            scope.newNode.push(resource);
+                            var outermostEntity = assignEntity(entity, 'outermostParentEntity');
                           } else if (_.isObject(entity.value)) {
                             scope.outermostId = entity.rid;
                             extractEntity(entity);
-                            var resource = {
-                              id: entity.rid,
-                              name: entity.rid,
-                              metadata: entity.metadata,
-                              path: scope.path
-                            };
-                            scope.newNode.push(resource);
+                            var outermostEntity = assignEntity(entity, 'outermostParentEntity');
                           } else {
                             return;
+                          }
+
+                          if (outermostEntity) {
+                            scope.newNode.push(outermostEntity);
                           }
 
                           var filterNode = [];

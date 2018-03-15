@@ -1,16 +1,29 @@
 define([
     'angular',
-    'jquery'
+    'jquery',
+    'ngMaterial'
 ], function(angular, $) {
     'use strict';
     /**
      * Circlenav module:
      */
-    angular.module('autolinks.circlenav', []);
-    angular.module('autolinks.circlenav')
+    angular.module('autolinks.circlenav', ['ngMaterial'])
+    // angular.module('autolinks.circlenav')
         // Circlenav Controller
         .controller('CirclenavController', ['$scope', '$rootScope', '$mdSidenav', 'EntityService',
         function ($scope, $rootScope, $mdSidenav, EntityService) {
+
+         this.topDirections = ['left', 'up'];
+         this.bottomDirections = ['down', 'right'];
+
+         this.isOpen = false;
+
+         this.availableModes = ['md-fling', 'md-scale'];
+         this.selectedMode = 'md-fling';
+
+         this.availableDirections = ['up', 'down', 'left', 'right'];
+         this.selectedDirection = 'up';
+
 
           $scope.lockLeft = true;
 

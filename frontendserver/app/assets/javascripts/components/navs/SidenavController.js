@@ -38,19 +38,17 @@ define([
           // // add Edges to the edges object, then broadcast the change event
           $scope.update = function() {
               const entity = $scope.selectedEntity;
-              const label = $scope.label;
-
               const before = {
                 "rid": entity.data('rid'),
                 "cid": entity.data('cid'),
                 "metadata": $scope.metadata ? $scope.metadata : {}
-                // "value": entity.data('value') ? entity.data('value') : {}
+                // "value": entity.data('name') ? entity.data('name') : {}
               };
               const after = {
                 "rid": entity.data('rid'),
                 "cid": entity.data('cid'),
                 "metadata": entity.data('metadata') ? entity.data('metadata') : {}
-                // "value": entity.data('value') ? entity.data('value') : {}
+                // "value": entity.data('name') ? entity.data('name') : {}
               };
               const data = { before: before, after: after};
               EndPointService.editResource(data);
@@ -67,6 +65,18 @@ define([
           };
 
           $scope.delete = function(){
+              const entity = $scope.selectedEntity;
+              const label = $scope.label;
+
+              const before = {
+                "rid": entity.data('rid'),
+                "cid": entity.data('cid'),
+                "metadata": $scope.metadata ? $scope.metadata : {},
+                "value": entity.data('name') ? entity.data('name') : {}
+              };
+
+              const data = { before: before, after: null };
+              EndPointService.editResource(data);
               EntityService.deleteEntity();
               $mdSidenav('right').close();
           };
