@@ -10,8 +10,8 @@ define([
     angular.module('autolinks.circlenav', ['ngMaterial'])
     // angular.module('autolinks.circlenav')
         // Circlenav Controller
-        .controller('CirclenavController', ['$scope', '$rootScope', '$mdSidenav', 'EntityService',
-        function ($scope, $rootScope, $mdSidenav, EntityService) {
+        .controller('CirclenavController', ['$scope', '$rootScope', '$timeout', '$mdBottomSheet', '$mdToast', '$mdSidenav', 'EntityService',
+        function ($scope, $rootScope, $$timeout, $mdBottomSheet, $mdToast, mdSidenav, EntityService) {
 
          this.topDirections = ['left', 'up'];
          this.bottomDirections = ['down', 'right'];
@@ -23,6 +23,26 @@ define([
 
          this.availableDirections = ['up', 'down', 'left', 'right'];
          this.selectedDirection = 'up';
+
+         $scope.alert = '';
+
+         $scope.showGridBottomSheet = function() {
+           $scope.alert = '';
+           $mdBottomSheet.show({
+             templateUrl: '/app/assets/partials/bottom.html',
+             controller: 'BottomSheetController',
+             clickOutsideToClose: true
+           }).then(function(clickedItem) {
+             $mdToast.show(
+                   $mdToast.simple()
+                     .textContent(clickedItem['name'] + ' clicked!')
+                     .position('top right')
+                     .hideDelay(1500)
+                 );
+           }).catch(function(error) {
+             // User clicked outside or hit escape
+           });
+         };
 
 
           $scope.lockLeft = true;
