@@ -1,5 +1,6 @@
 define([
     'angular',
+    './components/bottom/BottomSheetController',
     './components/navs/CirclenavController',
     './components/navs/SidenavController',
     './components/navs/MainnavController',
@@ -18,7 +19,7 @@ define([
     'use strict';
 
     var app = angular.module('autolinks', [
-            'ui.layout', 'ui.router', 'ui.bootstrap', 'lodash', 'autolinks.graphConfig', 'autolinks.graph',
+            'ui.layout', 'ui.router', 'ui.bootstrap', 'lodash', 'autolinks.graphConfig', 'autolinks.bottom', 'autolinks.graph',
             'autolinks.input', 'autolinks.viewer', 'ngMaterial', 'autolinks.entityservice', 'autolinks.circlenav', 'autolinks.sidenav',
             'autolinks.mainnav', 'autolinks.endpointservice'
           ]);
