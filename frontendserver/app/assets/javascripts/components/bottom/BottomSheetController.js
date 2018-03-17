@@ -8,8 +8,12 @@ define([
      * BottomSheetController
      */
     angular.module('autolinks.bottom', ['ngMaterial'])
-        .controller('BottomSheetController', ['$scope', 'EndPointService', '$timeout', '$mdBottomSheet', '$mdToast', 'EntityService', '_',
-        function ($scope, EndPointService, $timeout, $mdBottomSheet, $mdToast, EntityService, _) {
+        .controller('BottomSheetController', ['$scope', '$rootScope', 'EndPointService', '$timeout', '$mdBottomSheet', '$mdToast', 'EntityService', '_',
+        function ($scope, $rootScope, EndPointService, $timeout, $mdBottomSheet, $mdToast, EntityService, _) {
+
+          $scope.closeChevron = function() {
+            $mdBottomSheet.hide();
+          };
 
            $scope.items = [
               { name: 'Fit', icon: 'fa fa-expand fa-2x' },
@@ -23,9 +27,24 @@ define([
 
             $scope.listItemClick = function($index) {
               var clickedItem = $scope.items[$index];
-              $mdBottomSheet.hide(clickedItem);
+              // if (clickedItem.name === 'Fit') {
+              //   $rootScope.$emit('centerGraph');
+              // }
+              switchBottomFunction(clickedItem);
+              // $mdBottomSheet.hide(clickedItem);
             };
 
+            function switchBottomFunction(clickedItem) {
+              switch (clickedItem.name) {
+                case 'Fit':
+                  $rootScope.$emit('centerGraph');
+                  break;
+                case 'Fix Layout':
+                  $rootScope.$emit('layoutReset');
+                default:
+
+              }
+            }
         }
       ]);
 });
