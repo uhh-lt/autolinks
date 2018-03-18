@@ -41,6 +41,26 @@ define([
                   break;
                 case 'Fix Layout':
                   $rootScope.$emit('layoutReset');
+                  break;
+                case 'Clear':
+                  $rootScope.$emit('clearAll');
+                case 'Add':
+                case 'Edit':
+                case 'Delete':
+                case 'Compound':
+                  if (cy.$(':selected').length > 0) {
+                    EntityService.openSideNav('createCompound');
+                  } else {
+                    $mdToast.show(
+                          $mdToast.simple()
+                            .textContent('Please select one or more node to be children')
+                            .position('top right')
+                            .theme("warn-toast")
+                            .hideDelay(3500)
+                        );
+                    console.log('Please select one or more node to be children');
+                  }
+                  break;
                 default:
 
               }
