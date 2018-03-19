@@ -30,19 +30,29 @@ public class CtakesController {
     // Reuse the pipeline for demo purposes
     private static AnalysisEngine pipeline;
 
-    @PostConstruct
-    public void init() throws ServletException {
-        AggregateBuilder aggregateBuilder;
-        try {
-            aggregateBuilder = Pipeline.getAggregateBuilder();
-            pipeline = aggregateBuilder.createAggregate();
-        } catch (Exception e) {
-            throw new ServletException(e);
-        }
-    }
+//    @PostConstruct
+//    public void init2() throws ServletException {
+//        AggregateBuilder aggregateBuilder;
+//        try {
+//            aggregateBuilder = Pipeline.getAggregateBuilder();
+//            pipeline = aggregateBuilder.createAggregate();
+//        } catch (Exception e) {
+//            throw new ServletException(e);
+//        }
+//    }
 
     @PostMapping("/analyse")
     public ResponseEntity analyse(@RequestBody MyRequest request) throws ServletException {
+        if(pipeline == null) {
+            AggregateBuilder aggregateBuilder;
+            try {
+                aggregateBuilder = Pipeline.getAggregateBuilder();
+                pipeline = aggregateBuilder.createAggregate();
+            } catch (Exception e) {
+                throw new ServletException(e);
+            }
+        }
+
         String text = request.getQuery();
         String result;
         MyAnalysis analysis;

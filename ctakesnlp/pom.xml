@@ -250,6 +250,7 @@
         </dependency>
     </dependencies>
     <build>
+        <finalName>ctakes-nlp</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
