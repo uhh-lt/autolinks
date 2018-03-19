@@ -13,7 +13,8 @@ define([
         .config(['$mdIconProvider', function($mdIconProvider) {
           $mdIconProvider.icon('md-close', 'img/icons/ic_close_24px.svg', 24);
         }])
-        .controller('InputController', ['$scope', 'EndPointService', 'EntityService', '_', function ($scope, EndPointService, EntityService, _) {
+        .controller('InputController', ['$scope', '$mdToast', '$mdSidenav', 'EndPointService', 'EntityService', '_',
+        function ($scope, $mdToast, $mdSidenav, EndPointService, EntityService, _) {
 
           /* This contains the JavaScript code for the 'commafield,' which is basically
           a tag input. It just gives visual feedback that inputs were 'registered' when a
@@ -40,6 +41,7 @@ define([
           }
 
           $scope.submit = function() {
+            debugger;
             EndPointService.fetchService().then(function(response) {
               resetNetworkFromInput(response);
             });
@@ -70,36 +72,48 @@ define([
                   $scope.context = response.data
                   $scope.active = EndPointService.getActiveService();
 
-                  _.forEach(annotations, function(anno) {
+                  if ($scope.active.length > 0) {
+                    _.forEach(annotations, function(anno) {
 
-                    const offsets = anno.doffset.offsets;
-                    _.forEach($scope.list, function(l) {
+                      const offsets = anno.doffset.offsets;
+                      _.forEach($scope.list, function(l) {
 
-                      $scope.serviceName = l.name;
-                      $scope.serviceVersion = l.version;
+                        $scope.serviceName = l.name;
+                        $scope.serviceVersion = l.version;
 
-                      _.forEach(l.endpoints, function(e) {
-                        if (_.includes($scope.active, e.path)) {
-                          $scope.data = {
-                            offsets:
-                            {
-                              from: offsets[0].from ? offsets[0].from : 0,
-                              length: offsets[0].length
-                            },
-                            context: $scope.context,
-                            name: $scope.serviceName,
-                            version: $scope.serviceVersion,
-                            endpoint: e
+                        _.forEach(l.endpoints, function(e) {
+                          if (_.includes($scope.active, e.path)) {
+                            $scope.data = {
+                              offsets:
+                              {
+                                from: offsets[0].from ? offsets[0].from : 0,
+                                length: offsets[0].length
+                              },
+                              context: $scope.context,
+                              name: $scope.serviceName,
+                              version: $scope.serviceVersion,
+                              endpoint: e
+                            };
+
+                            EndPointService.fetchData($scope.data).then(function(response) {
+                                EntityService.addEntity(response, $scope.data);
+                            });
                           };
 
-                          EndPointService.fetchData($scope.data).then(function(response) {
-                              EntityService.addEntity(response, $scope.data);
-                          });
-                        };
-
+                        });
                       });
                     });
-                  });
+                  } else {
+                    $mdToast.show(
+                          $mdToast.simple()
+                            .textContent('Please select a service path first')
+                            .position('top right')
+                            .theme("warn-toast")
+                            .hideDelay(3500)
+                        );
+                    $mdSidenav('left').toggle();
+                  }
+
               });
 
             });

@@ -22,9 +22,11 @@
          </md-chip-template>
 
        </md-chips>
-       <!-- <button id="submit" class="md-button md-primary md-raised md-button submit-button" type="button"> -->
+       <!-- <button id="submit" ng-click="submit()" type="button"> -->
          <!-- <span ng-click="submit()" class="">Go!</span> -->
-         <i class="fa fa-search fa-2x search-call" ng-click="submit()" aria-hidden="true" style="color: rgb(63,81,181)"></i>
+         <span ng-click="submit()">
+           <i class="fa fa-search fa-2x search-call"  aria-hidden="true" style="color: rgb(63,81,181)"></i>
+         </span>
        <!-- </button> -->
        <!-- <div class="errors" ng-messages="chipForm.chipName.$error">
          <div ng-message="md-max-chips">Maximum number of chips reached.</div>

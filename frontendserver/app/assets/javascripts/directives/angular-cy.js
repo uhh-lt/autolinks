@@ -645,6 +645,10 @@ define([
                           cy.layout(scope.options.layout).run();
                       });
 
+                      $rootScope.$on('clearAll', function(){
+                          cy.nodes().remove();
+                      });
+
                       $rootScope.$on('centerGraph', function(){
                           cy.fit();
                       });

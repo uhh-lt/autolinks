@@ -8,8 +8,12 @@ define([
      * BottomSheetController
      */
     angular.module('autolinks.bottom', ['ngMaterial'])
-        .controller('BottomSheetController', ['$scope', 'EndPointService', '$timeout', '$mdBottomSheet', '$mdToast', 'EntityService', '_',
-        function ($scope, EndPointService, $timeout, $mdBottomSheet, $mdToast, EntityService, _) {
+        .controller('BottomSheetController', ['$scope', '$rootScope', 'EndPointService', '$timeout', '$mdBottomSheet', '$mdToast', 'EntityService', '_',
+        function ($scope, $rootScope, EndPointService, $timeout, $mdBottomSheet, $mdToast, EntityService, _) {
+
+          $scope.closeChevron = function() {
+            $mdBottomSheet.hide();
+          };
 
            $scope.items = [
               { name: 'Fit', icon: 'fa fa-expand fa-2x' },
@@ -23,9 +27,48 @@ define([
 
             $scope.listItemClick = function($index) {
               var clickedItem = $scope.items[$index];
-              $mdBottomSheet.hide(clickedItem);
+              // if (clickedItem.name === 'Fit') {
+              //   $rootScope.$emit('centerGraph');
+              // }
+              switchBottomFunction(clickedItem);
+              // $mdBottomSheet.hide(clickedItem);
             };
 
+            function switchBottomFunction(clickedItem) {
+              switch (clickedItem.name) {
+                case 'Fit':
+                  $rootScope.$emit('centerGraph');
+                  break;
+                case 'Fix Layout':
+                  $rootScope.$emit('layoutReset');
+                  break;
+                case 'Clear':
+                  $rootScope.$emit('clearAll');
+                  break;
+                case 'Add':
+                  break;
+                case 'Edit':
+                  break;
+                case 'Delete':
+                  break;
+                case 'Compound':
+                  if (cy.$(':selected').length > 0) {
+                    EntityService.openSideNav('createCompound');
+                  } else {
+                    $mdToast.show(
+                          $mdToast.simple()
+                            .textContent('Please select one or more node to be children')
+                            .position('top right')
+                            .theme("warn-toast")
+                            .hideDelay(3500)
+                        );
+                    console.log('Please select one or more node to be children');
+                  }
+                  break;
+                default:
+
+              }
+            }
         }
       ]);
 });

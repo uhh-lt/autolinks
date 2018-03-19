@@ -15,6 +15,8 @@
 @background_color_10: #4677f8;
 @border_color_1: #d3d3d3;
 @border_color_2: #5394ed;
+@blue_material: rgb(63,81,181);
+@red_material: rgb(255,87,34);
 
 @import "input";
 @import "navs/circlenav";
@@ -50,6 +52,9 @@ html, body, .container, canvas {
 }
 #canvas {
 	z-index: 1 !important;
+}
+.md-grid-item-content:hover {
+	color: @blue_material;
 }
 .outer-canvas {
 	z-index: 2;
@@ -209,6 +214,12 @@ div.popupMenu {
 			}
 		}
 	}
+}
+
+md-toast.md-warn-toast-theme {
+    .md-toast-content {
+        background-color: @red_material;
+    }
 }
 
 .metadata-inputs {
