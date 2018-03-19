@@ -108,23 +108,14 @@ services:
 
   # START: ctakes-nlp
   ctakes-nlp:
-    container_name: ctakes_nlp
     build:
       context: ctakesnlp
       dockerfile: Dockerfile
     image: ctakes-nlp:latest
-    expose:
-      - 8080
     ports:
       - 8080:8080
     networks:
       - anet
-    working_dir: /opt/project
-    entrypoint:
-      - java
-      - -Djava.security.egd=file:/dev/./urandom
-      - -jar
-      - target/ctakes-nlp.jar
   # END: ctakes-nlp
 
   ##

@@ -18,7 +18,7 @@ COPY pom.xml /opt/project
 COPY . /opt/project
 
 RUN apt-get install -y maven
-RUN mvn package
-RUN mvn clean
+RUN mvn clean compile
+CMD ["mvn","spring-boot:run"]
 
-CMD ["java","-Djava.security.egd=file:/dev/./urandom","-jar","target/ctakes-nlp.jar"]
+# CMD ["java","-Djava.security.egd=file:/dev/./urandom","-jar","target/ctakes-nlp.jar"]
