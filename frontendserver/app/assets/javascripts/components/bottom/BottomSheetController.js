@@ -44,9 +44,13 @@ define([
                   break;
                 case 'Clear':
                   $rootScope.$emit('clearAll');
+                  break;
                 case 'Add':
+                  break;
                 case 'Edit':
+                  break;
                 case 'Delete':
+                  break;
                 case 'Compound':
                   if (cy.$(':selected').length > 0) {
                     EntityService.openSideNav('createCompound');
