@@ -221,7 +221,8 @@ module.exports.saveListResource = function (listResource, uid) {
       item_resources => {
         const item_rids = item_resources.map(r => r.rid);
         logger.debug(`Saved resources ${item_rids}.`);
-        return this.saveListResourceDescriptor(item_rids, uid)
+        const listResourceDescriptor = computeListResourceDescriptor(item_rids);
+        return this.saveListResourceDescriptor(listResourceDescriptor, uid)
           .then(desc_rid => {
             listResource.rid = desc_rid;
             item_resources.forEach(itemResource => propagateApplyCid(itemResource, listResource.rid));
@@ -255,9 +256,8 @@ function computeListResourceDescriptor(list_of_ints){
   return listResourceDescriptor;
 }
 
-module.exports.saveListResourceDescriptor = function (rids, uid) {
+module.exports.saveListResourceDescriptor = function (listResourceDescriptor, uid) {
   return new Promise((resolve, reject) => {
-    const listResourceDescriptor = computeListResourceDescriptor(rids);
     logger.debug(`Saving listResourceDesriptor '${listResourceDescriptor}' for user with id '${uid}'.`);
     promisedQuery('select get_or_add_listResource(?, ?) as rid', [listResourceDescriptor, uid]).then(
       res => {
