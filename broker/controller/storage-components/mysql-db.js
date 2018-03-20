@@ -122,11 +122,11 @@ module.exports.write = function (userid, storagekey, resourceList, callback) {
 module.exports.promisedWrite = function (userid, storagekey, resourceList) {
   // if storagekey is known check if a resource exists for it, otherwise save it.
   if (storagekey) {
-    this.getStorageResourceId(userid, storagekey)
+    return this.getStorageResourceId(userid, storagekey)
       .then(rid => {
         if (rid) {
           logger.debug(`Resource for storagekey '${storagekey}' and user with id '${userid}' was already stored, skipping write action.`);
-          return true;
+          return this.getResource(rid);
         }
         return this.saveNewResourceOrValue(resourceList, userid)
           .then(resource => this.saveStorageItem(userid, storagekey)
@@ -221,20 +221,45 @@ module.exports.saveListResource = function (listResource, uid) {
       item_resources => {
         const item_rids = item_resources.map(r => r.rid);
         logger.debug(`Saved resources ${item_rids}.`);
-        return this.saveListResourceDescriptor(item_rids, uid)
-          .then(desc_rid => {
-            listResource.rid = desc_rid;
-            item_resources.forEach(itemResource => propagateApplyCid(itemResource, listResource.rid));
-            listResource.value = item_resources;
-            return item_rids;
-          });
+        const listResourceDescriptor = computeListResourceDescriptor(item_rids);
+        // propagate listResourceDescriptor AND item_rids AND items
+        return { desc: listResourceDescriptor, items: item_resources, item_rids: item_rids };
       }
     ).then(
-      item_rids => Promise
-        .all(item_rids.map(item_rid => this.saveListResourceItem(listResource.rid, item_rid)))
-        .then(ignore_ => listResource) // return list resource
+      obj => {
+        // check if the listresource already exists before adding elements to it!
+        return promisedQuery('select * from userListResources where listdescriptor = ? and uid = ?', [obj.desc, uid]).then(
+          res => {
+            if(res.rows.length){
+              obj.rid = res.rows[0].rid;
+              logger.debug(`Listresource descriptor '${obj.desc}' for user '${uid}' already exists with id '${obj.rid}'.`);
+            }
+            return obj;
+          }
+        );
+      }
+    ).then(
+      obj => {
+        // if we don't have an rid for the listresource descriptor, save it and add the items to the list
+        if(!obj.rid){
+          return this.saveListResourceDescriptor(obj.desc, uid)
+            .then(desc_rid => {
+              listResource.rid = desc_rid;
+              obj.items.forEach(itemResource => propagateApplyCid(itemResource, listResource.rid));
+              listResource.value = obj.items;
+              return obj;
+            }).then(
+              obj => Promise
+                .all(obj.item_rids.map(item_rid => this.saveListResourceItem(listResource.rid, item_rid)))
+                .then(ignore_ => listResource) // return list resource
+            );
+        }
+        // otherwise load the resource, its items, and its metadata and skip the saving the list resource items as they might be different!
+        listResource.rid = obj.rid;
+        listResource.value = null;
+        return this.fillListResource(listResource).then(this.fillMetadata);
+      }
     );
-
 };
 
 function propagateApplyCid(resource, cid) {
@@ -247,10 +272,16 @@ function propagateApplyCid(resource, cid) {
   }
 }
 
-module.exports.saveListResourceDescriptor = function (rids, uid) {
+function computeListResourceDescriptor(list_of_ints){
+  // get a string representation
+  const listResourceDescriptorString = 'l:[' + list_of_ints.join(',') + ']';
+  // gte the hash representation
+  const listResourceDescriptor = murmurhashNative.murmurHash128x64(listResourceDescriptorString);
+  return listResourceDescriptor;
+}
+
+module.exports.saveListResourceDescriptor = function (listResourceDescriptor, uid) {
   return new Promise((resolve, reject) => {
-    const listResourceDescriptorString = 'l:[' + rids.join(',') + ']';
-    const listResourceDescriptor = murmurhashNative.murmurHash128x64(listResourceDescriptorString);
     logger.debug(`Saving listResourceDesriptor '${listResourceDescriptor}' for user with id '${uid}'.`);
     promisedQuery('select get_or_add_listResource(?, ?) as rid', [listResourceDescriptor, uid]).then(
       res => {
@@ -402,7 +433,7 @@ module.exports.fillMetadata = function (resource) {
 };
 
 module.exports.getStorageResourceId = function (uid, storagekey) {
-  return promisedQuery('select s2r.rid as rid from storageItems s, storageItemToResource s2r where s2r.sid = s.sid and s.storagekey = ? and s.uid = uid', [storagekey, uid])
+  return promisedQuery('select s2r.rid as rid from storageItems s, storageItemToResource s2r where s2r.sid = s.sid and s.storagekey = ? and s.uid = ?', [storagekey, uid])
     .then(res => {
       if (!res.rows.length) {
         logger.debug(`Storage item '${storagekey}' for user with id '${uid}' does not exist`);
