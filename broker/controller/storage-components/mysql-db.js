@@ -247,10 +247,17 @@ function propagateApplyCid(resource, cid) {
   }
 }
 
+function computeListResourceDescriptor(list_of_ints){
+  // get a string representation
+  const listResourceDescriptorString = 'l:[' + list_of_ints.join(',') + ']';
+  // gte the hash representation
+  const listResourceDescriptor = murmurhashNative.murmurHash128x64(listResourceDescriptorString);
+  return listResourceDescriptor;
+}
+
 module.exports.saveListResourceDescriptor = function (rids, uid) {
   return new Promise((resolve, reject) => {
-    const listResourceDescriptorString = 'l:[' + rids.join(',') + ']';
-    const listResourceDescriptor = murmurhashNative.murmurHash128x64(listResourceDescriptorString);
+    const listResourceDescriptor = computeListResourceDescriptor(rids);
     logger.debug(`Saving listResourceDesriptor '${listResourceDescriptor}' for user with id '${uid}'.`);
     promisedQuery('select get_or_add_listResource(?, ?) as rid', [listResourceDescriptor, uid]).then(
       res => {
