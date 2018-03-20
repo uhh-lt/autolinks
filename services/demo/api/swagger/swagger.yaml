@@ -124,7 +124,7 @@ definitions:
 tags:
   - name: Demo
     description: Everything about the service
-  - name: Restricted
+  - name: Demo Restricted
     description: Paths that require a username
   - name: Maintenance
     description: Everything about the service maintenance and its connection to the autolinks broker
@@ -167,7 +167,6 @@ paths:
       operationId: foo
       tags:
         - Demo
-        - Restricted
       description: Another example service method
       parameters:
         - name: data
@@ -196,7 +195,6 @@ paths:
       operationId: bar
       tags:
         - Demo
-        - Restricted
       description: A service that has no parameter and always returns the same data
       parameters:
         - name: getkey
@@ -219,8 +217,7 @@ paths:
     post:
       operationId: baz
       tags:
-        - Demo
-        - Restricted
+        - Demo Restricted
       description: A service that needs a username (autorization needs to be done elsewhere)
       parameters:
         - name: username
