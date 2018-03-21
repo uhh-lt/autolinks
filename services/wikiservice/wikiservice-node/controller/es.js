@@ -77,19 +77,30 @@ module.exports.search = function(text) {
 
   // module.exports.query(esIndices[i], text, 0, 2);
 
-  const indexResources = esIndices.map(esindex => new Resource(null, [], null, { label: esindex }));
-  return Promise.resolve(indexResources)
-    .then(resources => {
-      resources.push(new Resource (null, text));
-      return new Resource(null, resources);
+  return Promise.all(
+    esIndices.map(esindex => {
+      return this.query(esindex, text, 0, 2)
+        .then(esresult => this.transformSearchResult(esindex, text, esresult));
+    })).then(indexresources => {
+      indexresources.push(new Resource (null, text));
+      return new Resource(null, indexresources);
     });
 };
 
-module.exports.transformSearchResults = function(text, searchResult) {
+module.exports.transformSearchResult = function(esindex, text, esresult) {
+  return Promise.all(
+    esresult.hits.hits.map((hit, i) => this.transformHit(text, hit, i))
+  ).then(
+    hitresources => new Resource(null, hitresources, null, { label: esindex, hits: esresult.hits.total })
+  );
+};
 
-  searchResult.hits.hits.map(hit => {
+module.exports.transformHit = function(text, hit, i) {
+  return Promise.resolve(hit)
+    .then(hit => {
+      return "test:" + i;
+    });
 
-  });
 
 
   // // for each hit create a triple
@@ -184,13 +195,13 @@ module.exports.query = function(index, text, offset, limit){
   };
   logger.debug('Query: ', queryBody);
 
-  esClient.search({
+  return esClient.search({
     index: index,
     body: queryBody
   }).then(
     result => {
       logger.debug(`Found ${result.hits.total} hits for '${index}', returning ${limit}.`);
-      return this.transformSearchResults(text, result);
+      return result;
     }
   );
 };

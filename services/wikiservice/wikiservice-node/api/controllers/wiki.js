@@ -10,7 +10,7 @@ const
 
 module.exports.findArticles = function(req, res, next) {
 
-  return ServiceParameter.fromRequest(req).then(
+  return ServiceParameter.fromRequestPromise(req).then(
     serviceParameter => {
       // get the text for the offset
       const text = serviceParameter.focus.getText(serviceParameter.context.text);
@@ -21,34 +21,21 @@ module.exports.findArticles = function(req, res, next) {
       }
 
       // query elastic search
-      res.header('Content-Type', 'application/json; charset=utf-8');
-
-      // es.search(
-      //   text,
-        // function(err, result){
-        //   if (err) {
-        //     const exc = Exception.fromError(err, 'Failed to query elasticsearch.', { serviceParameter : serviceParameter, text : text });
-        //     logger.warn(exc.message, exc);
-        //     return exc.handleResponse(res).end(next);
-        //   }
-        //
-        //   res.json(result);
-        //
-        //   writtenAtLeastOneResult = true;
-        //
-        // },
-        // function(err){
-        //   if(err){
-        //     const exc = Exception.fromError(err, 'Failed to finalize querying elasticsearch.', { serviceParameter : serviceParameter, text : text });
-        //     logger.warn(exc.message, exc);
-        //     exc.handleResponse(res);
-        //   }
-        //   res.end(next);
-        // }
-      // );
-      res.end(next);
-  },
-  err => Exception.handleErrorResponse(err, res).end(next)
+      return es.search(text)
+        .then(
+          resource => {
+            // res.header('Content-Type', 'application/json; charset=utf-8');
+            res.json(resource);
+            return res.end(next);
+          },
+          err => {
+            const exc = Exception.fromError(err, 'Failed to query elasticsearch.', { serviceParameter : serviceParameter, text : text });
+            logger.warn(exc.message, exc);
+            return exc.handleResponse(res).end(next);
+          }
+        );
+    },
+    err => Exception.handleErrorResponse(err, res).end(next)
   );
 
 };
