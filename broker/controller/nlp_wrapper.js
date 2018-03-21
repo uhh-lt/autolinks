@@ -6,7 +6,7 @@
 const logger = require('./log')(module);
 
 const explicitNLP = (() => {
-  switch (process.env.NER) {
+  switch (process.env.NLP) {
     case 'corenlp':
       logger.info('Using CoreNLP');
       return require('./nlp-components/CoreNLP')({
@@ -19,8 +19,8 @@ const explicitNLP = (() => {
       });
     case 'stupid':
     default:
-      logger.info('Using StupidNER');
-      return require('./nlp-components/StupidNER');
+      logger.info('Using StupidNLP');
+      return require('./nlp-components/StupidNLP');
   }
 })();
 

@@ -19,8 +19,9 @@ function Resource(rid, value, cid, metadata) {
   this.value = value;
   this.cid = cid;
   if(!metadata) {
-    this.metadata = {};
+    metadata = {};
   }
+  this.metadata = metadata;
 }
 
 Resource.prototype.resolve = function(){

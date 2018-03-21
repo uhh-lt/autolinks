@@ -66,69 +66,98 @@ module.exports.ping = function(callback){
 
 /**
  *
+ * Perform a query for each index and return the results as a ListResource
+ *
  * @param text
- * @param callback
- * @param callbackDone
+ * @return {Promise} of a Resource
  */
-module.exports.search = function(text, itemCallback, callbackDone) {
-  (function searchRecursive(i){
-    module.exports.query(esIndices[i], text, 0, 2, itemCallback, () => {
-      if(i > 0) {
-        return searchRecursive(i-1);
-      }
-      return callbackDone(null);
+module.exports.search = function(text) {
+
+  // Promise.resolve(combined);
+
+  // module.exports.query(esIndices[i], text, 0, 2);
+
+  return Promise.all(
+    esIndices.map(esindex => {
+      return this.query(esindex, text, 0, 2)
+        .then(esresult => this.transformSearchResult(esindex, text, esresult));
+    })).then(indexresources => {
+      indexresources.push(new Resource (null, text));
+      return new Resource(null, indexresources);
     });
-  })(esIndices.length-1);
 };
 
-module.exports.transformSearchResults = function(text, searchResult){
-  // for each hit create a triple
-  return _(searchResult.hits.hits)
-    .map(h =>
-      new Resource(null,
-        new Triple(
-            new Resource(null,text),
-            new Resource(null, [
-              new Resource(null, new Triple(
-                  new Resource(null, "appears_in"),
-                  new Resource(null, "has_score"),
-                  new Resource(null, h._score)
-              )),
-              new Resource(null, new Triple(
-                  new Resource(null, "appears_in"),
-                  new Resource(null, "has_index"),
-                  new Resource(null, h._index)
-              ))
-            ]),
-            new Resource(null, [
-              new Resource(null, new Triple(
-                  new Resource(null, h._id),
-                  new Resource(null, "has_title"),
-                  new Resource(null, h._source.title)
-              ))
-              ]
-              .concat(
-                _(h._source.category).map(c =>
-                    new Resource(null, new Triple(
-                        new Resource(null, h._id),
-                        new Resource(null, "has_category"),
-                        new Resource(null, c)
-                    ))
-                ).value()
-              )
-              .concat(
-                _(h._source.redirect).map(r =>
-                    new Triple(
-                        h._id,
-                        'has_redirect',
-                        r.title
-                    )
-                ).value()
-              )
-            )
-          )
-        )
-      ).value();
+module.exports.transformSearchResult = function(esindex, text, esresult) {
+  return Promise.all(
+    esresult.hits.hits.map((hit, i) => this.transformHit(text, hit, i+1))
+  ).then(
+    hitresources => new Resource(null, hitresources, null, { label: esindex, totalhits: esresult.hits.total })
+  );
+};
+
+module.exports.transformHit = function(text, hit, i) {
+  return Promise.resolve(hit)
+    .then(hit => {
+      const hitresource = new Resource(null, hit._id, null, {
+        id: hit._id,
+        label: hit._source.title,
+        hit: i,
+        index: hit._index,
+        score: hit._score,
+      });
+
+      const redirectResources = []; // h._source.redirect
+      const categoryResources = []; // h._source.category
+      return hitresource;
+    });
+
+  // // for each hit create a triple
+  // return _(searchResult.hits.hits)
+  //   .map(h =>
+  //     new Resource(null,
+  //       new Triple(
+  //           new Resource(null,text),
+  //           new Resource(null, [
+  //             new Resource(null, new Triple(
+  //                 new Resource(null, "appears_in"),
+  //                 new Resource(null, "has_score"),
+  //                 new Resource(null, h._score)
+  //             )),
+  //             new Resource(null, new Triple(
+  //                 new Resource(null, "appears_in"),
+  //                 new Resource(null, "has_index"),
+  //                 new Resource(null, h._index)
+  //             ))
+  //           ]),
+  //           new Resource(null, [
+  //             new Resource(null, new Triple(
+  //                 new Resource(null, h._id),
+  //                 new Resource(null, "has_title"),
+  //                 new Resource(null, h._source.title)
+  //             ))
+  //             ]
+  //             .concat(
+  //               _(h._source.category).map(c =>
+  //                   new Resource(null, new Triple(
+  //                       new Resource(null, h._id),
+  //                       new Resource(null, "has_category"),
+  //                       new Resource(null, c)
+  //                   ))
+  //               ).value()
+  //             )
+  //             .concat(
+  //               _(h._source.redirect).map(r =>
+  //                   new Triple(
+  //                       h._id,
+  //                       'has_redirect',
+  //                       r.title
+  //                   )
+  //               ).value()
+  //             )
+  //           )
+  //         )
+  //       )
+  //     ).value();
 };
 
 /**
@@ -158,30 +187,29 @@ module.exports.get = function(index, type, id, callback){
 
 /**
  * @param index
- * @param query
- * @param callback
+ * @param text
+ * @param offset from
+ * @param limit limit
  */
-module.exports.query = function(index, text, offset, limitResults, itemCallback, callbackDone){
+module.exports.query = function(index, text, offset, limit){
+  // define the es query
   const query = { query_string: { query: `title:(${text})` } };
   // const query = { term : { title : text } };
   const queryBody = {
     query : query,
     from : offset,
-    size : limitResults,
+    size : limit,
     _source: ['title', 'category', 'redirect']
   };
   logger.debug('Query: ', queryBody);
 
-  esClient.search({
-    index: index, //esIndices, //index
+  return esClient.search({
+    index: index,
     body: queryBody
-  }).catch (
-    err => callbackDone(err, null)
-  ).then(
+  }).then(
     result => {
-      logger.debug(`Found ${result.hits.total} hits for '${index}', returning ${limitResults}.`);
-      this.transformSearchResults(text, result)
-        .forEach(triple => itemCallback(null, triple));
+      logger.debug(`Found ${result.hits.total} hits for '${index}', returning ${limit}.`);
+      return result;
     }
-  ).then(r => callbackDone(null, r));
+  );
 };
