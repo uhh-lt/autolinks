@@ -1,6 +1,8 @@
 define([
     'angular',
     './components/bottom/BottomSheetController',
+    './components/carousel/CarouselController',
+    './components/dialog/UploadFileController',
     './components/navs/CirclenavController',
     './components/navs/SidenavController',
     './components/navs/MainnavController',
@@ -14,13 +16,15 @@ define([
     'ui-layout',
     'ui-router',
     'ui-bootstrap',
-    'ngMaterial'
+    'ngSanitize',
+    'ngMaterial',
+    'ngTouch'
 ], function (angular) {
     'use strict';
 
     var app = angular.module('autolinks', [
-            'ui.layout', 'ui.router', 'ui.bootstrap', 'lodash', 'autolinks.graphConfig', 'autolinks.bottom', 'autolinks.graph',
-            'autolinks.input', 'autolinks.viewer', 'ngMaterial', 'autolinks.entityservice', 'autolinks.circlenav', 'autolinks.sidenav',
+            'ui.layout', 'ui.router', 'ui.bootstrap', 'lodash', 'autolinks.graphConfig', 'autolinks.bottom', 'autolinks.upload', 'autolinks.carousel', 'autolinks.graph',
+            'autolinks.input', 'autolinks.viewer', 'ngMaterial', 'ngTouch', 'autolinks.entityservice', 'autolinks.circlenav', 'autolinks.sidenav',
             'autolinks.mainnav', 'autolinks.endpointservice'
           ]);
 
@@ -28,6 +32,10 @@ define([
         $stateProvider
         .state('layout', {
             views: {
+                'carousel': {
+                  templateUrl: 'assets/partials/carousel.html',
+                  controller: 'CarouselController'
+                },
                 'circlenav': {
                   templateUrl: 'assets/partials/navs/circlenav.html',
                   controller: 'CirclenavController'
