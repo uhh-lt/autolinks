@@ -179,7 +179,17 @@ module.exports.saveNewResourceOrValue = function (resourceOrValue, uid, cid) {
       return resolve(this.saveStringResource(resource, uid));
     }
     reject(new Error('This is impossible, a resource has to be one of {list,triple,string}.'));
-  }).then(this.fillMetadata);
+  }).then(
+    resource => {
+      // fill with metadata if it existed before, otherwise save metadata!
+      const metadata_before = this.getMetadata(resource.rid);
+      if(metadata_before && Object.keys(metadata_before).length > 0){
+        return this.fillMetadata(resource);
+      }
+      // else
+      this.updateMetadata(resource.rid, {}, resource.metadata);
+      return resource;
+    });
 };
 
 /**
@@ -257,7 +267,7 @@ module.exports.saveListResource = function (listResource, uid) {
         // otherwise load the resource, its items, and its metadata and skip the saving the list resource items as they might be different!
         listResource.rid = obj.rid;
         listResource.value = null;
-        return this.fillListResource(listResource).then(this.fillMetadata);
+        return this.fillListResource(listResource);
       }
     );
 };
@@ -380,7 +390,7 @@ module.exports.getResource = function (rid, cid) {
       }
       throw new Error('This is impossible, a resource has to be one of {list,triple,string}.');
     })
-    .then(this.fillMetadata);
+    .then(resource => this.fillMetadata(resource));
 };
 
 module.exports.fillStringResource = function (resource) {
@@ -422,10 +432,14 @@ module.exports.fillListResource = function (resource) {
     });
 };
 
-module.exports.fillMetadata = function (resource) {
-  return promisedQuery('select * from resourceMetadata where rid = ?', [resource.rid])
+module.exports.getMetadata = function (rid) {
+  return promisedQuery('select * from resourceMetadata where rid = ?', [rid])
     .then(res => res.rows.map(r => Object({ key: r.mkey, val: r.mvalue })))
-    .then(kvps => kvps.reduce((acc, kvp) => { acc[kvp.key] = kvp.val; return acc; }, {}))
+    .then(kvps => kvps.reduce((acc, kvp) => { acc[kvp.key] = kvp.val; return acc; }, {}));
+};
+
+module.exports.fillMetadata = function (resource) {
+  return this.getMetadata(resource.rid)
     .then(metadata => {
       resource.metadata = metadata;
       return resource;

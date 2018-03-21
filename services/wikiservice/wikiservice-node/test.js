@@ -7,32 +7,28 @@ es.init(function(err){
   console.log(err);
 });
 
-es.ping(function(err){
-  console.log(err);
-});
 
-// console.log('Search1:');
-// es.search('jaguar', function(err, result){
-//   console.log(err);
-//   console.log(result);
-// }, (e) => {});
-
-
-console.log('Search2:');
+console.log('Search1:');
 const text = 'Jaguar';
-es.search(
-  text,
-  function(err, result){
-    if(result){
-      console.log(es.transformSearchResults(text, result));
-    }
-  },
-  function(err){
-    if(err){
-      console.log(err);
-    }
-  }
-);
+es.search(text)
+  .then(r => JSON.stringify(r, null, 2))
+  .then(console.log, console.error);
+
+// es.search(
+//   text,
+//   (err, result) => {
+//     if(result){
+//       console.log(es.transformSearchResults(text, result));
+//     }
+//   },
+//   (err) => {
+//     if(err){
+//       console.log(err);
+//     }
+//   }
+// );
+
+// module.exports.query('enwiki', text, 0, 2, ,
 
 
 

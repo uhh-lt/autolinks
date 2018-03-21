@@ -5,7 +5,7 @@
 ##
 swagger: '2.0'
 info:
-  version: '0.0.1'
+  version: '0.0.2'
   title: Wiki
   description: |
     Autolinks Wikiservice. Give access to wikimedia indices:
@@ -19,16 +19,18 @@ produces:
   - application/json
 
 definitions:
+  # helper object to describe strings, arrays, or objects
+  Any:
+    description: 'Can be anything: string, number, array, object, etc.'
 
-  # Objects used as parameters
   ServiceParameter:
     type: object
     properties:
-      focus: 
+      focus:
         $ref: '#/definitions/DOffset'
       context:
         $ref: '#/definitions/Analysis'
-        
+
   # NLP related objects
   Analysis:
     type: object
@@ -39,10 +41,6 @@ definitions:
         type: string
       lang:
         type: string
-      availabletypes:
-        type: array
-        items:
-          type: string
       annotations:
         type: array
         items:
@@ -77,26 +75,6 @@ definitions:
       length:
         type: integer
 
-  # Objects related to required return types
-  Triple:
-    type: object
-    properties:
-      subject:
-        type: object
-        description: the subject of the triple is either a string or a triple
-      predicate:
-        type: object
-        description: the predicate of the triple is either a string or a triple
-      object:
-        type: object
-        description: the object of the triple is either a string or a triple
-        
-  Triples:
-    type: array
-    description: a list of triples
-    items:
-      $ref: '#/definitions/Triple'
-
   Resource:
     type: object
     properties:
@@ -110,8 +88,7 @@ definitions:
         type: object
         description: some metadata the resource, e.g. label
       value:
-        type: object
-        description: the actual value of the resource, this is either a string, or a list of resources, or a triple
+        $ref: '#/definitions/Any'
 
   # in case of error return this object schema
   Exception:
@@ -129,8 +106,6 @@ definitions:
 tags:
   - name: Wiki
     description: Everything about the service
-  - name: Restricted
-    description: Paths that require a username
   - name: Maintenance
     description: Everything about the service maintenance and its connection to the autolinks broker
 
@@ -151,6 +126,11 @@ paths:
           description: The service parameter
           schema:
             $ref: '#/definitions/ServiceParameter'
+        - name: getkey
+          in: query
+          description: Compute and only return storagekey based on the ServiceParameter
+          type: boolean
+          allowEmptyValue: true
       responses:
         200:
           description: Success

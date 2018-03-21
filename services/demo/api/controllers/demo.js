@@ -54,7 +54,7 @@ module.exports.demo = function(req, res, next) {
     }
 
     let resource = new Resource(null, [
-      new Resource(null, new Triple(new Resource(null, text), new Resource(null,'says'), new Resource(null,'hello')))
+      new Resource(null, new Triple(new Resource(null, text, null, {aka: 'Simon'}), new Resource(null,'says'), new Resource(null,'hello')))
     ]);
 
     if(text.replace(/(\s|-)+/g,'').toLocaleLowerCase() === 'bcell') {
