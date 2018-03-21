@@ -89,19 +89,27 @@ module.exports.search = function(text) {
 
 module.exports.transformSearchResult = function(esindex, text, esresult) {
   return Promise.all(
-    esresult.hits.hits.map((hit, i) => this.transformHit(text, hit, i))
+    esresult.hits.hits.map((hit, i) => this.transformHit(text, hit, i+1))
   ).then(
-    hitresources => new Resource(null, hitresources, null, { label: esindex, hits: esresult.hits.total })
+    hitresources => new Resource(null, hitresources, null, { label: esindex, totalhits: esresult.hits.total })
   );
 };
 
 module.exports.transformHit = function(text, hit, i) {
   return Promise.resolve(hit)
     .then(hit => {
-      return "test:" + i;
+      const hitresource = new Resource(null, hit._id, {
+        id: hit._id,
+        label: hit._source.title,
+        hit: i,
+        index: hit._index,
+        score: hit._score,
+      });
+
+      const redirectResources = []; // h._source.redirect
+      const categoryResources = []; // h._source.category
+      return hitresource;
     });
-
-
 
   // // for each hit create a triple
   // return _(searchResult.hits.hits)
