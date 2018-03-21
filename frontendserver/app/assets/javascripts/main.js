@@ -8,11 +8,13 @@
 			'angular': 'libs/angular/angular.min',
 			'jquery': 'libs/jquery/dist/jquery.min',
 			'jquery-json': 'libs/jquery-json/dist/jquery.json.min',
-			'ngAnimate': 'libs/angular-animate/angular-animate',
-			'ngAria': 'libs/angular-aria/angular-aria',
+			'ngAnimate': 'libs/angular-animate/angular-animate.min',
+      'ngTouch': 'libs/angular-touch/angular-touch.min',
+			'ngAria': 'libs/angular-aria/angular-aria.min',
 			'ngMaterial': 'libs/angular-material/angular-material.min',
 			'bootstrap': 'libs/bootstrap/dist/js/bootstrap.min',
 			'ui-bootstrap': 'libs/angular-bootstrap/ui-bootstrap-tpls.min',
+      'ngSanitize': 'libs/angular-sanitize/angular-sanitize.min',
 			'ui-layout': 'libs/angular-ui-layout/src/ui-layout',
 			'ui-router': 'libs/angular-ui-router/release/angular-ui-router.min',
       'lodash': 'libs/lodash/lodash',
@@ -50,6 +52,10 @@
 				exports: 'angular',
 				deps: ['angular']
 			},
+      'ngTouch': {
+        exports: 'angular',
+        deps: ['angular']
+      },
 			'ngAria': {
 				exports: 'angular',
 				deps: ['angular']
@@ -60,6 +66,10 @@
 			'ui-bootstrap': {
 				deps: ['angular', 'bootstrap', 'ngAnimate']
 			},
+      'ngSanitize': {
+        exports: 'angular',
+        deps: ['angular']
+      },
 			'ui-router': {
 				exports: 'angular',
 				deps: ['angular']

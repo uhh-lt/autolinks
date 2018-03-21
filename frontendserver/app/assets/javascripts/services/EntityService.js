@@ -4,7 +4,8 @@ define([
 ], function (angular) {
     'use strict';
     angular.module('autolinks.entityservice', ['ngMaterial'])
-        .factory('EntityService', ['$rootScope', '$mdSidenav', '$mdComponentRegistry', '$timeout', function ($rootScope, $mdSidenav, $mdComponentRegistry, $timeout) {
+        .factory('EntityService', ['$rootScope', '$mdSidenav', '$mdComponentRegistry', '$timeout', 'EndPointService',
+        function ($rootScope, $mdSidenav, $mdComponentRegistry, $timeout, EndPointService) {
             var entityScope = null;
             $rootScope.entity = {};
             return {
@@ -19,6 +20,10 @@ define([
                   $mdSidenav('right').open();
                 // });
                 }, 100);
+              },
+
+              updateEntity: function(before, after) {
+
               },
 
               getRootScopeEntity: function() {

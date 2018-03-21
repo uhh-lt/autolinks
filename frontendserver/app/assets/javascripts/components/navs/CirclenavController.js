@@ -10,8 +10,8 @@ define([
     angular.module('autolinks.circlenav', ['ngMaterial'])
     // angular.module('autolinks.circlenav')
         // Circlenav Controller
-        .controller('CirclenavController', ['$scope', '$rootScope', '$timeout', '$mdBottomSheet', '$mdToast', '$mdSidenav', 'EntityService',
-        function ($scope, $rootScope, $$timeout, $mdBottomSheet, $mdToast, mdSidenav, EntityService) {
+        .controller('CirclenavController', ['$scope', '$rootScope', '$timeout', '$mdBottomSheet', '$mdToast', '$mdDialog', '$mdSidenav', 'EntityService',
+        function ($scope, $rootScope, $$timeout, $mdBottomSheet, $mdToast, $mdDialog, mdSidenav, EntityService) {
 
          this.topDirections = ['left', 'up'];
          this.bottomDirections = ['down', 'right'];
@@ -44,6 +44,23 @@ define([
            }).catch(function(error) {
              // User clicked outside or hit escape
            });
+         };
+
+
+         $scope.uploadFile = function(ev){
+           $mdDialog.show({
+              controller: 'UploadFileController',
+              templateUrl: '/app/assets/partials/dialog/uploadFile.html',
+              parent: angular.element(document.body),
+              targetEvent: ev,
+              clickOutsideToClose:true,
+              fullscreen: $scope.customFullscreen // Only for -xs, -sm breakpoints.
+            })
+            .then(function(answer) {
+              $scope.status = 'You said the information was "' + answer + '".';
+            }, function() {
+              $scope.status = 'You cancelled the dialog.';
+            });
          };
 
 
@@ -92,11 +109,12 @@ define([
           };
 
           $scope.toggleSidenav = function() {
-            if (window.innerWidth > 1280) {
-              $rootScope.$emit('toggleMainnav');
-            } else {
-              $mdSidenav('left').toggle();
-            }
+            $rootScope.$emit('toggleMainnav');
+            // if (window.innerWidth > 1280) {
+            //   $rootScope.$emit('toggleMainnav');
+            // } else {
+            //   $mdSidenav('left').toggle();
+            // }
           };
         }
       ]);
