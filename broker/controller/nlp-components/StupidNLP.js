@@ -67,6 +67,49 @@ module.exports = {
 
   },
 
+  /**
+   *
+   * Returns sentences which end with {.?!} followed by a space character.
+   *
+   * @param analysis
+   * @param callbackStart
+   * @param callbackIter
+   * @param callbackDone
+   *
+   */
+  getSentences : function(analysis, callbackStart, callbackIter, callbackDone) {
+
+    logger.debug(`Analyzing document: '${analysis.source}'.`);
+
+    // report that we'll start returning entities now
+    callbackStart();
+
+    let offset_start = 0; // this will the begin of a sentence
+    let matchResult; // this will be updated with the current match
+    const r = /[.?!]+((\s+)|($))/g; // look simply for one of the standard sentence boundaries {.?!} followed by a empty space
+
+    while ( (matchResult = r.exec(analysis.text)) ) { // while we have the end of a sentence
+      const boundary = matchResult[0];
+      const offset_end = matchResult.index + boundary.trim().length;
+      const sentence = analysis.text.substring(offset_start, offset_end);
+      const anno = new Annotation();
+      anno.analyzer = label;
+      anno.type = 'Sentence';
+      anno.doffset.offsets.push(new Offset(offset_start, offset_end));
+      anno.properties.surface = sentence;
+      anno.properties.type = 'UNK';
+      logger.debug(`Found a sentence: '${offset_start}:${offset_end}:${sentence}'.`, anno);
+      // return the sentence
+      callbackIter(null, anno);
+      offset_start = matchResult.index + boundary.length; // continue searching for the next end of a sentence from the found match begin index + its length
+      // r.lastIndex = offset_start;
+    }
+
+    // report that we're done
+    callbackDone();
+
+  },
+
   analyze : function(text, contentType, source, callback) {
     const ana = new Analysis();
     ana.text = text;
@@ -74,6 +117,7 @@ module.exports = {
     logger.info({text: text, contentType: contentType, source: source});
 
     // currently ignores errors completely
+    this.getSentences(ana, () => {}, (err, anno) => {ana.annotations.push(anno);}, () => {});
     this.findNamedEntities(ana, () => {}, (err, anno) => {ana.annotations.push(anno);}, () => {});
 
     callback(null, ana);
