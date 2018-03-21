@@ -98,7 +98,7 @@ module.exports.transformSearchResult = function(esindex, text, esresult) {
 module.exports.transformHit = function(text, hit, i) {
   return Promise.resolve(hit)
     .then(hit => {
-      const hitresource = new Resource(null, hit._id, {
+      const hitresource = new Resource(null, hit._id, null, {
         id: hit._id,
         label: hit._source.title,
         hit: i,
