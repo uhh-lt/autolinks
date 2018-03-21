@@ -19,6 +19,11 @@ module.exports.findArticles = function(req, res, next) {
     // get the text for the offset
     const text = serviceParameter.focus.getText(serviceParameter.context.text);
 
+    // if we're only asked for the key return it now!
+    if(req.swagger.params.getkey.value){
+      return res.header('Content-Type', 'text/plain; charset=utf-8').end(text, next);
+    }
+
     // query elastic search
     res.header('Content-Type', 'application/json; charset=utf-8');
     let writtenAtLeastOneResult = false;
