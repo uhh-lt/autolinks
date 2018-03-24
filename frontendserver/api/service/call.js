@@ -30,7 +30,26 @@ module.exports = function(url, token, data) {
             }
           ]
         },
-        "context": context
+        "context": {
+          "text": context.text,
+          "source": "string",
+          "lang": "string",
+          "annotations": [
+            {
+              "type": "string",
+              "doffset": {
+                "offsets": [
+                  {
+                    "from": 0,
+                    "length": 0
+                  }
+                ]
+              },
+              "properties": {},
+              "analyzer": "string"
+            }
+          ]
+        }
       }
     }
   }
