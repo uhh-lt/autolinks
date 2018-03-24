@@ -12,13 +12,17 @@ define([
      */
     angular.module('autolinks.carousel', ['ngAnimate', 'ngSanitize', 'ui.bootstrap', 'ngTouch'])
         // Viewer Controller
-        .controller('CarouselController', ['$scope', '$mdDialog', '$timeout', '$sce', function ($scope, $mdDialog, $timeout, $sce) {
+        .controller('CarouselController', ['$scope', '$rootScope', 'EndPointService', '$mdDialog', '$timeout', '$sce', '_',
+        function ($scope, $rootScope, EndPointService, $mdDialog, $timeout, $sce, _) {
 
           $scope.myInterval = 5000;
           $scope.noWrapSlides = true;
           $scope.active = 0;
-          var slides = $scope.slides = [];
-          var currIndex = 0;
+          $scope.isActive = false;
+          $scope.pages = 0;
+
+          $scope.slides = [];
+          $scope.currIndex = 0;
 
           var text1 = "The leftist-populist Chavez will make his 13th visit to Cuba since taking power in 1999 to sit his personal friend, Castro. At the Latin American School of Medicine, Chavez will";
 
@@ -26,12 +30,12 @@ define([
 
           var text3 = "The two presidents have challenged Washington to demand the extradition of a common foe: anti-Castro militant Luis Posada Carriles. He was arrested in the United States by immigration";
 
-          $scope.addSlide = function() {
-            var newWidth = 600 + slides.length + 1;
-            slides.push({
+          $scope.addSlide = function(text) {
+            // var newWidth = 600 + $scope.slides.length + 1;
+            $scope.slides.push({
               // image: '//unsplash.it/' + newWidth + '/300',
-              texts: [$sce.trustAsHtml(text1),$sce.trustAsHtml(text2),text3],
-              id: currIndex++
+              texts: [$sce.trustAsHtml(text)],
+              id: $scope.currIndex++
             });
           };
 
@@ -53,9 +57,29 @@ define([
             assignNewIndexesToSlides(indexes);
           };
 
-          for (var i = 0; i < 4; i++) {
-            $scope.addSlide();
+          $scope.resetSlides = function() {
+            $scope.slides = [];
+            $scope.currIndex = 0;
+            $scope.active = 0;
           }
+
+          // for (var i = 0; i < 4; i++) {
+          //   $scope.addSlide(sentence.properties.surface);
+          // }
+
+          $rootScope.$on('activateTextCarousel', function(event, data) {
+              $scope.resetSlides();
+              $scope.isActive = true;
+              EndPointService.annotateText(data).then(function(response) {
+                debugger;
+                var anno = response.data.annotations;
+                var sentences = anno.filter(a => a.type === 'Sentence');
+                // $scope.pages = sentences.length;
+                _.forEach(sentences, function(sentence){
+                  $scope.addSlide(sentence.properties.surface);
+                });
+              });
+          });
 
           // Instantiate the Bootstrap carousel
           // $('.multi-item-carousel').carousel({
