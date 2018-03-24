@@ -1,12 +1,14 @@
-<div id="carousel-region">
+<div id="carousel-region" ng-if="isActive">
   <div uib-carousel active="active" data-interval="false" no-wrap="noWrapSlides" ng-swipe-left="changeSlide('left')"
       ng-swipe-right="changeSlide('right')" class="multi-item-carousel">
     <div uib-slide ng-repeat="slide in slides track by slide.id" index="slide.id" class="carousel-card">
-      <md-card id="text-card" style="text-align: justify; height: 200px; overflow-y: auto;" ng-repeat="text in slide.texts">
-        <md-content-card style="height: 200px; overflow-y: auto;" >
-        <div ng-bind-html="text"></div>
-        </md-content-card>
-      </md-card>
+      <div id="text-card-div" ng-repeat="text in slide.texts">
+        <md-card id="text-card">
+          <md-content-card>
+            <div ng-bind-html="text"></div>
+          </md-content-card>
+        </md-card>
+      </div>
     </div>
   </div>
 </div>
