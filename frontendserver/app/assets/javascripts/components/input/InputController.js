@@ -68,7 +68,7 @@ define([
               EndPointService.annotateText(i).then(function(response) {
 
                   const annotations = response.data.annotations;
-                  $scope.context = response.data
+                  $scope.context = response.data;
                   $scope.active = EndPointService.getActiveService();
 
                   if ($scope.active.length > 0) {

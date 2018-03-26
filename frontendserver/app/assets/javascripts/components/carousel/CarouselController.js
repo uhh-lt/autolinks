@@ -12,8 +12,8 @@ define([
      */
     angular.module('autolinks.carousel', ['ngAnimate', 'ngSanitize', 'ui.bootstrap', 'ngTouch'])
         // Viewer Controller
-        .controller('CarouselController', ['$scope', '$rootScope', 'EndPointService', '$mdDialog', '$timeout', '$sce', '_',
-        function ($scope, $rootScope, EndPointService, $mdDialog, $timeout, $sce, _) {
+        .controller('CarouselController', ['$scope', '$rootScope', 'EntityService', 'EndPointService', '$mdDialog', '$timeout', '$sce', '_', '$mdToast', '$mdSidenav',
+        function ($scope, $rootScope, EntityService, EndPointService, $mdDialog, $timeout, $sce, _, $mdToast, $mdSidenav) {
 
           $scope.myInterval = 5000;
           $scope.noWrapSlides = true;
@@ -74,14 +74,75 @@ define([
           function createNeHighlight(id, name) {
               // var color = graphProperties.options['groups'][typeId]['color']['background'];
               var color = 'blue';
-              var addFilter = '<a id='+ id +' ng-click="addEntityFilter(' + id +')" context-menu="contextMenu" style="text-decoration: none;">' + name + '</a>';
-              var innerElement = '<span ng-style="{ padding: 0, margin: 0, \'text-decoration\': none, \'border-bottom\': \'3px solid ' + color + '\'}">' + addFilter + '</span>';
+              var addFilter = '<a id='+ id +' ng-click="addEntityFilter(' + id +')" context-menu="contextMenu" style="text-decoration: none;" class="entityHighlight">' + name + '</a>';
+              var innerElement = '<span style="padding: 0; margin: 0; text-decoration: none; border-bottom: 3px solid ' + color + ';">' + addFilter + '</span>';
               // innerElement.className = 'highlight-general';
               // addFilter.append(document.createTextNode(name));
               // innerElement.append(addFilter);
               return innerElement;
           }
 
+          $scope.addEntityFilter = function(name) {
+            EndPointService.fetchService().then(function(response) {
+              $scope.list = response.data;
+
+              EndPointService.annotateText(name).then(function(response) {
+                const annotations = response.data.annotations;
+                $scope.context = response.data;
+                $scope.active = EndPointService.getActiveService();
+
+                if ($scope.active.length > 0) {
+                  _.forEach(annotations, function(anno) {
+
+                    const offsets = anno.doffset.offsets;
+                    _.forEach($scope.list, function(l) {
+
+                      $scope.serviceName = l.name;
+                      $scope.serviceVersion = l.version;
+
+                      _.forEach(l.endpoints, function(e) {
+                        if (_.includes($scope.active, e.path)) {
+                          $scope.data = {
+                            offsets:
+                            {
+                              from: offsets[0].from ? offsets[0].from : 0,
+                              length: offsets[0].length
+                            },
+                            context: $scope.context,
+                            name: $scope.serviceName,
+                            version: $scope.serviceVersion,
+                            endpoint: e
+                          };
+
+                          EndPointService.fetchData($scope.data).then(function(response) {
+                              EntityService.addEntity(response, $scope.data);
+                          });
+                        };
+
+                      });
+                    });
+                  });
+                } else {
+                  $mdToast.show(
+                        $mdToast.simple()
+                          .textContent('Please select a service path first')
+                          .position('top right')
+                          .theme("warn-toast")
+                          .hideDelay(3500)
+                      );
+                  $mdSidenav('left').toggle();
+                }
+
+              });
+            });
+          };
+
+          $(document).on('click', '.entityHighlight', function (e) {
+              var text = e.target.innerText;
+              $scope.addEntityFilter(text);
+              console.log(text);
+              e.preventDefault();
+          });
 
           $scope.changeSlide = function (direction) {
             var index = $scope.active;
