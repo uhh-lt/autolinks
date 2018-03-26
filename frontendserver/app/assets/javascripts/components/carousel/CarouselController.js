@@ -30,14 +30,58 @@ define([
 
           var text3 = "The two presidents have challenged Washington to demand the extradition of a common foe: anti-Castro militant Luis Posada Carriles. He was arrested in the United States by immigration";
 
-          $scope.addSlide = function(text) {
+          $scope.addSlide = function(sentence, entity) {
             // var newWidth = 600 + $scope.slides.length + 1;
+            $scope.sentenceFrom = sentence.doffset.offsets[0].from;
+            $scope.sentenceTo = sentence.doffset.offsets[0].length
+
+            var text = sentence.properties.surface;
+            var offset = 0;
+            var compiledString = "";
+
+            entity.forEach(function(e) {
+                var from = e.doffset.offsets[0].from - $scope.sentenceFrom;
+                var to = (e.doffset.offsets[0].from + e.doffset.offsets[0].length) - $scope.sentenceFrom;
+                var fragments = text.slice(offset, from).split('\n');
+                var surface = e.properties.surface;
+                var eId = ($scope.currIndex) + surface;
+
+                fragments.forEach(function(f, i) {
+                    compiledString = compiledString.concat(f);
+                    if(fragments.length > 1 && i != fragments.length - 1) compiledString = compiledString.concat('<br />');
+                });
+
+                var highlightElement = undefined;
+
+                highlightElement = createNeHighlight(eId, surface);
+                // Append marked element to DOM
+                // var compiledElement = $compile(highlightElement)(scope);
+                compiledString = compiledString.concat(highlightElement);
+                // Move the cursor
+                offset = _.has(e, 'nested') && e.nested.end > e.end ? e.nested.end : to;
+            });
+
+            compiledString = compiledString.concat(text.slice(offset, text.length));
+
             $scope.slides.push({
               // image: '//unsplash.it/' + newWidth + '/300',
-              texts: [$sce.trustAsHtml(text)],
-              id: $scope.currIndex++
+              texts: [$sce.trustAsHtml(compiledString)],
+              id: $scope.currIndex++,
+              entity: entity
             });
           };
+
+          function createNeHighlight(id, name) {
+              // var color = graphProperties.options['groups'][typeId]['color']['background'];
+              var color = 'blue';
+              var addFilter = '<a id='+ id +' ng-click="addEntityFilter(' + id +')" context-menu="contextMenu" style="text-decoration: none;">' + name + '</a>';
+              var innerElement = '<span ng-style="{ padding: 0, margin: 0, \'text-decoration\': none, \'border-bottom\': \'3px solid ' + color + '\'}">' + addFilter + '</span>';
+              // innerElement.className = 'highlight-general';
+              // addFilter.append(document.createTextNode(name));
+              // innerElement.append(addFilter);
+              return innerElement;
+          }
+
 
           $scope.changeSlide = function (direction) {
             var index = $scope.active;
@@ -49,7 +93,7 @@ define([
                 $scope.active = (index >= ($scope.slides.length - 1) ? ($scope.slides.length - 1) : index + 1);
                 return;
             }
-        };
+          };
 
 
           $scope.randomize = function() {
@@ -71,12 +115,27 @@ define([
               $scope.resetSlides();
               $scope.isActive = true;
               EndPointService.annotateText(data).then(function(response) {
-                debugger;
-                var anno = response.data.annotations;
-                var sentences = anno.filter(a => a.type === 'Sentence');
+
+                $scope.anno = response.data.annotations;
+                var sentences = $scope.anno.filter(a => a.type === 'Sentence');
+                // $scope.entity = anno.filter(a => a.type ==='NamedEntity')
                 // $scope.pages = sentences.length;
                 _.forEach(sentences, function(sentence){
-                  $scope.addSlide(sentence.properties.surface);
+                  var entity = [];
+                  var length = sentence.doffset.offsets[0].length;
+                  // var surface = sentence.properties.surface;
+
+                  if (length) {
+                    var from = sentence.doffset.offsets[0].from;
+                    from = from === undefined ? (sentence.doffset.offsets[0].from = 0) : from;
+                  }
+                  entity = $scope.anno.filter(a => (
+                    (a.type === 'NamedEntity') &&
+                    ((a.doffset.offsets[0].from + a.doffset.offsets[0].length) <= length) &&
+                    (a.doffset.offsets[0].from >= from)
+                  ));
+                  debugger;
+                  $scope.addSlide(sentence, entity);
                 });
               });
           });
