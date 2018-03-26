@@ -473,7 +473,7 @@ define([
                         };
                       }
 
-                      function extractEntity(n, parent = null) {
+                      function extractTripleResources(n, parent = null) {
                         let s = n.value.subject;
                         let p = n.value.predicate;
                         let o = n.value.object;
@@ -526,6 +526,29 @@ define([
                         } else if (_.isObject(o.value)) {
                           extractEntity(o, object);
                         };
+                      }
+
+                      function extractEntity(n, parent = null) {
+                        if (_.isArray(n.value)) {
+                          if (n.value.length > 0) {
+                            _.forEach(n.value, function(e) {
+                              n.value = 'parent';
+                              var subject = assignEntity(n, parent);
+                              scope.newNode.push(subject);
+                              extractEntity(e, subject);
+                            });
+                          } else {
+                            n.value = 'empty';
+                            var subject = assignEntity(n, parent, true);
+                            scope.newNode.push(subject);
+                          }
+                        } else if (_.isObject(n.value)) {
+                          extractTripleResources(n, parent);
+                        } else {
+                          debugger;
+                          var subject = assignEntity(n, parent, true);
+                          scope.newNode.push(subject);
+                        }
                       };
 
                       $rootScope.$on('addEntity', function(event, res) {
