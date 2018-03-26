@@ -159,7 +159,7 @@ module.exports.saveNewResourceOrValue = function (resourceOrValue, uid, cid) {
       if(resource instanceof Resource){
         resource = resourceOrValue;
       }else {
-        resource = new Resource().deepAssign(resourceOrValue);
+        resource = new Resource().assign(resourceOrValue);
       }
     } else {
       resource = new Resource(null, resourceOrValue);
@@ -528,7 +528,7 @@ module.exports.promisedEditResource = function (userid, resourceBefore, resource
       return null;
     }
     logger.debug('Creating new resource.');
-    return this.saveNewResourceOrValue(resourceAfter.value, userid, resourceAfter.cid);
+    return this.saveNewResourceOrValue(resourceAfter, userid, resourceAfter.cid);
   }
 
   // 2: delete resource if resourceAfter is null

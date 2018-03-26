@@ -199,7 +199,7 @@ mysqldb.init((err, r) => {
     //   .then(console.error, console.error);
 
     Promise.resolve(1)
-      .then(r => mysqldb.promisedEditResource(42, null, {value: {subject: {rid: 1}, predicate: {rid: 2}, object: {rid: 3} }}))
+      .then(r => mysqldb.promisedEditResource(42, null, {value: {subject: {rid: 1}, predicate: "my new reltion", object: {rid: 3} }}))
       .then(r => mysqldb.getResource(r.rid, r.cid))
       .then(r => console.log(r), e => console.error(e));
 
