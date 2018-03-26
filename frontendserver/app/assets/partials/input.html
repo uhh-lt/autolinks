@@ -7,11 +7,11 @@
     </div>
   </div> -->
 
-  <div class="input-chip">
+  <div ng-controller="InputController as ctrl" class="input-chip">
 
      <form name="chipForm">
        <md-chips
-          ng-model="roChipNames"
+          ng-model="ctrl.roChipNames"
           name="chipName"
           md-removable="true"
           placeholder="Type a query..."
@@ -27,6 +27,7 @@
          <span ng-click="submit()">
            <i class="fa fa-search fa-2x search-call"  aria-hidden="true" style="color: rgb(63,81,181)"></i>
          </span>
+
        <!-- </button> -->
        <!-- <div class="errors" ng-messages="chipForm.chipName.$error">
          <div ng-message="md-max-chips">Maximum number of chips reached.</div>

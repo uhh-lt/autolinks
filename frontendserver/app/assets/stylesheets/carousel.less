@@ -7,15 +7,29 @@
 	left: 0;
 	right: 0;
 	left: 0;
+	.carousel-inner {
+		height: 230px;
+	}
 	.carousel-card {
 		margin: auto;
 		width: 100%;
-    md-card {
+    #text-card-div {
       height: 100%;
       width: 30%;
       display: inline-block;
-      box-shadow: none;
-      background-color: rgba(255, 255, 255, 0.20);
+			height: 200px;
+			md-card {
+				max-height: 200px;
+				text-align: justify;
+				overflow-y: auto;
+				box-shadow: none;
+				background-color: rgba(255, 255, 255, 0.20);
+				position: relative;
+				top: 50%;
+				-webkit-transform: translateY(-50%);
+				-ms-transform: translateY(-50%);
+				transform: translateY(-50%);
+			}
     }
 	}
 	.item {

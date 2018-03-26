@@ -9,7 +9,7 @@ define([
     angular.module('autolinks.upload', []);
     angular.module('autolinks.upload')
         // Viewer Controller
-        .controller('UploadFileController', ['$scope', '$mdDialog', '$q', function ($scope, $mdDialog, $q) {
+        .controller('UploadFileController', ['$scope', '$rootScope', '$mdDialog', '$q', function ($scope, $rootScope, $mdDialog, $q) {
 
           $scope.close = function() {
             $mdDialog.hide();
@@ -40,11 +40,13 @@ define([
           function processFile(e) {
               var file = e.target.result,results;
               if (file && file.length) {
-                  results = file.split("\n");
+                  // results = file.split("\n");
+                  var results = file;
                   console.log(results)
-                  $('#text-card').text(function() {
-                    return results;
-                  });
+                  // $('#text-card').text(function() {
+                  //   return results;
+                  // });
+                  $rootScope.$emit('activateTextCarousel', results);
                   // val(results[0]);
                   // $('#age').val(results[1]);
                   $mdDialog.hide();

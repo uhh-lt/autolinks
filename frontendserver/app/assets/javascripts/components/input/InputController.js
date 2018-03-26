@@ -41,7 +41,6 @@ define([
           }
 
           $scope.submit = function() {
-            debugger;
             EndPointService.fetchService().then(function(response) {
               resetNetworkFromInput(response);
             });
