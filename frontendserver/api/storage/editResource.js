@@ -2,17 +2,8 @@ module.exports = function(url, token, data) {
   const before = data.before;
   let after = data.after;
 
-  if (after !== null) {
-    after = {
-      "after": {
-        "rid": after.rid,
-        "cid": after.cid,
-        "metadata": after.metadata ? after.metadata : {},
-        "value": after.value ? after.value : {}
-      }
-    };
-  }
-
+  var body = getBody(before, after);
+  debugger;
   return {
     url: url + '/storage/editresource',
     method: 'POST',
@@ -22,15 +13,47 @@ module.exports = function(url, token, data) {
        'authorization': token
        },
     json: true,
-    body:
+    body: body
+  }
+}
+
+function getBody(before, after) {
+  if (before === null) {
+    return {
+      "after": getAfter(after).after
+    };
+  }
+  if (after === null) {
+    return {
+      "before": getBefore(before).before
+    };
+  }
+  return {
+    "before": getBefore(before).before,
+    "after": getAfter(after).after
+  }
+};
+
+function getBefore(before) {
+  return {
+    "before":
     {
-      "before": {
         "rid": before.rid,
         "cid": before.cid,
         "metadata": before.metadata ? before.metadata : {},
         "value": before.value ? before.value : {}
-      },
-      after
     }
-  }
-}
+  };
+};
+
+function getAfter(after) {
+  return {
+    "after":
+    {
+        "rid": after.rid,
+        "cid": after.cid,
+        "metadata": after.metadata ? after.metadata : {},
+        "value":   after.value ? after.value : {}
+    }
+  };
+};
