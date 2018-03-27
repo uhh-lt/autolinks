@@ -12,7 +12,11 @@ module.exports.foo = function(req, res, next) {
     // get text from service parameter, ignore errors (just return simon)
     const etext = err && 'Simon' || ( serviceParameter.focus.getText(serviceParameter.context.text) || 'Simon' );
 
-    let resource_triple = new Resource(null, new Triple(new Resource(null, etext), new Resource(null, "says"), new Resource(null, "bar")));
+    if(req.swagger.params.getkey.value){
+      return res.header('Content-Type', 'text/plain; charset=utf-8').end(etext, next);
+    }
+
+    let resource_triple = new Resource(null, new Resource(null, new Triple(new Resource(null, etext), new Resource(null, "says"), new Resource(null, "bar"))));
 
     // this sends back a JSON response
     res.header('Content-Type', 'application/json; charset=utf-8');
@@ -22,6 +26,10 @@ module.exports.foo = function(req, res, next) {
 };
 
 module.exports.bar = function (req, res, next) {
+
+  if(req.swagger.params.getkey.value){
+    return res.header('Content-Type', 'text/plain; charset=utf-8').end('Simon', next);
+  }
 
   let resource_triple = new Resource(null, new Triple(new Resource(null, "Simon"), new Resource(null, "says"), new Resource(null, "foo")));
   let resource_triple2 = new Resource(null, new Triple(new Resource(null, "Simon"), new Resource(null, "says"), new Resource(null, "bar")));
@@ -44,11 +52,15 @@ module.exports.baz = function(req, res, next) {
     // this is required
     const username = req.swagger.params.username.value;
 
+    if(req.swagger.params.getkey.value){
+      return res.header('Content-Type', 'text/plain; charset=utf-8').end(etext + ':' + username, next);
+    }
+
     let r2 = new Resource(null, new Triple(new Resource(null, "hello"), new Resource(null, "is not"), new Resource(null, "goodbye")));
     let r3 = new Resource(null, new Triple(new Resource(null, "says"), new Resource(null, "is similar to"), new Resource(null, "shout")));
     let r4 = new Resource(null,
         new Triple(new Resource(null, username), new Resource(null, "is same as"),
-        new Resource(null, new Triple(new Resource(null, etext), new Resource(null, 'is a'), new Resource(null, 'human')), null, {})));
+        new Resource(null, new Triple(new Resource(null, etext), new Resource(null, 'is a'), new Resource(null, 'human')))));
     let r5 = new Resource(null, new Triple(r4, new Resource().fromString("says"), r2));
 
     let result = new Resource(null, [r5, r3]);
