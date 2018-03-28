@@ -24,12 +24,14 @@ module.exports = {
         callbackStart();
 
         let options = {
-            uri: 'http://ctakes-nlp:8080/analyse',
+            uri: process.env.CTAKESURL + '/analyse',
             method: 'POST',
             json: {
                 "query": analysis.text
             }
         };
+
+        console.log(options.uri);
 
         request(options)
             .then(function (parsedBody) {

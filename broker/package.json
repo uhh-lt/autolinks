@@ -20,7 +20,7 @@
     "passport-local": "^1.0.0",
     "random-words": "0.0.1",
     "request": "^2.83.0",
-    "request-promise-native": "latest",
+    "request-promise-native": "^1.0.5",
     "sqlite3": "^3.1.13",
     "swagger-express-mw": "^0.1.0",
     "swagger-ui-express": "^2.0.10",
