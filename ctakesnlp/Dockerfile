@@ -20,5 +20,3 @@ COPY . /opt/project
 RUN apt-get install -y maven
 RUN mvn clean compile
 CMD ["mvn","spring-boot:run"]
-
-# CMD ["java","-Djava.security.egd=file:/dev/./urandom","-jar","target/ctakes-nlp.jar"]

@@ -27,19 +27,8 @@ import java.util.List;
 
 @RestController
 public class CtakesController {
-    // Reuse the pipeline for demo purposes
-    private static AnalysisEngine pipeline;
 
-//    @PostConstruct
-//    public void init2() throws ServletException {
-//        AggregateBuilder aggregateBuilder;
-//        try {
-//            aggregateBuilder = Pipeline.getAggregateBuilder();
-//            pipeline = aggregateBuilder.createAggregate();
-//        } catch (Exception e) {
-//            throw new ServletException(e);
-//        }
-//    }
+    private static AnalysisEngine pipeline;
 
     @PostMapping("/analyse")
     public ResponseEntity analyse(@RequestBody MyRequest request) throws ServletException {
@@ -74,7 +63,6 @@ public class CtakesController {
             } catch (Exception e) {
                 throw new ServletException(e);
             }
-            //return ResponseEntity.status(HttpStatus.OK).body(result);
             return ResponseEntity.status(HttpStatus.OK).body(analysis);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Query Error");
