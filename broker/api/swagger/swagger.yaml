@@ -598,6 +598,66 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Exception"
+            
+  /storage/document:
+    x-swagger-router-controller: storage
+    post:
+      operationId: document_add
+      tags:
+        - Storage
+      description: Add a document
+      consumes:
+        - multipart/form-data
+      parameters:
+        - name: data
+          in: formData
+          type: file
+          required: true
+      security:
+        - broker_auth: []
+      responses:
+        200:
+          description: single string with ok message
+          schema:
+            type: string
+            default: 'OK'
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Exception"
+    delete:
+      operationId: document_del
+      tags:
+        - Storage
+      description: Removes a document
+      security:
+        - broker_auth: []
+      responses:
+        200:
+          description: single string with ok message
+          schema:
+            type: string
+            default: 'OK'
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Exception"
+    get:
+      operationId: document_get
+      tags:
+        - Storage
+      description: Download a document
+      security:
+        - broker_auth: []
+      responses:
+        200:
+          description: The file which was requested
+          schema:
+            type: file
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Exception"
 
   /storage/info:
     x-swagger-router-controller: storage
