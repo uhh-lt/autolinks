@@ -3,6 +3,7 @@
 // requires
 const
   fs = require('fs'),
+  path = require('path'),
   nodeCleanup = require('node-cleanup'),
   mysql = require('mysql'),
   Exception = require('../../model/Exception').model,
@@ -11,6 +12,22 @@ const
   utils = require('../utils/utils'),
   murmurhashNative = require('murmurhash-native'),
   logger = require('../log')(module);
+
+/* where to store data file */
+const datadir = (() => {
+  /* make sure the data directory exists */
+  const datadir = path.resolve(global.__datadir && path.join(global.__datadir, 'storage'));
+  if (!fs.existsSync(datadir)) { fs.mkdirSync(datadir); }
+  return datadir;
+})();
+
+function getFileLocation(userid, basename) {
+  const userdir = path.resolve(datadir, userid.toString());
+  if (!fs.existsSync(userdir)) { fs.mkdirSync(userdir); }
+  return path.resolve(userdir, basename.toString());
+}
+
+const MAX_FILESIZE = process.env.MAX_FILESIZE || 5e7; // 5 MB by default
 
 /* connection string: mysql://user:pass@host:port/database?optionkey=optionvalue&optionkey=optionvalue&... */
 const connectionString = process.env.MYSQL || 'mysql://autolinks:autolinks1@mysql:3306/autolinks?debug=false&connectionLimit=100';
@@ -62,7 +79,7 @@ function promisedQuery(query, values) {
 
 module.exports.init = function (callback, resetdata) {
 
-  // read the script
+  // init database read the mysql script
   fs.readFile('config/storagedb-schema.mysql.sql', 'utf8', function (err, data) {
     if (err) {
       return callback(err);
@@ -564,6 +581,48 @@ module.exports.promisedEditResource = function (userid, resourceBefore, resource
   // otherwise nothing has changed
   logger.debug('Resource is unchanged.');
   return Promise.accept(resourceAfter);
+};
+
+module.exports.promisedSaveFile = function(userid, filename, encoding, mimetype, size, content, overwrite) {
+  return this.getDocumentId(userid, filename)
+    .then(did => new Promise((resolve, reject) => {
+      if(did) {
+        const msg = `File already exists for user ${userid}: '${filename}'.`;
+        if(!overwrite) {
+          return reject(new Exception('IllegalState', `${msg} Specify overwrite if you want to update the file.`));
+        }
+        logger.warn(`File already exists for user ${userid}: '${filename}'.`);
+        return reject(new Exception('NotImplemented', `Method not yet implemented!`));
+      }
+      if(size > MAX_FILESIZE) {
+        return reject(new Exception('IllegalState', `Size of the file is too large (${size} > ${MAX_FILESIZE}). Upload smaller files or ask your administrator to increase the file size limit.`));
+      }
+      return promisedQuery('select add_document(?,?) as did', [filename, userid])
+        .then(
+          res => {
+            const did = res.rows[0].did;
+            logger.debug(`Successfully saved file '${filename}' for user with id '${userid}'.`);
+            const storeAt = getFileLocation(userid, did);
+            logger.debug(`Saving file '${storeAt}'.`);
+            return fs.writeFile(storeAt, content, 'binary', function(err) {
+              if(err) {
+                return reject(Exception.fromError(err, `Storing file '${filename}' failed.`));
+              }
+              logger.debug(`Saving file '${storeAt}'.`);
+              return resolve(did);
+            });
+          }, err => reject(err));
+    }));
+};
+
+module.exports.getDocumentId = function(userid, filename) {
+  return promisedQuery('select did from documents where uid = ? and name = ?', [userid, filename])
+    .then(res => {
+      if(res.rows.length > 0){
+        return res.rows[0].did;
+      }
+      return null;
+    });
 };
 
 module.exports.close = function (callback) {

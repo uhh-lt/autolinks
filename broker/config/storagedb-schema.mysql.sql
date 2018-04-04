@@ -175,7 +175,7 @@ create function add_document ( name_ varchar(512), uid_ int unsigned )
 RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
 BEGIN
   declare did_ int unsigned default 0;
-    if null_ is NULL then
+    if name_ is NULL then
       return did_;
     end if;
     select did into did_ from documents where name = name_ and uid = uid_ limit 1;

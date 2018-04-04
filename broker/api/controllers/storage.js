@@ -4,8 +4,6 @@ const
   auth = require('../../controller/auth'),
   storage = require('../../controller/storage_wrapper'),
   Exception = require('../../model/Exception').model,
-  fs = require('fs'),
-  path = require('path'),
   logger = require('../../controller/log')(module);
 
 module.exports.info = function(req, res, next) {
@@ -53,7 +51,15 @@ module.exports.document_add = function(req, res, next) {
     if(!req.swagger.params.data.value){
       return new Exception('IllegalState', 'Data missing!').handleResponse(res).end(next);
     }
+
     const formdata = req.swagger.params.data.value;
+    const overwrite =  req.swagger.params.overwrite && req.swagger.params.overwrite.value;
+
+    storage.promisedSaveFile(user.id, formdata.originalname, formdata.encoding, formdata.mimeType, formdata.size, formdata.buffer, overwrite)
+      .then(
+        did => res.json({did: did, name: formdata.originalname}).end(next),
+        err => Exception.fromError(err).handleResponse(res).end(next)
+      );
 
     // { fieldname: 'data',
     //   originalname: 'lstm_text_generation.py',
@@ -61,18 +67,17 @@ module.exports.document_add = function(req, res, next) {
     //   mimetype: 'text/x-python-script',
     //   buffer: <Buffer 27 27 27 45 78 61 6d 70 6c 65 20 73 63 72 69 70 74 20 74 6f 20 67 65 6e 65 72 61 74 65 20 74 65 78 74 20 66 72 6f 6d 20 4e 69 65 74 7a 73 63 68 65 27 ... >,
     //   size: 3332 }
-    console.log(formdata);
-    const fsize = formdata.size;
-    const mimetype = formdata.mimeType;
-    const encoding = formdata.encoding;
-    // TODO: if too large throw error
-    const fname = path.resolve(global.__datadir && path.join(global.__datadir, formdata.originalname) || formdata.originalname);
-    fs.writeFile(fname, formdata.buffer, 'binary', function(err) {
-      if(err) {
-        return Exception.fromError(err, `Storing file '${formdata.originalname}' failed.`).handleResponse(res).end(next);
-      }
-    });
-    res.end(next);
+    // console.log(formdata);
+    // const fsize = formdata.size;
+    // const mimetype = formdata.mimeType;
+    // const encoding = formdata.encoding;
+    // // TODO: if too large throw error
+    // const fname = path.resolve(global.__datadir && path.join(global.__datadir, formdata.originalname) || formdata.originalname);
+    // fs.writeFile(fname, formdata.buffer, 'binary', function(err) {
+    //   if(err) {
+    //     return Exception.fromError(err, `Storing file '${formdata.originalname}' failed.`).handleResponse(res).end(next);
+    //   }
+    // });
   });
 };
 
