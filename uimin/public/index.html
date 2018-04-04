@@ -5,13 +5,29 @@
 <link rel="stylesheet" href="assets/w3css/w3.css">
 <script src="javascripts/bundle.js"></script>
 <body>
-    <h1 id="head">Autolinks minimized frontend</h1>
-    <div id="main"></div>
+    <h1 id="head">Autolinks minimized debug frontend</h1>
+    <div id="main">
+        Broker URL: <input type="text" id="BROKER_URL" value="http://localhost:10000"> <br />
+        Services:
+        <ul id="service_list">
+            <!-- FILL ME -->
+        </ul>
+    </div>
 </body>
 <script>
-    // functions are provided by bundle.js
-    // jquery is also loaded by bundle.js
-    init();
+    // functions are bundled with browserify into bundle.js, check sources!
+    // jquery is loaded internally within bundle.js
+    $("#BROKER_URL").keyup(function(event) {
+      if (event.keyCode === 13) {
+        //location.reload(false);
+        renderServices();
+      }
+    });
+
+    $( document ).ready(function() {
+      renderServices();
+    });
+
 </script>
 </html>
 

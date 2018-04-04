@@ -1,0 +1,19 @@
+<md-bottom-sheet class="md-grid" layout="column">
+  <div layout="row" layout-align="center center" ng-cloak>
+    <md-button class="md-grid-item-content" ng-click="closeChevron()">
+      <md-icon md-font-icon="fa fa-chevron-down fa-2x"></md-icon>
+    </md-button>
+  </div>
+  <div ng-cloak>
+    <md-list flex layout="row" layout-align="center center">
+      <md-list-item ng-repeat="item in items">
+        <div>
+          <md-button class="md-grid-item-content" ng-click="listItemClick($index)">
+            <md-icon md-font-icon="{{item.icon}}"></md-icon>
+            <div class="md-grid-text"> {{ item.name }} </div>
+          </md-button>
+        </div>
+      </md-list-item>
+    </md-list>
+  </div>
+</md-bottom-sheet>

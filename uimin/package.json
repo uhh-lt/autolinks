@@ -5,10 +5,10 @@
   "repository": "xyz",
   "license": "Apache-2.0",
   "scripts": {
-    "bundle": "echo 'bundling app' && browserify ./browser/main.js -o ./public/javascripts/bundle.js",
-    "bundle-inapp": "echo 'bundling app' && node browserify-app.js",
-    "bundle-continuous": "watchify ./browser/main.js -o ./public/javascripts/bundle.js",
-    "bundle-continuous-inapp": "node watchify-app.js"
+    "browserify": "echo 'bundling app' && browserify ./browser/main.js -o ./public/javascripts/bundle.js",
+    "browserify-in-app": "echo 'bundling app' && node browserify-app.js",
+    "watchify": "watchify ./browser/main.js -o ./public/javascripts/bundle.js",
+    "watchify-in-app": "node watchify-app.js"
   },
   "dependencies": {
     "express": "^4.16.2",

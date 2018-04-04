@@ -112,7 +112,7 @@ function update_user(name, userobj, callback){
  */
 function get_user(name, callback){
   //run sql statement
-  dbconn.get('select * from users where name = ?', [name], callback);
+  dbconn.get('select rowid as id, * from users where name = ?', [name], callback);
 }
 
 // delete a service from the database

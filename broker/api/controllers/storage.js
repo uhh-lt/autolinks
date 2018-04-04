@@ -35,7 +35,7 @@ module.exports.editresource = function(req, res, next) {
     return Exception.fromError(null, 'No data object provided.', {data: data}).handleResponse(res).end(next);
   }
   auth.handle_authenticated_request(req, res, function(user) {
-    storage.promisedEditResource(data.before, data.after, user).then(
+    storage.promisedEditResource(user, data.before, data.after).then(
       result => {
         res.header('Content-Type', 'application/json; charset=utf-8');
         res.write(JSON.stringify(result));

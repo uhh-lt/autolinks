@@ -5,10 +5,13 @@
 -- create the tables
 CREATE TABLE IF NOT EXISTS resources (
   rid         int unsigned NOT NULL AUTO_INCREMENT,
+  uid         int unsigned,
   isstring    boolean DEFAULT NULL,
   istriple    boolean DEFAULT NULL,
   islist      boolean DEFAULT NULL,
-  PRIMARY KEY (rid)
+  PRIMARY KEY (rid, uid),
+  KEY (rid),
+  KEY (uid)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS resourceMetadata (
@@ -20,9 +23,9 @@ CREATE TABLE IF NOT EXISTS resourceMetadata (
 
 CREATE TABLE IF NOT EXISTS stringResources (
   rid         int unsigned NOT NULL,
-  surfaceform varchar(512) NOT NULL,
+  surfaceform varchar(256) NOT NULL,
   PRIMARY KEY (rid),
-  UNIQUE (surfaceform(333))
+  UNIQUE (rid, surfaceform)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS tripleResources (
@@ -34,15 +37,15 @@ CREATE TABLE IF NOT EXISTS tripleResources (
   KEY (subj),
   KEY (pred),
   KEY (obj),
-  UNIQUE spo (subj, pred, obj)
+  UNIQUE spo (rid, subj, pred, obj)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS listResources (
   rid            int unsigned NOT NULL,
   listdescriptor varchar(256) NOT NULL,
-  PRIMARY KEY (rid, listdescriptor),
-  KEY (rid),
-  KEY (listdescriptor)
+  PRIMARY KEY (rid),
+  KEY (listdescriptor),
+  UNIQUE (rid, listdescriptor)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS listResourceItems (
@@ -58,7 +61,7 @@ CREATE TABLE IF NOT EXISTS resourcePermission (
   uid         int unsigned NOT NULL,
   r           boolean DEFAULT TRUE,
   w           boolean DEFAULT NULL,
-  PRIMARY KEY (rid,uid),
+  PRIMARY KEY (rid, uid),
   KEY (uid),
   KEY (rid)
 ) ENGINE=MyISAM;
@@ -78,13 +81,23 @@ CREATE TABLE IF NOT EXISTS storageItemToResource (
   KEY (rid)
 ) ENGINE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS users (
-  uid         int unsigned NOT NULL AUTO_INCREMENT,
-  name        varchar(32),
-  isgroup     boolean DEFAULT NULL,
-  PRIMARY KEY (uid),
-  UNIQUE (name)
-) ENGINE=MyISAM;
+-- CREATE TABLE IF NOT EXISTS users (
+--  uid         int unsigned NOT NULL AUTO_INCREMENT,
+--  name        varchar(32),
+--  isgroup     boolean DEFAULT NULL,
+--  PRIMARY KEY (uid),
+--  UNIQUE (name)
+-- ) ENGINE=MyISAM;
+
+-- CREATE HELPER VIEWS
+
+CREATE OR REPLACE VIEW userResourceMetadata AS SELECT r1.uid, r2.* FROM resources r1 JOIN resourceMetadata r2 ON (r1.rid = r2.rid);
+
+CREATE OR REPLACE VIEW userStringResources  AS SELECT r1.uid, r2.* FROM resources r1 JOIN stringResources  r2 ON (r1.rid = r2.rid);
+
+CREATE OR REPLACE VIEW userTripleResources  AS SELECT r1.uid, r2.* FROM resources r1 JOIN tripleResources  r2 ON (r1.rid = r2.rid);
+
+CREATE OR REPLACE VIEW userListResources    AS SELECT r1.uid, r2.* FROM resources r1 JOIN listResources    r2 ON (r1.rid = r2.rid);
 
 -- DEFINE SOME HELPER FUNCTIONS
 
@@ -104,9 +117,9 @@ drop function if exists get_or_add_storageItem;
 
 drop function if exists create_storageItemToResourceMapping;
 
-drop function if exists get_uid;
+-- drop function if exists get_uid;
 
-drop function if exists get_or_add_user;
+-- drop function if exists get_or_add_user;
 
 drop procedure if exists full_delete_resource;
 
@@ -130,38 +143,22 @@ BEGIN
     truncate listResourceItems;
     truncate resourceMetadata;
     truncate resources;
-    truncate users;
     truncate resourcePermission;
     truncate storageItemToResource;
     truncate storageItems;
   COMMIT ;
 END //
 
-create function add_resource ( isstring_ boolean, istriple_ boolean, islist_ boolean )
+create function add_resource ( isstring_ boolean, istriple_ boolean, islist_ boolean, uid_ int unsigned )
 RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
 BEGIN
   declare rid_ int unsigned default 0;
-  -- TODO: check if multiple values are set
+  -- TODO: check if permutated values are set
   if NOT ( isstring_ AND istriple_ AND islist_) then
     return rid_;
   end if;
-  insert into resources set isstring = isstring_, istriple = istriple_, islist = islist_;
+  insert into resources set uid = uid_, isstring = isstring_, istriple = istriple_, islist = islist_;
   select LAST_INSERT_ID() into rid_;
-  return rid_;
-END //
-
-create function get_or_add_stringResource ( surfaceform_ varchar(512) )
-RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
-BEGIN
-  declare rid_ int unsigned default 0;
-  if surfaceform_ is NULL then
-    return rid_;
-  end if;
-  select rid into rid_ from stringResources where surfaceform = surfaceform_ limit 1;
-  if rid_ = 0 then
-    select add_resource(TRUE, NULL, NULL) into rid_;
-    insert into stringResources set rid = rid_, surfaceform = surfaceform_;
-  end if;
   return rid_;
 END //
 
@@ -185,28 +182,43 @@ BEGIN
   COMMIT ;
 END //
 
-create function get_or_add_tripleResource ( subj_ int unsigned, pred_ int unsigned, obj_ int unsigned )
+create function get_or_add_stringResource ( surfaceform_ varchar(512), uid_ int unsigned )
 RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
 BEGIN
   declare rid_ int unsigned default 0;
-  select rid into rid_ from tripleResources where subj = subj_ and pred = pred_ and obj = obj_ limit 1;
+  if surfaceform_ is NULL then
+    return rid_;
+  end if;
+  select rid into rid_ from userStringResources where surfaceform = surfaceform_ and uid = uid_ limit 1;
   if rid_ = 0 then
-    select add_resource(NULL, TRUE, NULL) into rid_;
+    select add_resource(TRUE, NULL, NULL, uid_) into rid_;
+    insert into stringResources set rid = rid_, surfaceform = surfaceform_;
+  end if;
+  return rid_;
+END //
+
+create function get_or_add_tripleResource ( subj_ int unsigned, pred_ int unsigned, obj_ int unsigned, uid_ int unsigned)
+RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
+BEGIN
+  declare rid_ int unsigned default 0;
+  select rid into rid_ from userTripleResources where subj = subj_ and pred = pred_ and obj = obj_ and uid = uid_ limit 1;
+  if rid_ = 0 then
+    select add_resource(NULL, TRUE, NULL, uid_) into rid_;
     insert into tripleResources set rid = rid_, subj = subj_, pred = pred_, obj = obj_;
   end if;
   return rid_;
 END //
 
-create function get_or_add_listResource ( listdescriptor_ varchar(512) )
+create function get_or_add_listResource ( listdescriptor_ varchar(512), uid_ int unsigned )
 RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
 BEGIN
   declare rid_ int unsigned default 0;
   if listdescriptor_ is NULL then
     return rid_;
   end if;
-  select rid into rid_ from listResources where listdescriptor = listdescriptor_ limit 1;
+  select rid into rid_ from userListResources where listdescriptor = listdescriptor_ and uid = uid_ limit 1;
   if rid_ = 0 then
-    select add_resource(NULL, NULL, TRUE) into rid_;
+    select add_resource(NULL, NULL, TRUE, uid_) into rid_;
     insert into listResources set rid = rid_, listdescriptor = listdescriptor_;
   end if;
   return rid_;
@@ -247,30 +259,30 @@ BEGIN
   return mapping_existed;
 END //
 
-create function get_uid ( name_ varchar(32) )
-RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
-BEGIN
-  declare uid_ int unsigned default 0;
-  if name_ is NULL then
-    return uid_;
-  end if;
-  select uid into uid_ from users where name = name_ limit 1;
-  return uid_;
-END //
+--create function get_uid ( name_ varchar(32) )
+--RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
+--BEGIN
+--  declare uid_ int unsigned default 0;
+--  if name_ is NULL then
+--    return uid_;
+--  end if;
+--  select uid into uid_ from users where name = name_ limit 1;
+--  return uid_;
+--END //
 
-create function get_or_add_user ( name_ varchar(32), isgroup_ boolean )
-RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
-BEGIN
-  declare uid_ int unsigned default 0;
-  if name_ is NULL then
-    return uid_;
-  end if;
-  select get_uid( name_ ) into uid_;
-  if uid_ = 0 then
-    insert into users set name = name_, isgroup = isgroup_;
-  end if;
-  return uid_;
-END //
+--create function get_or_add_user ( name_ varchar(32), isgroup_ boolean )
+--RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
+--BEGIN
+--  declare uid_ int unsigned default 0;
+--  if name_ is NULL then
+--    return uid_;
+--  end if;
+--  select get_uid( name_ ) into uid_;
+--  if uid_ = 0 then
+--    insert into users set name = name_, isgroup = isgroup_;
+--  end if;
+--  return uid_;
+--END //
 
 create procedure remove_stringResourceFromContainer( IN rid_ int unsigned, IN cid_ int unsigned )
 MODIFIES SQL DATA

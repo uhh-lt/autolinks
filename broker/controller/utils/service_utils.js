@@ -142,7 +142,7 @@ function sendData(data, res) {
   return res;
 }
 
-module.exports.call_service = function (location, path, method, username, data, req, res, next) {
+module.exports.call_service = function (location, path, method, userid, data, req, res, next) {
 
   const requestDataOptions = {
     url: path,
@@ -155,23 +155,21 @@ module.exports.call_service = function (location, path, method, username, data, 
     body: data && JSON.stringify(data) || null,
   };
   const requestKeyOptions = Object.assign({}, requestDataOptions);
-  requestKeyOptions.url = `${path}?getStorageKey`;
+  requestKeyOptions.url = `${path}?getkey=true`;
   // get the storage key
   request_utils.promisedRequest(requestKeyOptions)
     .then(result => {
-      const mimeType = result.response.headers['Content-Type'];
-      if (mimeType && mimeType.includes('text/plain')) {
         const key = result.body;
         logger.debug(`Successfully recevied storagekey: ${key}`);
         return key;
-      }
-      logger.warn(`Unable to get storagekey from service endpoint '${requestKeyOptions.baseUrl}${requestKeyOptions.url}'. Using rid as storagekey.`);
-      return null;
     }, err => null)
     .then(key => {
       // if data for key exists in DB use it, otherwise get it from service call and store it
       if (key) {
-        return storage.promisedRead(username, key);
+        const data = storage.promisedRead(userid, key);
+        if(data){
+          return data;
+        }
       }
       // get the data from service, then save it (save returns the data itself)
       return request_utils.promisedRequest(requestDataOptions)
@@ -180,7 +178,7 @@ module.exports.call_service = function (location, path, method, username, data, 
           const rawdata = JSON.parse(result.body);
           return rawdata;
         })
-        .then(rawdata => storage.promisedWrite(username, key, rawdata));
+        .then(rawdata => storage.promisedWrite(userid, key, rawdata));
     })
     .then(data => sendData(data, res).end(next))
     .catch(err => Exception.fromError(err, err.message).log(logger.warn).handleResponse(res).end(next));

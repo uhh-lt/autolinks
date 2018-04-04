@@ -1,10 +1,9 @@
 define([
     'angular',
     'jquery',
-    'cola',
     'cytoscape',
     'cytoscape-cose-bilkent',
-    'cytoscape-cola',
+    'cytoscape-klay',
     'cytoscape-cxtmenu',
     'cytoscape-panzoom',
     'cytoscape-qtip',
@@ -13,7 +12,7 @@ define([
     'cytoscape.js-undo-redo',
     'qtip2',
     'bootstrap',
-], function(angular, $, cola, cytoscape, regCose, cycola, cxtmenu, panzoom, cyqtip, expandCollapse,edgehandles, undoRedo, qtip2) {
+], function(angular, $, cytoscape, regCose, klay, cxtmenu, panzoom, cyqtip, expandCollapse,edgehandles, undoRedo, qtip2) {
     'use strict';
 
     angular.module('ngCy', [])
@@ -53,6 +52,7 @@ define([
 
                 var cy = null;
 
+                // klay(cytoscape);
                 panzoom(cytoscape, $);
                 expandCollapse(cytoscape, $);
                 undoRedo(cytoscape);
@@ -61,6 +61,7 @@ define([
                 cyqtip(cytoscape, $);
                 cxtmenu(cytoscape);
                 edgehandles(cytoscape);
+
 
                 scope.ehListeners = [];
 
@@ -421,112 +422,165 @@ define([
                         ]
                       });
 
-                      $rootScope.$on('addEntity', function(event, entity){
+                      function extractResource(n) {
+                        return n.value.subject;
+                      }
+
+                      function extractList(n) {
+                        if (_.isArray(n[0].value)) {
+                          return extractList(n[0].value);
+                        }
+                        if(_.isObject(n[0].value)) {
+                          return n[0].value.subject;
+                        }
+                        return n[0].value;
+                      }
+
+                      function assignEntity(e, parent, child = false) {
+                        if ( parent === 'outermostParentEntity' ) {
+                          return {
+                              id: e.rid,
+                              name: e.rid,
+                              metadata: e.metadata,
+                              path: scope.path
+                          };
+                        }
+                        return {
+                          cid: e.cid,
+                          rid: e.rid,
+                          metadata: e.metadata,
+                          id: ( e.value + ( child ? '' : '_as_parent' ) + e.rid + e.cid ).replace(/\s/g, ''),
+                          name: e.value + '',
+                          parent: parent ? parent.id : scope.outermostId,
+                          path: scope.path
+                        };
+                      }
+
+                      function assignRelation(r, subject, object) {
+                        return {
+                          group: "edges",
+                          data:
+                          {
+                            cid: r.cid,
+                            rid: r.rid,
+                            metadata: r.metadata,
+                            id: ( subject.id + object.id + r.rid ).replace(/\s/g, ''),
+                            source: (subject.id).replace(/\s/g, ''),
+                            target: (object.id).replace(/\s/g, ''),
+                            name: r.value,
+                            path: scope.path
+                          }
+                        };
+                      }
+
+                      function extractTripleResources(n, parent = null) {
+                        let s = n.value.subject;
+                        let p = n.value.predicate;
+                        let o = n.value.object;
+
+                        if (_.isArray(s.value)) {
+                          var es = extractList(s.value);
+                          var subject = assignEntity(es, parent);
+                        } else if (_.isObject(s.value)) {
+                          var es = extractResource(s);
+                          var subject = assignEntity(es, parent);
+                        } else {
+                          var subject = assignEntity(s, parent, true);
+                        }
+
+                        if (_.isArray(o.value)) {
+                          var eo = extractList(o.value);
+                          var object = assignEntity(eo, parent);
+                        } else if (_.isObject(o.value)) {
+                          var eo = extractResource(o);
+                          var object = assignEntity(eo, parent);
+                        } else {
+                          var object = assignEntity(o, parent, true);
+                        }
+
+                        if (_.isArray(p.value)) {
+                          var ep = extractList(p.value);
+                          var edge = assignRelation(ep, subject, object);
+                        } else if (_.isObject(p.value)) {
+                          var ep = extractResource(p);
+                          var edge = assignEntity(ep, parent);
+                        } else {
+                          var edge = assignRelation(p, subject, object);
+                        };
+
+                        scope.newEdge.push(edge);
+                        scope.newNode.push(subject, object);
+
+                        if (_.isArray(s.value)) {
+                          _.forEach(s.value, function(n) {
+                            extractEntity(n, subject);
+                          });
+                        } else if (_.isObject(s.value)) {
+                          extractEntity(s, subject);
+                        };
+
+                        if (_.isArray(o.value)) {
+                          _.forEach(o.value, function(n) {
+                            extractEntity(n, object);
+                          });
+                        } else if (_.isObject(o.value)) {
+                          extractEntity(o, object);
+                        };
+                      }
+
+                      function extractEntity(n, parent = null) {
+                        if (_.isArray(n.value)) {
+                          if (n.value.length > 0) {
+                            _.forEach(n.value, function(e) {
+                              n.value = 'parent';
+                              var subject = assignEntity(n, parent);
+                              scope.newNode.push(subject);
+                              extractEntity(e, subject);
+                            });
+                          } else {
+                            n.value = 'empty';
+                            var subject = assignEntity(n, parent, true);
+                            scope.newNode.push(subject);
+                          }
+                        } else if (_.isObject(n.value)) {
+                          extractTripleResources(n, parent);
+                        } else {
+                          debugger;
+                          var subject = assignEntity(n, parent, true);
+                          scope.newNode.push(subject);
+                        }
+                      };
+
+                      $rootScope.$on('addEntity', function(event, res) {
+                        var entity = res.entity;
                         var nodes = scope.data.nodes;
                         var edges = scope.data.edges;
-                        var newNode = [];
-                        var newEdge = [];
 
-                        debugger;
+                        scope.path = res.data.endpoint.path;
+                        scope.newNode = [];
+                        scope.newEdge = [];
+
                         if (entity) {
-                          _.forEach(entity, function(n) {
-                            function extractEntity(n, parent = null) {
-                              function extractSubject(n) {
-                                if (_.isArray(n.subject)) {
-                                  return extractSubject(n.subject[0]);
-                                }
-                                return n;
-                              }
+                          if (_.isArray(entity.value)) {
+                            scope.outermostId = entity.rid;
+                            _.forEach(entity.value, function(n) {
+                              extractEntity(n);
+                            });
+                            var outermostEntity = assignEntity(entity, 'outermostParentEntity');
+                          } else if (_.isObject(entity.value)) {
+                            scope.outermostId = entity.rid;
+                            extractEntity(entity);
+                            var outermostEntity = assignEntity(entity, 'outermostParentEntity');
+                          } else {
+                            return;
+                          }
 
-                              function extractObject(n) {
-                                if (_.isArray(n.object)) {
-                                  return extractSubject(n.object[0]);
-                                }
-                                return n;
-                              }
-
-                              function extractPredicate(n) {
-                                if (_.isArray(n.predicate)) {
-                                  return extractSubject(n.predicate[0]);
-                                }
-                                return n;
-                              }
-
-                              if (_.isArray(n.subject)) {
-                                var s = extractSubject(n);
-                                var subject = {
-                                    id: (s.subject + '_as_parent').replace(/\s/g, ''),
-                                    name: s.subject,
-                                    parent: parent ? parent.id : null
-                                };
-                              } else {
-                                var subject = {
-                                    id: (n.subject).replace(/\s/g, ''),
-                                    name: n.subject,
-                                    parent: parent ? parent.id : null
-                                };
-                              }
-
-                              if (_.isArray(n.object)) {
-                                var o = extractObject(n);
-                                var object = {
-                                    id: (o.subject + '_as_parent').replace(/\s/g, ''),
-                                    name: o.subject,
-                                    parent: parent ? parent.id : null
-                                };
-                              } else {
-                                var object = {
-                                    id: (n.object).replace(/\s/g, ''),
-                                    name: n.object,
-                                    parent: parent ? parent.id : null
-                                };
-                              }
-
-                              if (_.isArray(n.predicate)) {
-                                var p = extractPredicate(n);
-                                var edge = {
-                                  group: "edges",
-                                  data:
-                                  {
-                                    id: ( subject.id + object.id ).replace(/\s/g, ''),
-                                    source: (subject.name).replace(/\s/g, ''),
-                                    target: (object.name).replace(/\s/g, ''),
-                                    name: p.subject
-                                  }
-                                }
-                              } else {
-                                var edge = {
-                                  group: "edges",
-                                  data:
-                                  {
-                                    id: ( subject.id + object.id ).replace(/\s/g, ''),
-                                    source: (subject.name).replace(/\s/g, ''),
-                                    target: (object.name).replace(/\s/g, ''),
-                                    name: n.predicate
-                                  }
-                                };
-                              }
-
-                              newEdge.push(edge);
-                              newNode.push(subject, object);
-
-                              if (_.isArray(n.subject)) {
-                                _.forEach(n.subject, function(n) {
-                                  extractEntity(n, subject);
-                                });
-                              };
-
-                              if (_.isArray(n.object)) {
-                                _.forEach(n.object, function(n) {
-                                  extractEntity(n, object);
-                                });
-                              };
-                            }
-                            extractEntity(n);
-                          });
+                          if (outermostEntity) {
+                            scope.newNode.push(outermostEntity);
+                          }
 
                           var filterNode = [];
-                          _.forEach(_.uniqBy(newNode, 'id'), function(n) {
+                          _.forEach(_.uniqBy(scope.newNode, 'id'), function(n) {
                             filterNode.push({
                               group: 'nodes',
                               data: n,
@@ -538,25 +592,23 @@ define([
                           });
 
                           var n = cy.add(filterNode);
-                          var e = cy.add(newEdge);
+                          var e = cy.add(scope.newEdge);
 
                           nodeTipExtension(n);
                           edgeTipExtension(e);
 
                           scope.data.nodes = _.union(nodes, filterNode);
-                          scope.data.edges = _.union(edges, newEdge);
+                          scope.data.edges = _.union(edges, scope.newEdge);
                           cy.layout(scope.options.layout).run();
                         }
                       });
-                      // debugger;
+
                       if (!$rootScope.$$listenerCount.addEdge) {
                         if ($rootScope.$$listenerCount.addEdge === 1) {
                           $rootScope.$$listenerCount.addEdge = 0;
-                          // debugger;
                           return;
                         } else {
-                          $rootScope.$on('addEdge', function(e){
-                            debugger;
+                          $rootScope.$on('addEdge', function(e) {
                             eh.enabled = true;
                             // eh.active = true;
                             var nodeId = scope.selectedEntity.data('id');
@@ -577,6 +629,12 @@ define([
                       $rootScope.$on('deleteEntity', function(){
                         if (cy.$(":selected").length > 0) {
                             cy.$(":selected").remove();
+                        }
+                      });
+
+                      $rootScope.$on('disableEndpoint', function(event, path){
+                        if (cy.elements("[path = '" + path + "']").length > 0) {
+                            cy.elements("[path = '" + path + "']").remove();
                         }
                       });
 
@@ -608,6 +666,10 @@ define([
 
                       $rootScope.$on('layoutReset', function(){
                           cy.layout(scope.options.layout).run();
+                      });
+
+                      $rootScope.$on('clearAll', function(){
+                          cy.nodes().remove();
                       });
 
                       $rootScope.$on('centerGraph', function(){

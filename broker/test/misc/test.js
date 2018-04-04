@@ -130,7 +130,7 @@ mysqldb.init((err, r) => {
   // mysqldb.saveStorageResourceMapping(23,21).then(console.log,console.error);
   // mysqldb.saveStorageItemToResourceMapping('me','asdjbao').then(console.log, console.error);
 
-  // mysqldb.createUsergroup('me').then(console.log, console.error);
+
   const arr = [
     'hello',
     ['hallo hallo', new Triple('i','am','goof')],
@@ -143,14 +143,25 @@ mysqldb.init((err, r) => {
     'hallo welt'
   ];
 
+
   // try writing
-  mysqldb.write('me', '12345', arr,
+  mysqldb.write(42, '12345', arr,
     function(err, res) {
       if(err){
         return console.log(err);
       }
       return console.log(JSON.stringify(res, null, 2));
     });
+
+  // try writing
+  mysqldb.write(4711, '12345', arr,
+    function(err, res) {
+      if(err){
+        return console.log(err);
+      }
+      return console.log(JSON.stringify(res, null, 2));
+    });
+
 
 
   // mysqldb.getTriple(2).then(console.log,console.err);
@@ -166,26 +177,26 @@ mysqldb.init((err, r) => {
     mysqldb.getResource(1)
       .then(r => JSON.stringify(r, null, 2))
       .then(console.log)
-      .then(mysqldb.promisedEditResource({rid: 1, value: 'hello'}, null))
+      .then(mysqldb.promisedEditResource(42, {rid: 1, value: 'hello'}, null))
       .then(mysqldb.getResource(1))
-      .then(r => JSON.stringify(r, null, 2))
-      .then(console.log)
-      .then(r => mysqldb.promisedEditResource(null, {value: 'ashdoiahs'}))
-      .then(r => mysqldb.getResource(r.rid))
-      .then(r => JSON.stringify(r, null, 2))
-      .then(console.log)
-      .then(r => mysqldb.promisedEditResource({rid: 18, cid : 3}, {rid: 18, cid : 27}))
-      .then(r => mysqldb.getResource(r.rid))
-      .then(r => JSON.stringify(r, null, 2))
-      .then(console.log)
-      .then(r => mysqldb.promisedEditResource({rid: 1, metadata : {}}, {rid: 1, metadata : {labely : "hallo"}}))
-      .then(r => mysqldb.getResource(r.rid))
-      .then(r => JSON.stringify(r, null, 2))
-      .then(console.log)
-      .then(r => mysqldb.promisedEditResource({rid: 1, metadata : {labely : "hallo"}}, {rid: 1, metadata : {label : "hallo", label1 : "hallo"}}))
-      .then(r => mysqldb.getResource(r.rid))
-      .then(r => JSON.stringify(r, null, 2))
-      .then(console.log, console.err);
+      // .then(r => JSON.stringify(r, null, 2))
+      // .then(console.log)
+      // .then(r => mysqldb.promisedEditResource(42, null, {value: 'ashdoiahs'}))
+      // .then(r => mysqldb.getResource(r.rid))
+      // .then(r => JSON.stringify(r, null, 2))
+      // .then(console.log)
+      // .then(r => mysqldb.promisedEditResource(42, {rid: 18, cid : 3}, {rid: 18, cid : 27}))
+      // .then(r => mysqldb.getResource(r.rid))
+      // .then(r => JSON.stringify(r, null, 2))
+      // .then(console.log)
+      // .then(r => mysqldb.promisedEditResource(42, {rid: 1, metadata : {}}, {rid: 1, metadata : {labely : "hallo"}}))
+      // .then(r => mysqldb.getResource(r.rid))
+      // .then(r => JSON.stringify(r, null, 2))
+      // .then(console.log)
+      // .then(r => mysqldb.promisedEditResource(42, {rid: 1, metadata : {labely : "hallo"}}, {rid: 1, metadata : {label : "hallo", label1 : "hallo"}}))
+      // .then(r => mysqldb.getResource(r.rid))
+      // .then(r => JSON.stringify(r, null, 2))
+      .then(console.err, console.err);
 
 
 

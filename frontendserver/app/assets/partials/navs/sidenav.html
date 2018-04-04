@@ -1,15 +1,21 @@
-<md-sidenav class="md-sidenav-right md-whiteframe-4dp" md-component-id="right">
-  <div ng-controller="SidenavController">
+<md-sidenav
+  class="md-sidenav-right md-whiteframe-4dp"
+  md-component-id="right"
+  style="min-height: 100%; z-index: 1003;"
+>
+  <div>
      <form>
        <md-toolbar class="md-theme-light">
          <h1 class="md-toolbar-tools">
-           <md-input-container class="example-full-width" ng-if="selectedEntity !== 'createCompound'">
+           {{ selectedEntity.data().name }}
+           <!-- <md-input-container class="example-full-width" ng-if="selectedEntity !== 'createCompound'">
              <input
               style="color: white"
               ng-model="selectedEntity.data().name"
               ng-model-options="{ getterSetter: true, updateOn: 'default' }"
+              readonly
              >
-           </md-input-container>
+           </md-input-container> -->
            <!-- <input value="{{selectedEntity.data('name')}}" /> -->
            <div ng-if="selectedEntity === 'createCompound'">
             Create Compound Node:
@@ -17,38 +23,102 @@
           </h1>
        </md-toolbar>
        <md-content layout-padding>
-          <img
-            ng-show="selectedEntity.data('image')"
-            ng-src="{{selectedEntity.data('image') === undefined ? '' : selectedEntity.data('image')}}"
-            style="width:200px;"
-          />
-           <md-input-container
-            ng-if="selectedEntity !== 'createCompound'"
-           >
-             <label for="testInput">Description</label>
-             <textarea
-                ng-model="selectedEntity.data().desc"
-                md-autofocus
-                ng-model-options="{ getterSetter: true, updateOn: 'default' }"
-              >
-             </textarea>
-           </md-input-container>
-           <md-input-container
-            ng-if="selectedEntity === 'createCompound'"
-           >
-             <label for="newCompound">Name</label>
-             <input
-                id="newCompound"
-                ng-if="selectedEntity === 'createCompound'"
-              >
-            </input>
-           </md-input-container>
-         <md-button ng-click="delete()" class="md-warn" ng-if="selectedEntity !== 'createCompound'">
-           Delete
-         </md-button>
-         <md-button ng-click="createCompound()" class="md-primary" ng-if="selectedEntity === 'createCompound'">
-           Create
-         </md-button>
+         <div ng-if="selectedEntity !== 'createCompound'">
+            <img
+              ng-show="selectedEntity.data('image')"
+              ng-src="{{selectedEntity.data('image') === undefined ? '' : selectedEntity.data('image')}}"
+              style="width:200px;"
+            />
+            <h4>"metadata" :  {</h4>
+            <div layout="row" layout-xs="column" class="metadata-inputs">
+              <div flex>
+                key
+              </div>
+              :
+              <div flex>
+                value
+              </div>
+            </div>
+            <div layout="row" layout-xs="column" class="metadata-inputs">
+              <div flex>
+                <md-input-container>
+                  <input
+                     style="text-align: center"
+                     readonly
+                     value="{{metadata_keys[0]}}"
+                   >
+                 </input>
+               </md-input-container>
+              </div>
+              <div flex>
+                <md-input-container>
+                  <input
+                     ng-model="selectedEntity.data().metadata.label"
+                     md-autofocus
+                     ng-model-options="{ getterSetter: true, updateOn: 'default' }"
+                     style="text-align: center"
+                   >
+                 </input>
+               </md-input-container>
+              </div>
+            </div>
+            <div layout="row" layout-xs="column" class="metadata-inputs">
+              <div flex>
+                <md-input-container>
+                  <input
+                     style="text-align: center"
+                   >
+                 </input>
+               </md-input-container>
+              </div>
+              <div flex>
+                <md-input-container>
+                  <input
+                     md-autofocus
+                     ng-model-options="{ getterSetter: true, updateOn: 'default' }"
+                     style="text-align: center"
+                   >
+                 </input>
+               </md-input-container>
+              </div>
+            </div>
+             <!-- <md-input-container>
+               <label for="testInput">Label</label>
+               <input
+                  ng-model="selectedEntity.data().metadata.label"
+                  md-autofocus
+                  ng-model-options="{ getterSetter: true, updateOn: 'default' }"
+                >
+              </input>
+             </md-input-container> -->
+           <h4>}</h4>
+           <md-button ng-click="add()" class="md-primary" style="min-width: 50px">
+             <i class="fa fa-plus-circle fa-2x"></i>
+           </md-button>
+           <md-button ng-click="update()" class="md-primary">
+             Update
+           </md-button>
+           <md-button ng-click="delete()" class="md-warn">
+             Delete
+           </md-button>
+           <md-divider></md-divider>
+           <h3>Properties:<h3>
+           <pre id="propertify">
+           </pre>
+         </div>
+
+         <div ng-if="selectedEntity === 'createCompound'">
+             <md-input-container>
+               <label for="newCompound">Name</label>
+               <input
+                  id="newCompound"
+                >
+              </input>
+             </md-input-container>
+           <md-button ng-click="createCompound()" class="md-primary">
+             Create
+           </md-button>
+         </div>
        </md-content>
      </form>
      <md-toolbar class="md-scroll-shrink">

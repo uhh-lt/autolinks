@@ -22,8 +22,8 @@ const explicitNLP = (() => {
       return require('./nlp-components/CtakesNLP');
     case 'stupid':
     default:
-      logger.info('Using StupidNER');
-      return require('./nlp-components/StupidNER');
+      logger.info('Using StupidNLP');
+      return require('./nlp-components/StupidNLP');
   }
 })();
 
