@@ -142,7 +142,7 @@ function sendData(data, res) {
   return res;
 }
 
-module.exports.call_service = function (location, path, method, userid, data, req, res, next) {
+module.exports.call_service = function (location, path, method, userid, data, serviceref, endpointref, req, res, next) {
 
   const requestDataOptions = {
     url: path,
@@ -163,6 +163,7 @@ module.exports.call_service = function (location, path, method, userid, data, re
         logger.debug(`Successfully recevied storagekey: ${key}`);
         return key;
     }, err => null)
+    .then(key => `${serviceref.name}__${serviceref.version}__${endpointref.path}__${serviceref.method}__${key}`) // make key unique per service & endpoint
     .then(key => {
       // if data for key exists in DB use it, otherwise get it from service call and store it
       if (key) {
