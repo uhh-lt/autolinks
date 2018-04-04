@@ -58,8 +58,8 @@ services:
       - NODE_ENV=development
       - COOKIE_SECRET=YOUR_COOKIE_SECRET
       - STORAGE=mysql
-      # - NLP=stupid
-      - NLP=ctakes
+      - NLP=stupid
+      # - NLP=ctakes
       - CTAKESURL=http://ctakes-nlp:8080
       - MYSQL=mysql://autolinks:autolinks1@mysql:3306/autolinks?debug=false&connectionLimit=100
       - LOGLEVEL=debug
