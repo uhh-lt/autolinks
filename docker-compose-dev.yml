@@ -116,8 +116,6 @@ services:
       context: ctakesnlp
       dockerfile: Dockerfile
     image: ctakes-nlp:latest
-    ports:
-      - 8080:8080
     networks:
       - anet
   # END: ctakes-nlp

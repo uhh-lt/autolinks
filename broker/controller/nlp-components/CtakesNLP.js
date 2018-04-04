@@ -31,7 +31,7 @@ module.exports = {
             }
         };
 
-        console.log(options.uri);
+        logger.info(`Using ctakes webservice: '${options.uri}'.`);
 
         request(options)
             .then(function (parsedBody) {
