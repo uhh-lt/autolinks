@@ -15,20 +15,24 @@
 @background_color_10: #4677f8;
 @border_color_1: #d3d3d3;
 @border_color_2: #5394ed;
+@blue_material: rgb(63,81,181);
+@red_material: rgb(255,87,34);
 
 @import "input";
+@import "carousel";
+@import "bottom";
 @import "navs/circlenav";
 /*md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolbar) {
     background-color: rgba(181, 63, 63, 0.2);
     color: rgba(255,255,255,0.87);
 }*/
 /* Node card */
-html, body, .container {
+html, body, .container, canvas {
 	height: 100%;
 	width: 100%;
 }
 #cy-network {
-	height: 900px;
+	height: 100%;
 	width: 100%;
 	background-color: @background_color_1;
 }
@@ -50,6 +54,9 @@ html, body, .container {
 }
 #canvas {
 	z-index: 1 !important;
+}
+.md-grid-item-content:hover {
+	color: @blue_material;
 }
 .outer-canvas {
 	z-index: 2;
@@ -208,6 +215,20 @@ div.popupMenu {
 				color: @color_3;
 			}
 		}
+	}
+}
+
+md-toast.md-warn-toast-theme {
+    .md-toast-content {
+        background-color: @red_material;
+    }
+}
+
+.metadata-inputs {
+	text-align: center;
+	margin-bottom: 15px;
+	md-input-container {
+		margin: 0;
 	}
 }
 

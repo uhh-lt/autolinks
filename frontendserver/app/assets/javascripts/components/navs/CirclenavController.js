@@ -1,16 +1,68 @@
 define([
     'angular',
-    'jquery'
+    'jquery',
+    'ngMaterial'
 ], function(angular, $) {
     'use strict';
     /**
      * Circlenav module:
      */
-    angular.module('autolinks.circlenav', []);
-    angular.module('autolinks.circlenav')
+    angular.module('autolinks.circlenav', ['ngMaterial'])
+    // angular.module('autolinks.circlenav')
         // Circlenav Controller
-        .controller('CirclenavController', ['$scope', '$rootScope', '$mdSidenav', 'EntityService',
-        function ($scope, $rootScope, $mdSidenav, EntityService) {
+        .controller('CirclenavController', ['$scope', '$rootScope', '$timeout', '$mdBottomSheet', '$mdToast', '$mdDialog', '$mdSidenav', 'EntityService',
+        function ($scope, $rootScope, $$timeout, $mdBottomSheet, $mdToast, $mdDialog, mdSidenav, EntityService) {
+
+         this.topDirections = ['left', 'up'];
+         this.bottomDirections = ['down', 'right'];
+
+         this.isOpen = false;
+
+         this.availableModes = ['md-fling', 'md-scale'];
+         this.selectedMode = 'md-fling';
+
+         this.availableDirections = ['up', 'down', 'left', 'right'];
+         this.selectedDirection = 'up';
+
+         $scope.alert = '';
+
+         $scope.showGridBottomSheet = function() {
+           $scope.alert = '';
+           $mdBottomSheet.show({
+             templateUrl: '/app/assets/partials/bottom.html',
+             controller: 'BottomSheetController',
+             clickOutsideToClose: false,
+             disableBackdrop: true,
+             disableParentScroll: false
+           }).then(function(clickedItem) {
+             $mdToast.show(
+                   $mdToast.simple()
+                     .textContent(clickedItem['name'] + ' clicked!')
+                     .position('top right')
+                     .hideDelay(1500)
+                 );
+           }).catch(function(error) {
+             // User clicked outside or hit escape
+           });
+         };
+
+
+         $scope.uploadFile = function(ev){
+           $mdDialog.show({
+              controller: 'UploadFileController',
+              templateUrl: '/app/assets/partials/dialog/uploadFile.html',
+              parent: angular.element(document.body),
+              targetEvent: ev,
+              clickOutsideToClose:true,
+              fullscreen: $scope.customFullscreen // Only for -xs, -sm breakpoints.
+            })
+            .then(function(answer) {
+              $scope.status = 'You said the information was "' + answer + '".';
+            }, function() {
+              $scope.status = 'You cancelled the dialog.';
+            });
+         };
+
 
           $scope.lockLeft = true;
 
@@ -57,11 +109,12 @@ define([
           };
 
           $scope.toggleSidenav = function() {
-            if (window.innerWidth > 1280) {
-              $rootScope.$emit('toggleMainnav');
-            } else {
-              $mdSidenav('left').toggle();
-            }
+            $rootScope.$emit('toggleMainnav');
+            // if (window.innerWidth > 1280) {
+            //   $rootScope.$emit('toggleMainnav');
+            // } else {
+            //   $mdSidenav('left').toggle();
+            // }
           };
         }
       ]);

@@ -17,6 +17,9 @@ const explicitNLP = (() => {
       return require('./nlp-components/GermaNER')({
 
       });
+      case 'ctakes':
+      logger.info('Using CtakesNLP1234');
+      return require('./nlp-components/CtakesNLP');
     case 'stupid':
     default:
       logger.info('Using StupidNLP');

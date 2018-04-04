@@ -11,15 +11,21 @@ define([
         .controller('SidenavController', ['$scope', '$rootScope', '$timeout', '$mdSidenav', '$log', 'EntityService', 'EndPointService', '_',
         function ($scope, $rootScope, $timeout, $mdSidenav, $log, EntityService, EndPointService, _) {
 
-          $scope.newCompound = '';
+          $scope.label = '';
 
           $scope.init = function() {
-            // $timeout( function
+            $timeout( function() {
               $scope.selectedEntity = EntityService.getRootScopeEntity();
+              const entity = $scope.selectedEntity;
+              if (entity._private) {
+                const metadata = _.clone(entity._private.data.metadata);
+                $scope.metadata = metadata;
+                $scope.metadata_keys = Object.keys($scope.metadata);
+                document.getElementById("propertify").innerHTML = JSON.stringify($scope.selectedEntity._private.data, undefined, 4);
+              }
               console.log($scope.selectedEntity);
-              // console.log($scope);
-            // }, 1000);
-          }
+            }, 1000);
+          };
 
           $rootScope.$on('sidenavReinit', function (event, args) {
             $scope.init();
@@ -30,12 +36,28 @@ define([
           // console.log(selectedEntity);
 
           // // add Edges to the edges object, then broadcast the change event
-          // $scope.update = function(){
-          //     $scope.selectedEntity = EntityService.updateRootScopeEntity($scope.selectedEntity);
-          //     // broadcasting the event
-          //     // $rootScope.$broadcast('appChanged');
-          //     $mdSidenav('right').close();
-          // };
+          $scope.update = function() {
+              const entity = $scope.selectedEntity;
+              const before = {
+                "rid": entity.data('rid'),
+                "cid": entity.data('cid'),
+                "metadata": $scope.metadata ? $scope.metadata : {}
+                // "value": entity.data('name') ? entity.data('name') : {}
+              };
+              const after = {
+                "rid": entity.data('rid'),
+                "cid": entity.data('cid'),
+                "metadata": entity.data('metadata') ? entity.data('metadata') : {}
+                // "value": entity.data('name') ? entity.data('name') : {}
+              };
+              const data = { before: before, after: after};
+              EndPointService.editResource(data);
+              $mdSidenav('right').close();
+              // $scope.selectedEntity = EntityService.updateRootScopeEntity($scope.selectedEntity);
+              // // broadcasting the event
+              // // $rootScope.$broadcast('appChanged');
+              // $mdSidenav('right').close();
+          };
 
           $scope.createCompound = function(){
               $rootScope.$emit('createCompound');
@@ -43,6 +65,18 @@ define([
           };
 
           $scope.delete = function(){
+              const entity = $scope.selectedEntity;
+              const label = $scope.label;
+
+              const before = {
+                "rid": entity.data('rid'),
+                "cid": entity.data('cid'),
+                "metadata": $scope.metadata ? $scope.metadata : {},
+                "value": entity.data('name') ? entity.data('name') : {}
+              };
+
+              const data = { before: before, after: null };
+              EndPointService.editResource(data);
               EntityService.deleteEntity();
               $mdSidenav('right').close();
           };
@@ -51,8 +85,10 @@ define([
             // Component lookup should always be available since we are not using `ng-if`
             // $route.reload();
             EndPointService.fetchData();
+
             $mdSidenav('right').close()
               .then(function () {
+                document.getElementById("propertify").innerHTML = '{}';
                 $log.debug("close RIGHT is done");
               });
           };

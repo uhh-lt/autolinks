@@ -101,6 +101,11 @@ define([
                     'background-fit': 'cover',
                     'content':
                       function(e) {
+                        if (e.data('metadata')) {
+                          if (e.data('metadata').label) {
+                            return e.data('metadata').label;
+                          }
+                        }
                         return e.data('name');
                       },
                     'text-valign': 'bottom',
@@ -115,7 +120,12 @@ define([
                     'width': '2',
                     'content':
                       function(e) {
-                        return e.data('name') ? e.data('name') : 'has relation';
+                        if (e.data('metadata')) {
+                          if (e.data('metadata').label) {
+                            return e.data('metadata').label;
+                          }
+                        }
+                        return (e.data('name') ? e.data('name') : 'has relation');
                       },
                     'curve-style': 'bezier',
                     'target-arrow-shape': 'triangle',
