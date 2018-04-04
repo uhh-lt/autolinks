@@ -613,14 +613,25 @@ paths:
           in: formData
           type: file
           required: true
+        - name: overwrite
+          in: query
+          description: Overwrite file if it already exists
+          type: boolean
+          allowEmptyValue: true
       security:
         - broker_auth: []
       responses:
         200:
           description: single string with ok message
           schema:
-            type: string
-            default: 'OK'
+            type: object
+            properties:
+              name: 
+                type: string
+                description: filename
+              did: 
+                type: integer
+                description: document id
         default:
           description: Error
           schema:

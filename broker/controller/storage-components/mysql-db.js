@@ -591,8 +591,8 @@ module.exports.promisedSaveFile = function(userid, filename, encoding, mimetype,
         if(!overwrite) {
           return reject(new Exception('IllegalState', `${msg} Specify overwrite if you want to update the file.`));
         }
-        logger.warn(`File already exists for user ${userid}: '${filename}'.`);
-        return reject(new Exception('NotImplemented', `Method not yet implemented!`));
+        logger.warn(`File already exists for user ${userid}: '${filename}' OVERWRITING!.`);
+        // TODO: delete and dependent data
       }
       if(size > MAX_FILESIZE) {
         return reject(new Exception('IllegalState', `Size of the file is too large (${size} > ${MAX_FILESIZE}). Upload smaller files or ask your administrator to increase the file size limit.`));
@@ -608,7 +608,7 @@ module.exports.promisedSaveFile = function(userid, filename, encoding, mimetype,
               if(err) {
                 return reject(Exception.fromError(err, `Storing file '${filename}' failed.`));
               }
-              logger.debug(`Saving file '${storeAt}'.`);
+              logger.debug(`Saved file '${storeAt}'.`);
               return resolve(did);
             });
           }, err => reject(err));
