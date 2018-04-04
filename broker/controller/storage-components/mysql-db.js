@@ -613,6 +613,15 @@ module.exports.promisedSaveFile = function(userid, filename, encoding, mimetype,
             });
           }, err => reject(err));
     }));
+
+  //fs.writeFileSync('./data.json', JSON.stringify(obj, null, 2) , 'utf-8');
+  //fs.writeFile('./data.json', JSON.stringify(obj, null, 2) , 'utf-8');
+  // var obj = JSON.parse(fs.readFileSync('file', 'utf8'));
+  // fs.readFile('file', 'utf8', function (err, data) {
+  //   if (err) throw err;
+  //   obj = JSON.parse(data);
+  // });
+
 };
 
 module.exports.getDocumentId = function(userid, filename) {
