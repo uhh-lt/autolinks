@@ -624,13 +624,9 @@ module.exports.promisedSaveFile = function(userid, filename, encoding, mimetype,
 
 };
 
-
 module.exports.promisedListFiles = function(userid) {
   return promisedQuery('select did from documents where uid = ?', [userid])
-    .then(
-      rows => {
-        // do stg
-      });
+    .then(res => res.rows.map(row => row.did));
 };
 
 module.exports.promisedDeleteFile = function(userid, did) {
