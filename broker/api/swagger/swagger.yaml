@@ -622,7 +622,7 @@ paths:
         - broker_auth: []
       responses:
         200:
-          description: single string with ok message
+          description: object contaning the document id (did)
           schema:
             type: object
             properties:
