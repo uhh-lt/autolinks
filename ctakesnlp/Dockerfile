@@ -14,9 +14,7 @@ RUN mkdir -p /opt/project
 
 WORKDIR /opt/project
 
-COPY pom.xml /opt/project
 COPY . /opt/project
 
-RUN apt-get install -y maven
 RUN mvn clean compile package
 ENTRYPOINT ["mvn","spring-boot:run", "-o"]
