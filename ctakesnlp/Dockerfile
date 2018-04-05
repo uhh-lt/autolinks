@@ -18,5 +18,5 @@ COPY pom.xml /opt/project
 COPY . /opt/project
 
 RUN apt-get install -y maven
-RUN mvn clean compile
-CMD ["mvn","spring-boot:run"]
+RUN mvn clean compile package
+ENTRYPOINT ["mvn","spring-boot:run", "-o"]
