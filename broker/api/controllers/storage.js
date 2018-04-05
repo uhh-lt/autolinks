@@ -55,7 +55,7 @@ module.exports.document_add = function(req, res, next) {
     const formdata = req.swagger.params.data.value;
     const overwrite =  req.swagger.params.overwrite && req.swagger.params.overwrite.value;
 
-    storage.promisedSaveFile(user.id, formdata.originalname, formdata.encoding, formdata.mimeType, formdata.size, formdata.buffer, overwrite)
+    storage.promisedSaveFile(user.id, formdata.originalname, formdata.encoding, formdata.mimetype, formdata.size, formdata.buffer, overwrite)
       .then(
         did => res.json({did: did, name: formdata.originalname}).end(next),
         err => Exception.fromError(err).handleResponse(res).end(next)

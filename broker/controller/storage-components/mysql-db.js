@@ -597,7 +597,7 @@ module.exports.promisedSaveFile = function(userid, filename, encoding, mimetype,
       if(size > MAX_FILESIZE) {
         return reject(new Exception('IllegalState', `Size of the file is too large (${size} > ${MAX_FILESIZE}). Upload smaller files or ask your administrator to increase the file size limit.`));
       }
-      return promisedQuery('select add_document(?,?) as did', [filename, userid])
+      return promisedQuery('select add_document(?,?,?,?) as did', [userid, filename, encoding, mimetype])
         .then(
           res => {
             const did = res.rows[0].did;

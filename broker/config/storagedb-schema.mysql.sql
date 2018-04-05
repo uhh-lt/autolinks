@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS documents (
   did         int unsigned NOT NULL AUTO_INCREMENT,
   uid         int unsigned,
   name        varchar(512) NOT NULL,
-  analysis    LONGTEXT DEFAULT NULL,
+  encoding    varchar(64) NOT NULL,
+  mimetype    varchar(128) NOT NULL,
   PRIMARY KEY (did, uid),
   KEY (did),
   KEY (uid),
@@ -171,16 +172,20 @@ BEGIN
   COMMIT ;
 END //
 
-create function add_document ( name_ varchar(512), uid_ int unsigned )
+create function add_document ( uid_ int unsigned, name_ varchar(512), encoding_ varchar(64), mimetype_ varchar(128) )
 RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
 BEGIN
   declare did_ int unsigned default 0;
-    if name_ is NULL then
-      return did_;
-    end if;
-    select did into did_ from documents where name = name_ and uid = uid_ limit 1;
-  insert into documents set uid = uid_, name = name_;
-  select LAST_INSERT_ID() into did_;
+  if name_ is NULL then
+    return did_;
+  end if;
+  select did into did_ from documents where name = name_ and uid = uid_ limit 1;
+  if did_ = 0 then
+    insert into documents set uid = uid_, name = name_, encoding = encoding_, mimetype = mimetype_;
+    select LAST_INSERT_ID() into did_;
+  else
+    replace into documents set did = did_, uid = uid_, name = name_, encoding = encoding_, mimetype = mimetype_;
+  end if;
   return did_;
 END //
 

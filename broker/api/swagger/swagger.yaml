@@ -636,6 +636,9 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Exception"
+            
+  /storage/document/{did}:
+    x-swagger-router-controller: storage
     delete:
       operationId: document_del
       tags:
@@ -643,6 +646,12 @@ paths:
       description: Removes a document
       security:
         - broker_auth: []
+      parameters:
+      - name: did
+        in: path
+        description: Document id to delete
+        required: true
+        type: integer
       responses:
         200:
           description: single string with ok message
@@ -657,9 +666,20 @@ paths:
       operationId: document_get
       tags:
         - Storage
-      description: Download a document
+      description: Get some info about a document or download it
       security:
         - broker_auth: []
+      parameters:
+      - name: did
+        in: path
+        description: Document id to query
+        required: true
+        type: integer
+      - name: target
+        in: query
+        description: Specify what to get explicitly
+        type: string
+        enum: [info, file, analysis]
       responses:
         200:
           description: The file which was requested
