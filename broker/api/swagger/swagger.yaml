@@ -601,37 +601,20 @@ paths:
             
   /storage/document:
     x-swagger-router-controller: storage
-    post:
-      operationId: document_add
+    get:
+      operationId: documents_list
       tags:
         - Storage
-      description: Add a document
-      consumes:
-        - multipart/form-data
-      parameters:
-        - name: data
-          in: formData
-          type: file
-          required: true
-        - name: overwrite
-          in: query
-          description: Overwrite file if it already exists
-          type: boolean
-          allowEmptyValue: true
+      description: Get a list of documents for the current user
       security:
         - broker_auth: []
       responses:
         200:
-          description: object contaning the document id (did)
+          description: The list of document ids (did)
           schema:
-            type: object
-            properties:
-              name: 
-                type: string
-                description: filename
-              did: 
-                type: integer
-                description: document id
+            type: array
+            items:
+              type: string
         default:
           description: Error
           schema:

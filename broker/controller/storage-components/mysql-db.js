@@ -624,6 +624,27 @@ module.exports.promisedSaveFile = function(userid, filename, encoding, mimetype,
 
 };
 
+
+module.exports.promisedListFiles = function(userid) {
+  return promisedQuery('select did from documents where uid = ?', [userid])
+    .then(
+      rows => {
+        // do stg
+      });
+};
+
+module.exports.promisedDeleteFile = function(userid, did) {
+  return promisedQuery('call remove_document(?,?)', [userid, did])
+    .then(
+      _ => {
+        logger.debug(`Deleted file from database '${did}'.`);
+        const storeAt = getFileLocation(userid, did);
+        logger.debug(`Deleting file '${storeAt}' from filesystem.`);
+        if (fs.existsSync(storeAt)) { fs.unlinkSync(storeAt); }
+        logger.debug(`File deleted '${storeAt}'.`);
+      });
+};
+
 module.exports.getDocumentId = function(userid, filename) {
   return promisedQuery('select did from documents where uid = ? and name = ?', [userid, filename])
     .then(res => {

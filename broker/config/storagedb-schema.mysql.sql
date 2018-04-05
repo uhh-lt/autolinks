@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS documents (
   name        varchar(512) NOT NULL,
   encoding    varchar(64) NOT NULL,
   mimetype    varchar(128) NOT NULL,
+  analysis    LONGTEXT DEFAULT NULL,
   PRIMARY KEY (did, uid),
   KEY (did),
   KEY (uid),
@@ -141,6 +142,8 @@ drop function if exists create_storageItemToResourceMapping;
 -- drop function if exists get_uid;
 
 -- drop function if exists get_or_add_user;
+
+drop procedure if exists remove_document;
 
 drop procedure if exists full_delete_resource;
 
@@ -323,6 +326,17 @@ END //
 --  end if;
 --  return uid_;
 --END //
+
+create procedure remove_document( IN uid_ int unsigned, IN did_ int unsigned )
+MODIFIES SQL DATA
+BEGIN
+  START TRANSACTION ;
+    -- delete the linked resources for the document
+    delete from resourceToDocument where did = did_;
+    -- delete the document
+    delete from documents where uid = uid_ and did = did_;
+  COMMIT ;
+END //
 
 create procedure remove_stringResourceFromContainer( IN rid_ int unsigned, IN cid_ int unsigned )
 MODIFIES SQL DATA

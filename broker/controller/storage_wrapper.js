@@ -93,6 +93,25 @@ module.exports.promisedSaveFile = function(userid, filename, encoding, mimetype,
 /**
  *
  * @param userid
+ * @return {*}
+ */
+module.exports.promisedListFiles = function(userid) {
+  return explicitStorage.promisedListFiles(userid);
+};
+
+/**
+ *
+ * @param userid
+ * @param did
+ * @return {*}
+ */
+module.exports.promisedDeleteFile = function(userid, did) {
+  return explicitStorage.promisedDeleteFile(userid, did);
+};
+
+/**
+ *
+ * @param userid
  * @param callback = function(err, info)
  */
 module.exports.info = function(userid, callback) {
