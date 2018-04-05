@@ -155,14 +155,17 @@ module.exports.promisedWrite = function (userid, storagekey, resourceList) {
 module.exports.saveNewResourceOrValue = function (resourceOrValue, uid, cid) {
   return new Promise((resolve, reject) => {
     let resource = null;
-    if(resourceOrValue.value){
+    if(resourceOrValue.value || resourceOrValue.rid){
       if(resource instanceof Resource){
         resource = resourceOrValue;
       }else {
-        resource = new Resource().deepAssign(resourceOrValue);
+        resource = new Resource().assign(resourceOrValue);
       }
     } else {
       resource = new Resource(null, resourceOrValue);
+    }
+    if(resource.rid){
+      return resolve(resource);
     }
     resource.cid = cid;
     // a resource can be an array of resources, a triple or a string
@@ -525,7 +528,7 @@ module.exports.promisedEditResource = function (userid, resourceBefore, resource
       return null;
     }
     logger.debug('Creating new resource.');
-    return this.saveNewResourceOrValue(resourceAfter.value, userid, resourceAfter.cid);
+    return this.saveNewResourceOrValue(resourceAfter, userid, resourceAfter.cid);
   }
 
   // 2: delete resource if resourceAfter is null
