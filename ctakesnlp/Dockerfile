@@ -17,6 +17,8 @@ WORKDIR /opt/project
 COPY pom.xml /opt/project
 COPY src /opt/project
 
-RUN mvn clean compile package && rm /opt/project/target/*.jar*
+RUN set -ex \
+      && mvn clean compile package -DskipTests \
+      && rm /opt/project/target/*.jar*
 
 ENTRYPOINT ["mvn","spring-boot:run", "-o"]
