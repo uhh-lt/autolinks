@@ -93,10 +93,11 @@ module.exports.promisedSaveFile = function(userid, filename, encoding, mimetype,
 /**
  *
  * @param userid
+ * @param detailed
  * @return {*}
  */
-module.exports.promisedListFiles = function(userid) {
-  return explicitStorage.promisedListFiles(userid);
+module.exports.promisedListFiles = function(userid, detailed) {
+  return explicitStorage.promisedListFiles(userid, detailed);
 };
 
 /**

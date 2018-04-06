@@ -643,6 +643,12 @@ paths:
       description: Get a list of documents for the current user
       security:
         - broker_auth: []
+      parameters:
+        - name: detailed
+          in: query
+          description: Get details for each document
+          type: boolean
+          allowEmptyValue: true
       responses:
         200:
           description: The list of document ids (did)

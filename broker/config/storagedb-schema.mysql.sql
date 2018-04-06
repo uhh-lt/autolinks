@@ -184,10 +184,12 @@ BEGIN
   end if;
   select did into did_ from documents where name = name_ and uid = uid_ limit 1;
   if did_ = 0 then
-    insert into documents set uid = uid_, name = name_, encoding = encoding_, mimetype = mimetype_;
+    insert into documents set uid = uid_, name = name_, encoding = encoding_, mimetype = mimetype_, analysis = null;
     select LAST_INSERT_ID() into did_;
   else
-    replace into documents set did = did_, uid = uid_, name = name_, encoding = encoding_, mimetype = mimetype_;
+    -- delete the linked resources for the document
+    delete from resourceToDocument where did = did_;
+    replace into documents set did = did_, uid = uid_, name = name_, encoding = encoding_, mimetype = mimetype_, analysis = null;
   end if;
   return did_;
 END //

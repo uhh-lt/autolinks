@@ -592,7 +592,6 @@ module.exports.promisedSaveFile = function(userid, filename, encoding, mimetype,
           return reject(new Exception('IllegalState', `${msg} Specify overwrite if you want to update the file.`));
         }
         logger.warn(`File already exists for user ${userid}: '${filename}' OVERWRITING!.`);
-        // TODO: delete and dependent data
       }
       if(size > MAX_FILESIZE) {
         return reject(new Exception('IllegalState', `Size of the file is too large (${size} > ${MAX_FILESIZE}). Upload smaller files or ask your administrator to increase the file size limit.`));
@@ -624,9 +623,20 @@ module.exports.promisedSaveFile = function(userid, filename, encoding, mimetype,
 
 };
 
-module.exports.promisedListFiles = function(userid) {
-  return promisedQuery('select did from documents where uid = ?', [userid])
-    .then(res => res.rows.map(row => row.did));
+module.exports.promisedListFiles = function(userid, detailed) {
+  if(!detailed){
+    return promisedQuery('select did from documents where uid = ?', [userid])
+      .then(res => res.rows.map(row => row.did));
+  }else{
+    return promisedQuery('select did, name, mimetype, encoding from documents where uid = ?', [userid])
+      .then(res => res.rows.map(row => Object({
+        did : row.did,
+        filename : row.name,
+        mimetype : row.mimetype,
+        encoding : row.encoding
+      })));
+  }
+
 };
 
 module.exports.promisedDeleteFile = function(userid, did) {

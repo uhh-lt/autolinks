@@ -66,7 +66,8 @@ module.exports.document_add = function(req, res, next) {
 
 module.exports.documents_list = function(req, res, next) {
   auth.handle_authenticated_request(req, res, function(user){
-    storage.promisedListFiles(user.id)
+    const detailed =  req.swagger.params.detailed && req.swagger.params.detailed.value;
+    storage.promisedListFiles(user.id, detailed)
       .then(
         dids => res.json(dids).end(next),
         err => Exception.fromError(err).handleResponse(res).end(next)
