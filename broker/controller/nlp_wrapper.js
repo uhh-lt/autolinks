@@ -40,19 +40,9 @@ module.exports.init = function(callback) {
  * @param text
  * @param callbackIter = function(err, analysis)
  */
-module.exports.analyze = function(text, contentType, source, callback) {
-  return explicitNLP.analyze(text, contentType, source, callback);
+module.exports.analyze = function(text, contentType, source) {
+  return explicitNLP.analyze(text, contentType, source);
 };
 
-/**
- *
- * @param analysis
- * @param callbackStart = function(err)
- * @param callbackIter = function(err, entities)
- * @param callbackDone = function(err)
- */
-module.exports.findNamedEntities = function(analysis, callbackStart, callbackIter, callbackDone) {
-  return explicitNLP.findNamedEntities(analysis, callbackStart, callbackIter, callbackDone);
-};
 
 

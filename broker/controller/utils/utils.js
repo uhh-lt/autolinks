@@ -28,10 +28,22 @@ module.exports.pause = function(numberMillis) {
   }
 };
 
+/*
+ * apply the same promise function to each element in an array
+ */
 module.exports.sequentialPromise = function(items, promisefun) {
   const reducer = (promise, item) =>
     promise.then(res => promisefun(item).then(y => res.push(y) && res));
   return items.reduce(reducer, Promise.resolve([]));
+};
+
+/*
+ * run the promises sequentially and return the results as a list
+ */
+module.exports.promiseSequential = function(promises) {
+  const reducer = (promiseagg, promise) =>
+    promiseagg.then(res => promise.then(y => res.push(y) && res));
+  return promises.reduce(reducer, Promise.resolve([]));
 };
 
 module.exports.waitPromise = function(ms) {

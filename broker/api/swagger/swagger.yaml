@@ -241,22 +241,22 @@ paths:
       security:
         - broker_auth: []
       parameters:
-        - name: data
-          in: body
-          description: The service + endpoint + parameter to be called
-          schema:
-            type: object
-            properties:
-              service:
-                type: string
-              version:
-                type: string
-              path:
-                type: string
-              method:
-                type: string
-              data:
-                $ref: '#/definitions/ServiceParameter'
+      - name: data
+        in: body
+        description: The service + endpoint + parameter to be called
+        schema:
+          type: object
+          properties:
+            service:
+              type: string
+            version:
+              type: string
+            path:
+              type: string
+            method:
+              type: string
+            data:
+              $ref: '#/definitions/ServiceParameter'
       responses:
         200:
           description: Success
@@ -275,18 +275,18 @@ paths:
         - Service
       description: Get service details of a registered service
       parameters:
-        - name: data
-          in: body
-          description: The name of the of the service
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-              version:
-                type: string
-              extended:
-                type: boolean
+      - name: data
+        in: body
+        description: The name of the of the service
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+            version:
+              type: string
+            extended:
+              type: boolean
       responses:
         200:
           description: Success
@@ -306,11 +306,11 @@ paths:
         - Service
       description: Register a service
       parameters:
-        - name: service
-          in: body
-          description: The service to be added
-          schema:
-            $ref: "#/definitions/Service"
+      - name: service
+        in: body
+        description: The service to be added
+        schema:
+          $ref: "#/definitions/Service"
       responses:
         200:
           description: Success
@@ -329,16 +329,16 @@ paths:
         - Service
       description: De-register a service, i.e. delete it from the broker
       parameters:
-        - name: service
-          in: body
-          description: The name of the of the service to delete
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-              version:
-                type: string
+      - name: service
+        in: body
+        description: The name of the of the service to delete
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+            version:
+              type: string
       responses:
         200:
           description: Success
@@ -376,16 +376,16 @@ paths:
         - Service
       description: Ping registered service
       parameters:
-        - name: service
-          in: body
-          description: The name of the of the service to ping
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-              version:
-                type: string
+      - name: service
+        in: body
+        description: The name of the of the service to ping
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+            version:
+              type: string
       responses:
         200:
           description: Success
@@ -415,12 +415,12 @@ paths:
         - NLP
       description: Find named entites in the provided text
       parameters:
-        - name: data
-          in: body
-          description: |
-            The analysis object which contains the current analysis object.
-          schema:
-            $ref: "#/definitions/Analysis"
+      - name: data
+        in: body
+        description: |
+          The analysis object which contains the current analysis object.
+        schema:
+          $ref: "#/definitions/Analysis"
       responses:
         200:
           description: Success
@@ -441,20 +441,43 @@ paths:
         - NLP
       description: Analyze the provided document
       parameters:
-        - name: data
-          in: body
-          description: |
-            The document object which contains the plain text and some
-            configuration parameters, e.g. the desired language of analyis.
+      - name: data
+        in: body
+        description: |
+          The document object which contains the plain text and some
+          configuration parameters, e.g. the desired language of analyis.
+        schema:
+          type: object
+          properties:
+            data: 
+              type: string
+            content-type:
+              type: string
+            source:
+              type: string
+      responses:
+        200:
+          description: Success
           schema:
-            type: object
-            properties:
-              data: 
-                type: string
-              content-type:
-                type: string
-              source:
-                type: string
+            $ref: "#/definitions/Analysis"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Exception"
+            
+  /nlp/analyze/{did}:
+    x-swagger-router-controller: nlp
+    post:
+      operationId: analyze_doc
+      tags:
+        - NLP
+      description: Analyze the provided document
+      parameters:
+      - name: did
+        in: path
+        description: Document id to delete
+        required: true
+        type: integer
       responses:
         200:
           description: Success
