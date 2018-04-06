@@ -125,4 +125,28 @@ module.exports.document_get = function(req, res, next) {
   });
 };
 
+module.exports.document_analysis_update = function(req, res, next) {
+  auth.handle_authenticated_request(req, res, function(user){
+
+    if(!req.swagger.params.did.value){
+      return new Exception('IllegalState', 'Document id missing!').handleResponse(res).end(next);
+    }
+
+    const did = req.swagger.params.did.value;
+    const ana = req.swagger.params.analysis && req.swagger.params.analysis.value;
+
+    storage.updateDocumentAnalysis(user.id, did, ana)
+      .then(
+        _ => {
+          res.header('Content-Type', 'text/plain; charset=utf-8');
+          res.end('OK\n', next);
+        },
+        err => Exception.fromError(err).handleResponse(res).end(next)
+      );
+
+  });
+};
+
+
+
 

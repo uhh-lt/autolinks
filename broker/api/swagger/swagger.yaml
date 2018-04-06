@@ -717,6 +717,33 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Exception"
+    post:
+      operationId: document_analysis_update
+      tags:
+        - Storage
+      description: Update the analysis of a document
+      security:
+        - broker_auth: []
+      parameters:
+      - name: did
+        in: path
+        description: Document id to update
+        required: true
+        type: integer
+      - name: analysis
+        in: body
+        description: The new analysis object, the old one will be overriden. Set to null if you want to delete the analysis object.
+        schema:
+          $ref: "#/definitions/Analysis"
+      responses:
+        200:
+          description: A single string with an OK message.
+          schema:
+            type: string
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Exception"
 
   /storage/info:
     x-swagger-router-controller: storage
