@@ -14,9 +14,11 @@ RUN mkdir -p /opt/project
 
 WORKDIR /opt/project
 
-COPY pom.xml /opt/project
-COPY . /opt/project
+COPY pom.xml /opt/project/
+COPY src /opt/project/src/
 
-RUN apt-get install -y maven
-RUN mvn clean compile
-CMD ["mvn","spring-boot:run"]
+RUN set -ex \
+      && mvn clean compile package -DskipTests \
+      && rm /opt/project/target/*.jar*
+
+CMD ["mvn","spring-boot:run", "-o"]
