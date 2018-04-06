@@ -655,7 +655,7 @@ paths:
           schema:
             type: array
             items:
-              type: string
+              $ref: '#/definitions/Any'
         default:
           description: Error
           schema:
