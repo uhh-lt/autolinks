@@ -19,8 +19,6 @@ module.exports.analyze = function(text, contentType, source) {
   const ana = new Analysis();
   ana.text = text;
   ana.source = source;
-  logger.info({text: text, contentType: contentType, source: source});
-
   logger.debug(`Analyzing document: '${ana.source}'.`);
   let options = {
     uri: process.env.CTAKESURL + '/analyse',

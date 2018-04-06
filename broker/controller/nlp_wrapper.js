@@ -5,6 +5,8 @@
  */
 const
   Exception = require('../model/Exception').model,
+  store = require('./storage_wrapper'),
+  utils = require('./utils/utils'),
   logger = require('./log')(module);
 
 const explicitNLP = (() => {
@@ -20,7 +22,7 @@ const explicitNLP = (() => {
 
       });
       case 'ctakes':
-      logger.info('Using CtakesNLP1234');
+      logger.info('Using CtakesNLP');
       return require('./nlp-components/CtakesNLP');
     case 'stupid':
     default:
@@ -40,7 +42,6 @@ module.exports.init = function(callback) {
 /**
  *
  * @param text
- * @param callbackIter = function(err, analysis)
  */
 module.exports.analyze = function(text, contentType, source) {
   return explicitNLP.analyze(text, contentType, source);
@@ -48,8 +49,21 @@ module.exports.analyze = function(text, contentType, source) {
 
 
 module.exports.analyzeDocument = function(uid, did, refresh) {
-
-  return Promise.reject(new Exception('NotImplemented', 'Method not yet implemented.'));
+  return store.promisedGetFile(uid, did, 'info')
+    .then(docinfo => {
+      if(docinfo.analyzed){
+        if(!refresh){
+          return store.promisedGetFile(uid, did, 'analysis');
+        }
+        logger.debug(`Document has already been analyzed. OVERWRITING!`);
+      }
+      return store.promisedGetFile(uid, did, 'content')
+        .then(content => this.analyze(content, docinfo.mimetype, docinfo.name))
+        .then(analysis => {
+          store.updateDocumentAnalysis(analysis);
+          return analysis;
+        });
+    });
 };
 
 

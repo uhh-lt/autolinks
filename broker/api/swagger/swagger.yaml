@@ -26,7 +26,7 @@ definitions:
 
   # helper object to describe strings, arrays, or objects
   Any:
-    description: 'Can be anything: string, number, array, object, etc.'
+    description: 'Can be anything: string, number, array, object, file, etc.'
 
   # objects related for service maintenance
   Service:
@@ -451,7 +451,7 @@ paths:
       parameters:
       - name: did
         in: path
-        description: Document id to delete
+        description: Document id to analyze
         required: true
         type: integer
       - name: refresh
@@ -707,12 +707,12 @@ paths:
         in: query
         description: Specify what to get explicitly
         type: string
-        enum: [info, file, analysis]
+        enum: [info, content, analysis]
       responses:
         200:
           description: The file which was requested
           schema:
-            type: file
+            $ref: "#/definitions/Any"
         default:
           description: Error
           schema:

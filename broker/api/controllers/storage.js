@@ -114,6 +114,24 @@ module.exports.document_get = function(req, res, next) {
     //     },
     //     err => Exception.fromError(err).handleResponse(res).end(next)
     //   );
+
+
+
+    // var file = __dirname + '/upload-folder/dramaticpenguin.MOV';
+    //
+    // var filename = path.basename(file);
+    // var mimetype = mime.lookup(file);
+    //
+    // res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+    // res.setHeader('Content-type', mimetype);
+    //
+    // var filestream = fs.createReadStream(file);
+    // filestream.pipe(res);
+
+    // var buf = Buffer.from('./test.html');
+    // fs.createReadStream(buf).pipe(res);
+
+
   });
 };
 
