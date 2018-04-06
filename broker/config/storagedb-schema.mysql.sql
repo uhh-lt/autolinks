@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS documents (
   name        varchar(512) NOT NULL,
   encoding    varchar(64) NOT NULL,
   mimetype    varchar(128) NOT NULL,
-  analysis    LONGTEXT DEFAULT NULL,
+  analysis    JSON DEFAULT NULL,
   PRIMARY KEY (did, uid),
   KEY (did),
   KEY (uid),

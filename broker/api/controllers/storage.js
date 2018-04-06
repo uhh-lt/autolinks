@@ -1,6 +1,7 @@
 'use strict';
 
 const
+  fs = require('fs'),
   auth = require('../../controller/auth'),
   storage = require('../../controller/storage_wrapper'),
   Exception = require('../../model/Exception').model,
@@ -24,7 +25,7 @@ module.exports.read = function(req, res, next) {
 };
 
 module.exports.write = function(req, res, next) {
-  auth.handle_authenticated_request(req, res, function(user){
+  auth.handle_authenticated_request(req, res, function(user) {
     new Exception('NOT IMPLEMENTED', 'not yet implemented').handleResponse(res).end(next);
   });
 };
@@ -101,20 +102,51 @@ module.exports.document_get = function(req, res, next) {
     if(!req.swagger.params.did.value){
       return new Exception('IllegalState', 'Document id missing!').handleResponse(res).end(next);
     }
+    if(!req.swagger.params.target.value){
+      return new Exception('IllegalState', 'Target parameter is missing!').handleResponse(res).end(next);
+    }
 
     const did = req.swagger.params.did.value;
+    const target = req.swagger.params.target.value;
 
-    res.end(next);
-
-    // storage.promisedGetFile(user.id, did, ...)
-    //   .then(
-    //     res => {
-    //       res.header('Content-Type', 'text/plain; charset=utf-8');
-    //       res.end('OK\n', next);
-    //     },
-    //     err => Exception.fromError(err).handleResponse(res).end(next)
-    //   );
+    if(target !== 'content'){
+      return storage.promisedGetFile(user.id, did, target)
+        .then(result => res.json(result).end(next));
+    }
+    // else
+    return storage.promisedGetFile(user.id, did, 'info')
+      .then(docinfo => storage.promisedGetFile(user.id, did, 'content')
+        .then(doccontent => {
+          res.setHeader('Content-disposition', `attachment; filename=${docinfo.filename}`);
+          res.setHeader('Content-type', docinfo.mimetype);
+          res.write(doccontent);
+          res.end(next);
+        }));
   });
 };
+
+module.exports.document_analysis_update = function(req, res, next) {
+  auth.handle_authenticated_request(req, res, function(user){
+
+    if(!req.swagger.params.did.value){
+      return new Exception('IllegalState', 'Document id missing!').handleResponse(res).end(next);
+    }
+
+    const did = req.swagger.params.did.value;
+    const ana = req.swagger.params.analysis && req.swagger.params.analysis.value;
+
+    storage.updateDocumentAnalysis(user.id, did, ana)
+      .then(
+        _ => {
+          res.header('Content-Type', 'text/plain; charset=utf-8');
+          res.end('OK\n', next);
+        },
+        err => Exception.fromError(err).handleResponse(res).end(next)
+      );
+
+  });
+};
+
+
 
 

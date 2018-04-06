@@ -8,6 +8,7 @@ const
   mysql = require('mysql'),
   Exception = require('../../model/Exception').model,
   Triple = require('../../model/Triple').model,
+  Analysis = require('../../model/Analysis').model,
   Resource = require('../../model/Resource').model,
   utils = require('../utils/utils'),
   murmurhashNative = require('murmurhash-native'),
@@ -16,7 +17,7 @@ const
 /* where to store data file */
 const datadir = (() => {
   /* make sure the data directory exists */
-  const datadir = path.resolve(global.__datadir && path.join(global.__datadir, 'storage'));
+  const datadir = path.resolve(global.__datadir && path.join(global.__datadir, 'storage') || 'storagedata');
   if (!fs.existsSync(datadir)) { fs.mkdirSync(datadir); }
   return datadir;
 })();
@@ -612,15 +613,6 @@ module.exports.promisedSaveFile = function(userid, filename, encoding, mimetype,
             });
           }, err => reject(err));
     }));
-
-  //fs.writeFileSync('./data.json', JSON.stringify(obj, null, 2) , 'utf-8');
-  //fs.writeFile('./data.json', JSON.stringify(obj, null, 2) , 'utf-8');
-  // var obj = JSON.parse(fs.readFileSync('file', 'utf8'));
-  // fs.readFile('file', 'utf8', function (err, data) {
-  //   if (err) throw err;
-  //   obj = JSON.parse(data);
-  // });
-
 };
 
 module.exports.promisedListFiles = function(userid, detailed) {
@@ -628,15 +620,15 @@ module.exports.promisedListFiles = function(userid, detailed) {
     return promisedQuery('select did from documents where uid = ?', [userid])
       .then(res => res.rows.map(row => row.did));
   }else{
-    return promisedQuery('select did, name, mimetype, encoding from documents where uid = ?', [userid])
+    return promisedQuery('select did, name, mimetype, encoding, (analysis is not null) as analyzed from documents where uid = ?', [userid])
       .then(res => res.rows.map(row => Object({
         did : row.did,
         filename : row.name,
         mimetype : row.mimetype,
-        encoding : row.encoding
+        encoding : row.encoding,
+        analyzed : row.analyzed,
       })));
   }
-
 };
 
 module.exports.promisedDeleteFile = function(userid, did) {
@@ -659,6 +651,74 @@ module.exports.getDocumentId = function(userid, filename) {
       }
       return null;
     });
+};
+
+module.exports.promisedGetFile = function(uid, did, target) {
+  if (target === 'info') {
+    return this.getDocumentInfo(uid, did);
+  }
+  if (target === 'content') {
+    return this.getDocumentContent(uid, did);
+  }
+  if (target === 'analysis') {
+    return this.getDocumentAnalysis(uid, did);
+  }
+};
+
+module.exports.getDocumentInfo = function(uid, did) {
+  return promisedQuery('select did, name, mimetype, encoding, (analysis is not null) as analyzed from documents where uid = ? and did = ?', [uid, did])
+    .then(res => {
+      if(!res.rows){
+        return Promise.reject(`Document ${did} not found for user ${did}.`);
+      }
+      const row = res.rows[0];
+      return {
+        did : row.did,
+        filename : row.name,
+        mimetype : row.mimetype,
+        encoding : row.encoding,
+        analyzed : row.analyzed,
+      };
+    });
+};
+
+module.exports.getDocumentContent = function(uid, did) {
+  return new Promise((resolve, reject) => {
+    const storeAt = getFileLocation(uid, did);
+    logger.debug(`Reading file content from file system: '${storeAt}'.`);
+    if (!fs.existsSync(storeAt)) {
+      return reject(new Exception('IllegalState', `File '${did}' for user '${uid}' does not exist.`));
+    }
+    fs.readFile(storeAt, 'binary', function (err, data) {
+      if (err) {
+        return reject(Exception.fromError(err, `Error while reading file '${did}' for user '${uid}'.`));
+      }
+      resolve(data);
+    });
+  });
+
+};
+
+module.exports.getDocumentAnalysis = function(uid, did) {
+  return promisedQuery('select name, mimetype, analysis from documents where uid = ? and did = ?', [uid, did])
+    .then(res => {
+      if(!res.rows){
+        return Promise.reject(`Document ${did} not found for user ${did}.`);
+      }
+      const row = res.rows[0];
+      if(!row.analysis){
+        const ana = Analysis.fromText('This document has not yet been analyzed!');
+        ana.source = row.name;
+        ana.mimeType = row.mimetype;
+        return ana;
+      }
+      return JSON.parse(row.analysis);
+    });
+};
+
+module.exports.updateDocumentAnalysis = function(uid, did, analysis) {
+  return promisedQuery('update documents set analysis = ? where uid = ? and did = ?', [JSON.stringify(analysis), uid, did])
+    .then(_ => true);
 };
 
 module.exports.close = function (callback) {

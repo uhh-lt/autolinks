@@ -113,6 +113,31 @@ module.exports.promisedDeleteFile = function(userid, did) {
 /**
  *
  * @param userid
+ * @param did
+ * @param target
+ * @param did
+ * @return {*}
+ */
+module.exports.promisedGetFile = function(userid, did, target) {
+  return explicitStorage.promisedGetFile(userid, did, target);
+};
+
+/**
+ *
+ * @param userid
+ * @param did
+ * @param analysis
+ * @return {*}
+ */
+module.exports.updateDocumentAnalysis = function(userid, did, analysis) {
+  return explicitStorage.updateDocumentAnalysis(userid, did, analysis);
+};
+
+
+
+/**
+ *
+ * @param userid
  * @param callback = function(err, info)
  */
 module.exports.info = function(userid, callback) {
