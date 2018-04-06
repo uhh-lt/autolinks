@@ -407,32 +407,6 @@ paths:
           schema:
             $ref: "#/definitions/Exception"
 
-  /nlp/findentities:
-    x-swagger-router-controller: nlp
-    post:
-      operationId: find_named_entities
-      tags:
-        - NLP
-      description: Find named entites in the provided text
-      parameters:
-      - name: data
-        in: body
-        description: |
-          The analysis object which contains the current analysis object.
-        schema:
-          $ref: "#/definitions/Analysis"
-      responses:
-        200:
-          description: Success
-          schema:
-            type: array
-            items:
-              $ref: "#/definitions/Annotation"
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/Exception"
-
   /nlp/analyze:
     x-swagger-router-controller: nlp
     post:
@@ -467,17 +441,24 @@ paths:
             
   /nlp/analyze/{did}:
     x-swagger-router-controller: nlp
-    post:
+    get:
       operationId: analyze_doc
       tags:
         - NLP
       description: Analyze the provided document
+      security:
+        - broker_auth: []
       parameters:
       - name: did
         in: path
         description: Document id to delete
         required: true
         type: integer
+      - name: refresh
+        in: query
+        description: Refresh and overwrite existing analysis
+        type: boolean
+        allowEmptyValue: true
       responses:
         200:
           description: Success

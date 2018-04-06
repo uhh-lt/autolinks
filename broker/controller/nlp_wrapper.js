@@ -3,7 +3,9 @@
 /**
  * imports
  */
-const logger = require('./log')(module);
+const
+  Exception = require('../model/Exception').model,
+  logger = require('./log')(module);
 
 const explicitNLP = (() => {
   switch (process.env.NLP) {
@@ -43,6 +45,14 @@ module.exports.init = function(callback) {
 module.exports.analyze = function(text, contentType, source) {
   return explicitNLP.analyze(text, contentType, source);
 };
+
+
+module.exports.analyzeDocument = function(uid, did, refresh) {
+
+  return Promise.reject(new Exception('NotImplemented', 'Method not yet implemented.'));
+};
+
+
 
 
 
