@@ -41,7 +41,7 @@ module.exports.analyze_doc = function(req, res, next) {
 
     const did = req.swagger.params.did.value;
 
-    const refresh =  req.swagger.params.detailed && req.swagger.params.refresh.value;
+    const refresh =  req.swagger.params.refresh && req.swagger.params.refresh.value;
 
     return NLP.analyzeDocument(user.id, did, refresh)
       .then(

@@ -17,7 +17,7 @@ const
 /* where to store data file */
 const datadir = (() => {
   /* make sure the data directory exists */
-  const datadir = path.resolve(global.__datadir && path.join(global.__datadir, 'storage'));
+  const datadir = path.resolve(global.__datadir && path.join(global.__datadir, 'storage') || 'storagedata');
   if (!fs.existsSync(datadir)) { fs.mkdirSync(datadir); }
   return datadir;
 })();
@@ -697,14 +697,6 @@ module.exports.getDocumentContent = function(uid, did) {
     });
   });
 
-  //fs.writeFileSync('./data.json', JSON.stringify(obj, null, 2) , 'utf-8');
-  //fs.writeFile('./data.json', JSON.stringify(obj, null, 2) , 'utf-8');
-  // var obj = JSON.parse(fs.readFileSync('file', 'utf8'));
-  // fs.readFile('file', 'utf8', function (err, data) {
-  //   if (err) throw err;
-  //   obj = JSON.parse(data);
-  // });
-
 };
 
 module.exports.getDocumentAnalysis = function(uid, did) {
@@ -720,12 +712,12 @@ module.exports.getDocumentAnalysis = function(uid, did) {
         ana.mimeType = row.mimetype;
         return ana;
       }
-      return row.analysis;
+      return JSON.parse(row.analysis);
     });
 };
 
 module.exports.updateDocumentAnalysis = function(uid, did, analysis) {
-  return promisedQuery('update documents set analysis = ? where uid = ? and did = ?', [analysis, uid, did])
+  return promisedQuery('update documents set analysis = ? where uid = ? and did = ?', [JSON.stringify(analysis), uid, did])
     .then(_ => true);
 };
 

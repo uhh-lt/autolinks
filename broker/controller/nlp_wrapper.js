@@ -60,7 +60,7 @@ module.exports.analyzeDocument = function(uid, did, refresh) {
       return store.promisedGetFile(uid, did, 'content')
         .then(content => this.analyze(content, docinfo.mimetype, docinfo.name))
         .then(analysis => {
-          store.updateDocumentAnalysis(analysis);
+          store.updateDocumentAnalysis(uid, did, analysis);
           return analysis;
         });
     });
