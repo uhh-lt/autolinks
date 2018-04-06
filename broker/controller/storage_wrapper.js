@@ -78,6 +78,41 @@ module.exports.promisedEditResource = function(userid, resourceBefore, resourceA
 /**
  *
  * @param userid
+ * @param filename
+ * @param encoding
+ * @param mimetype
+ * @param size
+ * @param content
+ * @param overwrite
+ * @return {*}
+ */
+module.exports.promisedSaveFile = function(userid, filename, encoding, mimetype, size, content, overwrite) {
+  return explicitStorage.promisedSaveFile(userid, filename, encoding, mimetype, size, content, overwrite);
+};
+
+/**
+ *
+ * @param userid
+ * @param detailed
+ * @return {*}
+ */
+module.exports.promisedListFiles = function(userid, detailed) {
+  return explicitStorage.promisedListFiles(userid, detailed);
+};
+
+/**
+ *
+ * @param userid
+ * @param did
+ * @return {*}
+ */
+module.exports.promisedDeleteFile = function(userid, did) {
+  return explicitStorage.promisedDeleteFile(userid, did);
+};
+
+/**
+ *
+ * @param userid
  * @param callback = function(err, info)
  */
 module.exports.info = function(userid, callback) {

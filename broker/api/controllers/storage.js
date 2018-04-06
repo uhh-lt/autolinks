@@ -37,12 +37,83 @@ module.exports.editresource = function(req, res, next) {
   auth.handle_authenticated_request(req, res, function(user) {
     storage.promisedEditResource(user.id, data.before, data.after).then(
       result => {
-        res.header('Content-Type', 'application/json; charset=utf-8');
-        res.write(JSON.stringify(result));
+        res.header('Content-Type', 'text/plain; charset=utf-8').write(JSON.stringify(result));
         res.end(next);
       },
       err => Exception.fromError(err, 'Editing resource failed.').handleResponse(res).end(next)
     );
+  });
+};
+
+module.exports.document_add = function(req, res, next) {
+  auth.handle_authenticated_request(req, res, function(user){
+
+    if(!req.swagger.params.data.value){
+      return new Exception('IllegalState', 'Data missing!').handleResponse(res).end(next);
+    }
+
+    const formdata = req.swagger.params.data.value;
+    const overwrite =  req.swagger.params.overwrite && req.swagger.params.overwrite.value;
+
+    storage.promisedSaveFile(user.id, formdata.originalname, formdata.encoding, formdata.mimetype, formdata.size, formdata.buffer, overwrite)
+      .then(
+        did => res.json({did: did, name: formdata.originalname}).end(next),
+        err => Exception.fromError(err).handleResponse(res).end(next)
+      );
+
+  });
+};
+
+module.exports.documents_list = function(req, res, next) {
+  auth.handle_authenticated_request(req, res, function(user){
+    const detailed =  req.swagger.params.detailed && req.swagger.params.detailed.value;
+    storage.promisedListFiles(user.id, detailed)
+      .then(
+        dids => res.json(dids).end(next),
+        err => Exception.fromError(err).handleResponse(res).end(next)
+      );
+  });
+};
+
+module.exports.document_del = function(req, res, next) {
+  auth.handle_authenticated_request(req, res, function(user){
+
+    if(!req.swagger.params.did.value){
+      return new Exception('IllegalState', 'Document id missing!').handleResponse(res).end(next);
+    }
+
+    const did = req.swagger.params.did.value;
+
+    storage.promisedDeleteFile(user.id, did)
+      .then(
+        _ => {
+          res.header('Content-Type', 'text/plain; charset=utf-8');
+          res.end('OK\n', next);
+        },
+        err => Exception.fromError(err).handleResponse(res).end(next)
+      );
+
+  });
+};
+
+module.exports.document_get = function(req, res, next) {
+  auth.handle_authenticated_request(req, res, function(user){
+    if(!req.swagger.params.did.value){
+      return new Exception('IllegalState', 'Document id missing!').handleResponse(res).end(next);
+    }
+
+    const did = req.swagger.params.did.value;
+
+    res.end(next);
+
+    // storage.promisedGetFile(user.id, did, ...)
+    //   .then(
+    //     res => {
+    //       res.header('Content-Type', 'text/plain; charset=utf-8');
+    //       res.end('OK\n', next);
+    //     },
+    //     err => Exception.fromError(err).handleResponse(res).end(next)
+    //   );
   });
 };
 

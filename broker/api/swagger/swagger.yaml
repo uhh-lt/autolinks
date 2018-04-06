@@ -598,6 +598,121 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Exception"
+            
+  /storage/document:
+    x-swagger-router-controller: storage
+    post:
+      operationId: document_add
+      tags:
+        - Storage
+      description: Add a document
+      consumes:
+        - multipart/form-data
+      parameters:
+        - name: data
+          in: formData
+          type: file
+          required: true
+        - name: overwrite
+          in: query
+          description: Overwrite file if it already exists
+          type: boolean
+          allowEmptyValue: true
+      security:
+        - broker_auth: []
+      responses:
+        200:
+          description: object contaning the document id (did)
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: filename
+              did:
+                type: integer
+                description: document id
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Exception"
+    get:
+      operationId: documents_list
+      tags:
+        - Storage
+      description: Get a list of documents for the current user
+      security:
+        - broker_auth: []
+      parameters:
+        - name: detailed
+          in: query
+          description: Get details for each document
+          type: boolean
+          allowEmptyValue: true
+      responses:
+        200:
+          description: The list of document ids (did)
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Any'
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Exception"
+            
+  /storage/document/{did}:
+    x-swagger-router-controller: storage
+    delete:
+      operationId: document_del
+      tags:
+        - Storage
+      description: Removes a document
+      security:
+        - broker_auth: []
+      parameters:
+      - name: did
+        in: path
+        description: Document id to delete
+        required: true
+        type: integer
+      responses:
+        200:
+          description: single string with ok message
+          schema:
+            type: string
+            default: 'OK'
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Exception"
+    get:
+      operationId: document_get
+      tags:
+        - Storage
+      description: Get some info about a document or download it
+      security:
+        - broker_auth: []
+      parameters:
+      - name: did
+        in: path
+        description: Document id to query
+        required: true
+        type: integer
+      - name: target
+        in: query
+        description: Specify what to get explicitly
+        type: string
+        enum: [info, file, analysis]
+      responses:
+        200:
+          description: The file which was requested
+          schema:
+            type: file
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Exception"
 
   /storage/info:
     x-swagger-router-controller: storage
