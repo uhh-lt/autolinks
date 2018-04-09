@@ -545,7 +545,6 @@ define([
                         } else if (_.isObject(n.value)) {
                           extractTripleResources(n, parent);
                         } else {
-                          debugger;
                           var subject = assignEntity(n, parent, true);
                           scope.newNode.push(subject);
                         }
@@ -664,15 +663,36 @@ define([
                         cy.fit();
                       });
 
-                      $rootScope.$on('layoutReset', function(){
+                      $rootScope.$on('createNode', function(event, newName) {
+                        var nodeObj = {
+                            data: {
+                              id: 'n' + scope.data.nodes.length,
+                              name: newName.name,
+                              metadata: { label: newName.name }
+                            },
+                            position: {
+                              x: 100 + Math.random() * 100,
+                              y: 100 + Math.random() * 100
+                            }
+                        };
+                        debugger;
+                        var n = cy.add(nodeObj);
+                        scope.data.nodes.push(nodeObj);
+                        nodeTipExtension(n);
+                        // cy.layout({name: 'cose-bilkent'}).run();
+                        // cy.fit();
+                        // cy.zoom(2);
+                      });
+
+                      $rootScope.$on('layoutReset', function() {
                           cy.layout(scope.options.layout).run();
                       });
 
-                      $rootScope.$on('clearAll', function(){
+                      $rootScope.$on('clearAll', function() {
                           cy.nodes().remove();
                       });
 
-                      $rootScope.$on('centerGraph', function(){
+                      $rootScope.$on('centerGraph', function() {
                           cy.fit();
                       });
 

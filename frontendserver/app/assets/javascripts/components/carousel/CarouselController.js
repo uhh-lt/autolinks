@@ -44,7 +44,7 @@ define([
                 var to = (e.doffset.offsets[0].from + e.doffset.offsets[0].length) - $scope.sentenceFrom;
                 var fragments = text.slice(offset, from).split('\n');
                 var surface = e.properties.surface;
-                var eId = ($scope.currIndex) + surface;
+                var eId = ($scope.currIndex) + '_' + surface + '_' + from + ':' + to;
 
                 fragments.forEach(function(f, i) {
                     compiledString = compiledString.concat(f);
@@ -65,7 +65,8 @@ define([
 
             $scope.slides.push({
               // image: '//unsplash.it/' + newWidth + '/300',
-              texts: [$sce.trustAsHtml(compiledString)],
+              texts:[text],
+              scripts: [$sce.trustAsHtml(compiledString)],
               id: $scope.currIndex++,
               entity: entity
             });
@@ -74,13 +75,72 @@ define([
           function createNeHighlight(id, name) {
               // var color = graphProperties.options['groups'][typeId]['color']['background'];
               var color = 'blue';
-              var addFilter = '<a id='+ id +' ng-click="addEntityFilter(' + id +')" context-menu="contextMenu" style="text-decoration: none;" class="entityHighlight">' + name + '</a>';
+              var addFilter = '<a id='+ id +' ng-click="addEntityFilter(' + id +')" context-menu="contextMenu" style="text-decoration: none; cursor: pointer" class="entityHighlight">' + name + '</a>';
               var innerElement = '<span style="padding: 0; margin: 0; text-decoration: none; border-bottom: 3px solid ' + color + ';">' + addFilter + '</span>';
               // innerElement.className = 'highlight-general';
               // addFilter.append(document.createTextNode(name));
               // innerElement.append(addFilter);
               return innerElement;
           }
+
+          function replaceAt(input, search, replace, start, end) {
+        		return input.slice(0, start)
+            	+ input.slice(start, end).replace(search, replace)
+              + input.slice(end);
+        	}
+
+          // Enable to select Entity and activate whitelisting modal
+          $scope.showSelectedEntity = function(text, script, id) {
+              script = script.toString();
+              $scope.selectedEntity =  $scope.getSelectionEntity(script);
+              var ent = $scope.selectedEntity;
+              var eId = ($scope.currIndex) + '_' + ent.text + '_' + ent.start + ':' + ent.end;
+              var highlightElement = createNeHighlight(eId, ent.text);
+
+              var newScript = replaceAt(script, ent.text, highlightElement, ent.start, ent.end);
+
+              // var selectedDoc = $scope.tabs.find((t) => { return t.id === doc.id; });
+              // var isInDoc = isEntityInDoc(selectedDoc, $scope.selectedEntity);
+              if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ')) {
+                $('#' + id + '_script-area').html(newScript);
+                $scope.slides[id].scripts = [$sce.trustAsHtml(newScript)];
+                $rootScope.$emit('createNode', { name: ent.text });
+
+              //   // $scope.isEntityInDoc = false;
+              //   $scope.open($scope, script, 'static');
+              // } else if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ')){
+              //   // $scope.isEntityInDoc = true;
+              //   $scope.open($scope, script, 'true');
+              }
+          };
+
+          $scope.selectedType = '';
+            var script = $scope.tabs;
+            $scope.getSelectionEntity = function(script) {
+              var text = "";
+              var start = 0;
+              var end = 0;
+              if (window.getSelection) {
+                 text = window.getSelection().toString();
+                 start = script.match(text).index;
+                 end = start + text.length;
+
+                // TODO: global exec RegExp
+                //  var regexScript = RegExp('the', 'g');
+                //  var iter;
+                //  while ((iter = regex1.exec(script)) !== null) {
+                //     console.log(`Found ${iter.index}. Next starts at ${regexScript.lastIndex}.`);
+                //   }
+              } else if (document.selection && document.selection.type != "Control") {
+                 text = document.selection.createRange().text;
+              }
+              text = text.trim();
+              return {
+                text,
+                start,
+                end
+              };
+            };
 
           $scope.addEntityFilter = function(name) {
             EndPointService.fetchService().then(function(response) {
@@ -138,9 +198,9 @@ define([
           };
 
           $(document).on('click', '.entityHighlight', function (e) {
-              var text = e.target.innerText;
-              $scope.addEntityFilter(text);
-              console.log(text);
+              $scope.text = e.target.innerText;
+              $scope.addEntityFilter($scope.text);
+              console.log($scope.text);
               e.preventDefault();
           });
 
@@ -190,12 +250,12 @@ define([
                     var from = sentence.doffset.offsets[0].from;
                     from = from === undefined ? (sentence.doffset.offsets[0].from = 0) : from;
                   }
+                  //TODO: make it dynamic for 'NamedEntity'
                   entity = $scope.anno.filter(a => (
                     (a.type === 'NamedEntity') &&
                     ((a.doffset.offsets[0].from + a.doffset.offsets[0].length) <= length) &&
                     (a.doffset.offsets[0].from >= from)
                   ));
-                  debugger;
                   $scope.addSlide(sentence, entity);
                 });
               });
