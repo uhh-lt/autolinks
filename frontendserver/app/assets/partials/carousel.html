@@ -2,10 +2,10 @@
   <div uib-carousel active="active" data-interval="false" no-wrap="noWrapSlides" ng-swipe-left="changeSlide('left')"
       ng-swipe-right="changeSlide('right')" class="multi-item-carousel">
     <div uib-slide ng-repeat="slide in slides track by slide.id" index="slide.id" class="carousel-card">
-      <div id="text-card-div" ng-repeat="text in slide.texts">
+      <div id="text-card-div" ng-repeat="script in slide.scripts">
         <md-card id="text-card">
           <md-content-card>
-            <div ng-bind-html="text"></div>
+            <div id="{{slide.id}}_script-area" ng-bind-html="script" ng-model="script" ng-mouseup="showSelectedEntity(slide.texts, script, slide.id)"></div>
           </md-content-card>
         </md-card>
       </div>

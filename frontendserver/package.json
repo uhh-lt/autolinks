@@ -14,7 +14,7 @@
     "url": "git+https://github.com/uhh-lt/autolinks.git"
   },
   "devDependencies": {
-    "bower": "^1.8.0"
+    "bower": "^1.8.4"
   },
   "keywords": [],
   "author": "",
