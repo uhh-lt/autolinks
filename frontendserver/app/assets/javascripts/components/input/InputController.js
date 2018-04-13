@@ -65,16 +65,15 @@ define([
             // for (var i=0; i<inputs.length; i++) {
             // if (_.includes(inputs, 'Simon')) {
             _.forEach(inputs, function(i) {
-              EndPointService.annotateText(i).then(function(response) {
-
-                  const annotations = response.data.annotations;
-                  $scope.context = response.data;
+              // EndPointService.annotateText(i).then(function(response) {
+                  // const annotations = response.data.annotations;
+                  $scope.context = i;
+                  const inputLength = i.length;
                   $scope.active = EndPointService.getActiveService();
 
                   if ($scope.active.length > 0) {
-                    _.forEach(annotations, function(anno) {
-
-                      const offsets = anno.doffset.offsets;
+                    // _.forEach(annotations, function(anno) {
+                      // const offsets = anno.doffset.offsets;
                       _.forEach($scope.list, function(l) {
 
                         $scope.serviceName = l.name;
@@ -85,8 +84,10 @@ define([
                             $scope.data = {
                               offsets:
                               {
-                                from: offsets[0].from ? offsets[0].from : 0,
-                                length: offsets[0].length
+                                // from: offsets[0].from ? offsets[0].from : 0,
+                                from: 0,
+                                length: inputLength
+                                // length: offsets[0].length
                               },
                               context: $scope.context,
                               name: $scope.serviceName,
@@ -101,7 +102,7 @@ define([
 
                         });
                       });
-                    });
+                    // });
                   } else {
                     $mdToast.show(
                           $mdToast.simple()
@@ -112,14 +113,8 @@ define([
                         );
                     $mdSidenav('left').toggle();
                   }
-
-              });
-
+              // });
             });
-
-            // }
-              // getPageName(encodeURI(inputs[i]), addStart);
-            // }
           }
 
 
