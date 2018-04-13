@@ -33,9 +33,9 @@ define([
           $scope.addSlide = function(sentence, entity) {
             // var newWidth = 600 + $scope.slides.length + 1;
             $scope.sentenceFrom = sentence.doffset.offsets[0].from;
-            $scope.sentenceTo = sentence.doffset.offsets[0].length
+            $scope.sentenceTo = sentence.doffset.offsets[0].from + sentence.doffset.offsets[0].length;
 
-            var text = sentence.properties.surface;
+            var text = $scope.doc.substring($scope.sentenceFrom, $scope.sentenceTo);
             var offset = 0;
             var compiledString = "";
 
@@ -43,7 +43,7 @@ define([
                 var from = e.doffset.offsets[0].from - $scope.sentenceFrom;
                 var to = (e.doffset.offsets[0].from + e.doffset.offsets[0].length) - $scope.sentenceFrom;
                 var fragments = text.slice(offset, from).split('\n');
-                var surface = e.properties.surface;
+                var surface = text.substring(from, to);
                 var eId = ($scope.currIndex) + '_' + surface + '_' + from + ':' + to;
 
                 fragments.forEach(function(f, i) {
@@ -101,7 +101,8 @@ define([
 
               // var selectedDoc = $scope.tabs.find((t) => { return t.id === doc.id; });
               // var isInDoc = isEntityInDoc(selectedDoc, $scope.selectedEntity);
-              if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ')) {
+              if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ') && (event.ctrlKey)) {
+                debugger;
                 $('#' + id + '_script-area').html(newScript);
                 $scope.slides[id].scripts = [$sce.trustAsHtml(newScript)];
                 $rootScope.$emit('createNode', { name: ent.text });
@@ -235,9 +236,10 @@ define([
           $rootScope.$on('activateTextCarousel', function(event, data) {
               $scope.resetSlides();
               $scope.isActive = true;
+              $scope.doc = data;
               EndPointService.annotateText(data).then(function(response) {
 
-                $scope.anno = response.data.annotations;
+                $scope.anno = response.data;
                 var sentences = $scope.anno.filter(a => a.type === 'Sentence');
                 // $scope.entity = anno.filter(a => a.type ==='NamedEntity')
                 // $scope.pages = sentences.length;
@@ -249,10 +251,11 @@ define([
                   if (length) {
                     var from = sentence.doffset.offsets[0].from;
                     from = from === undefined ? (sentence.doffset.offsets[0].from = 0) : from;
+                    length += from;
                   }
                   //TODO: make it dynamic for 'NamedEntity'
                   entity = $scope.anno.filter(a => (
-                    (a.type === 'NamedEntity') &&
+                    (a.type === 'AnatomicalSiteMention' || a.type === 'MedicationMention') &&
                     ((a.doffset.offsets[0].from + a.doffset.offsets[0].length) <= length) &&
                     (a.doffset.offsets[0].from >= from)
                   ));
