@@ -31,7 +31,7 @@ module.exports = function(url, token, data) {
           ]
         },
         "context": {
-          "text": context.text,
+          "text": context,
           "source": "string",
           "lang": "string",
           "annotations": [
