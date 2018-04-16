@@ -32,7 +32,6 @@ module.exports.analyze = function(text, contentType, source) {
 
   return request(options)
     .then(function (parsedBody) {
-      const annotations = [];
       // POST succeeded...
       if(parsedBody.annotations !== null) {
         parsedBody.annotations.forEach(function(element) {
@@ -41,10 +40,10 @@ module.exports.analyze = function(text, contentType, source) {
           anno.type = element.type;
           anno.doffset.offsets.push(new Offset(element.offset.from, element.offset.to - element.offset.from));
           anno.properties = element.properties;
-          annotations.push(anno);
+          ana.annotations.push(anno);
         });
       }
-      return annotations;
+      return ana;
     });
 
 };
