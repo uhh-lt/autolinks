@@ -114,11 +114,13 @@ Analysis.prototype.getAnnotationsWithinOffset = function(offset) {
   const annos = new Set();
   let i = offset.from;
   for(; i < (offset.from + offset.length); i++) {
-    const anno = this.annotation_index[i];
-    if(!anno) {
+    const annos_at_i = this.annotation_index[i];
+    if(!annos_at_i) {
       continue;
     }
-    annos.add(anno);
+    for(let anno of annos_at_i){
+      annos.add(anno);
+    }
   }
   return annos;
 };

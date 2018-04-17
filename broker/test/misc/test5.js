@@ -9,10 +9,13 @@ const ana = new Analysis().deepAssign(a);
 
 // console.log(ana);
 ana.prepareIndex();
-console.log(ana.annotation_index);
+// console.log(ana.annotation_index);
 const annot = ana.getAnnotationsWithinOffset(new Offset(0,7));
 //
-console.log(annot.size)
+// console.log(annot.size);
+annot.forEach(a => console.log(a.type));
+
+
 
 
 
