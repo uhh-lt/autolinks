@@ -21,7 +21,7 @@ services:
   ##
   # BEGIN: frontend
   frontend:
-    image: node:9.3
+    image: node:9.2.0
     volumes:
       - ${PWD}/frontendserver:/opt/project/frontendserver
     ports:
@@ -59,6 +59,8 @@ services:
       - COOKIE_SECRET=YOUR_COOKIE_SECRET
       - STORAGE=mysql
       - NLP=stupid
+      # - NLP=ctakes
+      - CTAKESURL=http://ctakes-nlp:8080
       - MYSQL=mysql://autolinks:autolinks1@mysql:3306/autolinks?debug=false&connectionLimit=100
       - LOGLEVEL=debug
   # END: broker
@@ -107,6 +109,16 @@ services:
     networks:
       - anet
   # END: mysql
+
+  # START: ctakes-nlp
+  ctakes-nlp:
+    build:
+      context: ctakesnlp
+      dockerfile: Dockerfile
+    image: ctakes-nlp:latest
+    networks:
+      - anet
+  # END: ctakes-nlp
 
   ##
   # Services and their dependencies
@@ -214,3 +226,26 @@ services:
       es:
         condition: service_healthy
   # END: elasticsearch index
+
+
+  # BEGIN: annotation interpreter service
+  anno:
+    image: remstef/node-swagger:latest
+    volumes:
+      - ${PWD}/services/annotationinterpreter:/opt/project/services/annotationinterpreter
+      - ${PWD}/broker:/opt/project/broker
+      - ${PWD}/data:/opt/project/data
+    ports:
+      - 10012:10010
+      - 3012:3001
+    networks:
+      - anet
+    stdin_open: true
+    tty: true
+    working_dir: /opt/project/services/annotationinterpreter
+    entrypoint: bash
+    environment:
+      - NODE_ENV=development
+      - COOKIE_SECRET=YOUR_COOKIE_SECRET
+      - BROKER_URL=http://broker:10010
+  # END: annotation interpreter service

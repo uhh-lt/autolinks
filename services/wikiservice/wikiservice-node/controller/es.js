@@ -111,6 +111,11 @@ module.exports.transformHit = function(text, hit, i) {
       return hitresource;
     });
 
+  // provide a url:
+  // http://en.wikipedia.org/?curid=18630637
+  // This is the shortest form, others are also possible:
+  // http://en.wikipedia.org/wiki?curid=18630637
+
   // // for each hit create a triple
   // return _(searchResult.hits.hits)
   //   .map(h =>

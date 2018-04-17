@@ -1,7 +1,7 @@
 # Manual exclude
-fronendserver/node_modules/*
-frontendserver/app/assets/javascripts/libs/*
-data/
+/fronendserver/node_modules/*
+/frontendserver/app/assets/javascripts/libs/*
+/data
 docker-compose.yml
 
 ### VisualStudioCode ###

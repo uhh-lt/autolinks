@@ -3,6 +3,27 @@
 -- USE autolinks;
 
 -- create the tables
+CREATE TABLE IF NOT EXISTS documents (
+  did         int unsigned NOT NULL AUTO_INCREMENT,
+  uid         int unsigned,
+  name        varchar(512) NOT NULL,
+  encoding    varchar(64) NOT NULL,
+  mimetype    varchar(128) NOT NULL,
+  analysis    JSON DEFAULT NULL,
+  PRIMARY KEY (did, uid),
+  KEY (did),
+  KEY (uid),
+  KEY (name(333))
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS resourceToDocument (
+  did int unsigned NOT NULL,
+  rid int unsigned NOT NULL,
+  PRIMARY KEY (did, rid),
+  KEY (did),
+  KEY (rid)
+) ENGINE=MyISAM;
+
 CREATE TABLE IF NOT EXISTS resources (
   rid         int unsigned NOT NULL AUTO_INCREMENT,
   uid         int unsigned,
@@ -74,7 +95,7 @@ CREATE TABLE IF NOT EXISTS storageItems (
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS storageItemToResource (
-  sid int unsigned NOT NULL AUTO_INCREMENT,
+  sid int unsigned NOT NULL,
   rid int unsigned NOT NULL,
   PRIMARY KEY (sid, rid),
   KEY (sid),
@@ -90,7 +111,6 @@ CREATE TABLE IF NOT EXISTS storageItemToResource (
 -- ) ENGINE=MyISAM;
 
 -- CREATE HELPER VIEWS
-
 CREATE OR REPLACE VIEW userResourceMetadata AS SELECT r1.uid, r2.* FROM resources r1 JOIN resourceMetadata r2 ON (r1.rid = r2.rid);
 
 CREATE OR REPLACE VIEW userStringResources  AS SELECT r1.uid, r2.* FROM resources r1 JOIN stringResources  r2 ON (r1.rid = r2.rid);
@@ -102,6 +122,8 @@ CREATE OR REPLACE VIEW userListResources    AS SELECT r1.uid, r2.* FROM resource
 -- DEFINE SOME HELPER FUNCTIONS
 
 drop procedure if exists reset_database;
+
+drop function if exists add_document;
 
 drop function if exists add_resource;
 
@@ -121,6 +143,8 @@ drop function if exists create_storageItemToResourceMapping;
 
 -- drop function if exists get_or_add_user;
 
+drop procedure if exists remove_document;
+
 drop procedure if exists full_delete_resource;
 
 drop procedure if exists remove_stringResourceFromContainer;
@@ -137,6 +161,8 @@ create procedure reset_database( )
 MODIFIES SQL DATA
 BEGIN
   START TRANSACTION ;
+    truncate documents;
+    truncate resourceToDocument;
     truncate stringResources;
     truncate tripleResources;
     truncate listResources;
@@ -147,6 +173,25 @@ BEGIN
     truncate storageItemToResource;
     truncate storageItems;
   COMMIT ;
+END //
+
+create function add_document ( uid_ int unsigned, name_ varchar(512), encoding_ varchar(64), mimetype_ varchar(128) )
+RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
+BEGIN
+  declare did_ int unsigned default 0;
+  if name_ is NULL then
+    return did_;
+  end if;
+  select did into did_ from documents where name = name_ and uid = uid_ limit 1;
+  if did_ = 0 then
+    insert into documents set uid = uid_, name = name_, encoding = encoding_, mimetype = mimetype_, analysis = null;
+    select LAST_INSERT_ID() into did_;
+  else
+    -- delete the linked resources for the document
+    delete from resourceToDocument where did = did_;
+    replace into documents set did = did_, uid = uid_, name = name_, encoding = encoding_, mimetype = mimetype_, analysis = null;
+  end if;
+  return did_;
 END //
 
 create function add_resource ( isstring_ boolean, istriple_ boolean, islist_ boolean, uid_ int unsigned )
@@ -283,6 +328,17 @@ END //
 --  end if;
 --  return uid_;
 --END //
+
+create procedure remove_document( IN uid_ int unsigned, IN did_ int unsigned )
+MODIFIES SQL DATA
+BEGIN
+  START TRANSACTION ;
+    -- delete the linked resources for the document
+    delete from resourceToDocument where did = did_;
+    -- delete the document
+    delete from documents where uid = uid_ and did = did_;
+  COMMIT ;
+END //
 
 create procedure remove_stringResourceFromContainer( IN rid_ int unsigned, IN cid_ int unsigned )
 MODIFIES SQL DATA

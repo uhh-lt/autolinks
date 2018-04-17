@@ -3,14 +3,32 @@
 // requires
 const
   fs = require('fs'),
+  path = require('path'),
   nodeCleanup = require('node-cleanup'),
   mysql = require('mysql'),
   Exception = require('../../model/Exception').model,
   Triple = require('../../model/Triple').model,
+  Analysis = require('../../model/Analysis').model,
   Resource = require('../../model/Resource').model,
   utils = require('../utils/utils'),
   murmurhashNative = require('murmurhash-native'),
   logger = require('../log')(module);
+
+/* where to store data file */
+const datadir = (() => {
+  /* make sure the data directory exists */
+  const datadir = path.resolve(global.__datadir && path.join(global.__datadir, 'storage') || 'storagedata');
+  if (!fs.existsSync(datadir)) { fs.mkdirSync(datadir); }
+  return datadir;
+})();
+
+function getFileLocation(userid, basename) {
+  const userdir = path.resolve(datadir, userid.toString());
+  if (!fs.existsSync(userdir)) { fs.mkdirSync(userdir); }
+  return path.resolve(userdir, basename.toString());
+}
+
+const MAX_FILESIZE = process.env.MAX_FILESIZE || 5e7; // 5 MB by default
 
 /* connection string: mysql://user:pass@host:port/database?optionkey=optionvalue&optionkey=optionvalue&... */
 const connectionString = process.env.MYSQL || 'mysql://autolinks:autolinks1@mysql:3306/autolinks?debug=false&connectionLimit=100';
@@ -62,7 +80,7 @@ function promisedQuery(query, values) {
 
 module.exports.init = function (callback, resetdata) {
 
-  // read the script
+  // init database read the mysql script
   fs.readFile('config/storagedb-schema.mysql.sql', 'utf8', function (err, data) {
     if (err) {
       return callback(err);
@@ -155,14 +173,17 @@ module.exports.promisedWrite = function (userid, storagekey, resourceList) {
 module.exports.saveNewResourceOrValue = function (resourceOrValue, uid, cid) {
   return new Promise((resolve, reject) => {
     let resource = null;
-    if(resourceOrValue.value){
+    if(resourceOrValue.value || resourceOrValue.rid){
       if(resource instanceof Resource){
         resource = resourceOrValue;
       }else {
-        resource = new Resource().deepAssign(resourceOrValue);
+        resource = new Resource().assign(resourceOrValue);
       }
     } else {
       resource = new Resource(null, resourceOrValue);
+    }
+    if(resource.rid){
+      return resolve(resource);
     }
     resource.cid = cid;
     // a resource can be an array of resources, a triple or a string
@@ -525,7 +546,7 @@ module.exports.promisedEditResource = function (userid, resourceBefore, resource
       return null;
     }
     logger.debug('Creating new resource.');
-    return this.saveNewResourceOrValue(resourceAfter.value, userid, resourceAfter.cid);
+    return this.saveNewResourceOrValue(resourceAfter, userid, resourceAfter.cid);
   }
 
   // 2: delete resource if resourceAfter is null
@@ -561,6 +582,143 @@ module.exports.promisedEditResource = function (userid, resourceBefore, resource
   // otherwise nothing has changed
   logger.debug('Resource is unchanged.');
   return Promise.accept(resourceAfter);
+};
+
+module.exports.promisedSaveFile = function(userid, filename, encoding, mimetype, size, content, overwrite) {
+  return this.getDocumentId(userid, filename)
+    .then(did => new Promise((resolve, reject) => {
+      if(did) {
+        const msg = `File already exists for user ${userid}: '${filename}'.`;
+        if(!overwrite) {
+          return reject(new Exception('IllegalState', `${msg} Specify overwrite if you want to update the file.`));
+        }
+        logger.warn(`File already exists for user ${userid}: '${filename}' OVERWRITING!.`);
+      }
+      if(size > MAX_FILESIZE) {
+        return reject(new Exception('IllegalState', `Size of the file is too large (${size} > ${MAX_FILESIZE}). Upload smaller files or ask your administrator to increase the file size limit.`));
+      }
+      return promisedQuery('select add_document(?,?,?,?) as did', [userid, filename, encoding, mimetype])
+        .then(
+          res => {
+            const did = res.rows[0].did;
+            logger.debug(`Successfully saved file '${filename}' for user with id '${userid}'.`);
+            const storeAt = getFileLocation(userid, did);
+            logger.debug(`Saving file '${storeAt}'.`);
+            return fs.writeFile(storeAt, content, 'binary', function(err) {
+              if(err) {
+                return reject(Exception.fromError(err, `Storing file '${filename}' failed.`));
+              }
+              logger.debug(`Saved file '${storeAt}'.`);
+              return resolve(did);
+            });
+          }, err => reject(err));
+    }));
+};
+
+module.exports.promisedListFiles = function(userid, detailed) {
+  if(!detailed){
+    return promisedQuery('select did from documents where uid = ?', [userid])
+      .then(res => res.rows.map(row => row.did));
+  }else{
+    return promisedQuery('select did, name, mimetype, encoding, (analysis is not null) as analyzed from documents where uid = ?', [userid])
+      .then(res => res.rows.map(row => Object({
+        did : row.did,
+        filename : row.name,
+        mimetype : row.mimetype,
+        encoding : row.encoding,
+        analyzed : row.analyzed,
+      })));
+  }
+};
+
+module.exports.promisedDeleteFile = function(userid, did) {
+  return promisedQuery('call remove_document(?,?)', [userid, did])
+    .then(
+      _ => {
+        logger.debug(`Deleted file from database '${did}'.`);
+        const storeAt = getFileLocation(userid, did);
+        logger.debug(`Deleting file '${storeAt}' from filesystem.`);
+        if (fs.existsSync(storeAt)) { fs.unlinkSync(storeAt); }
+        logger.debug(`File deleted '${storeAt}'.`);
+      });
+};
+
+module.exports.getDocumentId = function(userid, filename) {
+  return promisedQuery('select did from documents where uid = ? and name = ?', [userid, filename])
+    .then(res => {
+      if(res.rows.length > 0){
+        return res.rows[0].did;
+      }
+      return null;
+    });
+};
+
+module.exports.promisedGetFile = function(uid, did, target) {
+  if (target === 'info') {
+    return this.getDocumentInfo(uid, did);
+  }
+  if (target === 'content') {
+    return this.getDocumentContent(uid, did);
+  }
+  if (target === 'analysis') {
+    return this.getDocumentAnalysis(uid, did);
+  }
+};
+
+module.exports.getDocumentInfo = function(uid, did) {
+  return promisedQuery('select did, name, mimetype, encoding, (analysis is not null) as analyzed from documents where uid = ? and did = ?', [uid, did])
+    .then(res => {
+      if(!res.rows){
+        return Promise.reject(`Document ${did} not found for user ${did}.`);
+      }
+      const row = res.rows[0];
+      return {
+        did : row.did,
+        filename : row.name,
+        mimetype : row.mimetype,
+        encoding : row.encoding,
+        analyzed : row.analyzed,
+      };
+    });
+};
+
+module.exports.getDocumentContent = function(uid, did) {
+  return new Promise((resolve, reject) => {
+    const storeAt = getFileLocation(uid, did);
+    logger.debug(`Reading file content from file system: '${storeAt}'.`);
+    if (!fs.existsSync(storeAt)) {
+      return reject(new Exception('IllegalState', `File '${did}' for user '${uid}' does not exist.`));
+    }
+    fs.readFile(storeAt, 'binary', function (err, data) {
+      if (err) {
+        return reject(Exception.fromError(err, `Error while reading file '${did}' for user '${uid}'.`));
+      }
+      resolve(data);
+    });
+  });
+
+};
+
+module.exports.getDocumentAnalysis = function(uid, did) {
+  return promisedQuery('select name, mimetype, analysis from documents where uid = ? and did = ?', [uid, did])
+    .then(res => {
+      if(!res.rows){
+        return Promise.reject(`Document ${did} not found for user ${did}.`);
+      }
+      const row = res.rows[0];
+      if(!row.analysis){
+        const ana = Analysis.fromText('This document has not yet been analyzed!');
+        ana.source = row.name;
+        ana.mimeType = row.mimetype;
+        return ana;
+      }
+      return JSON.parse(row.analysis);
+    });
+};
+
+module.exports.updateDocumentAnalysis = function(uid, did, analysis) {
+  return promisedQuery('update documents set analysis = ? where uid = ? and did = ?', [JSON.stringify(analysis), uid, did])
+    .then(_ => true);
 };
 
 module.exports.close = function (callback) {

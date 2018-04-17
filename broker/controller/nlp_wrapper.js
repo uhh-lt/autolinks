@@ -3,7 +3,11 @@
 /**
  * imports
  */
-const logger = require('./log')(module);
+const
+  Exception = require('../model/Exception').model,
+  store = require('./storage_wrapper'),
+  utils = require('./utils/utils'),
+  logger = require('./log')(module);
 
 const explicitNLP = (() => {
   switch (process.env.NLP) {
@@ -17,6 +21,9 @@ const explicitNLP = (() => {
       return require('./nlp-components/GermaNER')({
 
       });
+      case 'ctakes':
+      logger.info('Using CtakesNLP');
+      return require('./nlp-components/CtakesNLP');
     case 'stupid':
     default:
       logger.info('Using StupidNLP');
@@ -35,21 +42,31 @@ module.exports.init = function(callback) {
 /**
  *
  * @param text
- * @param callbackIter = function(err, analysis)
  */
-module.exports.analyze = function(text, contentType, source, callback) {
-  return explicitNLP.analyze(text, contentType, source, callback);
+module.exports.analyze = function(text, contentType, source) {
+  return explicitNLP.analyze(text, contentType, source);
 };
 
-/**
- *
- * @param analysis
- * @param callbackStart = function(err)
- * @param callbackIter = function(err, entities)
- * @param callbackDone = function(err)
- */
-module.exports.findNamedEntities = function(analysis, callbackStart, callbackIter, callbackDone) {
-  return explicitNLP.findNamedEntities(analysis, callbackStart, callbackIter, callbackDone);
+
+module.exports.analyzeDocument = function(uid, did, refresh) {
+  return store.promisedGetFile(uid, did, 'info')
+    .then(docinfo => {
+      if(docinfo.analyzed){
+        if(!refresh){
+          return store.promisedGetFile(uid, did, 'analysis');
+        }
+        logger.debug(`Document has already been analyzed. OVERWRITING!`);
+      }
+      return store.promisedGetFile(uid, did, 'content')
+        .then(content => this.analyze(content, docinfo.mimetype, docinfo.name))
+        .then(analysis => {
+          store.updateDocumentAnalysis(uid, did, analysis);
+          return analysis;
+        });
+    });
 };
+
+
+
 
 

@@ -17,7 +17,7 @@ services:
   ##
   # BEGIN: frontend
   frontend:
-    image: node:9.3
+    image: node:9.2.0
     volumes:
       - ${PWD}/frontendserver:/opt/project/frontendserver
     ports:
@@ -71,6 +71,8 @@ services:
       - COOKIE_SECRET=hfiauhdfnaln
       - STORAGE=mysql
       - NLP=stupid
+      # - NLP=ctakes
+      - CTAKESURL=http://ctakes-nlp:8080
       - MYSQL=mysql://autolinks:autolinks1@mysql:3306/autolinks?debug=false&connectionLimit=100
       - LOGLEVEL=info
     depends_on:
@@ -99,6 +101,16 @@ services:
     networks:
       - anet
   # END: mysql server
+
+  # START: ctakes-nlp
+  ctakes-nlp:
+    build:
+      context: ctakesnlp
+      dockerfile: Dockerfile
+    image: ctakes-nlp:latest
+    networks:
+      - anet
+  # END: ctakes-nlp
 
   ##
   # Services and their dependencies

@@ -78,6 +78,66 @@ module.exports.promisedEditResource = function(userid, resourceBefore, resourceA
 /**
  *
  * @param userid
+ * @param filename
+ * @param encoding
+ * @param mimetype
+ * @param size
+ * @param content
+ * @param overwrite
+ * @return {*}
+ */
+module.exports.promisedSaveFile = function(userid, filename, encoding, mimetype, size, content, overwrite) {
+  return explicitStorage.promisedSaveFile(userid, filename, encoding, mimetype, size, content, overwrite);
+};
+
+/**
+ *
+ * @param userid
+ * @param detailed
+ * @return {*}
+ */
+module.exports.promisedListFiles = function(userid, detailed) {
+  return explicitStorage.promisedListFiles(userid, detailed);
+};
+
+/**
+ *
+ * @param userid
+ * @param did
+ * @return {*}
+ */
+module.exports.promisedDeleteFile = function(userid, did) {
+  return explicitStorage.promisedDeleteFile(userid, did);
+};
+
+/**
+ *
+ * @param userid
+ * @param did
+ * @param target
+ * @param did
+ * @return {*}
+ */
+module.exports.promisedGetFile = function(userid, did, target) {
+  return explicitStorage.promisedGetFile(userid, did, target);
+};
+
+/**
+ *
+ * @param userid
+ * @param did
+ * @param analysis
+ * @return {*}
+ */
+module.exports.updateDocumentAnalysis = function(userid, did, analysis) {
+  return explicitStorage.updateDocumentAnalysis(userid, did, analysis);
+};
+
+
+
+/**
+ *
+ * @param userid
  * @param callback = function(err, info)
  */
 module.exports.info = function(userid, callback) {
