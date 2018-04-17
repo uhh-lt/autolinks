@@ -1,13 +1,18 @@
 const
   fs = require('fs'),
-  stupidnlp = require('../../controller/nlp-components/StupidNLP'),
+  Offset = require('../../model/Offset').model,
+  DOffset = require('../../model/DOffset').model,
   Analysis = require('../../model/Analysis').model;
 
-// const ana = JSON.parse(fs.readFileSync('./example.json'));
+const a = JSON.parse(fs.readFileSync('./example.json'));
+const ana = new Analysis().deepAssign(a);
+
 // console.log(ana);
+ana.prepareIndex();
+console.log(ana.annotation_index);
+const annot = ana.getAnnotationsWithinOffset(new Offset(0,7));
+//
+console.log(annot.size)
 
-
-stupidnlp.analyze('Ich bin ein Berliner.','','')
-  .then(ana => console.log(JSON.stringify(ana, null, 2)));
 
 
