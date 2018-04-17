@@ -680,7 +680,7 @@ define([
                         scope.data.nodes.push(nodeObj);
                         nodeTipExtension(n);
                         // cy.layout({name: 'cose-bilkent'}).run();
-                        // cy.fit();
+                        cy.fit();
                         // cy.zoom(2);
                       });
 
