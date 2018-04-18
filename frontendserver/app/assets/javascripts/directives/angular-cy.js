@@ -182,23 +182,6 @@ define([
 
                       // Event listeners
                       // with sample calling to the controller function as passed as an attribute
-                      cy.on('tap', 'node', function(e){
-                          eh.enabled = false;
-                          var evtTarget = e.target;
-                          var nodeId = evtTarget.id();
-                          scope.selectedEntity = evtTarget;
-
-                          var eventIsDirect = evtTarget.same(this);
-                          console.log(nodeId);
-                          if( eventIsDirect ){
-                            this.emit('directtap');
-                          }
-                          // scope.cyClick({value:nodeId});
-                          // scope.$parent.EntityService.openSideNav(evtTarget);
-                      })
-                      .on('directtap', function(e) {
-                        e.stopPropagation();
-                      });
 
                       scope.coordinate = {};
                       scope.selectedEntity = {};
@@ -261,7 +244,7 @@ define([
 
                       function nodeTipExtension(n) {
                         _.forEach(n, function(n) {
-                          if (!n.isParent()) {
+                          if (n.isNode()) {
                             cy.$('#'+ n.data('id')).qtip({
                               content: {
                                   text: function(event, api) {
@@ -288,30 +271,39 @@ define([
                               style: {
                                   name: 'qtip-content'
                               }
+                            })
+                            .on('tap', function( e ){
+                              var eventIsDirect = e.target.same( this ); // don't use 2.x cyTarget
+
+                              if( eventIsDirect ){
+                                this.emit('directtap');
+                              }
+                            }).on('directtap', function( e ){
+                              e.stopPropagation();
                             });
 
-                            cy.$('#'+ n.data('id')).qtip({
-                              content: {
-                                  text: function(event, api) {
-                                    if (n.data('desc')) {
-                                      return (
-                                      '<div class="node-description">' + n.data('desc') + '</div>'
-                                      )
-                                    }
-                                  }
-                              },
-                              position: {
-                                my: 'top center',
-                                at: 'bottom center'
-                              },
-                              style: {
-                                classes: 'qtip-bootstrap',
-                                tip: {
-                                  width: 16,
-                                  height: 8
-                                },
-                              }
-                            });
+                            // cy.$('#'+ n.data('id')).qtip({
+                            //   content: {
+                            //       text: function(event, api) {
+                            //         if (n.data('desc')) {
+                            //           return (
+                            //           '<div class="node-description">' + n.data('desc') + '</div>'
+                            //           )
+                            //         }
+                            //       }
+                            //   },
+                            //   position: {
+                            //     my: 'top center',
+                            //     at: 'bottom center'
+                            //   },
+                            //   style: {
+                            //     classes: 'qtip-bootstrap',
+                            //     tip: {
+                            //       width: 16,
+                            //       height: 8
+                            //     },
+                            //   }
+                            // });
                           }
                         });
                       }
