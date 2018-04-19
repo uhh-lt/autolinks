@@ -15,7 +15,9 @@ DOffset.prototype.offsets = [];
  * @constructor
  */
 function DOffset(offsets) {
-  this.offsets = offsets;
+  if(offsets){
+    this.offsets = offsets;
+  }
 }
 
 DOffset.prototype.end = function() {

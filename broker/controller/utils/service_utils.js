@@ -163,7 +163,7 @@ module.exports.call_service = function (location, path, method, userid, data, se
         logger.debug(`Successfully recevied storagekey: ${key}`);
         return key;
     }, err => null)
-    .then(key => `${serviceref.name}__${serviceref.version}__${endpointref.path}__${serviceref.method}__${key}`) // make key unique per service & endpoint
+    .then(key => `service::${serviceref.name}/${endpointref.path.replace('/','')}/${serviceref.version}/${method}/q=${encodeURI(key)}`) // make key unique per service & endpoint, this can be used for /service/get/...
     .then(key => {
       // if data for key exists in DB use it, otherwise get it from service call and store it
       if (key) {

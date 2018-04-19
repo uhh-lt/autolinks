@@ -7,6 +7,7 @@ const
   Exception = require('../model/Exception').model,
   store = require('./storage_wrapper'),
   utils = require('./utils/utils'),
+  analysis = require('../model/Analysis'),
   logger = require('./log')(module);
 
 const explicitNLP = (() => {
@@ -64,5 +65,4 @@ module.exports.analyzeDocument = function(uid, did, refresh) {
         });
     });
 };
-
 

@@ -129,6 +129,10 @@ module.exports.call_service = function(req, res, next) {
     });
 };
 
+module.exports.get_service_data = function(req, res, next) {
+  return new Exception('NotImplemented', 'Method not yet implemented.').handleResponse(res).end(next);
+};
+
 module.exports.get_service_details = function(req, res, next) {
 
   if(!req.swagger.params.data || !req.swagger.params.data.value) {

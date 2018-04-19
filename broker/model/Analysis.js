@@ -142,10 +142,13 @@ Analysis.prototype.getAnnotationsWithinDOffset = function(doffset, strict = true
   doffset.offsets.forEach(offset => this.getAnnotationsWithinOffset(offset).forEach(anno => annotations.add(anno)));
 
   if(strict) {
-    // logger.debug('Filter strict.');
+    logger.debug('Filter strict.');
     // filter
     annotations.forEach(anno => {
-      if(!(anno.begin() >= doffset.begin() && anno.end() <= doffset.end())){
+      if(!(
+        anno.begin() >= doffset.begin() &&
+        anno.end() <= doffset.end())
+      ){
         annotations.delete(anno);
       }
     });
