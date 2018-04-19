@@ -5,16 +5,24 @@ const
   _ = require('lodash'),
   Exception = require('../../model/Exception').model,
   storage = require('../storage_wrapper'),
-  Resource = require('../Resource').model,
+  Resource = require('../../model/Resource').model,
   logger = require('../log')(module)
 ;
+
+module.exports.getAnnotationResourcesDoc = function(uid, did, focus) {
+  return storage.promisedGetFile(uid, did, 'analysis')
+    .then(
+      ana => this.getAnnotationResources(uid, ana, focus),
+      err => Exception.fromError(err, `Could not get analysis object for document ${did}.`)
+    );
+};
 
 module.exports.getAnnotationResources = function(uid, analysis, focus){
   const focustext = focus.getText(analysis.text);
   const focus_storage_key = `annotation::${analysis.source}::${focus.begin()}:${focustext}`;
   const overlappingAnnotations = analysis.getAnnotationsWithinDOffset(focus);
 
-  const annotationResourcePromises = overlappingAnnotations.map(anno => {
+  const annotationResourcePromises = [...overlappingAnnotations].map(anno => {
     const anno_text = anno.doffset.getText(analysis.text);
     const resource_key = `annotation::${anno_text}:${anno.analyzer}:${anno.type}`;
     const resource_storage_key = `annotation::${analysis.source}:${anno.begin()}:${anno_text}:${anno.analyzer}:${anno.type}`;

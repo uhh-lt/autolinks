@@ -58,7 +58,7 @@ module.exports.analyzeDocument = function(uid, did, refresh) {
         logger.debug(`Document has already been analyzed. OVERWRITING!`);
       }
       return store.promisedGetFile(uid, did, 'content')
-        .then(content => this.analyze(content, docinfo.mimetype, docinfo.name))
+        .then(content => this.analyze(content, docinfo.mimetype, docinfo.filename))
         .then(analysis => {
           store.updateDocumentAnalysis(uid, did, analysis);
           return analysis;

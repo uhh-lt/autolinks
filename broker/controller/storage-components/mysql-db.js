@@ -36,15 +36,19 @@ const pool = mysql.createPool(connectionString);
 logger.info(`Using ${pool.config.connectionLimit} connections.`);
 
 function withConnection(callback) {
-  pool.getConnection(function (err, connection) {
-    if (err) {
-      return callback(Exception.fromError(err, 'Could not establish connection to database.'), null);
-    }
-    callback(null, connection);
-    connection.on('error', function (err) {
-      return callback(Exception.fromError(err, 'Error connecting to database.'), null);
+  try{
+    pool.getConnection(function (err, connection) {
+      if (err) {
+        return callback(Exception.fromError(err, 'Could not establish connection to database.'), null);
+      }
+      callback(null, connection);
+      connection.on('error', function (err) {
+        return callback(Exception.fromError(err, 'Error connecting to database.'), null);
+      });
     });
-  });
+  }catch(err){
+    callback(Exception.fromError(err, 'Error connecting to database.'), null);
+  }
 }
 
 function promisedQuery(query, values) {
@@ -479,7 +483,7 @@ module.exports.getStorageResourceId = function (uid, storagekey) {
 };
 
 module.exports.getStorageResource = function (userid, storagekey) {
-  this.getStorageResourceId(userid, storagekey)
+  return this.getStorageResourceId(userid, storagekey)
     .then(rid => rid && this.getResource(rid, -1) || null);
 };
 
@@ -712,7 +716,7 @@ module.exports.getDocumentAnalysis = function(uid, did) {
         ana.mimeType = row.mimetype;
         return ana;
       }
-      return JSON.parse(row.analysis);
+      return new Analysis().deepAssign(JSON.parse(row.analysis));
     });
 };
 

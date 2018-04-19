@@ -65,7 +65,7 @@ module.exports.interpret = function(req, res, next) {
     ServiceParameter.fromRequestPromise(req)
       .then(serviceParameter => {
         const focus = serviceParameter.focus;
-        const ana = serviceParameter.context.text;
+        const ana = serviceParameter.context;
         return nlp_utils.getAnnotationResources(user.id, ana, focus)
           .then(resource => {
             // this sends back a JSON response
@@ -81,18 +81,28 @@ module.exports.interpret = function(req, res, next) {
 
 module.exports.interpret_doffset = function(req, res, next) {
 
-  ServiceParameter.fromRequestPromise(req)
-    .then(serviceParameter => {
-      const focus = serviceParameter.focus;
-      const ana = serviceParameter.context.text;
+  auth.handle_authenticated_request(req, res, function(user) {
 
-      // this sends back a JSON response
-      res.header('Content-Type', 'application/json; charset=utf-8');
-      res.json(resource);
-      res.end(next);
+    if (!req.swagger.params.did || !req.swagger.params.did.value) {
+      return new Exception('IllegalState', 'Document id is missing!').handleResponse(res).end(next);
+    }
 
-    })
-    .catch(err => Exception.fromError(err).handleResponse(res).end(next));
+    if (!req.swagger.params.focus || !req.swagger.params.focus.value) {
+      return new Exception('IllegalState', 'Focus parameter is missing!').handleResponse(res).end(next);
+    }
+
+    const did = req.swagger.params.did.value;
+    const focus = new DOffset().deepAssign(req.swagger.params.focus.value);
+
+    return nlp_utils.getAnnotationResourcesDoc(user.id, did, focus)
+      .then(resource => {
+        // this sends back a JSON response
+        res.header('Content-Type', 'application/json; charset=utf-8');
+        res.json(resource);
+        res.end(next);
+      });
+
+  });
 };
 
 

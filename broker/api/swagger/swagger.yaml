@@ -492,6 +492,8 @@ paths:
         - NLP
       description: | 
         Interpret annotations that are in the focus of the data.
+      security:
+        - broker_auth: []
       parameters:
         - name: data
           in: body
@@ -546,13 +548,15 @@ paths:
         - NLP
       description: | 
         Interpret annotations that are in the focus of the data.
+      security:
+        - broker_auth: []
       parameters:
       - name: did
         in: path
-        description: Document id to get the analyisis from
+        description: Document id to get the analysis from
         required: true
         type: integer
-      - name: offset
+      - name: focus
         in: body
         description: The DOffset parameter
         schema:

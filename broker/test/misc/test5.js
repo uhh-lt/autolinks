@@ -3,6 +3,7 @@
 const
   fs = require('fs'),
   path = require('path'),
+  nlp_utils = require('../../controller/utils/nlp_utils'),
   Offset = require('../../model/Offset').model,
   DOffset = require('../../model/DOffset').model,
   Analysis = require('../../model/Analysis').model;
@@ -23,11 +24,10 @@ console.log(doff.end());
 const annot = ana.getAnnotationsWithinDOffset(new DOffset([ new Offset(0,7) ]));
 //
 // console.log(annot.size);
-annot.forEach(a => console.log(`${a.type}: [${a.begin()},${a.end()}]`));
+const mapped = [...annot].map(a => `${a.type}: [${a.begin()},${a.end()}]`);
+console.log(mapped);
 
-Promise.reject(1).then(r => console.log('after catch ' + r)).catch(err => console.log("catch " + err))
-
-
+nlp_utils.getAnnotationResources(1, ana, doff).then(r => console.log(JSON.stringify(r, null, 2)));
 
 
 
