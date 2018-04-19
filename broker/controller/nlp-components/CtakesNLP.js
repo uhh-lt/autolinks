@@ -39,7 +39,8 @@ module.exports.analyze = function(text, contentType, source) {
           anno.analyzer = label;
           anno.type = element.type;
           anno.doffset.offsets.push(new Offset(element.offset.from, element.offset.to - element.offset.from));
-          anno.properties = element.properties;
+          anno.properties = {};
+          element.properties.forEach(prop => anno.properties[prop.name] = prop.value);
           ana.annotations.push(anno);
         });
       }

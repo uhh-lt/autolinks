@@ -266,6 +266,51 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Exception"
+            
+  /service/get/{service}/{path}/{version}/{method}/:
+    # tell nodejs where to find the code for this path
+    x-swagger-router-controller: services
+    post:
+      operationId: get_service_data
+      tags:
+        - Service
+      description: Call a service and get its response
+      security:
+        - broker_auth: []
+      parameters:
+      - name: service
+        in: path
+        description: Service to call
+        required: true
+        type: string
+      - name: path
+        in: path
+        description: Service endpoint path to call
+        required: true
+        type: string
+      - name: version
+        in: path
+        description: Version of the service
+        required: true
+        type: string
+      - name: method
+        in: path
+        description: Request method (get or post)
+        required: true
+        type: string
+      - name: q
+        in: query
+        description: The query key
+        type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/Resource'
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Exception"
 
   /service/details:
     x-swagger-router-controller: services
@@ -439,6 +484,32 @@ paths:
           schema:
             $ref: "#/definitions/Exception"
             
+  /nlp/interpret:
+    x-swagger-router-controller: nlp
+    post:
+      operationId: interpret
+      tags:
+        - NLP
+      description: | 
+        Interpret annotations that are in the focus of the data.
+      security:
+        - broker_auth: []
+      parameters:
+        - name: data
+          in: body
+          description: The service parameter
+          schema:
+            $ref: '#/definitions/ServiceParameter'
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/Resource'
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Exception"
+            
   /nlp/analyze/{did}:
     x-swagger-router-controller: nlp
     get:
@@ -464,6 +535,37 @@ paths:
           description: Success
           schema:
             $ref: "#/definitions/Analysis"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Exception"
+            
+  /nlp/interpret/{did}:
+    x-swagger-router-controller: nlp
+    post:
+      operationId: interpret_doffset
+      tags:
+        - NLP
+      description: | 
+        Interpret annotations that are in the focus of the data.
+      security:
+        - broker_auth: []
+      parameters:
+      - name: did
+        in: path
+        description: Document id to get the analysis from
+        required: true
+        type: integer
+      - name: focus
+        in: body
+        description: The DOffset parameter
+        schema:
+          $ref: '#/definitions/DOffset'
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/Resource'
         default:
           description: Error
           schema:
