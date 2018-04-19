@@ -6,7 +6,7 @@
 const
   auth = require('../../controller/auth'),
   NLP = require('../../controller/nlp_wrapper'),
-  nlp_utils = require('../../controller/utils/npl_utils'),
+  nlp_utils = require('../../controller/utils/nlp_utils'),
   Exception = require('../../model/Exception').model,
   Resource = require('../../model/Resource').model,
   ServiceParameter = require('../../model/ServiceParameter').model,
