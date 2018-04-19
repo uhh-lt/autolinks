@@ -47,7 +47,6 @@ module.exports.analyze = function(text, contentType, source) {
   return explicitNLP.analyze(text, contentType, source);
 };
 
-
 module.exports.analyzeDocument = function(uid, did, refresh) {
   return store.promisedGetFile(uid, did, 'info')
     .then(docinfo => {
@@ -65,8 +64,5 @@ module.exports.analyzeDocument = function(uid, did, refresh) {
         });
     });
 };
-
-
-
 
 

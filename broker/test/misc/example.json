@@ -1,0 +1,1029 @@
+{
+  "annotations": [
+    {
+      "properties": {
+        "language": "x-unspecified"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "length": 143
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "DocumentAnnotation"
+    },
+    {
+      "properties": {
+        "id": "SIMPLE_SEGMENT"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "length": 143
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "Segment"
+    },
+    {
+      "properties": {
+        "sentenceNumber": "0"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "length": 143
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "Sentence"
+    },
+    {
+      "properties": {
+        "id": "0",
+        "codingScheme": "SNOMEDCT_US",
+        "code": "112130006",
+        "score": "0.0",
+        "disambiguated": "false",
+        "cui": "C0004561",
+        "tui": "T025",
+        "preferredText": "B-Lymphocytes",
+        "typeID": "6",
+        "discoveryTechnique": "1",
+        "polarity": "0",
+        "uncertainty": "0",
+        "conditional": "false",
+        "generic": "false",
+        "historyOf": "0"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "length": 7
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "AnatomicalSiteMention"
+    },
+    {
+      "properties": {
+        "tokenNumber": "0",
+        "partOfSpeech": "NN",
+        "capitalization": "3",
+        "numPosition": "0",
+        "canonicalForm": "b"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "length": 1
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "WordToken"
+    },
+    {
+      "properties": {
+        "id": "0",
+        "codingScheme": "SNOMEDCT_US",
+        "code": "4421005",
+        "score": "0.0",
+        "disambiguated": "false",
+        "cui": "C0007634",
+        "tui": "T025",
+        "preferredText": "Cells",
+        "typeID": "6",
+        "discoveryTechnique": "1",
+        "polarity": "0",
+        "uncertainty": "0",
+        "conditional": "false",
+        "generic": "false",
+        "historyOf": "0"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 2,
+            "length": 5
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "AnatomicalSiteMention"
+    },
+    {
+      "properties": {
+        "tokenNumber": "1",
+        "partOfSpeech": "NNS",
+        "capitalization": "0",
+        "numPosition": "0",
+        "canonicalForm": "cell"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 2,
+            "length": 5
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "WordToken"
+    },
+    {
+      "properties": {
+        "tokenNumber": "2",
+        "partOfSpeech": ","
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 7,
+            "length": 1
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "PunctuationToken"
+    },
+    {
+      "properties": {
+        "tokenNumber": "3",
+        "partOfSpeech": "IN",
+        "capitalization": "0",
+        "numPosition": "0",
+        "canonicalForm": "unlike"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 9,
+            "length": 6
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "WordToken"
+    },
+    {
+      "properties": {
+        "tokenNumber": "4",
+        "partOfSpeech": "DT",
+        "capitalization": "0",
+        "numPosition": "0"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 16,
+            "length": 3
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "WordToken"
+    },
+    {
+      "properties": {
+        "id": "0",
+        "codingScheme": "SNOMEDCT_US",
+        "code": "258348004",
+        "score": "0.0",
+        "disambiguated": "false",
+        "cui": "C0449210",
+        "tui": "T029",
+        "preferredText": "OTH tumor staging notation",
+        "typeID": "6",
+        "discoveryTechnique": "1",
+        "polarity": "0",
+        "uncertainty": "0",
+        "conditional": "false",
+        "generic": "false",
+        "historyOf": "0"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 20,
+            "length": 5
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "AnatomicalSiteMention"
+    },
+    {
+      "properties": {
+        "tokenNumber": "5",
+        "partOfSpeech": "JJ",
+        "capitalization": "0",
+        "numPosition": "0",
+        "canonicalForm": "oth"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 20,
+            "length": 5
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "WordToken"
+    },
+    {
+      "properties": {
+        "tokenNumber": "6",
+        "partOfSpeech": "CD",
+        "capitalization": "0",
+        "numPosition": "0",
+        "canonicalForm": "two"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 26,
+            "length": 3
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "WordToken"
+    },
+    {
+      "properties": {
+        "tokenNumber": "7",
+        "partOfSpeech": "NNS",
+        "capitalization": "0",
+        "numPosition": "0",
+        "canonicalForm": "class"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 30,
+            "length": 7
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "WordToken"
+    },
+    {
+      "properties": {
+        "tokenNumber": "8",
+        "partOfSpeech": "IN",
+        "capitalization": "0",
+        "numPosition": "0"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 38,
+            "length": 2
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "WordToken"
+    },
+    {
+      "properties": {
+        "id": "0",
+        "codingScheme": "SNOMEDCT_US",
+        "code": "56972008",
+        "score": "0.0",
+        "disambiguated": "false",
+        "cui": "C0024264",
+        "tui": "T025",
+        "preferredText": "Lymphocyte",
+        "typeID": "6",
+        "discoveryTechnique": "1",
+        "polarity": "0",
+        "uncertainty": "0",
+        "conditional": "false",
+        "generic": "false",
+        "historyOf": "0"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 41,
+            "length": 11
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "AnatomicalSiteMention"
+    },
+    {
+      "properties": {
+        "tokenNumber": "9",
+        "partOfSpeech": "NNS",
+        "capitalization": "0",
+        "numPosition": "0",
+        "canonicalForm": "lymphocyte"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 41,
+            "length": 11
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "WordToken"
+    },
+    {
+      "properties": {
+        "tokenNumber": "10",
+        "partOfSpeech": ","
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 52,
+            "length": 1
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "PunctuationToken"
+    },
+    {
+      "properties": {
+        "id": "0",
+        "codingScheme": "SNOMEDCT_US",
+        "code": "57184004",
+        "score": "0.0",
+        "disambiguated": "false",
+        "cui": "C0039194",
+        "tui": "T025",
+        "preferredText": "T-Lymphocyte",
+        "typeID": "6",
+        "discoveryTechnique": "1",
+        "polarity": "0",
+        "uncertainty": "0",
+        "conditional": "false",
+        "generic": "false",
+        "historyOf": "0"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 54,
+            "length": 7
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "AnatomicalSiteMention"
+    },
+    {
+      "properties": {
+        "tokenNumber": "11",
+        "partOfSpeech": "NN",
+        "capitalization": "3",
+        "numPosition": "0",
+        "canonicalForm": "t"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 54,
+            "length": 1
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "WordToken"
+    },
+    {
+      "properties": {
+        "id": "0",
+        "codingScheme": "SNOMEDCT_US",
+        "code": "4421005",
+        "score": "0.0",
+        "disambiguated": "false",
+        "cui": "C0007634",
+        "tui": "T025",
+        "preferredText": "Cells",
+        "typeID": "6",
+        "discoveryTechnique": "1",
+        "polarity": "0",
+        "uncertainty": "0",
+        "conditional": "false",
+        "generic": "false",
+        "historyOf": "0"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 56,
+            "length": 5
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "AnatomicalSiteMention"
+    },
+    {
+      "properties": {
+        "tokenNumber": "12",
+        "partOfSpeech": "NNS",
+        "capitalization": "0",
+        "numPosition": "0",
+        "canonicalForm": "cell"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 56,
+            "length": 5
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "WordToken"
+    },
+    {
+      "properties": {
+        "tokenNumber": "13",
+        "partOfSpeech": "CC",
+        "capitalization": "0",
+        "numPosition": "0"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 62,
+            "length": 3
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "WordToken"
+    },
+    {
+      "properties": {
+        "tokenNumber": "14",
+        "partOfSpeech": "JJ",
+        "capitalization": "0",
+        "numPosition": "0",
+        "canonicalForm": "natural"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 66,
+            "length": 7
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "WordToken"
+    },
+    {
+      "properties": {
+        "id": "0",
+        "codingScheme": "SNOMEDCT_US",
+        "code": "259717003",
+        "score": "0.0",
+        "disambiguated": "false",
+        "cui": "C0022688",
+        "tui": "T025",
+        "preferredText": "Natural Killer Cells",
+        "typeID": "6",
+        "discoveryTechnique": "1",
+        "polarity": "0",
+        "uncertainty": "0",
+        "conditional": "false",
+        "generic": "false",
+        "historyOf": "0"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 74,
+            "length": 12
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "AnatomicalSiteMention"
+    },
+    {
+      "properties": {
+        "tokenNumber": "15",
+        "partOfSpeech": "NN",
+        "capitalization": "0",
+        "numPosition": "0",
+        "canonicalForm": "kil"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 74,
+            "length": 6
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "WordToken"
+    },
+    {
+      "properties": {
+        "id": "0",
+        "codingScheme": "SNOMEDCT_US",
+        "code": "4421005",
+        "score": "0.0",
+        "disambiguated": "false",
+        "cui": "C0007634",
+        "tui": "T025",
+        "preferredText": "Cells",
+        "typeID": "6",
+        "discoveryTechnique": "1",
+        "polarity": "0",
+        "uncertainty": "0",
+        "conditional": "false",
+        "generic": "false",
+        "historyOf": "0"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 81,
+            "length": 5
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "AnatomicalSiteMention"
+    },
+    {
+      "properties": {
+        "tokenNumber": "16",
+        "partOfSpeech": "NNS",
+        "capitalization": "0",
+        "numPosition": "0",
+        "canonicalForm": "cell"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 81,
+            "length": 5
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "WordToken"
+    },
+    {
+      "properties": {
+        "tokenNumber": "17",
+        "partOfSpeech": ","
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 86,
+            "length": 1
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "PunctuationToken"
+    },
+    {
+      "properties": {
+        "tokenNumber": "18",
+        "partOfSpeech": "NN",
+        "capitalization": "0",
+        "numPosition": "0",
+        "canonicalForm": "expres"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 88,
+            "length": 7
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "WordToken"
+    },
+    {
+      "properties": {
+        "id": "0",
+        "codingScheme": "SNOMEDCT_US",
+        "code": "53382005",
+        "score": "0.0",
+        "disambiguated": "false",
+        "cui": "C0034789",
+        "tui": "T116",
+        "preferredText": "Receptors, Antigen, B-Cell",
+        "typeID": "1",
+        "discoveryTechnique": "1",
+        "polarity": "0",
+        "uncertainty": "0",
+        "conditional": "false",
+        "generic": "false",
+        "historyOf": "0"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 96,
+            "length": 16
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "MedicationMention"
+    },
+    {
+      "properties": {
+        "id": "0",
+        "codingScheme": "SNOMEDCT_US",
+        "code": "112130006",
+        "score": "0.0",
+        "disambiguated": "false",
+        "cui": "C0004561",
+        "tui": "T025",
+        "preferredText": "B-Lymphocytes",
+        "typeID": "6",
+        "discoveryTechnique": "1",
+        "polarity": "0",
+        "uncertainty": "0",
+        "conditional": "false",
+        "generic": "false",
+        "historyOf": "0"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 96,
+            "length": 6
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "AnatomicalSiteMention"
+    },
+    {
+      "properties": {
+        "tokenNumber": "19",
+        "partOfSpeech": "NN",
+        "capitalization": "3",
+        "numPosition": "0",
+        "canonicalForm": "b"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 96,
+            "length": 1
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "WordToken"
+    },
+    {
+      "properties": {
+        "id": "0",
+        "codingScheme": "SNOMEDCT_US",
+        "code": "4421005",
+        "score": "0.0",
+        "disambiguated": "false",
+        "cui": "C0007634",
+        "tui": "T025",
+        "preferredText": "Cells",
+        "typeID": "6",
+        "discoveryTechnique": "1",
+        "polarity": "0",
+        "uncertainty": "0",
+        "conditional": "false",
+        "generic": "false",
+        "historyOf": "0"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 98,
+            "length": 4
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "AnatomicalSiteMention"
+    },
+    {
+      "properties": {
+        "tokenNumber": "20",
+        "partOfSpeech": "NN",
+        "capitalization": "0",
+        "numPosition": "0",
+        "canonicalForm": "cell"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 98,
+            "length": 4
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "WordToken"
+    },
+    {
+      "properties": {
+        "id": "0",
+        "codingScheme": "SNOMEDCT_US",
+        "code": "116647005",
+        "score": "0.0",
+        "disambiguated": "false",
+        "cui": "C0597357",
+        "tui": "T116",
+        "preferredText": "receptor",
+        "typeID": "1",
+        "discoveryTechnique": "1",
+        "polarity": "0",
+        "uncertainty": "0",
+        "conditional": "false",
+        "generic": "false",
+        "historyOf": "0"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 103,
+            "length": 9
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "MedicationMention"
+    },
+    {
+      "properties": {
+        "tokenNumber": "21",
+        "partOfSpeech": "NNS",
+        "capitalization": "0",
+        "numPosition": "0",
+        "canonicalForm": "receptor"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 103,
+            "length": 9
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "WordToken"
+    },
+    {
+      "properties": {
+        "tokenNumber": "22",
+        "partOfSpeech": "-LRB-"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 113,
+            "length": 1
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "PunctuationToken"
+    },
+    {
+      "properties": {
+        "id": "0",
+        "codingScheme": "SNOMEDCT_US",
+        "code": "165581004",
+        "score": "0.0",
+        "disambiguated": "false",
+        "cui": "C0525032",
+        "tui": "T059",
+        "preferredText": "International Normalized Ratio",
+        "typeID": "5",
+        "discoveryTechnique": "1",
+        "polarity": "0",
+        "uncertainty": "0",
+        "conditional": "false",
+        "generic": "false",
+        "historyOf": "0"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 114,
+            "length": 4
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "ProcedureMention"
+    },
+    {
+      "properties": {
+        "tokenNumber": "23",
+        "partOfSpeech": "NN",
+        "capitalization": "2",
+        "numPosition": "0",
+        "canonicalForm": "bcr"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 114,
+            "length": 4
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "WordToken"
+    },
+    {
+      "properties": {
+        "tokenNumber": "24",
+        "partOfSpeech": "-RRB-"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 118,
+            "length": 1
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "PunctuationToken"
+    },
+    {
+      "properties": {
+        "tokenNumber": "25",
+        "partOfSpeech": "IN",
+        "capitalization": "0",
+        "numPosition": "0"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 120,
+            "length": 2
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "WordToken"
+    },
+    {
+      "properties": {
+        "tokenNumber": "26",
+        "partOfSpeech": "PRP$",
+        "capitalization": "0",
+        "numPosition": "0",
+        "canonicalForm": "their"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 123,
+            "length": 5
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "WordToken"
+    },
+    {
+      "properties": {
+        "id": "0",
+        "codingScheme": "SNOMEDCT_US",
+        "code": "53982002",
+        "score": "0.0",
+        "disambiguated": "false",
+        "cui": "C0007603",
+        "tui": "T026",
+        "preferredText": "Plasma membrane",
+        "typeID": "6",
+        "discoveryTechnique": "1",
+        "polarity": "0",
+        "uncertainty": "0",
+        "conditional": "false",
+        "generic": "false",
+        "historyOf": "0"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 129,
+            "length": 13
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "AnatomicalSiteMention"
+    },
+    {
+      "properties": {
+        "id": "0",
+        "codingScheme": "SNOMEDCT_US",
+        "code": "4421005",
+        "score": "0.0",
+        "disambiguated": "false",
+        "cui": "C0007634",
+        "tui": "T025",
+        "preferredText": "Cells",
+        "typeID": "6",
+        "discoveryTechnique": "1",
+        "polarity": "0",
+        "uncertainty": "0",
+        "conditional": "false",
+        "generic": "false",
+        "historyOf": "0"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 129,
+            "length": 4
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "AnatomicalSiteMention"
+    },
+    {
+      "properties": {
+        "tokenNumber": "27",
+        "partOfSpeech": "NN",
+        "capitalization": "0",
+        "numPosition": "0",
+        "canonicalForm": "cell"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 129,
+            "length": 4
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "WordToken"
+    },
+    {
+      "properties": {
+        "tokenNumber": "28",
+        "partOfSpeech": "NN",
+        "capitalization": "0",
+        "numPosition": "0",
+        "canonicalForm": "membrane"
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 134,
+            "length": 8
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "WordToken"
+    },
+    {
+      "properties": {
+        "tokenNumber": "29",
+        "partOfSpeech": "."
+      },
+      "doffset": {
+        "offsets": [
+          {
+            "from": 142,
+            "length": 1
+          }
+        ]
+      },
+      "analyzer": "CtakesNLP",
+      "type": "PunctuationToken"
+    }
+  ],
+  "text": "B cells, unlike the other two classes of lymphocytes, T cells and natural killer cells, express B cell receptors (BCRs) on their cell membrane.",
+  "source": "string"
+}

@@ -7,6 +7,9 @@ const
   auth = require('../../controller/auth'),
   NLP = require('../../controller/nlp_wrapper'),
   Exception = require('../../model/Exception').model,
+  Resource = require('../../model/Resource').model,
+  ServiceParameter = require('../../model/ServiceParameter').model,
+  DOffset = require('../../model/DOffset').model,
   logger = require('../../controller/log')(module)
   ;
 
@@ -52,4 +55,65 @@ module.exports.analyze_doc = function(req, res, next) {
   });
 
 };
+
+
+
+module.exports.interpret = function(req, res, next) {
+
+  ServiceParameter.fromRequestPromise(req)
+    .then(serviceParameter => {
+      const focus = serviceParameter.focus;
+      const ana = serviceParameter.context.text;
+
+
+
+
+      // this sends back a JSON response
+      res.header('Content-Type', 'application/json; charset=utf-8');
+      res.json(resource);
+      res.end(next);
+
+    })
+    .catch(err => Exception.fromError(err).handleResponse(res).end(next));
+};
+
+
+module.exports.interpret_doffset = function(req, res, next) {
+
+  ServiceParameter.fromRequestPromise(req)
+    .then(serviceParameter => {
+      const focus = serviceParameter.focus;
+      const ana = serviceParameter.context.text;
+      const focustext = focus.getText(ana.text);
+      const key = `${ana.source}::${focustext}`;
+
+
+      // this sends back a JSON response
+      res.header('Content-Type', 'application/json; charset=utf-8');
+      res.json(resource);
+      res.end(next);
+
+    })
+    .catch(err => Exception.fromError(err).handleResponse(res).end(next));
+};
+
+
+function create_annotation_resources(analysis, focus){
+  // const focustext = focus.getText(analysis.text);
+  // const focus_key = `annotation::${focustext}`;
+  // const focus_key_unique = `annotation::${analysis.source}::${focustext}`;
+
+  const overlappingAnnotations = analysis.getAnnotationsWithinDOffset(focus);
+  const annotationResources = overlappingAnnotations.map(anno => {
+    const anno_text = anno.doffset.getText(analysis.text);
+    const anno_key = `annotation::${anno_text}`;
+    // const anno_key_unique = `annotation::${analysis.source}::${anno_text}`;
+    const annotationresource = new Resource(null, anno_key, null, {
+
+    });
+  });
+
+  const resource = new Resource(null, annotationResources, null, { key: key, label: focustext, source: ana.source });
+  return resource;
+}
 

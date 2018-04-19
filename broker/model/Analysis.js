@@ -137,12 +137,18 @@ Analysis.prototype.getAnnotationsWithinOffset = function(offset) {
  * @param strict
  * @return {Set<Annotation>}
  */
-Analysis.prototype.getAnnotationsWithinDOffset = function(doffset, strict) {
+Analysis.prototype.getAnnotationsWithinDOffset = function(doffset, strict = true) {
   const annotations = new Set();
   doffset.offsets.forEach(offset => this.getAnnotationsWithinOffset(offset).forEach(anno => annotations.add(anno)));
-  // TODO: filter with strict!!
-  if(strict){
-    logger.warn('Strict method has not yet been implemented! Returning non-strict results.');
+
+  if(strict) {
+    // logger.debug('Filter strict.');
+    // filter
+    annotations.forEach(anno => {
+      if(!(anno.begin() >= doffset.begin() && anno.end() <= doffset.end())){
+        annotations.delete(anno);
+      }
+    });
   }
   return annotations;
 };

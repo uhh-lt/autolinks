@@ -439,6 +439,30 @@ paths:
           schema:
             $ref: "#/definitions/Exception"
             
+  /nlp/interpret:
+    x-swagger-router-controller: nlp
+    post:
+      operationId: interpret
+      tags:
+        - NLP
+      description: | 
+        Interpret annotations that are in the focus of the data.
+      parameters:
+        - name: data
+          in: body
+          description: The service parameter
+          schema:
+            $ref: '#/definitions/ServiceParameter'
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/Resource'
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Exception"
+            
   /nlp/analyze/{did}:
     x-swagger-router-controller: nlp
     get:
@@ -464,6 +488,35 @@ paths:
           description: Success
           schema:
             $ref: "#/definitions/Analysis"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Exception"
+            
+  /nlp/interpret/{did}:
+    x-swagger-router-controller: nlp
+    post:
+      operationId: interpret_doffset
+      tags:
+        - NLP
+      description: | 
+        Interpret annotations that are in the focus of the data.
+      parameters:
+      - name: did
+        in: path
+        description: Document id to get the analyisis from
+        required: true
+        type: integer
+      - name: offset
+        in: body
+        description: The DOffset parameter
+        schema:
+          $ref: '#/definitions/DOffset'
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/Resource'
         default:
           description: Error
           schema:
