@@ -36,6 +36,7 @@ define([
           }
 
           $scope.EntityService = EntityService;
+          $scope.EndPointService = EndPointService;
           // $scope.fetchData = {};
 
           $scope.edgehandler = false;

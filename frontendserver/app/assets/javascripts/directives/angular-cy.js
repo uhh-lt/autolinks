@@ -12,7 +12,7 @@ define([
     'cytoscape.js-undo-redo',
     'qtip2',
     'bootstrap',
-], function(angular, $, cytoscape, regCose, klay, cxtmenu, panzoom, cyqtip, expandCollapse,edgehandles, undoRedo, qtip2) {
+], function(angular, $, cytoscape, regCose, klay, cxtmenu, panzoom, cyqtip, expandCollapse, edgehandles, undoRedo, qtip2) {
     'use strict';
 
     angular.module('ngCy', [])
@@ -225,7 +225,7 @@ define([
                                     scope.selectedEntity = e;
                                     return (
                                     '<div class="edge-buttons">' +
-                                    '<button id="editEdge" class="node-button"><i class="fa fa-pencil fa-2x"/></button>' +
+                                    '<button id="editEdge" class="node-button"><i class="fa fa-edit fa-2x"/></button>' +
                                     '</div>'
                                     )
                                   }
@@ -256,7 +256,7 @@ define([
                                     '<div class="node-buttons">' +
                                     '<button id="readMode" class="node-button"><i class="fa fa-book fa-2x"/></button>' +
                                     '<button id="addEdge" class="node-button"><i class="fa fa-link fa-2x"/></button> ' +
-                                    '<button id="editNode" class="node-button"><i class="fa fa-pencil fa-2x"/></button>' +
+                                    '<button id="editNode" class="node-button"><i class="fa fa-edit fa-2x"/></button>' +
                                     '</div>'
                                     )
                                   }
@@ -355,9 +355,59 @@ define([
                           // openMenuEvents: 'tap',
                           commands: [
                             {
-                              content: '<span class="fa fa-flash fa-2x"></span>',
-                              select: function(ele){
-                                console.log( ele.id() );
+                              content: '<span class="fa fa-plus-circle fa-2x"></span>',
+                              select: function(e){
+                                const after = {
+                                  "rid": 0,
+                                  "cid": 0,
+                                  "metadata": { label: "new" },
+                                  "value": "new"
+                                };
+
+                                const data = { before: null, after: after };
+
+                                scope.$parent.EndPointService.editResource(data).then(function(response) {
+                                    const before = {
+                                      "rid": response.data.rid,
+                                      "cid": response.data.cid,
+                                      "metadata": response.data.metadata,
+                                      "value": response.data.value
+                                    };
+
+                                    const after = {
+                                      "rid": response.data.rid,
+                                      "cid": parseInt(e.id()),
+                                      "metadata": response.data.metadata,
+                                      "value": response.data.value
+                                    };
+                                    const data = { before: before, after: after };
+
+                                    scope.$parent.EndPointService.editResource(data).then(function(response) {
+                                      if (e.isParent()) {
+                                        var x = scope.coordinate.x;
+                                        var y = scope.coordinate.y;
+                                        var data = response.data;
+                                        var nodeObj = {
+                                            data: {
+                                              parent: e.id(),
+                                              cid: data.cid,
+                                              rid: data.rid,
+                                              metadata: data.metadata,
+                                              id: ( data.value + ( '' ) + data.rid + data.cid ).replace(/\s/g, ''),
+                                              name: data.value + ''
+                                            },
+                                            position: {
+                                              x,
+                                              y
+                                            }
+                                        };
+                                        var n = cy.add(nodeObj);
+                                        scope.data.nodes.push(nodeObj);
+                                        nodeTipExtension(n);
+                                        cy.fit();
+                                      }
+                                    });
+                                });
                               }
                             },
 
