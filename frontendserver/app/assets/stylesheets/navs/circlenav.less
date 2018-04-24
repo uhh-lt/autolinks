@@ -17,7 +17,7 @@
 	color: @circle_nav_color;
 	cursor: pointer;
 	> li {
-		display: none;
+		display: block;
 		position: absolute;
 		right: 0;
 		top: 0;
@@ -33,7 +33,39 @@
 			background-color: @circle_nav_hover;
 		}
 	}
-	&:after {
+	&:hover:after {
+		background-color: @circle_nav_hover;
+	}
+	a {
+		width: 100%;
+		height: 100%;
+		display: inline-block;
+		border-radius: 50%;
+		-webkit-border-radius: 50%;
+		text-decoration: none;
+		color: @circle_nav_color;
+		font-size: 0.8em;
+		&:focus {
+			outline: none;
+		}
+	}
+}
+
+#wavs {
+	z-index: 6;
+	position: fixed;
+	right: 5vh;
+	bottom: 5vh;
+	width: 60px;
+	height: 60px;
+	line-height: 60px;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	text-align: center;
+	color: @circle_nav_color;
+	cursor: pointer;
+	> li {
 		position: absolute;
 		right: 0;
 		top: 0;
@@ -42,12 +74,12 @@
 		border-radius: 50%;
 		-webkit-border-radius: 50%;
 		background-color: @circle_nav_background;
-		content: '\f085';
-		font-size: 30px;
-		font-family: 'FontAwesome';
-		z-index: 1;
-		border-radius: 50%;
-		-webkit-border-radius: 50%;
+		transition: all .6s;
+		-webkit-transition: all .6s;
+		-moz-transition: .6s;
+		&:hover {
+			background-color: @circle_nav_hover;
+		}
 	}
 	&:hover:after {
 		background-color: @circle_nav_hover;
@@ -69,16 +101,6 @@
 		&:focus {
 			outline: none;
 		}
-	}
-}
-#navs.active {
-	> li {
-		display: block;
-	}
-	&:after {
-		content: '\f013';
-		font-family: 'FontAwesome';
-		font-size: 30px;
 	}
 }
 
