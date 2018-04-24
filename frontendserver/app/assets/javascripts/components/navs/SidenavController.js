@@ -8,8 +8,8 @@ define([
     angular.module('autolinks.sidenav', []);
     angular.module('autolinks.sidenav')
         // Viewer Controller
-        .controller('SidenavController', ['$scope', '$rootScope', '$timeout', '$mdSidenav', '$log', 'EntityService', 'EndPointService', '_',
-        function ($scope, $rootScope, $timeout, $mdSidenav, $log, EntityService, EndPointService, _) {
+        .controller('SidenavController', ['$scope', '$rootScope', '$timeout', '$mdSidenav', '$mdDialog', '$log', 'EntityService', 'EndPointService', '_',
+        function ($scope, $rootScope, $timeout, $mdSidenav, $mdDialog, $log, EntityService, EndPointService, _) {
 
           $scope.label = '';
 
@@ -64,21 +64,33 @@ define([
               $mdSidenav('right').close();
           };
 
-          $scope.delete = function(){
+          $scope.delete = function(ev) {
               const entity = $scope.selectedEntity;
               const label = $scope.label;
+              var entName = entity.data('metadata').label ?  entity.data('metadata').label : entity.data('name');
 
-              const before = {
-                "rid": entity.data('rid'),
-                "cid": entity.data('cid'),
-                "metadata": $scope.metadata ? $scope.metadata : {},
-                "value": entity.data('name') ? entity.data('name') : {}
-              };
+              var confirm = $mdDialog.confirm()
+                   .title('Are you sure to delete ' + entName + ' node ?')
+                   .targetEvent(ev)
+                   .ok('Yes, delete it!')
+                   .cancel('Cancel');
 
-              const data = { before: before, after: null };
-              EndPointService.editResource(data);
-              EntityService.deleteEntity();
-              $mdSidenav('right').close();
+              $mdDialog.show(confirm).then(function() {
+                const before = {
+                  "rid": entity.data('rid'),
+                  "cid": entity.data('cid'),
+                  "metadata": $scope.metadata ? $scope.metadata : {},
+                  "value": entity.data('name') ? entity.data('name') : {}
+                };
+
+                const data = { before: before, after: null };
+                EndPointService.editResource(data);
+                EntityService.deleteEntity();
+                $mdSidenav('right').close();
+              }, function() {
+               // cancel function
+              });
+
           };
 
           $scope.close = function () {

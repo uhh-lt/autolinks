@@ -182,8 +182,9 @@ define([
 
             // As the user release the Ctrl key, the key is no longer active.
             // So event.ctrlKey is false.
-            if (keyName === 'Control') {
+            if (keyName === 'Control' && ($scope.doffsetAnnotation.length > 0)) {
               $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation });
+              $scope.doffsetAnnotation = '';
               // alert('Control key was released');
             }
           }, false);
