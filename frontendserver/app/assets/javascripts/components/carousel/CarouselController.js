@@ -138,7 +138,7 @@ define([
 
               // var selectedDoc = $scope.tabs.find((t) => { return t.id === doc.id; });
               // var isInDoc = isEntityInDoc(selectedDoc, $scope.selectedEntity);
-              if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ') && (event.ctrlKey)) {
+              if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ') && (event.shiftKey)) {
 
                 $('#' + id + '_script-area').html(newScript);
                 $scope.slides[id].scripts = [$sce.trustAsHtml(newScript)];
@@ -162,7 +162,7 @@ define([
           document.addEventListener('keydown', (event) => {
             const keyName = event.key;
 
-            if (keyName === 'Control') {
+            if (keyName === 'Shift') {
               // do not alert when only Control key is pressed.
               $scope.doffsetAnnotation = '';
               return;
@@ -182,7 +182,7 @@ define([
 
             // As the user release the Ctrl key, the key is no longer active.
             // So event.ctrlKey is false.
-            if (keyName === 'Control' && ($scope.doffsetAnnotation.length > 0)) {
+            if (keyName === 'Shift' && ($scope.doffsetAnnotation.length > 0)) {
               $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation });
               $scope.doffsetAnnotation = '';
               // alert('Control key was released');
@@ -206,7 +206,7 @@ define([
                 //  while ((iter = regex1.exec(script)) !== null) {
                 //     console.log(`Found ${iter.index}. Next starts at ${regexScript.lastIndex}.`);
                 //   }
-              } else if (document.selection && document.selection.type != "Control") {
+              } else if (document.selection && document.selection.type != "Shift") {
                  text = document.selection.createRange().text;
               }
               text = text.trim();
