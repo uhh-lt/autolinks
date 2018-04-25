@@ -167,6 +167,7 @@ define([
                             scope.data.edges.push(edgeObj);
                             edgeTipExtension(addedEles);
                           }
+                          eh.enabled = false;
                           //this.enabled = false; TODO: Temporary commented for Steffen machine
                         },
                       }
