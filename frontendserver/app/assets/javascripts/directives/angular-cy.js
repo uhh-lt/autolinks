@@ -171,7 +171,7 @@ define([
                         },
                       }
                       var eh = cy.edgehandles(edgeHandleProps);
-                      //eh.enabled = false; TODO: this line is for solving another bug which is reload bugs, but temporary commented
+                      eh.enabled = false; //TODO: this line is for solving another bug which is expandCollapse bugs
 
                       // if (scope.$parent.edgehandler) {
                       //   eh.enabled = true;
@@ -403,7 +403,7 @@ define([
                                         var n = cy.add(nodeObj);
                                         scope.data.nodes.push(nodeObj);
                                         nodeTipExtension(n);
-                                        cy.fit();
+                                        // cy.fit();
                                       }
                                     });
                                 });
@@ -450,7 +450,7 @@ define([
                               var n = cy.add(nodeObj);
                               scope.data.nodes.push(nodeObj);
                               nodeTipExtension(n);
-                              cy.fit();
+                              // cy.fit();
                             }
                           },
 
@@ -700,8 +700,8 @@ define([
                         cy.edges().forEach(function(e) {
                           edgeTipExtension(e);
                         });
-                        cy.layout({name: 'cose-bilkent'}).run();
-                        cy.fit();
+                        // cy.layout({name: 'cose-bilkent'}).run();
+                        // cy.fit();
                       });
 
                       $rootScope.$on('createNode', function(event, newName) {
@@ -721,7 +721,7 @@ define([
                         scope.data.nodes.push(nodeObj);
                         nodeTipExtension(n);
                         // cy.layout({name: 'cose-bilkent'}).run();
-                        cy.fit();
+                        // cy.fit();
                         // cy.zoom(2);
                       });
 
