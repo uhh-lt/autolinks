@@ -24,9 +24,9 @@
   },
   "homepage": "https://github.com/uhh-lt/autolinks#readme",
   "dependencies": {
-    "angular": "^1.6.9",
+    "angular": "^1.6.10",
     "body-parser": "^1.18.2",
-    "ejs": "^2.5.8",
+    "ejs": "^2.5.9",
     "express": "^4.16.3",
     "express-jwt": "^5.3.1",
     "express-session": "^1.15.6",

@@ -12,7 +12,7 @@ define([
     'cytoscape.js-undo-redo',
     'qtip2',
     'bootstrap',
-], function(angular, $, cytoscape, regCose, klay, cxtmenu, panzoom, cyqtip, expandCollapse,edgehandles, undoRedo, qtip2) {
+], function(angular, $, cytoscape, regCose, klay, cxtmenu, panzoom, cyqtip, expandCollapse, edgehandles, undoRedo, qtip2) {
     'use strict';
 
     angular.module('ngCy', [])
@@ -167,12 +167,11 @@ define([
                             scope.data.edges.push(edgeObj);
                             edgeTipExtension(addedEles);
                           }
-                          this.enabled = false;
+                          //this.enabled = false; TODO: Temporary commented for Steffen machine
                         },
                       }
-                      // debugger;
                       var eh = cy.edgehandles(edgeHandleProps);
-                      eh.enabled = false;
+                      //eh.enabled = false; TODO: this line is for solving another bug which is reload bugs, but temporary commented
 
                       // if (scope.$parent.edgehandler) {
                       //   eh.enabled = true;
@@ -182,23 +181,6 @@ define([
 
                       // Event listeners
                       // with sample calling to the controller function as passed as an attribute
-                      cy.on('tap', 'node', function(e){
-                          eh.enabled = false;
-                          var evtTarget = e.target;
-                          var nodeId = evtTarget.id();
-                          scope.selectedEntity = evtTarget;
-
-                          var eventIsDirect = evtTarget.same(this);
-                          console.log(nodeId);
-                          if( eventIsDirect ){
-                            this.emit('directtap');
-                          }
-                          // scope.cyClick({value:nodeId});
-                          // scope.$parent.EntityService.openSideNav(evtTarget);
-                      })
-                      .on('directtap', function(e) {
-                        e.stopPropagation();
-                      });
 
                       scope.coordinate = {};
                       scope.selectedEntity = {};
@@ -242,7 +224,7 @@ define([
                                     scope.selectedEntity = e;
                                     return (
                                     '<div class="edge-buttons">' +
-                                    '<button id="editEdge" class="node-button"><i class="fa fa-pencil fa-2x"/></button>' +
+                                    '<button id="editEdge" class="node-button"><i class="fa fa-edit fa-2x"/></button>' +
                                     '</div>'
                                     )
                                   }
@@ -261,7 +243,7 @@ define([
 
                       function nodeTipExtension(n) {
                         _.forEach(n, function(n) {
-                          if (!n.isParent()) {
+                          if (n.isNode()) {
                             cy.$('#'+ n.data('id')).qtip({
                               content: {
                                   text: function(event, api) {
@@ -273,7 +255,7 @@ define([
                                     '<div class="node-buttons">' +
                                     '<button id="readMode" class="node-button"><i class="fa fa-book fa-2x"/></button>' +
                                     '<button id="addEdge" class="node-button"><i class="fa fa-link fa-2x"/></button> ' +
-                                    '<button id="editNode" class="node-button"><i class="fa fa-pencil fa-2x"/></button>' +
+                                    '<button id="editNode" class="node-button"><i class="fa fa-edit fa-2x"/></button>' +
                                     '</div>'
                                     )
                                   }
@@ -288,30 +270,39 @@ define([
                               style: {
                                   name: 'qtip-content'
                               }
+                            })
+                            .on('tap', function( e ){
+                              var eventIsDirect = e.target.same( this ); // don't use 2.x cyTarget
+
+                              if( eventIsDirect ){
+                                this.emit('directtap');
+                              }
+                            }).on('directtap', function( e ){
+                              e.stopPropagation();
                             });
 
-                            cy.$('#'+ n.data('id')).qtip({
-                              content: {
-                                  text: function(event, api) {
-                                    if (n.data('desc')) {
-                                      return (
-                                      '<div class="node-description">' + n.data('desc') + '</div>'
-                                      )
-                                    }
-                                  }
-                              },
-                              position: {
-                                my: 'top center',
-                                at: 'bottom center'
-                              },
-                              style: {
-                                classes: 'qtip-bootstrap',
-                                tip: {
-                                  width: 16,
-                                  height: 8
-                                },
-                              }
-                            });
+                            // cy.$('#'+ n.data('id')).qtip({
+                            //   content: {
+                            //       text: function(event, api) {
+                            //         if (n.data('desc')) {
+                            //           return (
+                            //           '<div class="node-description">' + n.data('desc') + '</div>'
+                            //           )
+                            //         }
+                            //       }
+                            //   },
+                            //   position: {
+                            //     my: 'top center',
+                            //     at: 'bottom center'
+                            //   },
+                            //   style: {
+                            //     classes: 'qtip-bootstrap',
+                            //     tip: {
+                            //       width: 16,
+                            //       height: 8
+                            //     },
+                            //   }
+                            // });
                           }
                         });
                       }
@@ -363,9 +354,59 @@ define([
                           // openMenuEvents: 'tap',
                           commands: [
                             {
-                              content: '<span class="fa fa-flash fa-2x"></span>',
-                              select: function(ele){
-                                console.log( ele.id() );
+                              content: '<span class="fa fa-plus-circle fa-2x"></span>',
+                              select: function(e){
+                                const after = {
+                                  "rid": 0,
+                                  "cid": 0,
+                                  "metadata": { label: "new" },
+                                  "value": "new"
+                                };
+
+                                const data = { before: null, after: after };
+
+                                scope.$parent.EndPointService.editResource(data).then(function(response) {
+                                    const before = {
+                                      "rid": response.data.rid,
+                                      "cid": response.data.cid,
+                                      "metadata": response.data.metadata,
+                                      "value": response.data.value
+                                    };
+
+                                    const after = {
+                                      "rid": response.data.rid,
+                                      "cid": parseInt(e.id()),
+                                      "metadata": response.data.metadata,
+                                      "value": response.data.value
+                                    };
+                                    const data = { before: before, after: after };
+
+                                    scope.$parent.EndPointService.editResource(data).then(function(response) {
+                                      if (e.isParent()) {
+                                        var x = scope.coordinate.x;
+                                        var y = scope.coordinate.y;
+                                        var data = response.data;
+                                        var nodeObj = {
+                                            data: {
+                                              parent: e.id(),
+                                              cid: data.cid,
+                                              rid: data.rid,
+                                              metadata: data.metadata,
+                                              id: ( data.value + ( '' ) + data.rid + data.cid ).replace(/\s/g, ''),
+                                              name: data.value + ''
+                                            },
+                                            position: {
+                                              x,
+                                              y
+                                            }
+                                        };
+                                        var n = cy.add(nodeObj);
+                                        scope.data.nodes.push(nodeObj);
+                                        nodeTipExtension(n);
+                                        cy.fit();
+                                      }
+                                    });
+                                });
                               }
                             },
 
@@ -680,7 +721,7 @@ define([
                         scope.data.nodes.push(nodeObj);
                         nodeTipExtension(n);
                         // cy.layout({name: 'cose-bilkent'}).run();
-                        // cy.fit();
+                        cy.fit();
                         // cy.zoom(2);
                       });
 
