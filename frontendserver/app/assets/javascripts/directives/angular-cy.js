@@ -184,11 +184,6 @@ define([
 
                                 scope.$parent.EndPointService.editResource(data).then(function(response) {
 
-                                  if (e.isParent()) {
-                                    var x = scope.coordinate.x;
-                                    var y = scope.coordinate.y;
-                                    var data = response.data;
-
                                     var edgeObj = {
                                         data:{
                                           id: sourceNode.data('id') + targetNode.data('id'),
@@ -201,7 +196,6 @@ define([
                                     // adding the edge object to the edges array
                                     scope.data.edges.push(edgeObj);
                                     edgeTipExtension(addedEles);
-                                  }
                                 });
                             });
                           }
@@ -400,7 +394,7 @@ define([
                                   "rid": 0,
                                   "cid": 0,
                                   "metadata": { label: "new" },
-                                  "value": "new"
+                                  "value": "new_no_" + scope.data.nodes.length,
                                 };
 
                                 const data = { before: null, after: after };
