@@ -19,8 +19,10 @@ define([
               const entity = $scope.selectedEntity;
               if (entity._private) {
                 const metadata = _.clone(entity._private.data.metadata);
-                $scope.metadata = metadata;
-                $scope.metadata_keys = Object.keys($scope.metadata);
+                if (metadata) {
+                  $scope.metadata = metadata;
+                  $scope.metadata_keys = Object.keys($scope.metadata);
+                }
                 document.getElementById("propertify").innerHTML = JSON.stringify($scope.selectedEntity._private.data, undefined, 4);
               }
               console.log($scope.selectedEntity);
@@ -67,7 +69,7 @@ define([
           $scope.delete = function(ev) {
               const entity = $scope.selectedEntity;
               const label = $scope.label;
-              var entName = entity.data('metadata').label ?  entity.data('metadata').label : entity.data('name');
+              var entName = entity.data('metadata') ?  entity.data('metadata').label : entity.data('name');
 
               var confirm = $mdDialog.confirm()
                    .title('Are you sure to delete ' + entName + ' node ?')
