@@ -45,4 +45,16 @@ Annotation.prototype.assign = function(obj) {
   return Object.assign(this, obj);
 };
 
+Annotation.prototype.begin = function() {
+  return this.doffset.begin();
+};
+
+Annotation.prototype.end = function() {
+  return this.doffset.end();
+};
+
+Annotation.prototype.length = function() {
+  return this.doffset.maxlength();
+};
+
 

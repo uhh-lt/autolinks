@@ -132,14 +132,21 @@ module.exports.get_service_and_endpoints = function (servicename, callback) {
   });
 };
 
-function getRandomStorageKey() {
-  return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
-}
-
 function sendData(data, res) {
   res.header('Content-Type', 'application/json');
   res.send(data);
   return res;
+}
+
+function getAndSaveRawData(userid, storagekey, requestDataOptions, location, path){
+  // get the data from service, then save it (save returns the data itself)
+  return request_utils.promisedRequest(requestDataOptions)
+    .then(result => {
+      logger.debug(`Sucessfully called service '${location}${path}'.`);
+      const rawdata = JSON.parse(result.body);
+      return rawdata;
+    })
+    .then(rawdata => storage.promisedWrite(userid, storagekey, rawdata));
 }
 
 module.exports.call_service = function (location, path, method, userid, data, serviceref, endpointref, req, res, next) {
@@ -163,23 +170,20 @@ module.exports.call_service = function (location, path, method, userid, data, se
         logger.debug(`Successfully recevied storagekey: ${key}`);
         return key;
     }, err => null)
-    .then(key => `${serviceref.name}__${serviceref.version}__${endpointref.path}__${serviceref.method}__${key}`) // make key unique per service & endpoint
     .then(key => {
-      // if data for key exists in DB use it, otherwise get it from service call and store it
-      if (key) {
-        const data = storage.promisedRead(userid, key);
-        if(data){
-          return data;
-        }
+      if(!key){
+        return getAndSaveRawData(userid, null, requestDataOptions, location, path);
       }
-      // get the data from service, then save it (save returns the data itself)
-      return request_utils.promisedRequest(requestDataOptions)
-        .then(result => {
-          logger.debug(`Sucessfully called service '${location}${path}'.`);
-          const rawdata = JSON.parse(result.body);
-          return rawdata;
-        })
-        .then(rawdata => storage.promisedWrite(userid, key, rawdata));
+      // make key unique per service & endpoint, this can be used for /service/get/...
+      const ukey = `service::${serviceref.name}/${endpointref.path.replace('/','')}/${serviceref.version}/${method}/q=${encodeURI(key)}`;
+      return storage.promisedRead(userid, ukey).then(
+        // if data for key exists in DB use it, otherwise get it from service call and store it
+        data => {
+          if(data){
+            return data;
+          }
+          return getAndSaveRawData(userid, ukey, requestDataOptions, location, path);
+        });
     })
     .then(data => sendData(data, res).end(next))
     .catch(err => Exception.fromError(err, err.message).log(logger.warn).handleResponse(res).end(next));

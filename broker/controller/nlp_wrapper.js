@@ -7,6 +7,7 @@ const
   Exception = require('../model/Exception').model,
   store = require('./storage_wrapper'),
   utils = require('./utils/utils'),
+  analysis = require('../model/Analysis'),
   logger = require('./log')(module);
 
 const explicitNLP = (() => {
@@ -47,7 +48,6 @@ module.exports.analyze = function(text, contentType, source) {
   return explicitNLP.analyze(text, contentType, source);
 };
 
-
 module.exports.analyzeDocument = function(uid, did, refresh) {
   return store.promisedGetFile(uid, did, 'info')
     .then(docinfo => {
@@ -58,15 +58,11 @@ module.exports.analyzeDocument = function(uid, did, refresh) {
         logger.debug(`Document has already been analyzed. OVERWRITING!`);
       }
       return store.promisedGetFile(uid, did, 'content')
-        .then(content => this.analyze(content, docinfo.mimetype, docinfo.name))
+        .then(content => this.analyze(content, docinfo.mimetype, docinfo.filename))
         .then(analysis => {
           store.updateDocumentAnalysis(uid, did, analysis);
           return analysis;
         });
     });
 };
-
-
-
-
 

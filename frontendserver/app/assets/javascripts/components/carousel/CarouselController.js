@@ -22,7 +22,9 @@ define([
           $scope.pages = 0;
 
           $scope.slides = [];
+          $scope.entityInDoc = [];
           $scope.currIndex = 0;
+          $scope.doffsetAnnotation = '';
 
           var text1 = "The leftist-populist Chavez will make his 13th visit to Cuba since taking power in 1999 to sit his personal friend, Castro. At the Latin American School of Medicine, Chavez will";
 
@@ -51,14 +53,26 @@ define([
                     if(fragments.length > 1 && i != fragments.length - 1) compiledString = compiledString.concat('<br />');
                 });
 
-                var highlightElement = undefined;
+                if (!isEntityInDoc($scope.entityInDoc, from, to, $scope.currIndex)) {
+                  var highlightElement = undefined;
 
-                highlightElement = createNeHighlight(eId, surface);
-                // Append marked element to DOM
-                // var compiledElement = $compile(highlightElement)(scope);
-                compiledString = compiledString.concat(highlightElement);
-                // Move the cursor
-                offset = _.has(e, 'nested') && e.nested.end > e.end ? e.nested.end : to;
+                  highlightElement = createNeHighlight(eId, surface);
+                  // Append marked element to DOM
+                  // var compiledElement = $compile(highlightElement)(scope);
+                  compiledString = compiledString.concat(highlightElement);
+                  // Move the cursor
+                  offset = _.has(e, 'nested') && e.nested.end > e.end ? e.nested.end : to;
+
+                  $scope.entityInDoc.push(
+                    {
+                      entity: surface,
+                      start: from,
+                      end: to,
+                      id: $scope.currIndex
+                    }
+                  );
+                }
+
             });
 
             compiledString = compiledString.concat(text.slice(offset, text.length));
@@ -67,10 +81,33 @@ define([
               // image: '//unsplash.it/' + newWidth + '/300',
               texts:[text],
               scripts: [$sce.trustAsHtml(compiledString)],
-              id: $scope.currIndex++,
+              id: $scope.currIndex,
               entity: entity
             });
+
+            $scope.currIndex++;
           };
+
+          function isEntityInDoc(selectedDoc, start, end, id) {
+            var entities = selectedDoc.filter((e) =>
+              {
+                //avoids new entity contains / intersects / inside an existed entity
+                if (((e.start >= start) &&
+                    (e.end <= end)) ||
+                    ((e.start <= start) &&
+                    (e.end >= end)) ||
+                    ((e.start <= start) &&
+                    (e.end >= start)) ||
+                    ((e.start <= end) &&
+                    (e.end >= end)) &&
+                    (e.id === id)
+                  ) {
+                    return e;
+                  }
+              }
+            );
+            return entities.length > 0 ? true : false;
+          }
 
           function createNeHighlight(id, name) {
               // var color = graphProperties.options['groups'][typeId]['color']['background'];
@@ -101,11 +138,18 @@ define([
 
               // var selectedDoc = $scope.tabs.find((t) => { return t.id === doc.id; });
               // var isInDoc = isEntityInDoc(selectedDoc, $scope.selectedEntity);
-              if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ') && (event.ctrlKey)) {
-                debugger;
+              if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ') && (event.shiftKey)) {
+
                 $('#' + id + '_script-area').html(newScript);
                 $scope.slides[id].scripts = [$sce.trustAsHtml(newScript)];
-                $rootScope.$emit('createNode', { name: ent.text });
+                if ($scope.doffsetAnnotation.length === 0) {
+                  $scope.doffsetAnnotation = ent.text;
+                } else {
+                  var doffsetAnno = [' ', ent.text]
+                  $scope.doffsetAnnotation = $scope.doffsetAnnotation.concat(...doffsetAnno);
+                }
+
+                // $rootScope.$emit('createNode', { name: ent.text });
 
               //   // $scope.isEntityInDoc = false;
               //   $scope.open($scope, script, 'static');
@@ -114,6 +158,36 @@ define([
               //   $scope.open($scope, script, 'true');
               }
           };
+
+          document.addEventListener('keydown', (event) => {
+            const keyName = event.key;
+
+            if (keyName === 'Shift') {
+              // do not alert when only Control key is pressed.
+              $scope.doffsetAnnotation = '';
+              return;
+            }
+
+            if (event.ctrlKey) {
+              // Even though event.key is not 'Control' (i.e. 'a' is pressed),
+              // event.ctrlKey may be true if Ctrl key is pressed at the time.
+              // alert(`Combination of ctrlKey + ${keyName}`);
+            } else {
+              // alert(`Key pressed ${keyName}`);
+            }
+          }, false);
+
+          document.addEventListener('keyup', (event) => {
+            const keyName = event.key;
+
+            // As the user release the Ctrl key, the key is no longer active.
+            // So event.ctrlKey is false.
+            if (keyName === 'Shift' && ($scope.doffsetAnnotation.length > 0)) {
+              $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation });
+              $scope.doffsetAnnotation = '';
+              // alert('Control key was released');
+            }
+          }, false);
 
           $scope.selectedType = '';
             var script = $scope.tabs;
@@ -132,7 +206,7 @@ define([
                 //  while ((iter = regex1.exec(script)) !== null) {
                 //     console.log(`Found ${iter.index}. Next starts at ${regexScript.lastIndex}.`);
                 //   }
-              } else if (document.selection && document.selection.type != "Control") {
+              } else if (document.selection && document.selection.type != "Shift") {
                  text = document.selection.createRange().text;
               }
               text = text.trim();
@@ -146,16 +220,16 @@ define([
           $scope.addEntityFilter = function(name) {
             EndPointService.fetchService().then(function(response) {
               $scope.list = response.data;
-
-              EndPointService.annotateText(name).then(function(response) {
+              // EndPointService.annotateText(name).then(function(response) {
                 const annotations = response.data.annotations;
-                $scope.context = response.data;
+                $scope.context = name;
+                const inputLength = name.length;
                 $scope.active = EndPointService.getActiveService();
 
                 if ($scope.active.length > 0) {
-                  _.forEach(annotations, function(anno) {
+                  // _.forEach(annotations, function(anno) {
 
-                    const offsets = anno.doffset.offsets;
+                    // const offsets = anno.doffset.offsets;
                     _.forEach($scope.list, function(l) {
 
                       $scope.serviceName = l.name;
@@ -166,8 +240,10 @@ define([
                           $scope.data = {
                             offsets:
                             {
-                              from: offsets[0].from ? offsets[0].from : 0,
-                              length: offsets[0].length
+                              // from: offsets[0].from ? offsets[0].from : 0,
+                              from: 0,
+                              length: inputLength
+                              // length: offsets[0].length
                             },
                             context: $scope.context,
                             name: $scope.serviceName,
@@ -182,7 +258,7 @@ define([
 
                       });
                     });
-                  });
+                  // });
                 } else {
                   $mdToast.show(
                         $mdToast.simple()
@@ -194,7 +270,7 @@ define([
                   $mdSidenav('left').toggle();
                 }
 
-              });
+              // });
             });
           };
 
@@ -239,7 +315,7 @@ define([
               $scope.doc = data;
               EndPointService.annotateText(data).then(function(response) {
 
-                $scope.anno = response.data;
+                $scope.anno = response.data.annotations;
                 var sentences = $scope.anno.filter(a => a.type === 'Sentence');
                 // $scope.entity = anno.filter(a => a.type ==='NamedEntity')
                 // $scope.pages = sentences.length;
