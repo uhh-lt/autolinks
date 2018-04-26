@@ -160,7 +160,12 @@ define([
                               "rid": 0,
                               "cid": 0,
                               "metadata": {},
-                              "value": { "subject": { "rid": sourceNode.data().rid }, "predicate": "has relation", "object": { "rid": targetNode.data().rid } }
+                              "value": { "subject": { "rid": sourceNode.data().rid },
+                                         "predicate": {
+                                           "value": "has new relation_no_" + scope.data.edges.length,
+                                            "metadata": { "label": "has relation" } },
+                                         "object": { "rid": targetNode.data().rid }
+                                       }
                             };
 
                             const data = { before: null, after: after };
