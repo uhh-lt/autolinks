@@ -10,9 +10,9 @@ define([
     angular.module('autolinks.input', ['ngMaterial'])
     // angular.module('autolinks.input')
         // Network Controller
-        .config(['$mdIconProvider', function($mdIconProvider) {
-          $mdIconProvider.icon('md-close', 'img/icons/ic_close_24px.svg', 24);
-        }])
+        // .config(['$mdIconProvider', function($mdIconProvider) {
+        //   $mdIconProvider.icon('md-close', 'img/icons/ic_close_24px.svg', 24);
+        // }])
         .controller('InputController', ['$scope', '$mdToast', '$mdSidenav', 'EndPointService', 'EntityService', '_',
         function ($scope, $mdToast, $mdSidenav, EndPointService, EntityService, _) {
 
