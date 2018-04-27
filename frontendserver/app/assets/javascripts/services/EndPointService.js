@@ -48,6 +48,12 @@ define([
                 });
               },
 
+              getDocuments: function(data) {
+                return $http.get('/api/storage/getDocuments').then(function(response) {
+                  return response;
+                });
+              },
+
               fetchData: function(data) {
                 const promise = $q.defer();
                 // let data = [];
