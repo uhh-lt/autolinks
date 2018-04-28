@@ -20,16 +20,6 @@ module.exports.info = function(req, res, next) {
   });
 };
 
-module.exports.read = function(req, res, next) {
-  new Exception('NOT IMPLEMENTED', 'not yet implemented').handleResponse(res).end(next);
-};
-
-module.exports.write = function(req, res, next) {
-  auth.handle_authenticated_request(req, res, function(user) {
-    new Exception('NOT IMPLEMENTED', 'not yet implemented').handleResponse(res).end(next);
-  });
-};
-
 module.exports.editresource = function(req, res, next) {
   const data = req.swagger.params.data.value;
   if(!data) {

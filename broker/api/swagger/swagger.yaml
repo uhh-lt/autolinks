@@ -270,11 +270,11 @@ paths:
   /service/get/{service}/{path}/{version}/{method}/:
     # tell nodejs where to find the code for this path
     x-swagger-router-controller: services
-    post:
+    get:
       operationId: get_service_data
       tags:
         - Service
-      description: Call a service and get its response
+      description: Get the data that was computed by calling a service
       security:
         - broker_auth: []
       parameters:
