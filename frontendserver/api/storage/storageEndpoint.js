@@ -5,10 +5,12 @@ var router = express.Router();
 var storageEdit = require('./editResource');
 var documentLists = require('./getDocuments');
 var documentUpload = require('./postDocuments');
+var deleteDocument = require('./deleteDocument');
 
 router.post('/editResource', editResource);
 router.get('/getDocuments', getDocuments);
 router.post('/postDocuments', postDocuments);
+router.post('/deleteDocument', deleteDocument);
 
 module.exports = router;
 
@@ -31,8 +33,17 @@ function getDocuments(req, res) {
 
 function postDocuments(req, res) {
     const token = req.session.token;
-    const file = req.files.uploadedFile;
+    const file = req.files.docFile;
     const options = documentUpload(config.apiUrl, token, file);
+    request(options, function (error, response, body) {
+      res.send(body);
+    });
+}
+
+function deleteDocument(req, res) {
+    const token = req.session.token;
+    const file = req.body.data;
+    const options = documentDelete(config.apiUrl, token, file);
     request(options, function (error, response, body) {
       res.send(body);
     });

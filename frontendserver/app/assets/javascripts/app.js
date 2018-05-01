@@ -18,7 +18,8 @@ define([
     'ui-bootstrap',
     'ngSanitize',
     'ngMaterial',
-    'ngTouch'
+    'ngTouch',
+    'ngFileUpload'
 ], function (angular) {
     'use strict';
 
