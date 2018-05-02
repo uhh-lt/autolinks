@@ -154,24 +154,62 @@ define([
                           // get edge source
                           if (sourceNode.data && targetNode.data) {
                             // build the edge object
-                            var edgeObj = {
-                                data:{
-                                  id: sourceNode.data('id') + targetNode.data('id'),
-                                  source: sourceNode.data('id'),
-                                  target: targetNode.data('id'),
-                                  name: 'has relation'
-                                }
+                            debugger;
+
+                            const after = {
+                              "rid": 0,
+                              "cid": 0,
+                              "metadata": {},
+                              "value": { "subject": { "rid": sourceNode.data().rid },
+                                         "predicate": {
+                                           "value": "has new relation_no_" + scope.data.edges.length,
+                                            "metadata": { "label": "has relation" } },
+                                         "object": { "rid": targetNode.data().rid }
+                                       }
                             };
-                            addedEles.data().name = 'has relation';
-                            // adding the edge object to the edges array
-                            scope.data.edges.push(edgeObj);
-                            edgeTipExtension(addedEles);
+
+                            const data = { before: null, after: after };
+
+                            scope.$parent.EndPointService.editResource(data).then(function(response) {
+
+                                const before = {
+                                  "rid": response.data.rid,
+                                  "cid": response.data.cid,
+                                  "metadata": response.data.metadata,
+                                  "value": response.data.value
+                                };
+
+                                const after = {
+                                  "rid": response.data.rid,
+                                  "cid": sourceNode.data().cid,
+                                  "metadata": response.data.metadata,
+                                  "value": response.data.value
+                                };
+                                const data = { before: before, after: after };
+
+                                scope.$parent.EndPointService.editResource(data).then(function(response) {
+
+                                    var edgeObj = {
+                                        data:{
+                                          id: sourceNode.data('id') + targetNode.data('id'),
+                                          source: sourceNode.data('id'),
+                                          target: targetNode.data('id'),
+                                          name: 'has relation'
+                                        }
+                                    };
+                                    addedEles.data().name = 'has relation';
+                                    // adding the edge object to the edges array
+                                    scope.data.edges.push(edgeObj);
+                                    edgeTipExtension(addedEles);
+                                });
+                            });
                           }
+                          eh.enabled = false;
                           //this.enabled = false; TODO: Temporary commented for Steffen machine
-                        },
+                        }
                       }
                       var eh = cy.edgehandles(edgeHandleProps);
-                      //eh.enabled = false; TODO: this line is for solving another bug which is reload bugs, but temporary commented
+                      eh.enabled = false; //TODO: this line is for solving another bug which is expandCollapse bugs
 
                       // if (scope.$parent.edgehandler) {
                       //   eh.enabled = true;
@@ -310,12 +348,13 @@ define([
                       cy.expandCollapse({
                         layoutBy: {
                           name: "cose-bilkent",
-                          // animate: "end",
+                          animate: true,
                           randomize: false,
                           fit: true
                         },
                         fisheye: false,
-                        animate: false
+                        animate: false,
+                        undoable: false
                       });
 
                         // the default values of each option are outlined below:
@@ -360,7 +399,7 @@ define([
                                   "rid": 0,
                                   "cid": 0,
                                   "metadata": { label: "new" },
-                                  "value": "new"
+                                  "value": "new_no_" + scope.data.nodes.length,
                                 };
 
                                 const data = { before: null, after: after };
@@ -403,7 +442,7 @@ define([
                                         var n = cy.add(nodeObj);
                                         scope.data.nodes.push(nodeObj);
                                         nodeTipExtension(n);
-                                        cy.fit();
+                                        // cy.fit();
                                       }
                                     });
                                 });
@@ -450,7 +489,7 @@ define([
                               var n = cy.add(nodeObj);
                               scope.data.nodes.push(nodeObj);
                               nodeTipExtension(n);
-                              cy.fit();
+                              // cy.fit();
                             }
                           },
 
@@ -490,7 +529,7 @@ define([
                           cid: e.cid,
                           rid: e.rid,
                           metadata: e.metadata,
-                          id: ( e.value + ( child ? '' : '_as_parent' ) + e.rid + e.cid ).replace(/\s/g, ''),
+                          id: ( e.value + ( child ? '' : '_as_parent' ) + '-' + e.rid + '-' + e.cid ).replace(/\s/g, ''),
                           name: e.value + '',
                           parent: parent ? parent.id : scope.outermostId,
                           path: scope.path
@@ -505,7 +544,7 @@ define([
                             cid: r.cid,
                             rid: r.rid,
                             metadata: r.metadata,
-                            id: ( subject.id + object.id + r.rid ).replace(/\s/g, ''),
+                            id: ( subject.id + '-' + object.id + '-' + r.rid ).replace(/\s/g, ''),
                             source: (subject.id).replace(/\s/g, ''),
                             target: (object.id).replace(/\s/g, ''),
                             name: r.value,
@@ -700,8 +739,8 @@ define([
                         cy.edges().forEach(function(e) {
                           edgeTipExtension(e);
                         });
-                        cy.layout({name: 'cose-bilkent'}).run();
-                        cy.fit();
+                        // cy.layout({name: 'cose-bilkent'}).run();
+                        // cy.fit();
                       });
 
                       $rootScope.$on('createNode', function(event, newName) {
@@ -716,12 +755,11 @@ define([
                               y: 100 + Math.random() * 100
                             }
                         };
-                        debugger;
                         var n = cy.add(nodeObj);
                         scope.data.nodes.push(nodeObj);
                         nodeTipExtension(n);
                         // cy.layout({name: 'cose-bilkent'}).run();
-                        cy.fit();
+                        // cy.fit();
                         // cy.zoom(2);
                       });
 
