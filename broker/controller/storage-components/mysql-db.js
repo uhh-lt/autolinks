@@ -705,19 +705,17 @@ module.exports.getDocumentContent = function(uid, did) {
 
 module.exports.getDocumentAnalysis = function(uid, did) {
   return promisedQuery('select name, mimetype, analysis from documents where uid = ? and did = ?', [uid, did])
-    .then(res => {
+    .then(res => new Promise((resolve,reject) => {
       if(!res.rows){
-        return Promise.reject(`Document ${did} not found for user ${did}.`);
+        return reject(new Exception('IllegalState', `Document ${did} not found for user ${uid}.`));
       }
       const row = res.rows[0];
       if(!row.analysis){
-        const ana = Analysis.fromText('This document has not yet been analyzed!');
-        ana.source = row.name;
-        ana.mimeType = row.mimetype;
-        return ana;
+        new Exception('IllegalState', `Document ${did} has not yet been analyzed ${uid}.`).log(logger.info);
+        return resolve(null);
       }
-      return new Analysis().deepAssign(JSON.parse(row.analysis));
-    });
+      return resolve(new Analysis().deepAssign(JSON.parse(row.analysis)));
+    }));
 };
 
 module.exports.updateDocumentAnalysis = function(uid, did, analysis) {

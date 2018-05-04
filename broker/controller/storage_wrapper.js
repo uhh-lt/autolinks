@@ -126,6 +126,36 @@ module.exports.promisedGetFile = function(userid, did, target) {
  *
  * @param userid
  * @param did
+ * @return {*}
+ */
+module.exports.promisedGetDocumentInfo = function(userid, did) {
+  return explicitStorage.getDocumentInfo(userid, did);
+};
+
+/**
+ *
+ * @param userid
+ * @param did
+ * @return {*}
+ */
+module.exports.promisedGetDocumentContent = function(userid, did) {
+  return explicitStorage.getDocumentContent(userid, did);
+};
+
+/**
+ *
+ * @param userid
+ * @param did
+ * @return {*}
+ */
+module.exports.promisedGetDocumentAnalysis = function(userid, did) {
+  return explicitStorage.getDocumentAnalysis(userid, did);
+};
+
+/**
+ *
+ * @param userid
+ * @param did
  * @param analysis
  * @return {*}
  */
