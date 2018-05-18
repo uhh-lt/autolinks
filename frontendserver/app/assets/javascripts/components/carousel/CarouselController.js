@@ -99,10 +99,11 @@ define([
                     ((e.start <= start) &&
                     (e.end >= start)) ||
                     ((e.start <= end) &&
-                    (e.end >= end)) &&
-                    (e.id === id)
+                    (e.end >= end))
                   ) {
-                    return e;
+                    if (e.id === id) {
+                      return e;
+                    }
                   }
               }
             );
@@ -312,10 +313,10 @@ define([
           $rootScope.$on('activateTextCarousel', function(event, data) {
               $scope.resetSlides();
               $scope.isActive = true;
-              $scope.doc = data;
-              EndPointService.annotateText(data).then(function(response) {
+              $scope.doc = data.text;
+              // EndPointService.annotateText(data).then(function(response) {
 
-                $scope.anno = response.data.annotations;
+                $scope.anno = data.annotations;
                 var sentences = $scope.anno.filter(a => a.type === 'Sentence');
                 // $scope.entity = anno.filter(a => a.type ==='NamedEntity')
                 // $scope.pages = sentences.length;
@@ -337,7 +338,7 @@ define([
                   ));
                   $scope.addSlide(sentence, entity);
                 });
-              });
+              // });
           });
 
           // Instantiate the Bootstrap carousel
