@@ -37,15 +37,17 @@ define([
               });
           };
 
-
           $scope.init();
 
           $scope.navigateTo = function(service) {
             EndPointService.toggleService(service);
           };
 
-
-
+          $scope.loadDoc = function(doc) {
+            EndPointService.loadDoc(doc.did).then(function(response) {
+              $rootScope.$emit('activateTextCarousel', response.data);
+            });
+          }
         }
       ]);
 });

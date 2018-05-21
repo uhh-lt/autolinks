@@ -154,8 +154,6 @@ define([
                           // get edge source
                           if (sourceNode.data && targetNode.data) {
                             // build the edge object
-                            debugger;
-
                             const after = {
                               "rid": 0,
                               "cid": 0,

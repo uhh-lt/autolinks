@@ -22,7 +22,6 @@ function analyze(req, res){
 function analyzeDid(req, res){
     const token = req.session.token;
     const did = req.body.did;
-    debugger;
     const options = nlpAnalyzeDid(config.apiUrl, token, did);
     request(options, function (error, response, body) {
       res.send(body);

@@ -58,14 +58,34 @@
             <i ng-show="toggle.doc" class="fa fa-chevron-right" aria-hidden="true"></i>
           </md-list-item>
 
-          <div ng-repeat="doc in documents" ng-show="toggle.doc">
+          <!-- <div ng-repeat="doc in documents" ng-show="toggle.doc">
             <md-list-item>
               <p>{{$index + 1}}. {{ doc.filename }}</p>
-              <md-switch class="md-secondary" ng-model="endpoint.enabled" ng-model-options="{ getterSetter: true, updateOn: 'default' }" ng-change="navigateTo(endpoint)"></md-switch>
+              <md-switch class="md-secondary" ng-model="doc" ng-model-options="{ getterSetter: true, updateOn: 'default' }" ng-change="loadDoc(doc)"></md-switch>
             </md-list-item>
-          </div>
-          <md-divider></md-divider>
+          </div> -->
 
+
+          <md-radio-group
+            ng-show="toggle.doc"
+            ng-model="doc"
+            ng-model-options="{ getterSetter: true, updateOn: 'default' }"
+            ng-change="loadDoc(doc)"
+            >
+           <div ng-repeat='doc in documents' class="row-reverse">
+             <div flex layout='row' layout-padding layout-align="start center" >
+               <md-list-item>
+                 <md-radio-button flex
+                     ng-value="doc"
+                     id="{{doc.id}}"
+                  >
+                    {{$index + 1}}. {{ doc.filename }}
+                 </md-radio-button>
+               </md-list-item>
+             </div>
+           </div>
+         </md-radio-group>
+         <md-divider></md-divider>
         </md-list>
 
         <md-list-item class="md-1-line" ng-click="null">

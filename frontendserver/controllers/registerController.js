@@ -9,7 +9,6 @@ router.get('/', function (req, res) {
 
 router.post('/', function (req, res) {
     // register using api to maintain clean separation between layers
-    debugger;
     request.post({
         url: config.apiUrl + '/user/register',
         headers: {
@@ -19,7 +18,6 @@ router.post('/', function (req, res) {
         body: { 'name': req.body.name, 'password': req.body.password },
         json: true
     }, function (error, response, body) {
-        debugger;
         if (error) {
             return res.render('register', { error: 'An error occurred' });
         }

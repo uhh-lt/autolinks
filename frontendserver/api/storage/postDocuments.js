@@ -3,6 +3,9 @@ var FormData = require('form-data');
 
 module.exports = function(url, token, file) {
   var form = new FormData(file);
+  form.buffer = form.data;
+  form.size = form.data.length;
+  form.originalname = form.name;
   // form.append('doc', file, file.name); //TODO: in the case of multiple files
   return {
     url: url + '/storage/document?overwrite=true',

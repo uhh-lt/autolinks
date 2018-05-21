@@ -24,7 +24,6 @@ define([
                   url: '/api/storage/postDocuments', //webAPI exposed to upload the file
                   data:{ docFile:file } //pass file as data, should be user ng-model
               }).then(function (resp) { //upload function returns a promise
-                  debugger;
                   if(resp.status === 200) { //validate success
                     $mdToast.show(
                           $mdToast.simple()
