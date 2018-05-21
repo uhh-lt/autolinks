@@ -335,36 +335,48 @@ define([
           //   $scope.addSlide(sentence.properties.surface);
           // }
 
-          $rootScope.$on('activateTextCarousel', function(event, data) {
-              $scope.resetSlides();
-              $scope.isActive = true;
+          $rootScope.$on('activateCarouselFromDoc', function(event, data) {
+              // $scope.resetSlides();
+              // $scope.isActive = true;
               $scope.doc = data.text;
-              // EndPointService.annotateText(data).then(function(response) {
-
-                $scope.anno = data.annotations;
-                var sentences = $scope.anno.filter(a => a.type === 'Sentence');
-                // $scope.entity = anno.filter(a => a.type ==='NamedEntity')
-                // $scope.pages = sentences.length;
-                _.forEach(sentences, function(sentence){
-                  var entity = [];
-                  var length = sentence.doffset.offsets[0].length;
-                  // var surface = sentence.properties.surface;
-
-                  if (length) {
-                    var from = sentence.doffset.offsets[0].from;
-                    from = from === undefined ? (sentence.doffset.offsets[0].from = 0) : from;
-                    length += from;
-                  }
-                  //TODO: make it dynamic for 'NamedEntity'
-                  entity = $scope.anno.filter(a => (
-                    (a.type === 'AnatomicalSiteMention' || a.type === 'MedicationMention') &&
-                    ((a.doffset.offsets[0].from + a.doffset.offsets[0].length) <= length) &&
-                    (a.doffset.offsets[0].from >= from)
-                  ));
-                  $scope.addSlide(sentence, entity);
-                });
-              // });
+              textAnnotations(data);
           });
+
+          $rootScope.$on('activateCarouselFromUpload', function(event, data) {
+              $scope.doc = data;
+              EndPointService.annotateText(data).then(function(response) {
+                // $timeout( function(){
+                    textAnnotations(response.data);
+                // }, 2000 );
+              });
+          });
+
+          function textAnnotations(data) {
+            $scope.resetSlides();
+            $scope.isActive = true;
+            $scope.anno = data.annotations;
+            var sentences = $scope.anno.filter(a => a.type === 'Sentence');
+            // $scope.entity = anno.filter(a => a.type ==='NamedEntity')
+            // $scope.pages = sentences.length;
+            _.forEach(sentences, function(sentence){
+              var entity = [];
+              var length = sentence.doffset.offsets[0].length;
+              // var surface = sentence.properties.surface;
+
+              if (length) {
+                var from = sentence.doffset.offsets[0].from;
+                from = from === undefined ? (sentence.doffset.offsets[0].from = 0) : from;
+                length += from;
+              }
+              //TODO: make it dynamic for 'NamedEntity'
+              entity = $scope.anno.filter(a => (
+                (a.type === 'AnatomicalSiteMention' || a.type === 'MedicationMention') &&
+                ((a.doffset.offsets[0].from + a.doffset.offsets[0].length) <= length) &&
+                (a.doffset.offsets[0].from >= from)
+              ));
+              $scope.addSlide(sentence, entity);
+            });
+          }
 
           // Instantiate the Bootstrap carousel
           // $('.multi-item-carousel').carousel({

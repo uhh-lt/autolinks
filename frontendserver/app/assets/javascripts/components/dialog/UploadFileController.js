@@ -10,8 +10,8 @@ define([
     angular.module('autolinks.upload', ['ngFileUpload']);
     angular.module('autolinks.upload')
         // Viewer Controller
-        .controller('UploadFileController', ['Upload', '$window', '$scope', '$rootScope', '$mdDialog', '$q', 'EndPointService', '$mdToast',
-        function (Upload, $window, $scope, $rootScope, $mdDialog, $q, EndPointService, $mdToast) {
+        .controller('UploadFileController', ['Upload', '$window', '$scope', '$rootScope', '$mdDialog', '$q', 'EndPointService', '$mdToast', '$timeout',
+        function (Upload, $window, $scope, $rootScope, $mdDialog, $q, EndPointService, $mdToast, $timeout) {
 
           var vm = this;
           vm.submit = function(){ //function to call on form submit
@@ -19,37 +19,77 @@ define([
                   vm.upload(vm.file); //call upload function
               }
           }
-          vm.upload = function (file) {
-              Upload.upload({
-                  url: '/api/storage/postDocuments', //webAPI exposed to upload the file
-                  data:{ docFile:file } //pass file as data, should be user ng-model
-              }).then(function (resp) { //upload function returns a promise
-                  if(resp.status === 200) { //validate success
-                    $mdToast.show(
-                          $mdToast.simple()
-                            .textContent('Document ' + resp.data.name + ' with did: ' + resp.data.did + ' is uploaded!')
-                            .position('top right')
-                            .theme("primary-toast")
-                            .hideDelay(3500)
-                        );
-                      // $window.alert('Success ' + resp.data.name + 'with did: ' + resp.data.did + ' uploaded');
-                  } else {
-                      $window.alert('an error occured');
-                  }
+          vm.upload = function (doc) {
+              var file = $('#docFile');
+
+              console.log(file);
+              console.dir(file);
+
+              if (!window.FileReader) {
+                  alert('Your browser is not supported')
+              }
+              var input = file.get(0);
+
+              // Create a reader object
+              var reader = new FileReader();
+              if (input.files.length) {
+                  var textFile = input.files[0];
+                  reader.readAsText(textFile);
+                  $timeout( function(){
+                      $rootScope.$emit('activateCarouselFromUpload', reader.result);
+                  }, 500 );
                   $mdDialog.hide();
-              }, function (resp) { //catch error
-                  console.log('Error status: ' + resp.status);
-                  $window.alert('Error status: ' + resp.status);
-              }, function (evt) {
-                  console.log(evt);
-                  var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
-                  console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
-                  vm.progress = 'progress: ' + progressPercentage + '% '; // capture upload progress
-              });
+                  // $(reader).on('load', processFile);
+              } else {
+                  alert('Please upload a file before continuing')
+              }
+              // upload API
+              // Upload.upload({
+              //     url: '/api/storage/postDocuments', //webAPI exposed to upload the file
+              //     data:{ docFile: doc } //pass file as data, should be user ng-model
+              // }).then(function (resp) { //upload function returns a promise
+              //     if(resp.status === 200) { //validate success
+              //       $mdToast.show(
+              //             $mdToast.simple()
+              //               .textContent('Document ' + resp.data.name + ' with did: ' + resp.data.did + ' is uploaded!')
+              //               .position('top right')
+              //               .theme("primary-toast")
+              //               .hideDelay(3500)
+              //           );
+              //         // $window.alert('Success ' + resp.data.name + 'with did: ' + resp.data.did + ' uploaded');
+              //     } else {
+              //         $window.alert('an error occured');
+              //     }
+              //     $mdDialog.hide();
+              // }, function (resp) { //catch error
+              //     console.log('Error status: ' + resp.status);
+              //     $window.alert('Error status: ' + resp.status);
+              // }, function (evt) {
+              //     console.log(evt);
+              //     var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
+              //     console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
+              //     vm.progress = 'progress: ' + progressPercentage + '% '; // capture upload progress
+              // });
           };
 
           $scope.close = function() {
             $mdDialog.hide();
+          }
+
+          function processFile(e) {
+              var file = e.target.result,results;
+              if (file && file.length) {
+                  // results = file.split("\n");
+                  var results = file;
+                  console.log(results)
+                  // $('#text-card').text(function() {
+                  //   return results;
+                  // });
+                  $rootScope.$emit('activateCarouselFromUpload', results);
+                  // val(results[0]);
+                  // $('#age').val(results[1]);
+                  $mdDialog.hide();
+              }
           }
 
         }

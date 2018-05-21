@@ -45,7 +45,7 @@ define([
 
           $scope.loadDoc = function(doc) {
             EndPointService.loadDoc(doc.did).then(function(response) {
-              $rootScope.$emit('activateTextCarousel', response.data);
+              $rootScope.$emit('activateCarouselFromDoc', response.data);
             });
           }
         }
