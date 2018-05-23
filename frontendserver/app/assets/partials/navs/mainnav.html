@@ -81,6 +81,9 @@
                   >
                     {{$index + 1}}. {{ doc.filename }}
                  </md-radio-button>
+                 <a href="" ng-click="deleteDoc(doc, $index)" class="delete-doc">
+                   <i id="circle-fit" class="fa fa-trash-alt" aria-hidden="true"></i>
+                 </a>
                </md-list-item>
              </div>
            </div>

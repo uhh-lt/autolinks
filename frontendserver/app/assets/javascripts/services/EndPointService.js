@@ -48,6 +48,12 @@ define([
                 });
               },
 
+              deleteDoc: function(did) {
+                return $http.post('/api/storage/deleteDocument', { did: did }).then(function(response) {
+                  return response;
+                });
+              },
+
               editResource: function(data) {
                 return $http.post('/api/storage/editResource', { data }).then(function(response) {
                   return response;

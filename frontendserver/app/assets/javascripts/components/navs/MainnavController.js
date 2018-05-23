@@ -17,8 +17,8 @@ define([
           .defaultIconSet('img/icons/setitems/core-icons.svg', 24);
         })
         // Mainnav Controller
-        .controller('MainnavController', ['$scope', '$rootScope', 'EndPointService',
-        function ($scope, $rootScope, EndPointService) {
+        .controller('MainnavController', ['$scope', '$rootScope', 'EndPointService', '$mdDialog',
+        function ($scope, $rootScope, EndPointService, $mdDialog) {
 
           $scope.lockLeft = false;
           $scope.toggle = {};
@@ -46,6 +46,21 @@ define([
           $scope.loadDoc = function(doc) {
             EndPointService.loadDoc(doc.did).then(function(response) {
               $rootScope.$emit('activateCarouselFromDoc', response.data);
+            });
+          }
+
+          $scope.deleteDoc = function(doc, index) {
+            $scope.trash = doc;
+            $scope.trashIndex = index;
+            var confirm = $mdDialog.confirm()
+                 .title('Are you sure to delete document ' + doc.filename + '?')
+                 .targetEvent(doc)
+                 .ok('Yes, delete it!')
+                 .cancel('Cancel');
+
+            $mdDialog.show(confirm).then(function() {
+              $scope.documents.splice($scope.trashIndex, 1);
+              EndPointService.deleteDoc($scope.trash.did);
             });
           }
         }
