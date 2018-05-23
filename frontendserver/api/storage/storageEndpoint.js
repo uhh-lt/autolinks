@@ -42,7 +42,7 @@ function postDocuments(req, res) {
 
 function deleteDocument(req, res) {
     const token = req.session.token;
-    const docId = req.body.data;
+    const docId = req.body.did;
     const options = documentDelete(config.apiUrl, token, docId);
     request(options, function (error, response, body) {
       res.send(body);
