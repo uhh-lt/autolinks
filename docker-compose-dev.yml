@@ -26,6 +26,7 @@ services:
       - ${PWD}/frontendserver:/opt/project/frontendserver
     ports:
       - 10001:9090
+      - 3001:3001
     networks:
       - anet
     stdin_open: true
