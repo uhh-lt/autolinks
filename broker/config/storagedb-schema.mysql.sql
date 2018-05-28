@@ -111,13 +111,15 @@ CREATE TABLE IF NOT EXISTS storageItemToResource (
 -- ) ENGINE=MyISAM;
 
 -- CREATE HELPER VIEWS
-CREATE OR REPLACE VIEW userResourceMetadata AS SELECT r1.uid, r2.* FROM resources r1 JOIN resourceMetadata r2 ON (r1.rid = r2.rid);
+CREATE OR REPLACE VIEW userResourceMetadata  AS SELECT r1.uid, r2.* FROM resources r1 JOIN resourceMetadata  r2 ON (r1.rid = r2.rid);
 
-CREATE OR REPLACE VIEW userStringResources  AS SELECT r1.uid, r2.* FROM resources r1 JOIN stringResources  r2 ON (r1.rid = r2.rid);
+CREATE OR REPLACE VIEW userStringResources   AS SELECT r1.uid, r2.* FROM resources r1 JOIN stringResources   r2 ON (r1.rid = r2.rid);
 
-CREATE OR REPLACE VIEW userTripleResources  AS SELECT r1.uid, r2.* FROM resources r1 JOIN tripleResources  r2 ON (r1.rid = r2.rid);
+CREATE OR REPLACE VIEW userTripleResources   AS SELECT r1.uid, r2.* FROM resources r1 JOIN tripleResources   r2 ON (r1.rid = r2.rid);
 
-CREATE OR REPLACE VIEW userListResources    AS SELECT r1.uid, r2.* FROM resources r1 JOIN listResources    r2 ON (r1.rid = r2.rid);
+CREATE OR REPLACE VIEW userListResources     AS SELECT r1.uid, r2.* FROM resources r1 JOIN listResources     r2 ON (r1.rid = r2.rid);
+
+CREATE OR REPLACE VIEW userListResourceItems AS SELECT r1.uid, r2.* FROM resources r1 JOIN listResourceItems r2 ON (r1.rid = r2.rid);
 
 -- DEFINE SOME HELPER FUNCTIONS
 

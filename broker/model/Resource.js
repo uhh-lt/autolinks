@@ -9,6 +9,7 @@ module.exports.model = Resource;
 Resource.prototype.rid = 0;
 Resource.prototype.cid = 0;
 Resource.prototype.metadata = null;
+Resource.prototype.sources = null;
 Resource.prototype.value = null;
 
 /**

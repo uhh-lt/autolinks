@@ -148,7 +148,8 @@ module.exports.promisedWrite = function (userid, storagekey, resourceList) {
       .then(rid => {
         if (rid) {
           logger.debug(`Resource for storagekey '${storagekey}' and user with id '${userid}' was already stored, skipping write action.`);
-          return this.getResource(rid);
+          return this.getResource(rid)
+            .then(r => this.fillSourcesRecursive(userid, r));
         }
         return this.saveNewResourceOrValue(resourceList, userid)
           .then(resource => this.saveStorageItem(userid, storagekey)
@@ -156,7 +157,7 @@ module.exports.promisedWrite = function (userid, storagekey, resourceList) {
           ).then(obj => {
             this.saveStorageItemToResourceMapping(obj.sid, obj.resource.rid);
             return obj.resource;
-          });
+          }).then(r => this.fillSourcesRecursive(userid, r));
       });
   }
   // if storagekey is unknown save the resource, then use the rid as storagekey
@@ -370,14 +371,6 @@ module.exports.saveStorageItem = function (userid, storagekey) {
     );
 };
 
-// module.exports.getUserId = function(username) {
-//   return promisedQuery('select get_uid(?) as uid', [username])
-//     .then(
-//       res => res.rows[0].uid,
-//       err => 0
-//     );
-// };
-
 module.exports.saveStorageItemToResourceMapping = function (sid, rid) {
   return new Promise((resolve, reject) => {
     logger.debug(`Saving storage resource mapping (${sid},${rid}).`);
@@ -484,7 +477,14 @@ module.exports.getStorageResourceId = function (uid, storagekey) {
 
 module.exports.getStorageResource = function (userid, storagekey) {
   return this.getStorageResourceId(userid, storagekey)
-    .then(rid => rid && this.getResource(rid, -1) || null);
+    .then(rid => rid && this.getResource(rid, -1) || null)
+    .then(res => {
+      if(res){
+        return this.fillSourcesRecursive(userid, res);
+      }
+      return null;
+    })
+    ;
 };
 
 module.exports.deleteResource = function (resource, userid) {
@@ -519,11 +519,6 @@ module.exports.updateMetadata = function (rid, metadataBefore, metadataAfter) {
         .map(k => promisedQuery('delete from resourceMetadata where rid = ? and mkey = ?', [rid, k])));
     });
 };
-
-// module.exports.createUsergroup = function (name) {
-//   return promisedQuery('select get_or_add_user(?, true) as uid', [name])
-//     .then(res => res.rows[0].uid);
-// };
 
 module.exports.info = function (userid, callback) {
   return callback(new Exception('NOT YET IMPLEMENTED'));
@@ -723,10 +718,104 @@ module.exports.updateDocumentAnalysis = function(uid, did, analysis) {
     .then(_ => true);
 };
 
-module.exports.getSources = function(uid, query) {
+
+module.exports.getStorageKey = function(uid, rids){
+  if(!rids){
+    return Promise.resolve([]);
+  }
+  if(Array.isArray(rids) && !rids.length){
+    return Promise.resolve([]);
+  }
+  // get the storageItemKeys for each rid if it exists
+  return promisedQuery(`select distinct(storagekey) from storageItems s1 join storageItemToResource s2 on (s1.sid = s2.sid) where s1.uid = ? and s2.rid in ( ? )`, [ uid, rids ])
+    .then(res => res.rows.map(r => r.storagekey));
+};
 
 
+module.exports.getParentResources = function(uid, rids) {
+  if(!rids){
+    return Promise.resolve([]);
+  }
+  if(Array.isArray(rids) && !rids.length){
+    return Promise.resolve([]);
+  }
+  // select only unique elements where the resources are items in another listresource or take part in a tripleresource
+  return promisedQuery(
+    `select distinct(rid) from (
+      select rid from userListResourceItems where uid = ? and itemrid in ( ? )
+      union 
+      select rid from userTripleResources where uid = ? and ( subj in ( ? ) or obj in ( ? ) or pred in ( ? ) )
+     ) _`,
+    [ uid, rids, uid, rids, rids, rids ]
+  ).then(res => res.rows.map(r => r.rid));
+};
 
+module.exports.getSimilarResources = function(uid, query) {
+  // select only unique elements where a resource's label is the query or the resource's surfaceForm is the query
+  return promisedQuery(
+    `select distinct(rid) from (
+      select rid from userResourceMetadata where mkey = "label" and uid = ? and mvalue = ? 
+      union 
+      select rid from userStringresources where uid = ? and surfaceForm = ?
+     ) _`,
+    [ uid, query, uid, query ]
+  ).then(res => res.rows.map(r => r.rid));
+};
+
+module.exports.fillSources = function(uid, resource) {
+  resource.sources = new Set();
+  // if resource is not a string resource, just get its parents and so on
+  if(!resource.isStringResource()){
+    return Promise.resolve(resource.rid)
+      .then(rid => this.getSourcesRecursive(uid, [ rid ], resource.sources, 1))
+      .then(_ => resource.sources = Array.from(resource.sources))
+      .then(_ => resource);
+  }
+  // otherwise find resources with a similar label or surfaceform and get sources from them
+  return Promise.resolve(resource.metadata.label || resource.value)
+    .then(label => this.getSimilarResources(uid, label))
+    .then(rids => this.getSourcesRecursive(uid, rids, resource.sources, 1))
+    .then(_ => resource.sources = Array.from(resource.sources))
+    .then(_ => resource);
+};
+
+module.exports.fillSourcesRecursive = function(uid, resource) {
+  if(resource.isListResource()){
+    return Promise.all(resource.value.map(r => this.fillSourcesRecursive(uid, r)))
+      .then(_ => this.fillSources(uid, resource));
+  }
+  if(resource.isTripleResource()){
+    return Promise.all(
+      [
+        resource.value.subject,
+        resource.value.predicate,
+        resource.value.object,
+      ].map(r => this.fillSourcesRecursive(uid, r))
+    ).then(_ => this.fillSources(uid, resource));
+  }
+  // else resource is a string resource
+  return this.fillSources(uid, resource);
+};
+
+module.exports.getSourcesForQuery = function(uid, query) {
+  const keys = new Set();
+  return this.getSimilarResources(uid, query)
+    .then(rids => this.getSourcesRecursive(uid, rids, keys, 1))
+    .then(_ => keys);
+};
+
+module.exports.getSourcesRecursive = function(uid, rids, storagekeys, c){
+  if(!rids){
+    return;
+  }
+  if(Array.isArray(rids) && !rids.length){
+    return;
+  }
+  return this.getStorageKey(uid, rids).then(keys => keys.forEach(key => storagekeys.add(key)))
+    .then(_ => this.getParentResources(uid, rids))
+    .then(parentrids => {
+      return this.getSourcesRecursive(uid, parentrids, storagekeys, c+1);
+    });
 };
 
 

@@ -38,6 +38,13 @@ module.exports.sequentialPromise = function(items, promisefun) {
 };
 
 /*
+ * apply the same promise function to each element in an array
+ */
+module.exports.allPromise = function(items, promisefun) {
+  return Promise.all(items.map(item => promisefun(item)));
+};
+
+/*
  * run the promises sequentially and return the results as a list
  */
 module.exports.promiseSequential = function(promises) {
