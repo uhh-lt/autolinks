@@ -723,6 +723,13 @@ module.exports.updateDocumentAnalysis = function(uid, did, analysis) {
     .then(_ => true);
 };
 
+module.exports.getSources = function(uid, query) {
+
+
+
+};
+
+
 module.exports.close = function (callback) {
   pool.end(function (err) {
     if (err) {

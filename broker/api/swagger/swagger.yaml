@@ -452,63 +452,65 @@ paths:
           schema:
             $ref: "#/definitions/Exception"
 
-  /nlp/analyze:
-    x-swagger-router-controller: nlp
-    post:
-      operationId: analyze
-      tags:
-        - NLP
-      description: Analyze the provided document
-      parameters:
-      - name: data
-        in: body
-        description: |
-          The document object which contains the plain text and some
-          configuration parameters, e.g. the desired language of analyis.
-        schema:
-          type: object
-          properties:
-            data: 
-              type: string
-            content-type:
-              type: string
-            source:
-              type: string
-      responses:
-        200:
-          description: Success
-          schema:
-            $ref: "#/definitions/Analysis"
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/Exception"
-            
-  /nlp/interpret:
-    x-swagger-router-controller: nlp
-    post:
-      operationId: interpret
-      tags:
-        - NLP
-      description: | 
-        Interpret annotations that are in the focus of the data.
-      security:
-        - broker_auth: []
-      parameters:
-        - name: data
-          in: body
-          description: The service parameter
-          schema:
-            $ref: '#/definitions/ServiceParameter'
-      responses:
-        200:
-          description: Success
-          schema:
-            $ref: '#/definitions/Resource'
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/Exception"
+# TODO: this is to be removed
+#  /nlp/analyze:
+#    x-swagger-router-controller: nlp
+#    post:
+#      operationId: analyze
+#      tags:
+#        - NLP
+#      description: Analyze the provided document
+#      parameters:
+#      - name: data
+#        in: body
+#        description: |
+#          The document object which contains the plain text and some
+#          configuration parameters, e.g. the desired language of analyis.
+#        schema:
+#          type: object
+#          properties:
+#            data:
+#              type: string
+#            content-type:
+#              type: string
+#            source:
+#              type: string
+#      responses:
+#        200:
+#          description: Success
+#          schema:
+#            $ref: "#/definitions/Analysis"
+#        default:
+#          description: Error
+#          schema:
+#            $ref: "#/definitions/Exception"
+
+# TODO: this is to be removed
+#  /nlp/interpret:
+#    x-swagger-router-controller: nlp
+#    post:
+#      operationId: interpret
+#      tags:
+#        - NLP
+#      description: |
+#        Interpret annotations that are in the focus of the data.
+#      security:
+#        - broker_auth: []
+#      parameters:
+#        - name: data
+#          in: body
+#          description: The service parameter
+#          schema:
+#            $ref: '#/definitions/ServiceParameter'
+#      responses:
+#        200:
+#          description: Success
+#          schema:
+#            $ref: '#/definitions/Resource'
+#        default:
+#          description: Error
+#          schema:
+#            $ref: "#/definitions/Exception"
             
   /nlp/analyze/{did}:
     x-swagger-router-controller: nlp

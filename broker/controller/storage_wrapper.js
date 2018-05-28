@@ -164,6 +164,17 @@ module.exports.updateDocumentAnalysis = function(userid, did, analysis) {
 };
 
 
+/**
+ *
+ * @param userid
+ * @param query
+ * @return [ ]
+ */
+module.exports.getSources = function(userid, query) {
+  return explicitStorage.getSources(userid, query);
+};
+
+
 
 /**
  *
