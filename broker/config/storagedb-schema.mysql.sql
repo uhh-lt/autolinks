@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS documents (
   PRIMARY KEY (did, uid),
   KEY (did),
   KEY (uid),
-  KEY (name(333))
+  KEY (name(250))
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS resourceToDocument (
@@ -39,14 +39,15 @@ CREATE TABLE IF NOT EXISTS resourceMetadata (
   rid          int unsigned NOT NULL,
   mkey         varchar(64) NOT NULL,
   mvalue       varchar(512) NOT NULL,
-  PRIMARY KEY (rid, mkey)
+  PRIMARY KEY (rid, mkey),
+  KEY (mkey)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS stringResources (
   rid         int unsigned NOT NULL,
   surfaceform varchar(256) NOT NULL,
   PRIMARY KEY (rid),
-  UNIQUE (rid, surfaceform)
+  UNIQUE (rid, surfaceform(242))
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS tripleResources (
@@ -65,8 +66,8 @@ CREATE TABLE IF NOT EXISTS listResources (
   rid            int unsigned NOT NULL,
   listdescriptor varchar(256) NOT NULL,
   PRIMARY KEY (rid),
-  KEY (listdescriptor),
-  UNIQUE (rid, listdescriptor)
+  KEY (listdescriptor(250)),
+  UNIQUE (rid, listdescriptor(242))
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS listResourceItems (
@@ -91,7 +92,7 @@ CREATE TABLE IF NOT EXISTS storageItems (
   sid        int unsigned NOT NULL AUTO_INCREMENT,
   uid        int unsigned NOT NULL,
   storagekey varchar(512) NOT NULL,
-  PRIMARY KEY (sid, uid, storagekey(256))
+  PRIMARY KEY (sid, uid, storagekey(234))
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS storageItemToResource (
