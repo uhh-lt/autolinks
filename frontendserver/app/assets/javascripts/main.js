@@ -12,6 +12,7 @@
       'ngTouch': 'libs/angular-touch/angular-touch.min',
 			'ngAria': 'libs/angular-aria/angular-aria.min',
 			'ngMaterial': 'libs/angular-material/angular-material.min',
+      'ngFileUpload': 'libs/ng-file-upload/ng-file-upload.min',
 			'bootstrap': 'libs/bootstrap/dist/js/bootstrap.min',
 			'ui-bootstrap': 'libs/angular-bootstrap/ui-bootstrap-tpls.min',
       'ngSanitize': 'libs/angular-sanitize/angular-sanitize.min',
@@ -67,6 +68,10 @@
 				deps: ['angular', 'bootstrap', 'ngAnimate']
 			},
       'ngSanitize': {
+        exports: 'angular',
+        deps: ['angular']
+      },
+      'ngFileUpload': {
         exports: 'angular',
         deps: ['angular']
       },

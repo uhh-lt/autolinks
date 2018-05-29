@@ -1,11 +1,11 @@
-module.exports = function(url, text) {
+module.exports = function(url, token, text) {
   return {
     url: url + '/nlp/analyze',
     method: 'POST',
     headers: {
        'Content-Type': 'application/json',
        'Accept': 'application/json',
-      //  'authorization': 'Basic am9objpkb2U='
+       'authorization': token
        },
     json: true,
     body:

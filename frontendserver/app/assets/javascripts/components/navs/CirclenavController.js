@@ -49,7 +49,6 @@ define([
 
          $scope.uploadFile = function(ev){
            $mdDialog.show({
-              controller: 'UploadFileController',
               templateUrl: '/app/assets/partials/dialog/uploadFile.html',
               parent: angular.element(document.body),
               targetEvent: ev,

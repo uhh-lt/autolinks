@@ -17,20 +17,14 @@ define([
 
           $scope.myInterval = 5000;
           $scope.noWrapSlides = true;
-          $scope.active = 0;
+          $scope.active = 1;
           $scope.isActive = false;
           $scope.pages = 0;
 
           $scope.slides = [];
           $scope.entityInDoc = [];
-          $scope.currIndex = 0;
+          $scope.currIndex = 1;
           $scope.doffsetAnnotation = '';
-
-          var text1 = "The leftist-populist Chavez will make his 13th visit to Cuba since taking power in 1999 to sit his personal friend, Castro. At the Latin American School of Medicine, Chavez will";
-
-          var text2 = "Venezuelan <span style='color:red'>President</span> Hugo Chavez' visit to Cuba this weekend, to weld his alliance with President Fidel Castro's revolution, is keeping alive a socialist threat in Latin America as far as Washington is concerned.Venezuelan President Hugo Chavez' visit to Cuba this weekend, to weld his alliance with President Fidel Castro's revolution, is keeping alive a socialist threat in Latin America as far as Washington is concerned.Venezuelan President Hugo Chavez' visit to Cuba this weekend, to weld his alliance with President Fidel Castro's revolution, is keeping alive a socialist threat in Latin America as far as Washington is concerned.Venezuelan President Hugo Chavez' visit to Cuba this weekend, to weld his alliance with President Fidel Castro's revolution, is keeping alive a socialist threat in Latin America as far as Washington is concerned.";
-
-          var text3 = "The two presidents have challenged Washington to demand the extradition of a common foe: anti-Castro militant Luis Posada Carriles. He was arrested in the United States by immigration";
 
           $scope.addSlide = function(sentence, entity) {
             // var newWidth = 600 + $scope.slides.length + 1;
@@ -99,10 +93,11 @@ define([
                     ((e.start <= start) &&
                     (e.end >= start)) ||
                     ((e.start <= end) &&
-                    (e.end >= end)) &&
-                    (e.id === id)
+                    (e.end >= end))
                   ) {
-                    return e;
+                    if (e.id === id) {
+                      return e;
+                    }
                   }
               }
             );
@@ -224,9 +219,9 @@ define([
                 const annotations = response.data.annotations;
                 $scope.context = name;
                 const inputLength = name.length;
-                $scope.active = EndPointService.getActiveService();
+                $scope.listActive = EndPointService.getActiveService();
 
-                if ($scope.active.length > 0) {
+                if ($scope.listActive.length > 0) {
                   // _.forEach(annotations, function(anno) {
 
                     // const offsets = anno.doffset.offsets;
@@ -236,7 +231,7 @@ define([
                       $scope.serviceVersion = l.version;
 
                       _.forEach(l.endpoints, function(e) {
-                        if (_.includes($scope.active, e.path)) {
+                        if (_.includes($scope.listActive, e.path)) {
                           $scope.data = {
                             offsets:
                             {
@@ -293,6 +288,30 @@ define([
             }
           };
 
+          $scope.next = function () {
+            var index = $scope.active;
+            if (direction === 'right') {
+                $scope.active = (index <= 0 ? 0 : index - 1);
+                return;
+            }
+            if (direction ==='left') {
+                $scope.active = (index >= ($scope.slides.length - 1) ? ($scope.slides.length - 1) : index + 1);
+                return;
+            }
+          };
+
+          $scope.prev = function () {
+            var index = $scope.active;
+            if (direction === 'right') {
+                $scope.active = (index <= 0 ? 0 : index - 1);
+                return;
+            }
+            if (direction ==='left') {
+                $scope.active = (index >= ($scope.slides.length - 1) ? ($scope.slides.length - 1) : index + 1);
+                return;
+            }
+          };
+
 
           $scope.randomize = function() {
             var indexes = generateIndexesArray();
@@ -300,45 +319,64 @@ define([
           };
 
           $scope.resetSlides = function() {
-            $scope.slides = [];
-            $scope.currIndex = 0;
+            $scope.myInterval = 5000;
+            $scope.noWrapSlides = true;
             $scope.active = 0;
+            $scope.isActive = false;
+            $scope.pages = 0;
+
+            $scope.slides = [];
+            $scope.entityInDoc = [];
+            $scope.currIndex = 0;
+            $scope.doffsetAnnotation = '';
           }
 
           // for (var i = 0; i < 4; i++) {
           //   $scope.addSlide(sentence.properties.surface);
           // }
 
-          $rootScope.$on('activateTextCarousel', function(event, data) {
-              $scope.resetSlides();
-              $scope.isActive = true;
+          $rootScope.$on('activateCarouselFromDoc', function(event, data) {
+              // $scope.resetSlides();
+              // $scope.isActive = true;
+              $scope.doc = data.text;
+              textAnnotations(data);
+          });
+
+          $rootScope.$on('activateCarouselFromUpload', function(event, data) {
               $scope.doc = data;
               EndPointService.annotateText(data).then(function(response) {
-
-                $scope.anno = response.data.annotations;
-                var sentences = $scope.anno.filter(a => a.type === 'Sentence');
-                // $scope.entity = anno.filter(a => a.type ==='NamedEntity')
-                // $scope.pages = sentences.length;
-                _.forEach(sentences, function(sentence){
-                  var entity = [];
-                  var length = sentence.doffset.offsets[0].length;
-                  // var surface = sentence.properties.surface;
-
-                  if (length) {
-                    var from = sentence.doffset.offsets[0].from;
-                    from = from === undefined ? (sentence.doffset.offsets[0].from = 0) : from;
-                    length += from;
-                  }
-                  //TODO: make it dynamic for 'NamedEntity'
-                  entity = $scope.anno.filter(a => (
-                    (a.type === 'AnatomicalSiteMention' || a.type === 'MedicationMention') &&
-                    ((a.doffset.offsets[0].from + a.doffset.offsets[0].length) <= length) &&
-                    (a.doffset.offsets[0].from >= from)
-                  ));
-                  $scope.addSlide(sentence, entity);
-                });
+                // $timeout( function(){
+                    textAnnotations(response.data);
+                // }, 2000 );
               });
           });
+
+          function textAnnotations(data) {
+            $scope.resetSlides();
+            $scope.isActive = true;
+            $scope.anno = data.annotations;
+            var sentences = $scope.anno.filter(a => a.type === 'Sentence');
+            // $scope.entity = anno.filter(a => a.type ==='NamedEntity')
+            // $scope.pages = sentences.length;
+            _.forEach(sentences, function(sentence){
+              var entity = [];
+              var length = sentence.doffset.offsets[0].length;
+              // var surface = sentence.properties.surface;
+
+              if (length) {
+                var from = sentence.doffset.offsets[0].from;
+                from = from === undefined ? (sentence.doffset.offsets[0].from = 0) : from;
+                length += from;
+              }
+              //TODO: make it dynamic for 'NamedEntity'
+              entity = $scope.anno.filter(a => (
+                (a.type === 'AnatomicalSiteMention' || a.type === 'MedicationMention') &&
+                ((a.doffset.offsets[0].from + a.doffset.offsets[0].length) <= length) &&
+                (a.doffset.offsets[0].from >= from)
+              ));
+              $scope.addSlide(sentence, entity);
+            });
+          }
 
           // Instantiate the Bootstrap carousel
           // $('.multi-item-carousel').carousel({
@@ -369,7 +407,6 @@ define([
           // });
           // for every slide in carousel, copy the next slide's item in the slide.
           // Do the same for the next, next item.
-
 
           // Randomize logic below
 
@@ -402,6 +439,47 @@ define([
 
             return array;
           }
+
+
+          $scope.slidesViewed = [];
+         $scope.slidesRemaining = [];
+         //var carouselScope = element.isolateScope();
+
+         $scope.isSlideActive = function(slide) {
+          return $scope.active === slide.id;
+         };
+
+         $scope.selectSlide = function(slide) {
+          return $scope.active = slide.id;
+         };
+
+         $scope.goNext = function() {
+             //carouselScope.next();
+             var index = $scope.active;
+             $scope.active = (index >= ($scope.slides.length - 1) ? ($scope.slides.length - 1) : index + 1);
+         };
+         $scope.goPrev = function() {
+           var index = $scope.active;
+           $scope.active = (index <= 0 ? 0 : index - 1);
+             //carouselScope.prev();
+         };
+         $scope.setActiveSlide = function(number) {
+             console.log('>>>>>> : ' + number);
+             if (number === '' || isNaN(number) || number < 0 || number > carouselScope.slides.length - 1) {
+                 return;
+             }
+             var direction = ($scope.getActiveSlide(false) > number) ? 'prev' : 'next';
+            // carouselScope.select(carouselScope.slides[number], direction);
+         }
+         $scope.getActiveSlide = function(showAlert) {
+            //  var activeSlideIndex = carouselScope.slides.map(function(s) {
+            //      return s.slide.active;
+            //  }).indexOf(true);
+            //  if(showAlert) {
+            //    alert("Your Active Slide is : " + activeSlideIndex);
+            //  }
+            //  return activeSlideIndex;
+         }
 
         }
       ]);

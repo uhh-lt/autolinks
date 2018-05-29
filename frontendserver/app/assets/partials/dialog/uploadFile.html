@@ -1,29 +1,37 @@
 <md-dialog aria-label="Upload or Drop a File">
-  <form ng-cloak>
+  <form ng-cloak ng-controller="UploadFileController as up" name="up.upload_form">
     <md-toolbar>
       <div class="md-toolbar-tools">
-        <h2>Upload or Drop a File</h2>
+        <h2>Upload a document</h2>
         <span flex></span>
-        <md-button class="md-icon-button" ng-click="cancel()">
-          <md-icon md-svg-src="img/icons/ic_close_24px.svg" aria-label="Close dialog"></md-icon>
-        </md-button>
       </div>
     </md-toolbar>
-
     <md-dialog-content>
       <div class="md-dialog-content"
       </div>
     </md-dialog-content>
-
     <md-dialog-actions layout="row">
-      <input id="txtFile" type="file" file-model="txtFile"/>
-      <span flex></span>
-      <md-button ng-click="fileUpload()">
-       Upload
-      </md-button>
+      <input
+         type="file"
+         ngf-select
+         ng-model="up.file"
+         name="file"
+         ngf-pattern="'.txt'"
+         accept=".txt"
+         ngf-max-size="20MB"
+         id="docFile"
+         />
+         <span flex></span>
+       <i ng-show="up.upload_form.file.$error.required">*required</i><br>
+       <i ng-show="up.upload_form.file.$error.maxSize">File too large
+       {{up.file.size / 1000000|number:1}}MB: max 20M</i>
+       <md-button type="submit" ng-click="up.submit()">
+        Upload
+       </md-button>
       <md-button ng-click="close()">
         close
       </md-button>
+      <p>{{up.progress}}
     </md-dialog-actions>
   </form>
 </md-dialog>

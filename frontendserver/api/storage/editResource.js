@@ -3,7 +3,6 @@ module.exports = function(url, token, data) {
   let after = data.after;
 
   var body = getBody(before, after);
-  debugger;
   return {
     url: url + '/storage/editresource',
     method: 'POST',

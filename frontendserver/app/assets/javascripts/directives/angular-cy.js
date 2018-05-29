@@ -154,8 +154,6 @@ define([
                           // get edge source
                           if (sourceNode.data && targetNode.data) {
                             // build the edge object
-                            debugger;
-
                             const after = {
                               "rid": 0,
                               "cid": 0,
@@ -529,7 +527,7 @@ define([
                           cid: e.cid,
                           rid: e.rid,
                           metadata: e.metadata,
-                          id: ( e.value + ( child ? '' : '_as_parent' ) + '-' + e.rid + '-' + e.cid ).replace(/\s/g, ''),
+                          id: ( e.value.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '') + ( child ? '' : '_as_parent' ) + '-' + e.rid + '-' + e.cid ).replace(/\s/g, ''),
                           name: e.value + '',
                           parent: parent ? parent.id : scope.outermostId,
                           path: scope.path

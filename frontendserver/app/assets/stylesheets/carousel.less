@@ -3,12 +3,12 @@
 	width: 40%;
 	position: absolute;
 	margin: auto;
-	bottom: 15px;
+	bottom: 4%;
 	left: 0;
 	right: 0;
 	left: 0;
 	.carousel-inner {
-		height: 230px;
+		max-height: 230px;
 	}
 	.carousel-card {
 		margin: auto;
@@ -17,8 +17,11 @@
       height: 100%;
       width: 100%;
       display: inline-block;
-			height: 200px;
+			// min-height: 150px;
+			height: 60px;
 			md-card {
+				// height: 100%;
+				margin-top: 0;
 				max-height: 200px;
 				text-align: justify;
 				overflow-y: auto;
@@ -60,6 +63,16 @@
       background-color: @blue_material;
     }
     margin-bottom: -5%;
+	}
+	.carousel-control.left,
+	.carousel-control.right {
+		/* display: none; */
+	}
+	.carousel .carousel-indicators, .carousel .left.carousel-control, .carousel .right.carousel-control {
+			display: none;
+	}
+	.custom-carousel {
+		display: block !important;
 	}
 }
 //

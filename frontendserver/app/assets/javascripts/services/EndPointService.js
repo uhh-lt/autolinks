@@ -42,8 +42,26 @@ define([
                 });
               },
 
+              loadDoc: function(did) {
+                return $http.post('/api/nlp/analyzeDid', { did: did }).then(function(response) {
+                  return response;
+                });
+              },
+
+              deleteDoc: function(did) {
+                return $http.post('/api/storage/deleteDocument', { did: did }).then(function(response) {
+                  return response;
+                });
+              },
+
               editResource: function(data) {
                 return $http.post('/api/storage/editResource', { data }).then(function(response) {
+                  return response;
+                });
+              },
+
+              getDocuments: function(data) {
+                return $http.get('/api/storage/getDocuments').then(function(response) {
                   return response;
                 });
               },
