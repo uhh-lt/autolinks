@@ -101,7 +101,7 @@ services:
       - MYSQL_PASSWORD=autolinks1
     volumes:
       - ${PWD}/data/mysql:/var/lib/mysql
-    command: ["--character-set-server=utf8", "--collation-server=utf8_bin"]
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_bin"]
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-pautolinks1", "-uautolinks"]
       interval: 20s
@@ -227,26 +227,3 @@ services:
       es:
         condition: service_healthy
   # END: elasticsearch index
-
-
-  # BEGIN: annotation interpreter service
-  anno:
-    image: remstef/node-swagger:latest
-    volumes:
-      - ${PWD}/services/annotationinterpreter:/opt/project/services/annotationinterpreter
-      - ${PWD}/broker:/opt/project/broker
-      - ${PWD}/data:/opt/project/data
-    ports:
-      - 10012:10010
-      - 3012:3001
-    networks:
-      - anet
-    stdin_open: true
-    tty: true
-    working_dir: /opt/project/services/annotationinterpreter
-    entrypoint: bash
-    environment:
-      - NODE_ENV=development
-      - COOKIE_SECRET=YOUR_COOKIE_SECRET
-      - BROKER_URL=http://broker:10010
-  # END: annotation interpreter service

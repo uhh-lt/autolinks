@@ -751,6 +751,7 @@ module.exports.getParentResources = function(uid, rids) {
 };
 
 module.exports.getSimilarResources = function(uid, query) {
+  logger.debug(`Searching for similar resources to '${query}' for user ${uid}.`);
   // select only unique elements where a resource's label is the query or the resource's surfaceForm is the query
   return promisedQuery(
     `select distinct(rid) from (
@@ -759,30 +760,41 @@ module.exports.getSimilarResources = function(uid, query) {
       select rid from userStringresources where uid = ? and surfaceForm = ?
      ) _`,
     [ uid, query, uid, query ]
-  ).then(res => res.rows.map(r => r.rid));
+  ).then(res => {
+    const rids = res.rows.map(r => r.rid);
+    logger.debug(`Found ${rids.length} similar resources to '${query}' for user ${uid}: ${rids}.`);
+    return rids;
+  });
 };
 
 module.exports.fillSources = function(uid, resource) {
   resource.sources = new Set();
   // if resource is not a string resource, just get its parents and so on
   if(!resource.isStringResource()){
+    logger.debug(`Getting sources for non-string resource: ${resource.rid}.`);
     return Promise.resolve(resource.rid)
       .then(rid => this.getSourcesRecursive(uid, [ rid ], resource.sources, 1))
+      .catch(e => Exception.fromError(e).log(logger.info))
       .then(_ => resource.sources = Array.from(resource.sources))
+      .then(_ => logger.debug(`Found ${resource.sources.length} sources for non-string resource ${resource.rid}: ${resource.sources}.`))
       .then(_ => resource);
   }
   // otherwise find resources with a similar label or surfaceform and get sources from them
+  logger.debug(`Getting sources for string resource: ${resource.rid}.`);
   return Promise.resolve(resource.metadata.label || resource.value)
     .then(label => this.getSimilarResources(uid, label))
     .then(rids => this.getSourcesRecursive(uid, rids, resource.sources, 1))
+    .catch(e => Exception.fromError(e).log(logger.info))
     .then(_ => resource.sources = Array.from(resource.sources))
+    .then(_ => logger.debug(`Found ${resource.sources.length} sources for string resource ${resource.rid}: ${resource.sources}.`))
     .then(_ => resource);
 };
 
 module.exports.fillSourcesRecursive = function(uid, resource) {
   if(resource.isListResource()){
     return Promise.all(resource.value.map(r => this.fillSourcesRecursive(uid, r)))
-      .then(_ => this.fillSources(uid, resource));
+      .then(_ => this.fillSources(uid, resource))
+      .catch(e => Exception.fromError(e).log(logger.info));
   }
   if(resource.isTripleResource()){
     return Promise.all(
@@ -791,16 +803,18 @@ module.exports.fillSourcesRecursive = function(uid, resource) {
         resource.value.predicate,
         resource.value.object,
       ].map(r => this.fillSourcesRecursive(uid, r))
-    ).then(_ => this.fillSources(uid, resource));
+    ).catch(e => Exception.fromError(e).log(logger.info))
+      .then(_ => this.fillSources(uid, resource));
   }
   // else resource is a string resource
-  return this.fillSources(uid, resource);
+  return this.fillSources(uid, resource).catch(e => Exception.fromError(e).log(logger.info));
 };
 
 module.exports.getSourcesForQuery = function(uid, query) {
   const keys = new Set();
   return this.getSimilarResources(uid, query)
     .then(rids => this.getSourcesRecursive(uid, rids, keys, 1))
+    .catch(e => Exception.fromError(e).log(logger.warn))
     .then(_ => keys);
 };
 
@@ -809,12 +823,13 @@ module.exports.getSourcesRecursive = function(uid, rids, storagekeys, c){
     return;
   }
   if(Array.isArray(rids) && !rids.length){
-    return;
+    return Promise.resolve(null);
   }
   return this.getStorageKey(uid, rids).then(keys => keys.forEach(key => storagekeys.add(key)))
     .then(_ => this.getParentResources(uid, rids))
     .then(parentrids => {
-      return this.getSourcesRecursive(uid, parentrids, storagekeys, c+1);
+      return this.getSourcesRecursive(uid, parentrids, storagekeys, c+1)
+        .catch(e => Exception.fromError(e).log(logger.warn));
     });
 };
 
