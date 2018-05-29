@@ -17,8 +17,8 @@ define([
           .defaultIconSet('img/icons/setitems/core-icons.svg', 24);
         })
         // Mainnav Controller
-        .controller('MainnavController', ['$scope', '$rootScope', 'EndPointService', '$mdDialog',
-        function ($scope, $rootScope, EndPointService, $mdDialog) {
+        .controller('MainnavController', ['$scope', '$rootScope', 'EndPointService', '$mdDialog', '$mdSidenav',
+        function ($scope, $rootScope, EndPointService, $mdDialog, $mdSidenav) {
 
           $scope.lockLeft = false;
           $scope.toggle = {};
@@ -63,6 +63,14 @@ define([
               EndPointService.deleteDoc($scope.trash.did);
             });
           }
+
+          $rootScope.$on('addDocument', function(event, newDoc) {
+            $scope.loadDoc(newDoc);
+            newDoc.filename = newDoc.name;
+            $scope.documents.push(newDoc);
+            $mdSidenav('left').toggle();
+            $scope.toggle.doc;
+          });
         }
       ]);
 });

@@ -33,33 +33,34 @@ define([
                             .theme("primary-toast")
                             .hideDelay(3500)
                         );
+                     $rootScope.$emit('addDocument', resp.data);
                       // $window.alert('Success ' + resp.data.name + 'with did: ' + resp.data.did + ' uploaded');
                   } else {
                       $window.alert('an error occured');
                   }
-                  var file = $('#docFile');
-
-                  console.log(file);
-                  console.dir(file);
-
-                  if (!window.FileReader) {
-                      alert('Your browser is not supported')
-                  }
-                  var input = file.get(0);
-
-                  // Create a reader object
-                  var reader = new FileReader();
-                  if (input.files.length) {
-                      var textFile = input.files[0];
-                      reader.readAsText(textFile);
-                      $timeout( function(){
-                          $rootScope.$emit('activateCarouselFromUpload', reader.result);
-                      }, 500 );
-                      $mdDialog.hide();
-                      // $(reader).on('load', processFile);
-                  } else {
-                      alert('Please upload a file before continuing')
-                  }
+                  // var file = $('#docFile');
+                  //
+                  // console.log(file);
+                  // console.dir(file);
+                  //
+                  // if (!window.FileReader) {
+                  //     alert('Your browser is not supported')
+                  // }
+                  // var input = file.get(0);
+                  //
+                  // // Create a reader object
+                  // var reader = new FileReader();
+                  // if (input.files.length) {
+                  //     var textFile = input.files[0];
+                  //     reader.readAsText(textFile);
+                  //     $timeout( function(){
+                  //         $rootScope.$emit('activateCarouselFromUpload', reader.result);
+                  //     }, 500 );
+                  //     $mdDialog.hide();
+                  //     // $(reader).on('load', processFile);
+                  // } else {
+                  //     alert('Please upload a file before continuing')
+                  // }
                   $mdDialog.hide();
               }, function (resp) { //catch error
                   console.log('Error status: ' + resp.status);
