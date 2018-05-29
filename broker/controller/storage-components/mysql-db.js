@@ -757,7 +757,7 @@ module.exports.getSimilarResources = function(uid, query) {
     `select distinct(rid) from (
       select rid from userResourceMetadata where mkey = "label" and uid = ? and mvalue = ? 
       union 
-      select rid from userStringresources where uid = ? and surfaceForm = ?
+      select rid from userStringResources where uid = ? and surfaceForm = ?
      ) _`,
     [ uid, query, uid, query ]
   ).then(res => {
