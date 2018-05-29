@@ -19,11 +19,11 @@ define([
                   vm.upload(vm.file); //call upload function
               }
           }
-          vm.upload = function (doc) {
+          vm.upload = function (file) {
               // upload API
               Upload.upload({
                   url: '/api/storage/postDocuments', //webAPI exposed to upload the file
-                  data:{ docFile: doc } //pass file as data, should be user ng-model
+                  data:{ docFile: file } //pass file as data, should be user ng-model
               }).then(function (resp) { //upload function returns a promise
                   if(resp.status === 200) { //validate success
                     $mdToast.show(
