@@ -28,12 +28,16 @@ define([
           });
 
           $scope.init = function() {
-              $scope.lists = EndPointService.fetchService().then(function(response) {
+              EndPointService.fetchService().then(function(response) {
                 $scope.lists = response.data;
               });
 
-              $scope.documents = EndPointService.getDocuments().then(function(response) {
+              EndPointService.getDocuments().then(function(response) {
                 $scope.documents = response.data;
+              });
+
+              EndPointService.getUsername().then(function(response) {
+                $scope.username = response.data;
               });
           };
 
