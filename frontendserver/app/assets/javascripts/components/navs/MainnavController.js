@@ -47,11 +47,16 @@ define([
             EndPointService.toggleService(service);
           };
 
+          //TODO: this argument is named as typ, to avoid reserved words
+          $scope.toggleTypeTo = function(typ) {
+            EndPointService.toggleTypes(typ);
+          };
+
           $scope.loadDoc = function(doc) {
             EndPointService.loadDoc(doc.did).then(function(response) {
               $rootScope.$emit('activateCarouselFromDoc', response.data);
             });
-          }
+          };
 
           $scope.deleteDoc = function(doc, index) {
             $scope.trash = doc;
@@ -66,7 +71,11 @@ define([
               $scope.documents.splice($scope.trashIndex, 1);
               EndPointService.deleteDoc($scope.trash.did);
             });
-          }
+          };
+
+          $rootScope.$on('addTypes', function(event, types) {
+            $scope.types = types;
+          });
 
           $rootScope.$on('addDocument', function(event, newDoc) {
             $scope.loadDoc(newDoc);
