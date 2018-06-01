@@ -14,16 +14,18 @@ define([
         function (Upload, $window, $scope, $rootScope, $mdDialog, $q, EndPointService, $mdToast, $timeout) {
 
           var vm = this;
+          $scope.overwrite = "";
+
           vm.submit = function(){ //function to call on form submit
               if (vm.upload_form.file.$valid && vm.file) { //check if from is valid
-                  vm.upload(vm.file); //call upload function
+                  vm.upload(vm.file, $scope.overwrite); //call upload function
               }
           }
-          vm.upload = function (file) {
+          vm.upload = function (file, overwrite) {
               // upload API
               Upload.upload({
                   url: '/api/storage/postDocuments', //webAPI exposed to upload the file
-                  data:{ docFile: file } //pass file as data, should be user ng-model
+                  data:{ docFile: file, overwrite } //pass file as data, should be user ng-model
               }).then(function (resp) { //upload function returns a promise
                   if(resp.status === 200) { //validate success
                     $mdToast.show(
