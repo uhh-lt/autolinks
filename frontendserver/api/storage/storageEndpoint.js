@@ -38,9 +38,9 @@ function getDocuments(req, res) {
 function postDocuments(req, res) {
     const token = req.session.token;
     const file = req.files.docFile;
+    const overwrite = req.body.overwrite;
 
     if (!fs.existsSync(dir)) {
-      debugger;
         fs.mkdir(dir, 0777);
     }
     // Use the mv() method to place the file somewhere on the server
@@ -48,7 +48,7 @@ function postDocuments(req, res) {
       if (err)
         return res.status(500).send(err);
 
-      const options = documentUpload(config.apiUrl, token, file, dir);
+      const options = documentUpload(config.apiUrl, token, file, dir, overwrite);
       request(options, function (error, response, body) {
         fs.unlinkSync(dir + file.name)
         res.send(body);

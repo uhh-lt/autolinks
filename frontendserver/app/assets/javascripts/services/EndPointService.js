@@ -5,6 +5,7 @@ define([
     angular.module('autolinks.endpointservice', [])
         .factory('EndPointService', ['$rootScope', '$http', '$q', '_', function ($rootScope, $http, $q, _) {
             $rootScope.activeService = [];
+            $rootScope.activeTypes = ['AnatomicalSiteMention', 'MedicationMention'];
             $rootScope.listServices = {};
             $rootScope.serviceName = "";
             $rootScope.serviceVersion = "";
@@ -32,8 +33,22 @@ define([
                 // return $rootScope.listServices;
               },
 
+              toggleTypes: function(type) {
+                if (type.enabled) {
+                  $rootScope.activeTypes.push(type.name);
+                } else {
+                  _.pull($rootScope.activeTypes, type.name);
+                  // $rootScope.$broadcast('disableEndpoint', service.path);
+                }
+                $rootScope.$broadcast('refreshCarouselBasedOnType');
+              },
+
               getActiveService: function() {
                 return $rootScope.activeService;
+              },
+
+              getActiveTypes: function() {
+                return $rootScope.activeTypes;
               },
 
               annotateText: function(text) {

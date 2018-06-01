@@ -1,10 +1,10 @@
 var fs = require('fs');
 var FormData = require('form-data');
 
-module.exports = function(url, token, file, dir) {
+module.exports = function(url, token, file, dir, overwrite) {
   var form = new FormData(file);
   return {
-    url: url + '/storage/document?overwrite=true',
+    url: url + '/storage/document?overwrite=' + overwrite,
     method: 'POST',
     headers: {
        "Content-Type": "multipart/form-data",

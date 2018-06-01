@@ -19,12 +19,22 @@
          ngf-pattern="'.txt'"
          accept=".txt"
          ngf-max-size="20MB"
+         class="uploadFile"
          id="docFile"
-         />
-         <span flex></span>
+       />
+       <span flex></span>
        <i ng-show="up.upload_form.file.$error.required">*required</i><br>
        <i ng-show="up.upload_form.file.$error.maxSize">File too large
        {{up.file.size / 1000000|number:1}}MB: max 20M</i>
+
+        <md-input-container style="margin-right: 10px;">
+           <label>Overwrite file?</label>
+           <md-select ng-model="overwrite" style="min-width: 100px;">
+             <md-option value="true">true</md-option>
+             <md-option value="false">false</md-option>
+           </md-select>
+         </md-input-container>
+
        <md-button type="submit" ng-click="up.submit()">
         Upload
        </md-button>

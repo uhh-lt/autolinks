@@ -25,6 +25,7 @@ define([
           $scope.entityInDoc = [];
           $scope.currIndex = 1;
           $scope.doffsetAnnotation = '';
+          $scope.activeTypes = EndPointService.getActiveTypes();
 
           $scope.addSlide = function(sentence, entity) {
             // var newWidth = 600 + $scope.slides.length + 1;
@@ -318,10 +319,12 @@ define([
             assignNewIndexesToSlides(indexes);
           };
 
-          $scope.resetSlides = function() {
+          $scope.resetSlides = function(isRefresh) {
             $scope.myInterval = 5000;
             $scope.noWrapSlides = true;
-            $scope.active = 0;
+            if (!isRefresh) {
+              $scope.active = 0;
+            }
             $scope.isActive = false;
             $scope.pages = 0;
 
@@ -351,11 +354,24 @@ define([
               });
           });
 
-          function textAnnotations(data) {
-            $scope.resetSlides();
+          $rootScope.$on('refreshCarouselBasedOnType', function(event) {
+              textAnnotations($scope.carouselData, true);
+          });
+
+          function textAnnotations(data, isRefresh = false) {
+            $scope.resetSlides(isRefresh);
+            $scope.carouselData = data;
             $scope.isActive = true;
             $scope.anno = data.annotations;
+            var types = [];
             var sentences = $scope.anno.filter(a => a.type === 'Sentence');
+            var setTypes = new Set($scope.anno.map(a => a.type));
+            var arrTypes = Array.from(setTypes);
+            _.forEach(arrTypes, function(type) {
+              types.push({name: type, enabled: (_.includes($scope.activeTypes, type) ? true : false)});
+            });
+
+            $rootScope.$emit('addTypes', types);
             // $scope.entity = anno.filter(a => a.type ==='NamedEntity')
             // $scope.pages = sentences.length;
             _.forEach(sentences, function(sentence){
@@ -370,7 +386,7 @@ define([
               }
               //TODO: make it dynamic for 'NamedEntity'
               entity = $scope.anno.filter(a => (
-                (a.type === 'AnatomicalSiteMention' || a.type === 'MedicationMention') &&
+                (_.includes($scope.activeTypes, a.type)) &&
                 ((a.doffset.offsets[0].from + a.doffset.offsets[0].length) <= length) &&
                 (a.doffset.offsets[0].from >= from)
               ));

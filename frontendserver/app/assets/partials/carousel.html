@@ -1,6 +1,7 @@
 <div id="carousel-region" ng-if="isActive">
-  <div uib-carousel active="active" data-interval="false" no-wrap="noWrapSlides" ng-swipe-left="changeSlide('left')"
-      ng-swipe-right="changeSlide('right')" class="multi-item-carousel">
+  <!-- <div uib-carousel active="active" data-interval="false" no-wrap="noWrapSlides" ng-swipe-left="changeSlide('left')"
+      ng-swipe-right="changeSlide('right')" class="multi-item-carousel"> -->
+  <div uib-carousel active="active" data-interval="false" no-wrap="noWrapSlides" class="multi-item-carousel">
     <div uib-slide ng-repeat="slide in slides track by slide.id" index="slide.id" class="carousel-card">
       <div id="text-card-div" ng-repeat="script in slide.scripts">
         <md-card id="text-card">
