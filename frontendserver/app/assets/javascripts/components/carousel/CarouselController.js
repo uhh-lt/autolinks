@@ -17,7 +17,7 @@ define([
 
           $scope.myInterval = 5000;
           $scope.noWrapSlides = true;
-          $scope.active = 1;
+          $scope.active = 0;
           $scope.isActive = false;
           $scope.pages = 0;
 
@@ -319,10 +319,10 @@ define([
             assignNewIndexesToSlides(indexes);
           };
 
-          $scope.resetSlides = function(isRefresh) {
+          $scope.resetSlides = function(loadType) {
             $scope.myInterval = 5000;
             $scope.noWrapSlides = true;
-            if (!isRefresh) {
+            if (!loadType === 'refresh') {
               $scope.active = 0;
             }
             $scope.isActive = false;
@@ -349,22 +349,30 @@ define([
               $scope.doc = data;
               EndPointService.annotateText(data).then(function(response) {
                 // $timeout( function(){
-                    textAnnotations(response.data);
+                textAnnotations(response.data);
                 // }, 2000 );
               });
           });
 
           $rootScope.$on('refreshCarouselBasedOnType', function(event) {
-              textAnnotations($scope.carouselData, true);
+              textAnnotations($scope.carouselData, 'refresh');
           });
 
-          function textAnnotations(data, isRefresh = false) {
-            $scope.resetSlides(isRefresh);
+
+          $rootScope.$on('navigateToDocFromSource', function(event, resp) {
+              $scope.pvc = resp.pvc;
+              $scope.doc = resp.data.text;
+              textAnnotations(resp.data, 'source');
+          });
+
+          function textAnnotations(data, loadType = '') {
+            $scope.resetSlides(loadType);
             $scope.carouselData = data;
             $scope.isActive = true;
             $scope.anno = data.annotations;
             var types = [];
             var sentences = $scope.anno.filter(a => a.type === 'Sentence');
+
             var setTypes = new Set($scope.anno.map(a => a.type));
             var arrTypes = Array.from(setTypes);
             _.forEach(arrTypes, function(type) {
@@ -384,12 +392,23 @@ define([
                 from = from === undefined ? (sentence.doffset.offsets[0].from = 0) : from;
                 length += from;
               }
+
+              // Jumping to sentence from source
+              if (loadType == 'source') {
+                if ((parseInt($scope.pvc.start) >= sentence.doffset.offsets[0].from) &&
+                    (parseInt($scope.pvc.end) <= sentence.doffset.offsets[0].length)
+                  ) {
+                    $scope.active = parseInt(sentence.properties.sentenceNumber);
+                  }
+              }
+
               //TODO: make it dynamic for 'NamedEntity'
               entity = $scope.anno.filter(a => (
                 (_.includes($scope.activeTypes, a.type)) &&
                 ((a.doffset.offsets[0].from + a.doffset.offsets[0].length) <= length) &&
                 (a.doffset.offsets[0].from >= from)
               ));
+
               $scope.addSlide(sentence, entity);
             });
           }

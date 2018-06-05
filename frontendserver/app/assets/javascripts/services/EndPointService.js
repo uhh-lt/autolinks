@@ -4,8 +4,9 @@ define([
     'use strict';
     angular.module('autolinks.endpointservice', [])
         .factory('EndPointService', ['$rootScope', '$http', '$q', '_', function ($rootScope, $http, $q, _) {
-            $rootScope.activeService = [];
-            $rootScope.activeTypes = ['AnatomicalSiteMention', 'MedicationMention'];
+            $rootScope.activeServices = [];
+            $rootScope.activeTypes = [];
+            $rootScope.activeDocs = [];
             $rootScope.listServices = {};
             $rootScope.serviceName = "";
             $rootScope.serviceVersion = "";
@@ -25,9 +26,9 @@ define([
 
               toggleService: function(service) {
                 if (service.enabled) {
-                  $rootScope.activeService.push(service.path);
+                  $rootScope.activeServices.push(service.path);
                 } else {
-                  _.pull($rootScope.activeService, service.path);
+                  _.pull($rootScope.activeServices, service.path);
                   $rootScope.$broadcast('disableEndpoint', service.path);
                 }
                 // return $rootScope.listServices;
@@ -44,7 +45,7 @@ define([
               },
 
               getActiveService: function() {
-                return $rootScope.activeService;
+                return $rootScope.activeServices;
               },
 
               getActiveTypes: function() {
@@ -77,13 +78,19 @@ define([
 
               getDocuments: function(data) {
                 return $http.get('/api/storage/getDocuments').then(function(response) {
-                  return response;
+                  return $rootScope.activeService = response;;
                 });
               },
 
               getUsername: function() {
                 return $http.get('/api/user/getUsername').then(function(response) {
                   return response;
+                });
+              },
+
+              getService: function(data) {
+                return $http.post('/api/service/get', { data: data }).then(function(response) {
+                  return data = response.data;
                 });
               },
 

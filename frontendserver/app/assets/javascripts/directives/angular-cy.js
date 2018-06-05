@@ -520,7 +520,8 @@ define([
                               id: e.rid,
                               name: e.rid,
                               metadata: e.metadata,
-                              path: scope.path
+                              path: scope.path,
+                              provenances: e.sources
                           };
                         }
                         return {
@@ -530,7 +531,8 @@ define([
                           id: ( e.value.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '') + ( child ? '' : '_as_parent' ) + '-' + e.rid + '-' + e.cid ).replace(/\s/g, ''),
                           name: e.value + '',
                           parent: parent ? parent.id : scope.outermostId,
-                          path: scope.path
+                          path: scope.path,
+                          provenances: e.sources
                         };
                       }
 
@@ -546,7 +548,8 @@ define([
                             source: (subject.id).replace(/\s/g, ''),
                             target: (object.id).replace(/\s/g, ''),
                             name: r.value,
-                            path: scope.path
+                            path: scope.path,
+                            provenances: r.sources
                           }
                         };
                       }
