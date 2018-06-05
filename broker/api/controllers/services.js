@@ -159,17 +159,14 @@ module.exports.get_service_data = function(req, res, next) {
     }
     const key = req.swagger.params.q.value;
 
-    const storagekey = `service::${service}/${path.replace('/','')}/${version}/${method}/?q=${encodeURI(key)}`;
+    const storagekey = `service::${service}/${path.replace('/','').replace(/\//g,'%slash%')}/${version}/${method}/?q=${encodeURI(key)}`;
 
     return storage.promisedRead(user.id, storagekey)
       .then(
         result => res.json(result).end(next),
         err => Exception.fromError(err, 'Error retrieving service data.').log(logger.warn).handleResponse(res).end(next)
       );
-
   });
-
-
 
 };
 
