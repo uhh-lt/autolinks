@@ -102,6 +102,21 @@
              Delete
            </md-button>
            <md-divider></md-divider>
+           <md-list-item class="main-subheader" ng-click="toggle.provenances = !toggle.provenances">
+             <span flex>Sources:</span>
+             <i ng-show="!toggle.provenances" class="fa fa-chevron-down" aria-hidden="true"></i>
+             <i ng-show="toggle.provenances" class="fa fa-chevron-right" aria-hidden="true"></i>
+           </md-list-item>
+           <md-divider></md-divider>
+           <div ng-show="toggle.provenances">
+             <!-- <md-list-item ng-if="!types"> Please select a document first</md-list-item> -->
+             <md-list-item ng-repeat="pvc in provenances" ng-click="navigateTo(pvc)">
+               <p>{{ pvc.surface }}</p>
+               <!-- <md-switch class="md-secondary" ng-model="typ.enabled" ng-change="toggleTypeTo(typ)"></md-switch> -->
+             </md-list-item>
+             <md-divider></md-divider>
+           </div>
+           <md-divider></md-divider>
            <h3>Properties:<h3>
            <pre id="propertify">
            </pre>

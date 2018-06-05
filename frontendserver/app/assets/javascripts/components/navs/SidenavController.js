@@ -12,6 +12,7 @@ define([
         function ($scope, $rootScope, $timeout, $mdSidenav, $mdDialog, $log, EntityService, EndPointService, _) {
 
           $scope.label = '';
+          $scope.toggle = {};
 
           $scope.init = function() {
             $timeout( function() {
@@ -19,6 +20,38 @@ define([
               const entity = $scope.selectedEntity;
               if (entity._private) {
                 const metadata = _.clone(entity._private.data.metadata);
+
+                EndPointService.getDocuments().then(function(response) {
+                  $scope.documents = response.data;
+                  $scope.provenances = [];
+                  let sources = _.clone(entity._private.data.provenances);
+                  sources = _.forEach(sources, function(source) {
+                    if (_.includes(source, 'service::')) {
+                      const split = _.split(_.split(source, '::')[1], ':');
+                      $scope.provenances.push({
+                        surface: source.replace('service::', ''),
+                        origin: source,
+                        path: split[1]
+                      });
+                    } else {
+                      const split = _.split(_.split(source, '::')[1], ':');
+                      const docId = split[2];
+                      const activeDoc = _.filter($scope.documents, function(doc) { return doc.did == docId });
+                      if (!_.includes(source, 'annotations::') && (activeDoc.length > 0)) {
+                        $scope.provenances.push({
+                          // surface: source.replace('annotation::', ''),
+                          surface: activeDoc[0].filename + '(' + split[3] +')',
+                          origin: source,
+                          did: split[2],
+                          start: split[3],
+                          end: split[4]
+                        });
+                      }
+                    };
+                  });
+                });
+
+
                 if (metadata) {
                   $scope.metadata = metadata;
                   $scope.metadata_keys = Object.keys($scope.metadata);
@@ -60,6 +93,23 @@ define([
               // // $rootScope.$broadcast('appChanged');
               // $mdSidenav('right').close();
           };
+
+          $scope.navigateTo = function(pvc) {
+            $scope.selectedPvc = pvc;
+            if (_.includes(pvc.origin, 'service::')) {
+              $scope.dataPath = { endpoint: { path: pvc.path }}
+              EndPointService.getService(pvc.surface).then(function(response) {
+                $rootScope.$broadcast('addEntity', { entity: response, data: $scope.dataPath });
+              });
+            } else {
+              EndPointService.loadDoc(pvc.did).then(function(response) {
+                if (_.includes($scope.selectedPvc.origin, 'annotation::')) {
+                  const resp = {data: response.data, pvc: $scope.selectedPvc};
+                  $rootScope.$emit('navigateToDocFromSource', resp);
+                }
+              });
+            }
+          }
 
           $scope.createCompound = function(){
               $rootScope.$emit('createCompound');
