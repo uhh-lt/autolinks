@@ -395,8 +395,8 @@ define([
 
               // Jumping to sentence from source
               if (loadType == 'source') {
-                if ((parseInt($scope.pvc.start) >= sentence.doffset.offsets[0].from) &&
-                    (parseInt($scope.pvc.end) <= sentence.doffset.offsets[0].length)
+                if ((parseInt($scope.pvc.start) >= from) &&
+                    (parseInt($scope.pvc.end) <= length)
                   ) {
                     $scope.active = parseInt(sentence.properties.sentenceNumber);
                   }
