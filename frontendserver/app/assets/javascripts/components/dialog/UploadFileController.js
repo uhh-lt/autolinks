@@ -37,6 +37,7 @@ define([
                         );
                      $rootScope.$emit('addDocument', resp.data);
                       // $window.alert('Success ' + resp.data.name + 'with did: ' + resp.data.did + ' uploaded');
+                     EndPointService.interpretDoc(resp.data.did);
                   } else {
                       $window.alert('an error occured');
                   }

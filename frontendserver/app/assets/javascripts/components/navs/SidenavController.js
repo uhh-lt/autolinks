@@ -42,6 +42,7 @@ define([
                           // surface: source.replace('annotation::', ''),
                           surface: activeDoc[0].filename + '(' + split[3] +')',
                           origin: source,
+                          filename: activeDoc[0].filename,
                           did: split[2],
                           start: split[3],
                           end: split[4]
@@ -50,7 +51,6 @@ define([
                     };
                   });
                 });
-
 
                 if (metadata) {
                   $scope.metadata = metadata;
@@ -106,6 +106,7 @@ define([
                 if (_.includes($scope.selectedPvc.origin, 'annotation::')) {
                   const resp = {data: response.data, pvc: $scope.selectedPvc};
                   $rootScope.$emit('navigateToDocFromSource', resp);
+                  $rootScope.$emit('checkedDoc', {did: resp.pvc.did, name: resp.pvc.filename});
                 }
               });
             }

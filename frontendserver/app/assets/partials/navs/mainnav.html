@@ -60,7 +60,6 @@
             <i ng-show="!toggle.doc" class="fa fa-chevron-down" aria-hidden="true"></i>
             <i ng-show="toggle.doc" class="fa fa-chevron-right" aria-hidden="true"></i>
           </md-list-item>
-
           <!-- <div ng-repeat="doc in documents" ng-show="toggle.doc">
             <md-list-item>
               <p>{{$index + 1}}. {{ doc.filename }}</p>
@@ -70,16 +69,18 @@
 
           <md-radio-group
             ng-show="toggle.doc"
-            ng-model="doc"
+            ng-model="selecteDoc.did"
             ng-model-options="{ getterSetter: true, updateOn: 'default' }"
-            ng-change="loadDoc(doc)"
+            ng-change="loadDoc(selecteDoc)"
             >
+          <md-list-item ng-if="!documents.length > 0">No uploaded documents were found!</md-list-item>
            <div ng-repeat='doc in documents' class="row-reverse">
              <div flex layout='row' layout-padding layout-align="start center" >
                <md-list-item>
                  <md-radio-button flex
-                     ng-value="doc"
-                     id="{{doc.id}}"
+                     ng-value="doc.did"
+                     ng-attr-id="{{doc.did + doc.filename}}"
+                     ng-checked="true"
                   >
                     {{$index + 1}}. {{ doc.filename }}
                  </md-radio-button>
@@ -100,7 +101,7 @@
         </md-list-item>
         <md-divider></md-divider>
         <div ng-show="toggle.annotation">
-          <md-list-item ng-if="!types"> Please select a document first</md-list-item>
+          <md-list-item ng-if="!types"> Please select a document first!</md-list-item>
           <md-list-item ng-repeat="typ in types">
             <p>{{ typ.name }}</p>
             <md-switch class="md-secondary" ng-model="typ.enabled" ng-change="toggleTypeTo(typ)"></md-switch>

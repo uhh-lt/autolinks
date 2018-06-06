@@ -6,6 +6,9 @@
       <% if(locals.error) { %>
           <div class="alert alert-danger"><%= error %></div>
       <% } %>
+      <% if(locals.success) { %>
+          <div class="alert alert-success"><%= success %></div>
+      <% } %>
       <form method="post">
           <!-- <div class="form-group">
               <label for="firstName">First name</label>
@@ -19,14 +22,19 @@
               <label for="name">Username</label>
               <input type="text" name="name" id="name" class="form-control" value="<%= locals.name || '' %>" required />
           </div>
-          <div class="form-group">
-              <label for="password">Password</label>
-              <input type="password" name="password" id="password" class="form-control" required />
-          </div>
-          <div class="form-group buttons">
-              <button type="submit" class="btn btn-primary">Register</button>
-              <a href="/login" class="btn btn-link">Cancel</a>
-          </div>
+          <% if(!locals.success) { %>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" class="form-control" required />
+            </div>
+            <div class="form-group buttons">
+                <button type="submit" class="btn btn-primary">Register</button>
+                <a href="/login" class="btn btn-link">Cancel</a>
+            </div>
+          <% } %>
+          <% if(locals.success) { %>
+              <a href="/login" class="btn btn-primary">LOGIN</a>
+          <% } %>
       </form>
     </section>
   </main>

@@ -11,6 +11,7 @@ define([
             $rootScope.serviceName = "";
             $rootScope.serviceVersion = "";
             $rootScope.text = "";
+
             return {
               fetchService: function() {
                 return $http.get('/api/service/listServices').then(function(response) {
@@ -60,6 +61,13 @@ define([
 
               loadDoc: function(did) {
                 return $http.post('/api/nlp/analyzeDid', { did: did }).then(function(response) {
+                  return response;
+                });
+              },
+
+              interpretDoc: function(did) {
+                debugger;
+                return $http.post('/api/nlp/interpretDid', { did: did }).then(function(response) {
                   return response;
                 });
               },

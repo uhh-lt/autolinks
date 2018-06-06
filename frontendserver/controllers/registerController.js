@@ -32,8 +32,8 @@ router.post('/', function (req, res) {
         }
 
         // return to login page with success message
-        req.session.success = 'Registration successful';
-        return res.redirect('/login');
+        req.session.success = 'Registration successful, User: ' + req.body.name;
+        return res.render('register', { success: req.session.success, name: req.body.name });
     });
 });
 

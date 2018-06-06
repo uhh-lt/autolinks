@@ -22,6 +22,7 @@ define([
 
           $scope.lockLeft = false;
           $scope.toggle = {};
+          $scope.selecteDoc = {};
 
           $rootScope.$on('toggleMainnav', function() {
             $scope.lockLeft = !$scope.lockLeft;
@@ -77,7 +78,12 @@ define([
             $scope.types = types;
           });
 
+          $rootScope.$on('checkedDoc', function(event, doc) {
+            $scope.selecteDoc = doc;
+          });
+
           $rootScope.$on('addDocument', function(event, newDoc) {
+            $scope.selecteDoc = { did: newDoc.did, name: newDoc.name };
             $scope.loadDoc(newDoc);
             newDoc.filename = newDoc.name;
             $scope.documents.push(newDoc);
