@@ -3,10 +3,12 @@ var request = require('request');
 var express = require('express');
 var router = express.Router();
 var nlpAnalyze = require('./analyze');
-var nlpAnalyzeDid = require('./analyzeDid')
+var nlpAnalyzeDid = require('./analyzeDid');
+var nlpInterpretDid = require('./interpretDid');
 
 router.post('/analyze', analyze);
 router.post('/analyzeDid', analyzeDid);
+router.post('/interpretDid', interpretDid);
 
 module.exports = router;
 
@@ -23,6 +25,15 @@ function analyzeDid(req, res){
     const token = req.session.token;
     const did = req.body.did;
     const options = nlpAnalyzeDid(config.apiUrl, token, did);
+    request(options, function (error, response, body) {
+      res.send(body);
+    });
+}
+
+function interpretDid(req, res){
+    const token = req.session.token;
+    const did = req.body.did;
+    const options = nlpInterpretDid(config.apiUrl, token, did);
     request(options, function (error, response, body) {
       res.send(body);
     });
