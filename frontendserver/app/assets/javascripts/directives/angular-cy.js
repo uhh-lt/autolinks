@@ -65,8 +65,7 @@ define([
 
                 scope.ehListeners = [];
 
-                scope.$watch('data', function () {
-
+                // scope.$watch('data', function () { // Disable $watch for solving hidden graph bugs
                     var domContainer = document.getElementById('cy-network');
                     console.log(scope.data);
                     // graph  build
@@ -812,7 +811,7 @@ define([
                     $rootScope.$broadcast('addEdge');
                   });
 
-                });
+                // });
 
             }
         };
