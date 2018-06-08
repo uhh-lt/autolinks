@@ -109,7 +109,10 @@ define([
                         return e.data('name');
                       },
                     'text-valign': 'bottom',
-                    'color': 'rgba(35, 35, 35, 0.84)',
+                    'color': 'rgba(63, 63, 63, 0.98)',
+                    'border-style': 'solid', // node border, can be 'solid', 'dotted', 'dashed' or 'double'.
+                    'border-width': '1px',
+                    'border-color': 'black',
                     // 'text-outline-width': 2,
                     // 'text-outline-color': 'data(typeColor)'
                   }
@@ -127,9 +130,15 @@ define([
                         }
                         return (e.data('name') ? e.data('name') : 'has relation');
                       },
-                    'curve-style': 'bezier',
+                      'curve-style': 'bezier', /* options: bezier (curved) (default), unbundled-bezier (curved with manual control points), haystack (straight edges) */
+                      // 'control-point-step-size': '10px', // specifies the distance between successive bezier edges.
+                      // 'control-point-distance': '20px', /* overrides control-point-step-size to curves single edges as well, in addition to parallele edges */
+                      'control-point-weight': 0.5, // '0': curve towards source node, '1': curve towards target node.
+                    // 'curve-style': 'bezier',
                     'target-arrow-shape': 'triangle',
-                    'color': 'rgba(35, 35, 35, 0.84)'
+                    'line-color': 'rgba(166, 166, 166, 0.58)',
+                    'target-arrow-color': 'rgba(166, 166, 166, 0.58)',
+                    'color': 'rgba(63, 63, 63, 0.98)'
                   }
                 },
                 {
@@ -137,6 +146,7 @@ define([
                   style: {
                     'text-valign': 'top',
                     'background-opacity': 0.333,
+                    'background-color': 'rgba(230, 230, 230, 0.64)',
                     'text-opacity': 0
                   }
                 },
@@ -152,7 +162,10 @@ define([
                 selector: ':selected',
                 css: {
                     'border-width': 5,
+                    'border-color': 'blue',
                     'background-color': 'rgba(129, 227, 227, 0.84)',
+                    'color': 'rgba(32, 32, 32, 0.98)',
+                    // 'background-color': 'blue',
                     // 'line-color': 'black',
                     // 'filter': 'grayscale(200%)',
                     // 'target-arrow-color': 'black',
@@ -161,6 +174,55 @@ define([
                     'transition-duration': '0.4s'
                   }
                 },
+                //highlight Element
+                {
+                    selector: 'node.hoverNode',
+                    style: {
+                        // 'border-color': 'gold',
+                        // 'border-width': '2px',
+                        // 'border-style': 'dashed',
+                        'background-opacity': 0.65,
+                        'color': 'rgba(32, 32, 32, 0.98)'
+                        // 'background-color': 'rgba(102, 127, 227, 1)',
+                    }
+                },
+                {
+                    selector: 'node.semitransp',
+                    style: {
+                      // 'opacity': '0.8'
+                  }
+                },
+                {
+                    selector: 'edge.highlight',
+                    style: {
+                      'line-color': 'rgba(115, 115, 115, 0.98)',
+                      'target-arrow-color': 'rgba(115, 115, 115, 0.98)',
+                      'color': 'rgba(32, 32, 32, 0.98)'
+                    }
+                },
+                {
+                    selector: 'edge.semitransp',
+                    style:{ 'opacity': '0.8' }
+                },
+
+                {
+                    selector: 'edge.selected',
+                    style: {  'line-color': 'blue', 'target-arrow-color': 'blue' }
+                },
+
+                // {
+                // selector: ':selected',
+                // css: {
+                //     'border-width': 5,
+                //     'background-color': 'rgba(129, 227, 0, 0.84)',
+                //     // 'line-color': 'black',
+                //     // 'filter': 'grayscale(200%)',
+                //     // 'target-arrow-color': 'black',
+                //     // 'source-arrow-color': 'black',
+                //     'transition-property': 'background-color, line-color, target-arrow-color',
+                //     'transition-duration': '0.4s'
+                //   }
+                // },
                 {
                 selector: '.faded',
                 css:
