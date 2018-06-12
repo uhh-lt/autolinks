@@ -32,8 +32,8 @@ function analyzeDid(req, res){
 
 function interpretDid(req, res){
     const token = req.session.token;
-    const did = req.body.did;
-    const options = nlpInterpretDid(config.apiUrl, token, did);
+    const data = req.body;
+    const options = nlpInterpretDid(config.apiUrl, token, data);
     request(options, function (error, response, body) {
       res.send(body);
     });
