@@ -250,6 +250,64 @@ define([
                         edgeTipExtension(e);
                       });
 
+                      // cy.nodes().on('mouseover', function(e){
+                      //     console.log("wow");
+                      // });
+
+                      // Events collection : mouseover, taphold, tapend, tap
+                      cy.on('tapend', 'node', function(evt){
+                        var node = evt.target;
+                        console.log( 'tapend ' + node.id() );
+                        var x = scope.coordinate.x;
+                        var y = scope.coordinate.y;
+                        console.log(x, y);
+                        // evt.neighborhood('edge').style( { 'line-color' : 'black' });
+                        // evt.connectedEdges().style( { 'line-color' : 'black' });
+                      });
+
+                      cy.on('mouseover', 'node', function(e){
+                          var sel = e.target;
+                          var label = sel.data("metadata").label;
+                          // cy.elements().difference(sel.outgoers()).not(sel).addClass('semitransp');
+                          sel.addClass('hoverNode').outgoers().addClass('highlight');
+                          // cy.elements().difference(sel.incomers()).not(sel).addClass('semitransp');
+                          sel.incomers().addClass('highlight');
+
+                          var sameLabelNode = cy.nodes().filter(function( ele ) {
+                            return (ele.data('metadata').label == label);
+                          });
+
+                          sameLabelNode.addClass('sameLabelHighlight');
+
+                      });
+                      cy.on('mouseout', 'node', function(e){
+                          var sel = e.target;
+                          // cy.elements().removeClass('semitransp');
+                          cy.elements().removeClass('hoverNode').removeClass('sameLabelHighlight');
+                          // cy.elements().removeClass('sameLabelHighlight');
+                          sel.removeClass('highlight').outgoers().removeClass('highlight');
+                          sel.removeClass('highlight').incomers().removeClass('highlight');
+                          // sel.removeClass('highlight').incomers().removeClass('highlight');
+                      });
+
+                      cy.on('tap', 'node', function(e){
+                        var sel = e.target;
+                        // cy.elements().difference(sel.outgoers()).not(sel).addClass('semitransp');
+                        cy.elements().removeClass('selected');
+                        sel.addClass('selected').incomers().addClass('selected');
+                        sel.addClass('selected').outgoers().addClass('selected');
+                          // sel.removeClass('highlight').incomers().removeClass('highlight');
+                      });
+
+                      cy.on('tap', 'edge', function(e){
+                        var sel = e.target;
+                        // cy.elements().difference(sel.outgoers()).not(sel).addClass('semitransp');
+                        cy.elements().removeClass('selected');
+                        sel.addClass('selected');
+                          // sel.removeClass('highlight').incomers().removeClass('highlight');
+                      });
+
+
                       function edgeTipExtension(e) {
                         _.forEach(e, function(e) {
                           if (e.data('name')) {
@@ -288,7 +346,7 @@ define([
                                     console.log(scope.selectedEntity.id());
                                     return (
                                     '<div class="node-buttons">' +
-                                    '<button id="readMode" class="node-button"><i class="fa fa-book fa-2x"/></button>' +
+                                    '<button id="moveNode" class="node-button"><i class="fa fa-arrows-alt fa-2x"/></button>' +
                                     '<button id="addEdge" class="node-button"><i class="fa fa-link fa-2x"/></button> ' +
                                     '<button id="editNode" class="node-button"><i class="fa fa-edit fa-2x"/></button>' +
                                     '</div>'
@@ -635,7 +693,7 @@ define([
                         var nodes = scope.data.nodes;
                         var edges = scope.data.edges;
 
-                        scope.path = res.data.endpoint.path;
+                        scope.path = res.data ? res.data.endpoint.path : [];
                         scope.newNode = [];
                         scope.newEdge = [];
 
@@ -680,6 +738,7 @@ define([
                           scope.data.edges = _.union(edges, scope.newEdge);
                           cy.layout(scope.options.layout).run();
                         }
+                        $rootScope.$emit('switchNodesBasedOnTypes');
                       });
 
                       if (!$rootScope.$$listenerCount.addEdge) {
@@ -775,6 +834,23 @@ define([
                           cy.fit();
                       });
 
+                      $rootScope.$on('switchNodesBasedOnTypes', function() {
+                        scope.activeTypes = scope.$parent.EndPointService.getActiveTypes();
+                        // var nodes = cy.filter('node[path = "annotationNode"]');
+                        var annotationNode = cy.nodes().filter(function( ele ) {
+                          return (ele.data('path') == "annotationNode") && (!ele.isParent());
+                        });
+
+                        _.forEach(annotationNode, function(ele) {
+
+                          if (_.some(scope.activeTypes, (type) => _.includes(ele.data('name'), type))) {
+                            ele.show();
+                          } else {
+                            ele.hide();
+                          }
+                        });
+                      });
+
                     }; // end doCy()
 
                   scope.doCy();
@@ -810,6 +886,11 @@ define([
                   $(document).on('click', "#addEdge", function(e){
                     $rootScope.$broadcast('addEdge');
                   });
+
+                  $(document).on('click', "#moveNode", function(event, n){
+                    scope.$parent.EntityService.openSideNav(scope.selectedEntity);
+                  });
+
 
                 // });
 

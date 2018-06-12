@@ -1,6 +1,6 @@
-module.exports = function(url, token, did) {
+module.exports = function(url, token, data) {
   return {
-    url: url + '/nlp/interpret/' + did,
+    url: url + '/nlp/interpret/' + data.did,
     method: 'POST',
     headers: {
        'Content-Type': 'application/json',
@@ -12,8 +12,8 @@ module.exports = function(url, token, did) {
     {
       "offsets": [
         {
-          "from": 0,
-          "length": 1000000
+          "from": data.offsets ? parseInt(data.offsets[0]) : 0,
+          "length": data.offsets ? parseInt(data.offsets[1]) : 1000000
         }
       ]
     }

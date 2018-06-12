@@ -69,11 +69,11 @@
 
           <md-radio-group
             ng-show="toggle.doc"
-            ng-model="selecteDoc.did"
+            ng-model="selectedDoc.did"
             ng-model-options="{ getterSetter: true, updateOn: 'default' }"
-            ng-change="loadDoc(selecteDoc)"
-            >
-          <md-list-item ng-if="!documents.length > 0">No uploaded documents were found!</md-list-item>
+            ng-change="loadDoc(selectedDoc)"
+          >
+           <md-list-item ng-if="!documents.length > 0">No uploaded documents were found!</md-list-item>
            <div ng-repeat='doc in documents' class="row-reverse">
              <div flex layout='row' layout-padding layout-align="start center" >
                <md-list-item>

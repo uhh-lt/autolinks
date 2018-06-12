@@ -7,6 +7,7 @@ define([
             $rootScope.activeServices = [];
             $rootScope.activeTypes = [];
             $rootScope.activeDocs = [];
+            $rootScope.selectedDoc = {};
             $rootScope.listServices = {};
             $rootScope.serviceName = "";
             $rootScope.serviceVersion = "";
@@ -45,6 +46,14 @@ define([
                 $rootScope.$broadcast('refreshCarouselBasedOnType');
               },
 
+              setSelectedDoc: function(doc) {
+                $rootScope.selectedDoc = doc;
+              },
+
+              getSelectedDoc: function() {
+                return $rootScope.selectedDoc;
+              },
+
               getActiveService: function() {
                 return $rootScope.activeServices;
               },
@@ -66,8 +75,13 @@ define([
               },
 
               interpretDoc: function(did) {
-                debugger;
                 return $http.post('/api/nlp/interpretDid', { did: did }).then(function(response) {
+                  return response;
+                });
+              },
+
+              interpretOffset: function(did, offsets) {
+                return $http.post('/api/nlp/interpretDid', { did: did, offsets: offsets }).then(function(response) {
                   return response;
                 });
               },

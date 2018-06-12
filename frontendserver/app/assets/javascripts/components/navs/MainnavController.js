@@ -22,7 +22,7 @@ define([
 
           $scope.lockLeft = false;
           $scope.toggle = {};
-          $scope.selecteDoc = {};
+          $scope.selectedDoc = {};
 
           $rootScope.$on('toggleMainnav', function() {
             $scope.lockLeft = !$scope.lockLeft;
@@ -51,9 +51,11 @@ define([
           //TODO: this argument is named as typ, to avoid reserved words
           $scope.toggleTypeTo = function(typ) {
             EndPointService.toggleTypes(typ);
+            $rootScope.$emit('switchNodesBasedOnTypes');
           };
 
           $scope.loadDoc = function(doc) {
+            EndPointService.setSelectedDoc(doc);
             EndPointService.loadDoc(doc.did).then(function(response) {
               $rootScope.$emit('activateCarouselFromDoc', response.data);
             });
@@ -79,11 +81,11 @@ define([
           });
 
           $rootScope.$on('checkedDoc', function(event, doc) {
-            $scope.selecteDoc = doc;
+            $scope.selectedDoc = doc;
           });
 
           $rootScope.$on('addDocument', function(event, newDoc) {
-            $scope.selecteDoc = { did: newDoc.did, name: newDoc.name };
+            $scope.selectedDoc = { did: newDoc.did, name: newDoc.name };
             $scope.loadDoc(newDoc);
             newDoc.filename = newDoc.name;
             $scope.documents.push(newDoc);

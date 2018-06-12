@@ -36,6 +36,7 @@ define([
                             .hideDelay(3500)
                         );
                      $rootScope.$emit('addDocument', resp.data);
+                     EndPointService.setSelectedDoc(resp.data);
                       // $window.alert('Success ' + resp.data.name + 'with did: ' + resp.data.did + ' uploaded');
                      EndPointService.interpretDoc(resp.data.did);
                   } else {
