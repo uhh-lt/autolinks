@@ -187,6 +187,14 @@ define([
                     }
                 },
                 {
+                    selector: 'node.sameLabelHighlight',
+                    style: {
+                        'border-color': 'gold',
+                        'border-width': '2px',
+                        'border-style': 'dashed'
+                    }
+                },
+                {
                     selector: 'node.semitransp',
                     style: {
                       // 'opacity': '0.8'
