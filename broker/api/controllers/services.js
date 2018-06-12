@@ -98,36 +98,39 @@ module.exports.list_services = function(req, res, next) {
 };
 
 module.exports.call_service = function(req, res, next) {
-  if(!req.swagger.params.data || !req.swagger.params.data.value){
-    return new Exception('MissingInformation', 'No data provided.').handleResponse(res).end(next);
-  }
 
-  const data = req.swagger.params.data.value;
-  if(!(data.service && data.version && data.path && data.method)){
-    return new Exception('MissingInformation', `Make sure 'service', 'version', 'path' and 'method' are provided.`).handleResponse(res).end(next);
-  }
+  auth.handle_authenticated_request(req, res, function(user) {
 
-  const serviceref = {name: data.service, version: data.version};
-  const endpointref = {path: data.path, method: data.method};
-  service_db.get_service_endpoint(
-    serviceref,
-    endpointref,
-    function(err, row){
-      if (err) {
-        return Exception.fromError(err, 'Error retrieving service endpoint.', {data : data}).log(logger.warn).handleResponse(res).end(next);
+    if (!req.swagger.params.data || !req.swagger.params.data.value) {
+      return new Exception('MissingInformation', 'No data provided.').handleResponse(res).end(next);
+    }
+
+    const data = req.swagger.params.data.value;
+    if (!(data.service && data.version && data.path && data.method)) {
+      return new Exception('MissingInformation', `Make sure 'service', 'version', 'path' and 'method' are provided.`).handleResponse(res).end(next);
+    }
+
+    const serviceref = {name: data.service, version: data.version};
+    const endpointref = {path: data.path, method: data.method};
+    service_db.get_service_endpoint(
+      serviceref,
+      endpointref,
+      function (err, row) {
+        if (err) {
+          return Exception.fromError(err, 'Error retrieving service endpoint.', {data: data}).log(logger.warn).handleResponse(res).end(next);
+        }
+        if (!row) {
+          return new Exception('IllegalState', `Service endpoint not found: service '${serviceref.name}:${serviceref.version}', endpoint: '${endpointref.path}'.`, {data: data}).log(logger.warn).handleResponse(res).end(next);
+        }
+        let path = row.path;
+        if (row.requireslogin) {
+          path = path.replace(/\{username\}/, user.name);
+        }
+        return service_utils.call_service(row.location, path, row.method, user.id, data.data, serviceref, endpointref, req, res, next);
       }
-      if(!row) {
-        return new Exception('IllegalState', `Service endpoint not found: service '${serviceref.name}:${serviceref.version}', endpoint: '${endpointref.path}'.`, {data: data}).log(logger.warn).handleResponse(res).end(next);
-      }
-      if(row.requireslogin){
-        return auth.handle_authenticated_request(req, res, function(user) {
-          return service_utils.call_service(row.location, row.path.replace(/\{username\}/,user.name), row.method, user.id, data.data, serviceref, endpointref, req, res, next);
-        });
-      }
-      return auth.handle_authenticated_fallback_request(req, res, function(user) {
-        return service_utils.call_service(row.location, row.path, row.method, user.id, data.data, serviceref, endpointref, req, res, next);
-      });
-    });
+    );
+  });
+
 };
 
 module.exports.get_service_data = function(req, res, next) {
