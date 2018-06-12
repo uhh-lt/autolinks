@@ -1,7 +1,6 @@
 'use strict';
 
 const
-  fs = require('fs'),
   auth = require('../../controller/auth'),
   storage = require('../../controller/storage_wrapper'),
   nlp = require('../../controller/nlp_wrapper'),

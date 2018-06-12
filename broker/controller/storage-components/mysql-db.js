@@ -667,8 +667,8 @@ module.exports.promisedGetFile = function(uid, did, target) {
 module.exports.getDocumentInfo = function(uid, did) {
   return promisedQuery('select did, name, mimetype, encoding, (analysis is not null) as analyzed from documents where uid = ? and did = ?', [uid, did])
     .then(res => {
-      if(!res.rows){
-        return Promise.reject(`Document ${did} not found for user ${did}.`);
+      if(!res.rows.length){
+        return Promise.reject(new Exception('IllegalState', `File '${did}' for user '${uid}' does not exist.`));
       }
       const row = res.rows[0];
       return {
@@ -695,19 +695,19 @@ module.exports.getDocumentContent = function(uid, did) {
       resolve(data);
     });
   });
-
 };
 
 module.exports.getDocumentAnalysis = function(uid, did) {
   return promisedQuery('select name, mimetype, analysis from documents where uid = ? and did = ?', [uid, did])
     .then(res => new Promise((resolve,reject) => {
-      if(!res.rows){
-        return reject(new Exception('IllegalState', `Document ${did} not found for user ${uid}.`));
+      if(!res.rows.length){
+        return reject(new Exception('IllegalState', `Document '${did}' not found for user '${uid}'.`));
       }
       const row = res.rows[0];
-      if(!row.analysis){
-        new Exception('IllegalState', `Document ${did} has not yet been analyzed ${uid}.`).log(logger.info);
-        return resolve(null);
+      if(!row.analysis) {
+        const ex = new Exception('IllegalState', `Document '${did}' for user '${uid}' has not yet been analyzed.`);
+        ex.log(logger.info);
+        return reject(ex);
       }
       return resolve(new Analysis().deepAssign(JSON.parse(row.analysis)));
     }));
