@@ -87,7 +87,10 @@ define([
               };
               const data = { before: before, after: after};
               EndPointService.editResource(data);
+              // document.getElementById("cy-network").trigger('tap');
               $mdSidenav('right').close();
+              cy.$(':selected').trigger('tap');
+
               // $scope.selectedEntity = EntityService.updateRootScopeEntity($scope.selectedEntity);
               // // broadcasting the event
               // // $rootScope.$broadcast('appChanged');
