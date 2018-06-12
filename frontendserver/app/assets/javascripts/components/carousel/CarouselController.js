@@ -41,7 +41,7 @@ define([
                 var to = (e.doffset.offsets[0].from + e.doffset.offsets[0].length) - $scope.sentenceFrom;
                 var fragments = text.slice(offset, from).split('\n');
                 var surface = text.substring(from, to);
-                var eId = ($scope.currIndex) + '_' + surface + '_' + from + ':' + to;
+                var eId = ($scope.currIndex) + '_' + surface.replace(/\s/g,'') + '_' + from + ':' + to;
 
                 fragments.forEach(function(f, i) {
                     compiledString = compiledString.concat(f);
@@ -256,14 +256,14 @@ define([
                     });
                   // });
                 } else {
-                  $mdToast.show(
-                        $mdToast.simple()
-                          .textContent('Please select a service path first')
-                          .position('top right')
-                          .theme("warn-toast")
-                          .hideDelay(3500)
-                      );
-                  $mdSidenav('left').toggle();
+                  // $mdToast.show(
+                  //       $mdToast.simple()
+                  //         .textContent('Please select a service path first')
+                  //         .position('top right')
+                  //         .theme("warn-toast")
+                  //         .hideDelay(3500)
+                  //     );
+                  // $mdSidenav('left').toggle();
                 }
 
               // });
@@ -272,7 +272,18 @@ define([
 
           $(document).on('click', '.entityHighlight', function (e) {
               $scope.text = e.target.innerText;
+              var selectedDoc = EndPointService.getSelectedDoc();
               $scope.addEntityFilter($scope.text);
+
+              var splittedId = _.split(e.target.id, '_');
+              var offsets = splittedId[splittedId.length - 1];
+              offsets = _.split(offsets, ':');
+
+              EndPointService.interpretOffset(selectedDoc.did, offsets).then(function(response) {
+                var dataPath = { endpoint: { path: 'annotationNode' }}
+                $rootScope.$broadcast('addEntity', { entity: response.data, data: dataPath });
+                // EntityService.addEntity(response.data);
+              });
               console.log($scope.text);
               e.preventDefault();
           });
@@ -402,12 +413,14 @@ define([
                   }
               }
 
-              //TODO: make it dynamic for 'NamedEntity'
-              entity = $scope.anno.filter(a => (
-                (_.includes($scope.activeTypes, a.type)) &&
-                ((a.doffset.offsets[0].from + a.doffset.offsets[0].length) <= length) &&
-                (a.doffset.offsets[0].from >= from)
-              ));
+              _.forEach($scope.anno, function(a) {
+                a.doffset.offsets[0].from = a.doffset.offsets[0].from ? a.doffset.offsets[0].from : 0;
+                if ((_.includes($scope.activeTypes, a.type)) &&
+                  ((a.doffset.offsets[0].from + a.doffset.offsets[0].length) <= length) &&
+                  (a.doffset.offsets[0].from >= from)) {
+                    entity.push(a);
+                  }
+              });
 
               $scope.addSlide(sentence, entity);
             });
@@ -420,10 +433,10 @@ define([
           // $timeout(function() {
           //   debugger;
           //   $('.carousel-card').each(function() {
-          //     // debugger;
+          //     // debugger;$rootScope.selectedDoc
           //     var next = $(this).next();
           //     if (!next.length) {
-          //       debugger;
+          //       debugger;$rootScope.selectedDoc
           //       next = $(this).siblings(':first');
           //     }
           //     debugger;
@@ -476,7 +489,7 @@ define([
           }
 
 
-          $scope.slidesViewed = [];
+         $scope.slidesViewed = [];
          $scope.slidesRemaining = [];
          //var carouselScope = element.isolateScope();
 
