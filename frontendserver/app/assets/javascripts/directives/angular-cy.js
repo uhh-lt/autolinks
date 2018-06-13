@@ -220,12 +220,12 @@ define([
                       scope.coordinate = {};
                       scope.selectedEntity = {};
 
-                      cy.on('taphold', function(e){
+                      cy.on('taphold', function(e) {
                           eh.enabled = false;
                           scope.coordinate = e.position;
                       });
 
-                      cy.nodes().forEach(function(n){
+                      cy.nodes().forEach(function(n) {
                         if (n.data('image')) {
                           cy.style()
                             .selector('#'+ n.data('id'))
@@ -242,7 +242,7 @@ define([
                         }
                       });
 
-                      cy.nodes().forEach(function(n){
+                      cy.nodes().forEach(function(n) {
                         nodeTipExtension(n);
                       });
 
@@ -255,7 +255,7 @@ define([
                       // });
 
                       // Events collection : mouseover, taphold, tapend, tap
-                      cy.on('tapend', 'node', function(evt){
+                      cy.on('tapend', 'node', function(evt) {
                         var node = evt.target;
                         console.log( 'tapend ' + node.id() );
                         var x = scope.coordinate.x;
@@ -265,22 +265,27 @@ define([
                         // evt.connectedEdges().style( { 'line-color' : 'black' });
                       });
 
-                      cy.on('mouseover', 'node', function(e){
+                      cy.on('mouseover', 'node', function(e) {
                           var sel = e.target;
-                          var label = sel.data("metadata").label;
+                          var label = sel.data('metadata').label;
+                          var name = sel.data('name');
                           // cy.elements().difference(sel.outgoers()).not(sel).addClass('semitransp');
                           sel.addClass('hoverNode').outgoers().addClass('highlight');
                           // cy.elements().difference(sel.incomers()).not(sel).addClass('semitransp');
                           sel.incomers().addClass('highlight');
-
-                          var sameLabelNode = cy.nodes().filter(function( ele ) {
-                            return (ele.data('metadata').label == label);
-                          });
-
-                          sameLabelNode.addClass('sameLabelHighlight');
-
+                          if (label || name) {
+                            var sameLabelNodes = cy.nodes().filter(function( ele ) {
+                              var eleLabel = ele.data('metadata').label;
+                              var eleName = ele.data('name');
+                              return ((eleLabel ? eleLabel : eleName) == (label ? label : name) && ele.visible());
+                            });
+                            if (sameLabelNodes.length > 1) {
+                              sameLabelNodes.addClass('sameLabelHighlight');
+                            }
+                          }
                       });
-                      cy.on('mouseout', 'node', function(e){
+
+                      cy.on('mouseout', 'node', function(e) {
                           var sel = e.target;
                           // cy.elements().removeClass('semitransp');
                           cy.elements().removeClass('hoverNode').removeClass('sameLabelHighlight');
@@ -290,7 +295,7 @@ define([
                           // sel.removeClass('highlight').incomers().removeClass('highlight');
                       });
 
-                      cy.on('tap', 'node', function(e){
+                      cy.on('tap', 'node', function(e) {
                         var sel = e.target;
                         // cy.elements().difference(sel.outgoers()).not(sel).addClass('semitransp');
                         cy.elements().removeClass('selected');
@@ -299,7 +304,7 @@ define([
                           // sel.removeClass('highlight').incomers().removeClass('highlight');
                       });
 
-                      cy.on('tap', 'edge', function(e){
+                      cy.on('tap', 'edge', function(e) {
                         var sel = e.target;
                         // cy.elements().difference(sel.outgoers()).not(sel).addClass('semitransp');
                         cy.elements().removeClass('selected');
@@ -828,6 +833,10 @@ define([
 
                       $rootScope.$on('clearAll', function() {
                           cy.nodes().remove();
+                      });
+
+                      $rootScope.$on('clearSelected', function() {
+                          cy.$(':selected').remove();
                       });
 
                       $rootScope.$on('centerGraph', function() {
