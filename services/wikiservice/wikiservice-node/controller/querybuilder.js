@@ -2,7 +2,7 @@
 
 const
   Exception = require('../../../../broker/model/Exception').model,
-  // Triple = require('../../../../broker/model/Triple').model,
+  Triple = require('../../../../broker/model/Triple').model,
   Resource = require('../../../../broker/model/Resource').model,
   logger = require('../../../../broker/controller/log')(module);
 
@@ -69,10 +69,12 @@ const wikipedia = function(text, offset, limit) {
               "query": text,
               "fields":
                 [
-                  "title.keyword^3",
-                  "redirect.title.keyword^3",
-                  "title.plain^2",
-                  "source_text.plain"
+                  "title.keyword^5",
+                  "redirect.title.keyword^4",
+                  "title.plain^3",
+                  "opening_text.plain^2",
+                  "all",
+                  "all_near_match"
                 ],
               "default_operator": "AND"
             }
@@ -81,7 +83,9 @@ const wikipedia = function(text, offset, limit) {
         [
           "title",
           "category",
-          "redirect"
+          "redirect",
+          "opening_text",
+          "wikibase_item"
         ],
       "from": offset,
       "size": limit
@@ -93,71 +97,29 @@ const wikipedia = function(text, offset, limit) {
  */
 wikipedia.transformHit = function(text, hit, i) {
 
-  const hitresource = new Resource(null, `${hit._index}/${hit._type}/${hit._id}?version=${hit._version}`, null, {
+  const hitresource = new Resource(null, `${hit._index}/${hit._type}/${hit._id}`, null, {
     id: hit._id,
     label: hit._source.title,
     hit: i,
     index: hit._index,
     score: hit._score,
-    link: `http://en.wikipedia.org/?curid=${hit._id}`
+    language: hit._source.language,
+    www: `https://${hit._source.language}.wikipedia.org/?curid=${hit._id}`,
+    wikibase: `https://www.wikidata.org/wiki/${hit._source.wikibase_item}`,
+    description: hit._source.opening_text,
   });
 
-  const redirectResources = []; // h._source.redirect
-  const categoryResources = []; // h._source.category
-  return hitresource;
+  const redirectingResources = hit._source.redirect.map(r =>  Resource.fromValue(r.title));
+  const redirectingTriple = Resource.fromValue(new Triple(redirectingResources, Resource.fromValue('redirects'), hitresource));
 
-// provide a url:
-  // http://en.wikipedia.org/?curid=18630637
-  // This is the shortest form, others are also possible:
-  // http://en.wikipedia.org/wiki?curid=18630637
+  const categoryResources = hit._source.category.map(c => new Resource(null, c, null, {
+    www: `https://${hit._source.language}.wikipedia.org/wiki/category:${encodeURI(c)}`,
+  }));
+  const categoryTriple = Resource.fromValue(new Triple(hitresource, Resource.fromValue('appears in'), categoryResources));
 
-  // // for each hit create a triple
-  // return _(searchResult.hits.hits)
-  //   .map(h =>
-  //     new Resource(null,
-  //       new Triple(
-  //           new Resource(null,text),
-  //           new Resource(null, [
-  //             new Resource(null, new Triple(
-  //                 new Resource(null, "appears_in"),
-  //                 new Resource(null, "has_score"),
-  //                 new Resource(null, h._score)
-  //             )),
-  //             new Resource(null, new Triple(
-  //                 new Resource(null, "appears_in"),
-  //                 new Resource(null, "has_index"),
-  //                 new Resource(null, h._index)
-  //             ))
-  //           ]),
-  //           new Resource(null, [
-  //             new Resource(null, new Triple(
-  //                 new Resource(null, h._id),
-  //                 new Resource(null, "has_title"),
-  //                 new Resource(null, h._source.title)
-  //             ))
-  //             ]
-  //             .concat(
-  //               _(h._source.category).map(c =>
-  //                   new Resource(null, new Triple(
-  //                       new Resource(null, h._id),
-  //                       new Resource(null, "has_category"),
-  //                       new Resource(null, c)
-  //                   ))
-  //               ).value()
-  //             )
-  //             .concat(
-  //               _(h._source.redirect).map(r =>
-  //                   new Triple(
-  //                       h._id,
-  //                       'has_redirect',
-  //                       r.title
-  //                   )
-  //               ).value()
-  //             )
-  //           )
-  //         )
-  //       )
-  //     ).value();
+  const containerResource = Resource.fromValue([redirectingTriple, categoryTriple]);
+
+  return containerResource;
 
 };
 

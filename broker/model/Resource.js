@@ -80,8 +80,8 @@ Resource.prototype.isStringResource = function(){
   return !(this.isListResource() || this.isTripleResource());
 };
 
-Resource.prototype.fromString = function(string) {
+Resource.fromValue = function(value) {
     let r = new Resource();
-    r.value = string;
+    r.value = value;
     return r;
 };
