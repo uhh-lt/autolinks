@@ -70,6 +70,7 @@ const wikipedia = function(text, offset, limit) {
               "fields":
                 [
                   "title.keyword^3",
+                  "redirect.title.keyword^3",
                   "title.plain^2",
                   "source_text.plain"
                 ],
