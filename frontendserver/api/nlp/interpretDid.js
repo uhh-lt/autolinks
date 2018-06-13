@@ -13,7 +13,7 @@ module.exports = function(url, token, data) {
       "offsets": [
         {
           "from": data.offsets ? parseInt(data.offsets[0]) : 0,
-          "length": data.offsets ? parseInt(data.offsets[1]) : 1000000
+          "length": data.offsets ? (parseInt(data.offsets[1]) - parseInt(data.offsets[0])) : 1000000
         }
       ]
     }
