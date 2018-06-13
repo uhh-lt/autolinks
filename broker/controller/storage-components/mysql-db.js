@@ -11,6 +11,7 @@ const
   Analysis = require('../../model/Analysis').model,
   Resource = require('../../model/Resource').model,
   utils = require('../utils/utils'),
+  nlputils = require('../utils/nlp_utils'),
   murmurhashNative = require('murmurhash-native'),
   logger = require('../log')(module);
 
@@ -718,6 +719,20 @@ module.exports.updateDocumentAnalysis = function(uid, did, analysis) {
     .then(_ => true);
 };
 
+module.exports.addAnnotation = function(userid, did, anno){
+  return this.getDocumentAnalysis(userid, did)
+    .then(ana => {
+      ana.annotations.unshift(anno);
+      return ana;
+    })
+    .then(ana => {
+      const anno_text = anno.doffset.getText(ana.text);
+      return this.updateDocumentAnalysis(userid, did, ana).then(_ => anno_text);
+    })
+    .then(anno_text => {
+      return nlputils.getAnnotationResource(userid, did, anno, anno_text);
+    });
+};
 
 module.exports.getStorageKey = function(uid, rids){
   if(!rids){
@@ -832,7 +847,6 @@ module.exports.getSourcesRecursive = function(uid, rids, storagekeys, c){
         .catch(e => Exception.fromError(e).log(logger.warn));
     });
 };
-
 
 module.exports.close = function (callback) {
   pool.end(function (err) {

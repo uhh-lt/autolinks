@@ -8,32 +8,8 @@ const
   NLP = require('../../controller/nlp_wrapper'),
   nlp_utils = require('../../controller/utils/nlp_utils'),
   Exception = require('../../model/Exception').model,
-  Resource = require('../../model/Resource').model,
-  ServiceParameter = require('../../model/ServiceParameter').model,
   DOffset = require('../../model/DOffset').model,
-  logger = require('../../controller/log')(module)
-  ;
-
-
-// /** // TODO: this is to be removed
-//  * analyze text and create an analysis object
-//  *
-//  * @param req
-//  * @param res
-//  * @param next
-//  */
-// module.exports.analyze = function(req, res, next) {
-//   if(!req.swagger.params.data || !req.swagger.params.data.value){
-//     return new Exception('IllegalState', 'Data parameter is missing!').handleResponse(res).end(next);
-//   }
-//   const data = req.swagger.params.data.value;
-//   return NLP.analyze(data.data, data['content-type'], data.source)
-//     .then(
-//       ana => res.json(ana).end(next),
-//       err => Exception.fromError(err, 'Error while processing data.', { data : data } ).handleResponse(res).end(next)
-//     );
-// };
-
+  logger = require('../../controller/log')(module);
 
 module.exports.analyze_doc = function(req, res, next) {
 
@@ -54,29 +30,7 @@ module.exports.analyze_doc = function(req, res, next) {
       );
 
   });
-
 };
-
-
-// TODO: this is to be removed
-// module.exports.interpret = function(req, res, next) {
-//
-//   auth.handle_authenticated_request(req, res, function(user) {
-//     ServiceParameter.fromRequestPromise(req)
-//       .then(serviceParameter => {
-//         const focus = serviceParameter.focus;
-//         const ana = serviceParameter.context;
-//         return nlp_utils.getAnnotationResources(user.id, ana, focus)
-//           .then(resource => {
-//             // this sends back a JSON response
-//             res.header('Content-Type', 'application/json; charset=utf-8');
-//             res.json(resource);
-//             res.end(next);
-//           });
-//       })
-//       .catch(err => Exception.fromError(err).handleResponse(res).end(next));
-//   });
-// };
 
 
 module.exports.interpret_doffset = function(req, res, next) {

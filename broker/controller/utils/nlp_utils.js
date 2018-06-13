@@ -2,12 +2,10 @@
 
 // imports
 const
-  _ = require('lodash'),
   Exception = require('../../model/Exception').model,
   storage = require('../storage_wrapper'),
   Resource = require('../../model/Resource').model,
-  logger = require('../log')(module)
-;
+  logger = require('../log')(module);
 
 module.exports.getAnnotationResourcesDoc = function(uid, did, focus) {
   return storage.promisedGetFile(uid, did, 'analysis')
@@ -24,13 +22,7 @@ module.exports.getAnnotationResources = function(uid, did, analysis, focus){
 
   const annotationResourcePromises = [...overlappingAnnotations].map(anno => {
     const anno_text = anno.doffset.getText(analysis.text);
-    const resource_key = `annotation::${anno.analyzer}:${anno.type}:${did}:${anno.begin()}:${anno.end()}`;
-    const resource_storage_key = resource_key;
-    const raw_annotation_resource = new Resource(null, resource_key, null, {
-      label : anno_text
-    });
-    Object.assign(raw_annotation_resource.metadata, anno.properties);
-    return get_or_add_resource(uid, resource_storage_key, raw_annotation_resource);
+    this.getAnnotationResource(uid, did, anno, anno_text);
   });
 
   return Promise.all(annotationResourcePromises)
@@ -38,6 +30,16 @@ module.exports.getAnnotationResources = function(uid, did, analysis, focus){
       const raw_focus_resource = new Resource(null, annotationResources, null, { label: focustext });
       return get_or_add_resource(uid, focus_storage_key, raw_focus_resource);
     });
+};
+
+module.exports.getAnnotationResource = function(uid, did, anno, text){
+  const resource_key = `annotation::${anno.analyzer}:${anno.type}:${did}:${anno.begin()}:${anno.end()}`;
+  const resource_storage_key = resource_key;
+  const raw_annotation_resource = new Resource(null, resource_key, null, {
+    label : text
+  });
+  Object.assign(raw_annotation_resource.metadata, anno.properties);
+  return get_or_add_resource(uid, resource_storage_key, raw_annotation_resource);
 };
 
 

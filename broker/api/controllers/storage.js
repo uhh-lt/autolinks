@@ -5,6 +5,7 @@ const
   storage = require('../../controller/storage_wrapper'),
   nlp = require('../../controller/nlp_wrapper'),
   Exception = require('../../model/Exception').model,
+  Annotation = require('../../model/Annotation').model,
   logger = require('../../controller/log')(module);
 
 module.exports.info = function(req, res, next) {
@@ -141,6 +142,29 @@ module.exports.document_analysis_update = function(req, res, next) {
     const ana = req.swagger.params.analysis && req.swagger.params.analysis.value;
 
     storage.updateDocumentAnalysis(user.id, did, ana)
+      .then(
+        _ => {
+          res.header('Content-Type', 'text/plain; charset=utf-8');
+          res.end('OK\n', next);
+        },
+        err => Exception.fromError(err).handleResponse(res).end(next)
+      );
+
+  });
+};
+
+module.exports.add_annotation = function(req, res, next){
+  auth.handle_authenticated_request(req, res, function(user){
+
+    if(!req.swagger.params.did.value){
+      return new Exception('IllegalState', 'Document id missing!').handleResponse(res).end(next);
+    }
+
+    const did = req.swagger.params.did.value;
+    const anno = req.swagger.params.data && req.swagger.params.data.value;
+    const anno_obj = new Annotation().deepAssign(anno);
+
+    storage.addAnnotation(user.id, did, anno_obj)
       .then(
         _ => {
           res.header('Content-Type', 'text/plain; charset=utf-8');

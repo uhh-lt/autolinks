@@ -789,6 +789,36 @@ paths:
           schema:
             $ref: "#/definitions/Exception"
 
+  /storage/annotation/{did}:
+    x-swagger-router-controller: storage
+    post:
+      operationId: add_annotation
+      tags:
+        - Storage
+      description: |
+        Add an annotation to the document.
+      parameters:
+      - name: did
+        in: path
+        description: Document id
+        required: true
+        type: integer
+      - name: data
+        in: body
+        schema:
+          $ref: "#/definitions/Annotation"
+      security:
+        - broker_auth: []
+      responses:
+        200:
+          description: A single string with an OK message.
+          schema:
+            type: string
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Exception"
+
   /storage/info:
     x-swagger-router-controller: storage
     get:

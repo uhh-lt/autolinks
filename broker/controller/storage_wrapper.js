@@ -163,7 +163,6 @@ module.exports.updateDocumentAnalysis = function(userid, did, analysis) {
   return explicitStorage.updateDocumentAnalysis(userid, did, analysis);
 };
 
-
 /**
  *
  * @param userid
@@ -174,7 +173,15 @@ module.exports.getSources = function(userid, query) {
   return explicitStorage.getSources(userid, query);
 };
 
-
+/**
+ *
+ * @param userid
+ * @param did
+ * @param anno
+ */
+module.exports.addAnnotation = function(userid, did, anno){
+  return explicitStorage.addAnnotation(userid, did, anno);
+};
 
 /**
  *
@@ -184,3 +191,4 @@ module.exports.getSources = function(userid, query) {
 module.exports.info = function(userid, callback) {
   return explicitStorage.info(userid, callback);
 };
+
