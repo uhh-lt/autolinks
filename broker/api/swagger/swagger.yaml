@@ -270,11 +270,11 @@ paths:
   /service/get/{service}/{path}/{version}/{method}/:
     # tell nodejs where to find the code for this path
     x-swagger-router-controller: services
-    post:
+    get:
       operationId: get_service_data
       tags:
         - Service
-      description: Call a service and get its response
+      description: Get the data that was computed by calling a service
       security:
         - broker_auth: []
       parameters:
@@ -447,64 +447,6 @@ paths:
       responses:
         200:
           description: Success
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/Exception"
-
-  /nlp/analyze:
-    x-swagger-router-controller: nlp
-    post:
-      operationId: analyze
-      tags:
-        - NLP
-      description: Analyze the provided document
-      parameters:
-      - name: data
-        in: body
-        description: |
-          The document object which contains the plain text and some
-          configuration parameters, e.g. the desired language of analyis.
-        schema:
-          type: object
-          properties:
-            data: 
-              type: string
-            content-type:
-              type: string
-            source:
-              type: string
-      responses:
-        200:
-          description: Success
-          schema:
-            $ref: "#/definitions/Analysis"
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/Exception"
-            
-  /nlp/interpret:
-    x-swagger-router-controller: nlp
-    post:
-      operationId: interpret
-      tags:
-        - NLP
-      description: | 
-        Interpret annotations that are in the focus of the data.
-      security:
-        - broker_auth: []
-      parameters:
-        - name: data
-          in: body
-          description: The service parameter
-          schema:
-            $ref: '#/definitions/ServiceParameter'
-      responses:
-        200:
-          description: Success
-          schema:
-            $ref: '#/definitions/Resource'
         default:
           description: Error
           schema:
@@ -837,6 +779,36 @@ paths:
         description: The new analysis object, the old one will be overriden. Set to null if you want to delete the analysis object.
         schema:
           $ref: "#/definitions/Analysis"
+      responses:
+        200:
+          description: A single string with an OK message.
+          schema:
+            type: string
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Exception"
+
+  /storage/annotation/{did}:
+    x-swagger-router-controller: storage
+    post:
+      operationId: add_annotation
+      tags:
+        - Storage
+      description: |
+        Add an annotation to the document.
+      parameters:
+      - name: did
+        in: path
+        description: Document id
+        required: true
+        type: integer
+      - name: data
+        in: body
+        schema:
+          $ref: "#/definitions/Annotation"
+      security:
+        - broker_auth: []
       responses:
         200:
           description: A single string with an OK message.

@@ -126,6 +126,36 @@ module.exports.promisedGetFile = function(userid, did, target) {
  *
  * @param userid
  * @param did
+ * @return {*}
+ */
+module.exports.promisedGetDocumentInfo = function(userid, did) {
+  return explicitStorage.getDocumentInfo(userid, did);
+};
+
+/**
+ *
+ * @param userid
+ * @param did
+ * @return {*}
+ */
+module.exports.promisedGetDocumentContent = function(userid, did) {
+  return explicitStorage.getDocumentContent(userid, did);
+};
+
+/**
+ *
+ * @param userid
+ * @param did
+ * @return {*}
+ */
+module.exports.promisedGetDocumentAnalysis = function(userid, did) {
+  return explicitStorage.getDocumentAnalysis(userid, did);
+};
+
+/**
+ *
+ * @param userid
+ * @param did
  * @param analysis
  * @return {*}
  */
@@ -133,7 +163,25 @@ module.exports.updateDocumentAnalysis = function(userid, did, analysis) {
   return explicitStorage.updateDocumentAnalysis(userid, did, analysis);
 };
 
+/**
+ *
+ * @param userid
+ * @param query
+ * @return [ ]
+ */
+module.exports.getSources = function(userid, query) {
+  return explicitStorage.getSources(userid, query);
+};
 
+/**
+ *
+ * @param userid
+ * @param did
+ * @param anno
+ */
+module.exports.addAnnotation = function(userid, did, anno){
+  return explicitStorage.addAnnotation(userid, did, anno);
+};
 
 /**
  *
@@ -143,3 +191,4 @@ module.exports.updateDocumentAnalysis = function(userid, did, analysis) {
 module.exports.info = function(userid, callback) {
   return explicitStorage.info(userid, callback);
 };
+

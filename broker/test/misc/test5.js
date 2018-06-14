@@ -27,7 +27,7 @@ const annot = ana.getAnnotationsWithinDOffset(new DOffset([ new Offset(0,7) ]));
 const mapped = [...annot].map(a => `${a.type}: [${a.begin()},${a.end()}]`);
 console.log(mapped);
 
-nlp_utils.getAnnotationResources(1, ana, doff).then(r => console.log(JSON.stringify(r, null, 2)));
+nlp_utils.getAnnotationResources(1, 1, ana, doff).then(r => console.log(JSON.stringify(r, null, 2)));
 
 
 

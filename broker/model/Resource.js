@@ -9,6 +9,7 @@ module.exports.model = Resource;
 Resource.prototype.rid = 0;
 Resource.prototype.cid = 0;
 Resource.prototype.metadata = null;
+Resource.prototype.sources = null;
 Resource.prototype.value = null;
 
 /**
@@ -79,8 +80,8 @@ Resource.prototype.isStringResource = function(){
   return !(this.isListResource() || this.isTripleResource());
 };
 
-Resource.prototype.fromString = function(string) {
+Resource.fromValue = function(value) {
     let r = new Resource();
-    r.value = string;
+    r.value = value;
     return r;
 };
