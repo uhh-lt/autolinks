@@ -77,8 +77,7 @@ module.exports.search = function(text) {
       return this.query(esindex, text, 0, 1)
         .then(esresult => this.transformSearchResult(esindex, text, esresult));
     })).then(indexresources => {
-      indexresources.push(new Resource (null, text));
-      return new Resource(null, indexresources);
+      return new Resource(null, indexresources, null, { label : "wikimedia resources" });
     });
 };
 
