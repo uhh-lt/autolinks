@@ -174,6 +174,28 @@ services:
       - ELASTICSEARCH_INDICES=enwiki,wikidata,enwiktionary
   # END: wikiservice
 
+  # BEGIN: demo service
+  cooc:
+    image: remstef/node-swagger:latest
+    volumes:
+      - ${PWD}/services/cooc:/opt/project/services/cooc
+      - ${PWD}/broker:/opt/project/broker
+      - ${PWD}/data:/opt/project/data
+    ports:
+      - 10012:10010
+      - 3012:3001
+    networks:
+      - anet
+    stdin_open: true
+    tty: true
+    working_dir: /opt/project/services/cooc
+    entrypoint: bash
+    environment:
+      - NODE_ENV=development
+      - COOKIE_SECRET=YOUR_COOKIE_SECRET
+      - BROKER_URL=http://broker:10010
+  # END: dummy service
+
   # BEGIN: elasticsearch index
   es:
     image: custom-elasticsearch:5.5.2

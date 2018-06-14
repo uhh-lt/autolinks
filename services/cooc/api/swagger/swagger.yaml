@@ -1,0 +1,222 @@
+##
+#
+# API description of autolinks demo service
+#
+##
+swagger: '2.0'
+info:
+  version: '0.0.1'
+  title: Cooc
+  description: |
+    Autolinks Cooc Service:
+    This service is only here for sentences coocurences of annotations
+
+consumes:
+  - application/json
+produces:
+  - application/json
+
+definitions:
+
+  # helper object to describe strings, arrays, or objects
+  Any:
+    description: 'Can be anything: string, number, array, object, etc.'
+  
+  ServiceParameter:
+    type: object
+    properties:
+      focus:
+        $ref: '#/definitions/DOffset'
+      context:
+        $ref: '#/definitions/Analysis'
+  
+  # NLP related objects
+  Analysis:
+    type: object
+    properties:
+      text:
+        type: string
+      source:
+        type: string
+      lang:
+        type: string
+      annotations:
+        type: array
+        items:
+          $ref: "#/definitions/Annotation"
+  
+  Annotation:
+    type: object
+    properties:
+      type:
+        type: string
+      doffset:
+        $ref: "#/definitions/DOffset"
+      properties:
+        type: object
+      analyzer:
+        type: string
+  
+  # Discontinuous offset, composed of a list of offsets to allow for discontinuous annotations
+  DOffset:
+    type: object
+    properties:
+      offsets:
+        type: array
+        items:
+          $ref: "#/definitions/Offset"
+  
+  Offset:
+    type: object
+    properties:
+      from:
+        type: integer
+      length:
+        type: integer
+  
+  Resource:
+    type: object
+    properties:
+      rid:
+        type: integer
+        description: the id of the resource, set to 0 if unknown
+      cid:
+        type: integer
+        description: the id of the container resource, set to 0 if unknown
+      metadata:
+        type: object
+        description: some metadata the resource, e.g. label
+      value:
+        $ref: '#/definitions/Any'
+  
+  # in case of error return this object schema
+  Exception:
+    type: object
+    properties:
+      type:
+        type: string
+      message:
+        type: string
+      cause:
+        type: string
+      fields:
+        type: object
+
+tags:
+  - name: Cooc
+    description: Everything about the service
+  - name: Maintenance
+    description: Everything about the service maintenance and its connection to the autolinks broker
+
+paths:
+  # here are the endpoints to what the service does
+  /findcoocs:
+    x-swagger-router-controller: cooc
+    post:
+      operationId: find_coocurrences
+      tags:
+        - Cooc
+      description: | 
+        To extract the sentence coocurences of annotations
+      parameters:
+        - name: data
+          in: body
+          description: The service parameter
+          schema:
+            $ref: '#/definitions/ServiceParameter'
+        - name: getkey
+          in: query
+          description: Compute and only return storagekey based on the ServiceParameter
+          type: boolean
+          allowEmptyValue: true
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/Resource'
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Exception"
+
+  # here are service related endpoints
+  /ping:
+    x-swagger-router-controller: maintenance
+    get:
+      operationId: ping
+      tags:
+        - Maintenance
+      summary: check availability
+      description: |
+        returns 'OK' if service is fully available or ERROR if service partly fails
+      consumes: []
+      produces:
+        - text/plain
+      parameters: []
+      responses:
+        200:
+          description: single string with ok message if registered
+          schema:
+            type: string
+            default: 'OK'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Exception'
+
+  /service/registerAtBroker:
+    x-swagger-router-controller: maintenance
+    post:
+      operationId: register_at_broker
+      tags:
+        - Maintenance
+      summary: manually register this service and its endpoints at autolinks broker service
+      description: |
+        returns 'OK' if service was registered
+      produces:
+        - 'text/plain'
+      parameters:
+        - in: body
+          name: data
+          description: object holding the location
+          schema:
+            type: object
+            properties:
+              location:
+                description: where to find the broker
+                type: string
+                default: 'http://BROKER_SERVER:BROKER_PORT/BROKER_BASE_PATH'
+      responses:
+        200:
+          description: single string with ok message if registered
+          schema:
+            type: string
+            default: 'OK'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Exception'
+    get:
+      operationId: register_at_system_broker
+      tags:
+        - Maintenance
+      summary: Manually register this service and its endpoints at the provided autolinks broker service
+      description: |
+        returns 'OK' if service is fully available or ERROR if service partly fails
+      consumes: []
+      produces:
+        - text/plain
+      parameters: []
+      responses:
+        200:
+          description: single string with ok message if registered
+          schema:
+            type: string
+            default: 'OK'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Exception'
+
+  /swagger:
+    x-swagger-pipe: swagger_raw
