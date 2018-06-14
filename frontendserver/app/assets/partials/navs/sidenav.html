@@ -22,6 +22,7 @@
           </div>
           </h1>
        </md-toolbar>
+
        <md-content layout-padding>
          <div ng-if="selectedEntity !== 'createCompound'">
             <img
@@ -29,7 +30,53 @@
               ng-src="{{selectedEntity.data('image') === undefined ? '' : selectedEntity.data('image')}}"
               style="width:200px;"
             />
-            <h4>"metadata" :  {</h4>
+
+            <md-list-item class="main-subheader" ng-click="toggle.metadata = !toggle.metadata">
+              <span flex>Metadata:</span>
+              <i ng-show="!toggle.metadata" class="fa fa-chevron-down" aria-hidden="true"></i>
+              <i ng-show="toggle.metadata" class="fa fa-chevron-right" aria-hidden="true"></i>
+            </md-list-item>
+            <md-divider></md-divider>
+            <div ng-show="toggle.metadata">
+              <!-- <md-list-item ng-if="!types"> Please select a document first</md-list-item> -->
+              <div ng-repeat="key in metadata_keys track by $index">
+                <!-- <p>{{ metadata_keys[$index] }}</p> -->
+                <!-- <md-switch class="md-secondary" ng-model="typ.enabled" ng-change="toggleTypeTo(typ)"></md-switch> -->
+              <div layout="row" layout-xs="column">
+                <div flex>
+                  <!-- <md-input-container> -->
+                    <input
+                       class="metadata-inputs"
+                       ng-readonly="key !== ''"
+                       value="{{ key ? key : '' }}"
+                       style="font-weight: 700"
+                       ng-model-options="{ getterSetter: true, updateOn: 'default' }"
+                     >
+                   </input>
+                 <!-- </md-input-container> -->
+                </div>
+                <div flex>
+                  <!-- <md-input-container> -->
+                    <input
+                       class="metadata-inputs"
+                       ng-model="metadata[key] ? metadata[key] : ''"
+                       md-autofocus
+                       ng-model-options="{ getterSetter: true, updateOn: 'default' }"
+                     >
+                   </input>
+                 <!-- </md-input-container> -->
+                </div>
+                <div flex class="meta-trash">
+                  <a href="" ng-click="deleteMetadata(meta, $index)" class="delete-meta">
+                    <i id="circle-fit" class="fa fa-trash-alt" aria-hidden="true"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+              <md-divider></md-divider>
+            </div>
+
+            <!-- <h4>"metadata" :  {</h4>
             <div layout="row" layout-xs="column" class="metadata-inputs">
               <div flex>
                 key
@@ -81,7 +128,7 @@
                  </input>
                </md-input-container>
               </div>
-            </div>
+            </div> -->
              <!-- <md-input-container>
                <label for="testInput">Label</label>
                <input
@@ -91,7 +138,7 @@
                 >
               </input>
              </md-input-container> -->
-           <h4>}</h4>
+           <!-- <h4>}</h4> -->
            <md-button ng-click="add()" class="md-primary" style="min-width: 50px">
              <i class="fa fa-plus-circle fa-2x"></i>
            </md-button>
@@ -101,6 +148,7 @@
            <md-button ng-click="delete()" class="md-warn">
              Delete
            </md-button>
+
            <md-divider></md-divider>
            <md-list-item class="main-subheader" ng-click="toggle.provenances = !toggle.provenances">
              <span flex>Sources:</span>

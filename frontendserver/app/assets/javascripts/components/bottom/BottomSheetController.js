@@ -8,8 +8,9 @@ define([
      * BottomSheetController
      */
     angular.module('autolinks.bottom', ['ngMaterial'])
-        .controller('BottomSheetController', ['$scope', '$rootScope', 'EndPointService', '$timeout', '$mdBottomSheet', '$mdToast', 'EntityService', '_',
-        function ($scope, $rootScope, EndPointService, $timeout, $mdBottomSheet, $mdToast, EntityService, _) {
+        .controller('BottomSheetController',
+        ['$scope', '$rootScope', 'EndPointService', '$timeout', '$mdBottomSheet', '$mdToast', 'EntityService', '_', '$mdDialog',
+        function ($scope, $rootScope, EndPointService, $timeout, $mdBottomSheet, $mdToast, EntityService, _, $mdDialog) {
 
           $scope.closeChevron = function() {
             $mdBottomSheet.hide();
@@ -43,7 +44,19 @@ define([
                   $rootScope.$emit('layoutReset');
                   break;
                 case 'Clear':
-                  $rootScope.$emit('clearAll');
+                  if (cy.$(':selected').length > 0) {
+                    cy.$(':selected').remove()
+                  } else {
+                    var confirm = $mdDialog.confirm()
+                         .title('clear all nodes ?')
+                         // .targetEvent(doc)
+                         .ok('Yes, clear them!')
+                         .cancel('Cancel');
+
+                    $mdDialog.show(confirm).then(function() {
+                      $rootScope.$emit('clearAll');
+                    });
+                  }
                   break;
                 case 'Add':
                   break;

@@ -136,14 +136,31 @@ define([
               // var isInDoc = isEntityInDoc(selectedDoc, $scope.selectedEntity);
               if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ') && (event.shiftKey)) {
 
-                $('#' + id + '_script-area').html(newScript);
-                $scope.slides[id].scripts = [$sce.trustAsHtml(newScript)];
-                if ($scope.doffsetAnnotation.length === 0) {
-                  $scope.doffsetAnnotation = ent.text;
-                } else {
-                  var doffsetAnno = [' ', ent.text]
-                  $scope.doffsetAnnotation = $scope.doffsetAnnotation.concat(...doffsetAnno);
-                }
+                var confirm = $mdDialog.prompt()
+                   .title('Annotation Type?')
+                   .initialValue('AnatomicalSiteMention')
+                   // .targetEvent(ev)
+                   .required(true)
+                   .ok('Okay!')
+                   .cancel('Cancel');
+
+                 $mdDialog.show(confirm).then(function(result) {
+                   // $scope.status = 'You decided to name your dog ' + result + '.';
+                   $('#' + id + '_script-area').html(newScript);
+                   $scope.slides[id].scripts = [$sce.trustAsHtml(newScript)];
+                   if ($scope.doffsetAnnotation.length === 0) {
+                     $scope.doffsetAnnotation = ent.text;
+                   } else {
+                     var doffsetAnno = [' ', ent.text]
+                     $scope.doffsetAnnotation = $scope.doffsetAnnotation.concat(...doffsetAnno);
+                   }
+                   // Move the node creation inside prompt success
+                   $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation });
+                   $scope.doffsetAnnotation = '';
+                 }, function() {
+                   // $scope.status = 'You didn\'t name your dog.';
+                 });
+
 
                 // $rootScope.$emit('createNode', { name: ent.text });
 
@@ -179,8 +196,8 @@ define([
             // As the user release the Ctrl key, the key is no longer active.
             // So event.ctrlKey is false.
             if (keyName === 'Shift' && ($scope.doffsetAnnotation.length > 0)) {
-              $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation });
-              $scope.doffsetAnnotation = '';
+              // $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation });
+              // $scope.doffsetAnnotation = '';
               // alert('Control key was released');
             }
           }, false);

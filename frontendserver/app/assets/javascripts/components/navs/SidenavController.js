@@ -55,6 +55,7 @@ define([
                 if (metadata) {
                   $scope.metadata = metadata;
                   $scope.metadata_keys = Object.keys($scope.metadata);
+                  debugger;
                 }
                 document.getElementById("propertify").innerHTML = JSON.stringify($scope.selectedEntity._private.data, undefined, 4);
               }
@@ -147,6 +148,10 @@ define([
                // cancel function
               });
 
+          };
+
+          $scope.add = function () {
+            $scope.metadata_keys.push("");
           };
 
           $scope.close = function () {

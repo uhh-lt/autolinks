@@ -46,6 +46,9 @@ define([
            });
          };
 
+         $scope.toggleSearchbar = function() {
+           $rootScope.$emit('toggleSearchbar');
+         };
 
          $scope.uploadFile = function(ev){
            $mdDialog.show({

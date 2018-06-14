@@ -146,8 +146,8 @@ define([
                   style: {
                     'text-valign': 'top',
                     'background-opacity': 0.333,
-                    'background-color': 'rgba(230, 230, 230, 0.64)',
-                    'text-opacity': 0
+                    'background-color': 'rgba(230, 230, 230, 0.64)'
+                    // 'text-opacity': 0
                   }
                 },
                 {

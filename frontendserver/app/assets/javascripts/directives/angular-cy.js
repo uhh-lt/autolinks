@@ -573,7 +573,8 @@ define([
                         if(_.isObject(n[0].value)) {
                           return n[0].value.subject;
                         }
-                        return n[0].value;
+                        // return n[0].value;
+                        return n.value[0];
                       }
 
                       function assignEntity(e, parent, child = false) {

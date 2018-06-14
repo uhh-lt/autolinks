@@ -13,8 +13,8 @@ define([
         // .config(['$mdIconProvider', function($mdIconProvider) {
         //   $mdIconProvider.icon('md-close', 'img/icons/ic_close_24px.svg', 24);
         // }])
-        .controller('InputController', ['$scope', '$mdToast', '$mdSidenav', 'EndPointService', 'EntityService', '_',
-        function ($scope, $mdToast, $mdSidenav, EndPointService, EntityService, _) {
+        .controller('InputController', ['$scope', '$rootScope', '$mdToast', '$mdSidenav', 'EndPointService', 'EntityService', '_',
+        function ($scope, $rootScope, $mdToast, $mdSidenav, EndPointService, EntityService, _) {
 
           /* This contains the JavaScript code for the 'commafield,' which is basically
           a tag input. It just gives visual feedback that inputs were 'registered' when a
@@ -25,6 +25,7 @@ define([
           // == HELPER FUNCTIONS == //
 
           var self = this;
+          $scope.isActive = false;
 
           self.readonly = false;
 
@@ -45,6 +46,10 @@ define([
               resetNetworkFromInput(response);
             });
           }
+
+          $rootScope.$on('toggleSearchbar', function() {
+            $scope.isActive = !$scope.isActive;
+          });
 
           // Reset the network with the content from the input box.
           function resetNetworkFromInput(response) {
