@@ -75,23 +75,30 @@ module.exports.search = function(text) {
   return Promise.all(
     Object.keys(esIndices).map(esindex => {
       return this.query(esindex, text, 0, 1)
-        .then(esresult => this.transformSearchResult(esindex, text, esresult));
+        .then(esresult => this.transformSearchResult(esindex, text, esresult)); // returns a list resource per index
     })).then(indexresources => {
-      return new Resource(null, indexresources, null, { label : "wikimedia resources" });
+      // remove empty list resources indices
+      const filteredIndexresources = indexresources.filter(x => x.value.length > 0);
+      return Resource.fromValue(filteredIndexresources, { label : "wikimedia index resources" });
     });
 };
 
 module.exports.transformSearchResult = function(esindex, text, esresult) {
   return Promise.all(
-    esresult.hits.hits.map((hit, i) => this.transformHit(esindex, text, hit, i+1))
+    esresult.hits.hits.map((hit, i) => this.transformHit(esindex, text, hit, i+1)) // each hit returns a list of resources
   ).then(
-    hitresources => new Resource(null, hitresources, null, { label: esindex, totalhits: esresult.hits.total })
+    hitresources => {
+      // merge sublists
+      const merged = hitresources.reduce( (a, c) => { c.forEach(e => a.push(e)); return a; }, [] );
+      // create resource
+      return Resource.fromValue(merged, {label: `${text} hits in ${esindex}`, totalhits: esresult.hits.total});
+    }
   );
 };
 
 module.exports.transformHit = function(esindex, text, hit, i) {
   return Promise.resolve(hit)
-    .then(hit => esIndices[esindex].transformHit(text, hit, i));
+    .then(hit => esIndices[esindex].transformHit(text, hit, i, esindex));
 };
 
 /**
