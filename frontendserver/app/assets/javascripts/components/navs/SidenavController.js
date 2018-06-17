@@ -19,7 +19,7 @@ define([
               $scope.selectedEntity = EntityService.getRootScopeEntity();
               const entity = $scope.selectedEntity;
               if (entity._private) {
-                const metadata = _.clone(entity._private.data.metadata);
+                const metadata = entity._private.data.metadata;
 
                 EndPointService.getDocuments().then(function(response) {
                   $scope.documents = response.data;
@@ -54,8 +54,8 @@ define([
 
                 if (metadata) {
                   $scope.metadata = metadata;
+                  $scope.metadata_before = _.clone(entity._private.data.metadata);
                   $scope.metadata_keys = Object.keys($scope.metadata);
-                  debugger;
                 }
                 document.getElementById("propertify").innerHTML = JSON.stringify($scope.selectedEntity._private.data, undefined, 4);
               }
@@ -77,13 +77,13 @@ define([
               const before = {
                 "rid": entity.data('rid'),
                 "cid": entity.data('cid'),
-                "metadata": $scope.metadata ? $scope.metadata : {}
+                "metadata": $scope.metadata_before ? $scope.metadata_before : {}
                 // "value": entity.data('name') ? entity.data('name') : {}
               };
               const after = {
                 "rid": entity.data('rid'),
                 "cid": entity.data('cid'),
-                "metadata": entity.data('metadata') ? entity.data('metadata') : {}
+                "metadata": $scope.metadata ? $scope.metadata : {}
                 // "value": entity.data('name') ? entity.data('name') : {}
               };
               const data = { before: before, after: after};
@@ -116,10 +116,16 @@ define([
             }
           }
 
-          $scope.createCompound = function(){
+          $scope.createCompound = function() {
               $rootScope.$emit('createCompound');
               $mdSidenav('right').close();
           };
+
+          $scope.deleteMetadata = function(meta, $index) {
+            var deleted_object = $scope.metadata_keys[$index];
+            delete $scope.metadata[deleted_object];
+            $scope.metadata_keys.splice($index, 1);
+          }
 
           $scope.delete = function(ev) {
               const entity = $scope.selectedEntity;

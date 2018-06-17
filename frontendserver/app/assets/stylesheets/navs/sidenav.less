@@ -1,7 +1,7 @@
 .md-sidenav-right {
   width: 800px;
   .meta-trash {
-    flex: 0.3;
+    flex: 0.1;
     .delete-meta {
       float: right;
       color: red;
@@ -9,8 +9,16 @@
     }
   }
   .metadata-inputs {
+    border: none;
+    border-bottom: 1px solid black;
+    width: 97%;
   	md-input-container {
   		margin: 0;
   	}
+    &:focus {
+      outline: none !important;
+      border: none;
+      border-bottom: 1px solid blue;
+    }
   }
 }
