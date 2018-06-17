@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/uhh-lt/autolinks#readme",
   "dependencies": {
-    "angular": "^1.7.0",
+    "angular": "^1.7.2",
     "body-parser": "^1.18.3",
     "connect-multiparty": "^2.1.0",
     "ejs": "^2.6.1",
