@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var request = require('request');
-var config = require('config.json');
+var config = require('config');
 
 router.get('/', function (req, res) {
     res.render('register');
@@ -10,7 +10,7 @@ router.get('/', function (req, res) {
 router.post('/', function (req, res) {
     // register using api to maintain clean separation between layers
     request.post({
-        url: config.apiUrl + '/user/register',
+        url: config().apiUrl + '/user/register',
         headers: {
            'Content-Type': 'application/json',
            'Accept': 'application/json'

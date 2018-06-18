@@ -1,5 +1,5 @@
 var request = require('request');
-﻿var config = require('config.json');
+﻿var config = require('config');
 var express = require('express');
 var router = express.Router();
 
@@ -14,7 +14,7 @@ router.post('/call', call);
 module.exports = router;
 
 function list(req, res){
-    const options = serviceList(config.apiUrl);
+    const options = serviceList(config().apiUrl);
     request(options, function (error, response, body) {
       res.send(body);
     });
@@ -23,7 +23,7 @@ function list(req, res){
 function get(req, res){
     const token = req.session.token;
     let data = req.body.data;
-    const options = serviceGet(config.apiUrl, token, data);
+    const options = serviceGet(config().apiUrl, token, data);
     request(options, function (error, response, body) {
       res.send(body);
     });
@@ -32,7 +32,7 @@ function get(req, res){
 function call(req, res) {
     const token = req.session.token;
     let data = req.body.data;
-    const options = serviceCall(config.apiUrl, token, data);
+    const options = serviceCall(config().apiUrl, token, data);
     request(options, function (error, response, body) {
       res.send(body);
     });

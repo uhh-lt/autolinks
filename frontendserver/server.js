@@ -6,7 +6,7 @@ const port = process.env.PORT || 9090; 				// set the port
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const expressJwt = require('express-jwt');
-const config = require('config.json');
+const config = require('config');
 const fileUpload = require('express-fileupload');
 
 app.set('view engine', 'ejs');
@@ -15,7 +15,7 @@ app.set('views', __dirname + '/views');
 app.use(bodyParser.urlencoded({'extended': 'true'})); // parse application/x-www-form-urlencoded
 app.use(bodyParser.json()); // parse application/json
 app.use(bodyParser.json({type: 'application/vnd.api+json'})); // parse application/vnd.api+json as json
-app.use(session({ secret: config.secret, resave: false, saveUninitialized: true }));
+app.use(session({ secret: config().secret, resave: false, saveUninitialized: true }));
 
 app.use(fileUpload());
 

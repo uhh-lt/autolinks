@@ -1,5 +1,5 @@
 var request = require('request');
-﻿var config = require('config.json');
+﻿var config = require('config');
 var express = require('express');
 var fs = require('fs');
 
@@ -21,7 +21,7 @@ module.exports = router;
 function editResource(req, res) {
     const token = req.session.token;
     const data = req.body.data;
-    const options = storageEdit(config.apiUrl, token, data);
+    const options = storageEdit(config().apiUrl, token, data);
     request(options, function (error, response, body) {
       res.send(body);
     });
@@ -29,7 +29,7 @@ function editResource(req, res) {
 
 function getDocuments(req, res) {
     const token = req.session.token;
-    const options = documentLists(config.apiUrl, token);
+    const options = documentLists(config().apiUrl, token);
     request(options, function (error, response, body) {
       res.send(body);
     });
@@ -48,7 +48,7 @@ function postDocuments(req, res) {
       if (err)
         return res.status(500).send(err);
 
-      const options = documentUpload(config.apiUrl, token, file, dir, overwrite);
+      const options = documentUpload(config().apiUrl, token, file, dir, overwrite);
       request(options, function (error, response, body) {
         fs.unlinkSync(dir + file.name)
         res.send(body);
@@ -59,7 +59,7 @@ function postDocuments(req, res) {
 function deleteDocument(req, res) {
     const token = req.session.token;
     const docId = req.body.did;
-    const options = documentDelete(config.apiUrl, token, docId);
+    const options = documentDelete(config().apiUrl, token, docId);
     request(options, function (error, response, body) {
       res.send(body);
     });
