@@ -47,7 +47,7 @@
                   <!-- <md-input-container> -->
                     <input
                        class="metadata-inputs"
-                       ng-readonly="key !== ''"
+                       ng-model="key"
                        value="{{ key ? key : '' }}"
                        style="font-weight: 700"
                        ng-model-options="{ getterSetter: true, updateOn: 'default' }"
@@ -59,7 +59,7 @@
                   <!-- <md-input-container> -->
                     <input
                        class="metadata-inputs"
-                       ng-model="metadata[key] ? metadata[key] : ''"
+                       ng-model="metadata[key]"
                        md-autofocus
                        ng-model-options="{ getterSetter: true, updateOn: 'default' }"
                      >

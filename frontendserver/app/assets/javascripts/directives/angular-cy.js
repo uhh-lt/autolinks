@@ -573,6 +573,9 @@ define([
                         if(_.isObject(n[0].value)) {
                           return n[0].value.subject;
                         }
+                        if(_.isArray(n)) {
+                          return n[0];
+                        }
                         // return n[0].value;
                         return n.value[0];
                       }
