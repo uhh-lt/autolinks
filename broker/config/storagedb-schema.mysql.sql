@@ -1,5 +1,5 @@
 -- create and use the database if it doesn't exist
--- CREATE DATABASE IF NOT EXISTS autolinks DEFAULT CHARACTER SET binary;
+-- CREATE DATABASE IF NOT EXISTS autolinks;
 -- USE autolinks;
 
 -- create the tables
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS resources (
 CREATE TABLE IF NOT EXISTS resourceMetadata (
   rid          int unsigned NOT NULL,
   mkey         varchar(64) NOT NULL,
-  mvalue       varchar(512) NOT NULL,
+  mvalue       text NOT NULL,
   PRIMARY KEY (rid, mkey),
   KEY (mkey)
 ) ENGINE=MyISAM;
