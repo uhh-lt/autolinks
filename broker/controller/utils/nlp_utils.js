@@ -22,7 +22,7 @@ module.exports.getAnnotationResources = function(uid, did, analysis, focus){
 
   const annotationResourcePromises = [...overlappingAnnotations].map(anno => {
     const anno_text = anno.doffset.getText(analysis.text);
-    this.getAnnotationResource(uid, did, anno, anno_text);
+    return this.getAnnotationResource(uid, did, anno, anno_text);
   });
 
   return Promise.all(annotationResourcePromises)

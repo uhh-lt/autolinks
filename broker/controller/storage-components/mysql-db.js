@@ -179,6 +179,10 @@ module.exports.promisedWrite = function (userid, storagekey, resourceList) {
 module.exports.saveNewResourceOrValue = function (resourceOrValue, uid, cid) {
   return new Promise((resolve, reject) => {
     let resource = null;
+    if(!resourceOrValue){
+      const ex = new Exception('IllegalState', `Resource value is null! That shouldn't happen!`).log(logger.warn);
+      return reject(ex);
+    }
     if(resourceOrValue.value || resourceOrValue.rid){
       if(resource instanceof Resource){
         resource = resourceOrValue;
@@ -205,7 +209,8 @@ module.exports.saveNewResourceOrValue = function (resourceOrValue, uid, cid) {
       logger.debug('Resource is a string.');
       return resolve(this.saveStringResource(resource, uid));
     }
-    reject(new Error('This is impossible, a resource has to be one of {list,triple,string}.'));
+    const ex = new Exception('IllegalState', 'This is impossible, a resource has to be one of {list,triple,string}.').log(logger.warn);
+    return reject(ex);
   }).then(
     resource => {
       // fill with metadata if it existed before, otherwise save metadata!
@@ -484,8 +489,7 @@ module.exports.getStorageResource = function (userid, storagekey) {
         return this.fillSourcesRecursive(userid, res);
       }
       return null;
-    })
-    ;
+    });
 };
 
 module.exports.deleteResource = function (resource, userid) {
