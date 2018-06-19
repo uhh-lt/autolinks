@@ -495,13 +495,41 @@ module.exports.getStorageResource = function (userid, storagekey) {
 module.exports.deleteResource = function (resource, userid) {
   const r = Resource.asResource(resource);
   if (r.isListResource()) {
-    return promisedQuery('call remove_listResourceFromContainer(?,?)', [resource.rid, resource.cid]);
+    return promisedQuery('call remove_listResourceFromContainer(?,?)', [r.rid, r.cid]);
   }
   if (r.isTripleResource()) {
-    return promisedQuery('call remove_tripleResourceFromContainer(?,?)', [resource.rid, resource.cid]);
+    return promisedQuery('call remove_tripleResourceFromContainer(?,?)', [r.rid, r.cid]);
   }
   // else its a string resource
-  return promisedQuery('call remove_stringResourceFromContainer(?,?)', [resource.rid, resource.cid]);
+  return promisedQuery('call remove_stringResourceFromContainer(?,?)', [r.rid, r.cid])
+    .then(result => {
+      // if it is an annotation resource we also need to delete the annotation from the analysis
+      // TODO: debug me
+      // TODO: also from every other container
+      if(r.value && !r.value.startsWith('annotation:')) {
+        // parse resource value: e.g. annotation::CtakesNLP:AnatomicalSiteMention:1:0:7
+        const match = r.value.match(/::(.+):(.+):(\d+):(\d+):(\d+)/);
+        const analyzer = match[1];
+        const type = match[2];
+        const did = parseInt(match[3]);
+        const begin = parseInt(match[4]);
+        const end = parseInt(match[5]);
+        return this.getDocumentAnalysis(userid, did)
+          .then(ana => {
+            const aindex = ana.annotations.findIndex(x =>
+              x.analyzer === analyzer &&
+              x.type === type &&
+              x.begin() === begin &&
+              x.end() === end
+            );
+            if(aindex < 0){
+              return Promise.reject(new Exception('IllegalArgument', `Annotation ${r.value} not found in document ${did} for user ${userid}.`).log(logger.warn));
+            }
+            return promisedQuery('update documents set analysis = json_remove(analysis, $.annotations[?]) where uid = ? and did = ?', [aindex, userid, did]);
+          });
+      }
+      return Promise.resolve(result);
+    });
 };
 
 module.exports.moveResource = function (rid, cid_before, cid_after) {
