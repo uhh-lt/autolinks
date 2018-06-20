@@ -134,18 +134,17 @@ define([
 
               // var selectedDoc = $scope.tabs.find((t) => { return t.id === doc.id; });
               // var isInDoc = isEntityInDoc(selectedDoc, $scope.selectedEntity);
-              if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ') && (event.shiftKey)) {
+              if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ')) {
 
-                var confirm = $mdDialog.prompt()
-                   .title('Annotation Type?')
-                   .initialValue('AnatomicalSiteMention')
-                   // .targetEvent(ev)
-                   .required(true)
-                   .ok('Okay!')
-                   .cancel('Cancel');
-
-                 $mdDialog.show(confirm).then(function(result) {
-                   // $scope.status = 'You decided to name your dog ' + result + '.';
+                $mdDialog.show({
+                   templateUrl: '/app/assets/partials/dialog/newAnnotation.html',
+                   parent: angular.element(document.body),
+                   // targetEvent: ev,
+                   clickOutsideToClose:true,
+                   fullscreen: $scope.customFullscreen // Only for -xs, -sm breakpoints.
+                 })
+                 .then(function(answer) {
+                   // $scope.status = 'You said the information was "' + answer + '".';
                    $('#' + id + '_script-area').html(newScript);
                    $scope.slides[id].scripts = [$sce.trustAsHtml(newScript)];
                    if ($scope.doffsetAnnotation.length === 0) {
@@ -158,10 +157,36 @@ define([
                    $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation });
                    $scope.doffsetAnnotation = '';
                  }, function() {
-                   // $scope.status = 'You didn\'t name your dog.';
+                   $scope.status = 'You cancelled the dialog.';
                  });
+                //
+                // var confirm = $mdDialog.prompt()
+                //    .title('Annotation Type?')
+                //    .initialValue('AnatomicalSiteMention')
+                //    // .targetEvent(ev)
+                //    .required(true)
+                //    .ok('Okay!')
+                //    .cancel('Cancel');
+                //
+                //  $mdDialog.show(confirm).then(function(result) {
+                //    // $scope.status = 'You decided to name your dog ' + result + '.';
+                //    $('#' + id + '_script-area').html(newScript);
+                //    $scope.slides[id].scripts = [$sce.trustAsHtml(newScript)];
+                //    if ($scope.doffsetAnnotation.length === 0) {
+                //      $scope.doffsetAnnotation = ent.text;
+                //    } else {
+                //      var doffsetAnno = [' ', ent.text]
+                //      $scope.doffsetAnnotation = $scope.doffsetAnnotation.concat(...doffsetAnno);
+                //    }
+                //    // Move the node creation inside prompt success
+                //    $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation });
+                //    $scope.doffsetAnnotation = '';
+                //  }, function() {
+                //    // $scope.status = 'You didn\'t name your dog.';
+                //  });
 
 
+                 /////////////////7
                 // $rootScope.$emit('createNode', { name: ent.text });
 
               //   // $scope.isEntityInDoc = false;
@@ -408,6 +433,7 @@ define([
             });
 
             $rootScope.$emit('addTypes', types);
+            $rootScope.newAnnotationTypes = types;
             // $scope.entity = anno.filter(a => a.type ==='NamedEntity')
             // $scope.pages = sentences.length;
             _.forEach(sentences, function(sentence){
