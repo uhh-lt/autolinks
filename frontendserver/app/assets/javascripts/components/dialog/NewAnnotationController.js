@@ -31,7 +31,8 @@ define([
 
           $scope.ok = function () {
             // this.$resolve.parentScope.whitelist(selectedEntity, $scope.selectedType, doc);
-            this.modalClose();
+            $mdDialog.hide();
+            //this.modalClose();
           };
 
           $scope.cancel = function () {
@@ -41,8 +42,8 @@ define([
           };
 
           $scope.modalClose = function() {
-            this.$resolve.parentScope.isKeyword = false;
-            this.$close();
+            //this.$resolve.parentScope.isKeyword = false;
+            $mdDialog.cancel();
           };
 
         }

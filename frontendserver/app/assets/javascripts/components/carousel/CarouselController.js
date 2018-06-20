@@ -108,7 +108,7 @@ define([
           function createNeHighlight(id, name) {
               // var color = graphProperties.options['groups'][typeId]['color']['background'];
               var color = 'blue';
-              var addFilter = '<a id='+ id +' ng-click="addEntityFilter(' + id +')" context-menu="contextMenu" style="text-decoration: none; cursor: pointer" class="entityHighlight">' + name + '</a>';
+              var addFilter = '<a id='+ id.replace(/\s/g,'') +' ng-click="addEntityFilter(' + id.replace(/\s/g,'') +')" context-menu="contextMenu" style="text-decoration: none; cursor: pointer" class="entityHighlight">' + name + '</a>';
               var innerElement = '<span style="padding: 0; margin: 0; text-decoration: none; border-bottom: 3px solid ' + color + ';">' + addFilter + '</span>';
               // innerElement.className = 'highlight-general';
               // addFilter.append(document.createTextNode(name));
@@ -125,7 +125,10 @@ define([
           // Enable to select Entity and activate whitelisting modal
           $scope.showSelectedEntity = function(text, script, id) {
               script = script.toString();
-              $scope.selectedEntity =  $scope.getSelectionEntity(script);
+
+              $scope.annotation_text_script = $scope.getSelectionEntity(text[0], script);
+              $scope.selectedEntity = $scope.annotation_text_script.annotationSlideScript;
+
               var ent = $scope.selectedEntity;
               var eId = ($scope.currIndex) + '_' + ent.text + '_' + ent.start + ':' + ent.end;
               var highlightElement = createNeHighlight(eId, ent.text);
@@ -159,6 +162,7 @@ define([
                  }, function() {
                    $scope.status = 'You cancelled the dialog.';
                  });
+
                 //
                 // var confirm = $mdDialog.prompt()
                 //    .title('Annotation Type?')
@@ -229,29 +233,39 @@ define([
 
           $scope.selectedType = '';
             var script = $scope.tabs;
-            $scope.getSelectionEntity = function(script) {
+            $scope.getSelectionEntity = function(slideText, slideScript) {
               var text = "";
               var start = 0;
               var end = 0;
+
               if (window.getSelection) {
                  text = window.getSelection().toString();
-                 start = script.match(text).index;
-                 end = start + text.length;
+                 if (text.length > 0) {
+                   text = text.trim();
+                   start = slideScript.match(text).index;
+                   end = start + text.length;
+                   var annotations = [];
 
-                // TODO: global exec RegExp
-                //  var regexScript = RegExp('the', 'g');
-                //  var iter;
-                //  while ((iter = regex1.exec(script)) !== null) {
-                //     console.log(`Found ${iter.index}. Next starts at ${regexScript.lastIndex}.`);
-                //   }
+                   var regexScript = RegExp(text, 'g');
+                   var iter;
+                   while ((iter = regexScript.exec(slideScript)) !== null) {
+                      annotations.push({text, start: iter.index, end: regexScript.lastIndex});
+                    }
+
+                    var annotationSlideScript = {
+                      text,
+                      start,
+                      end,
+                      annotations
+                    }
+                 }
+
               } else if (document.selection && document.selection.type != "Shift") {
                  text = document.selection.createRange().text;
               }
               text = text.trim();
               return {
-                text,
-                start,
-                end
+                annotationSlideScript
               };
             };
 
