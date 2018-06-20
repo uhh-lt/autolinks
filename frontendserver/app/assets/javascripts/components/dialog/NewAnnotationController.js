@@ -12,7 +12,7 @@ define([
         .controller('NewAnnotationController', ['$window', '$scope', '$rootScope', '$mdDialog', '$q', 'EndPointService', '$mdToast', '$timeout',
         function ($window, $scope, $rootScope, $mdDialog, $q, EndPointService, $mdToast, $timeout) {
 
-          $scope.newEntity = $rootScope.annotationSlideText;
+          $scope.newAnnotation = $rootScope.annotationSlideText;
           $scope.entityTypes = $rootScope.newAnnotationTypes;
           $scope.selectedType = '';
           // $scope.isEntityInDoc = $scope.$resolve.parentScope.isEntityInDoc;
@@ -31,6 +31,9 @@ define([
 
           $scope.ok = function () {
             // this.$resolve.parentScope.whitelist(selectedEntity, $scope.selectedType, doc);
+            var selectedDoc = EndPointService.getSelectedDoc();
+            var type = $scope.selectedType.replace(/\s/g,'');
+            EndPointService.annotationDid({did: selectedDoc.did, type, newAnnotations: $scope.newAnnotation});
             $mdDialog.hide();
             //this.modalClose();
           };

@@ -6,6 +6,7 @@ var fs = require('fs');
 var storageEdit = require('./editResource');
 var documentLists = require('./getDocuments');
 var documentUpload = require('./postDocuments');
+var annotationDid = require('./annotationDid');
 var documentDelete = require('./deleteDocument');
 
 var router = express.Router();
@@ -14,6 +15,7 @@ var dir = './uploads/';
 router.post('/editResource', editResource);
 router.get('/getDocuments', getDocuments);
 router.post('/postDocuments', postDocuments);
+router.post('/postAnnotationDid', postAnnotationDid);
 router.post('/deleteDocument', deleteDocument);
 
 module.exports = router;
@@ -33,6 +35,20 @@ function getDocuments(req, res) {
     request(options, function (error, response, body) {
       res.send(body);
     });
+}
+
+function postAnnotationDid(req, res) {
+    const token = req.session.token;
+    const username = req.session.username;
+    const data = req.body.data;
+    const annotations = data.newAnnotations.annotations;
+
+    for (anno in annotations) {
+      const options = annotationDid(config().apiUrl, data, token, username, annotations[anno]);
+      request(options, function (error, response, body) {
+        res.send(body);
+      });
+    }
 }
 
 function postDocuments(req, res) {
