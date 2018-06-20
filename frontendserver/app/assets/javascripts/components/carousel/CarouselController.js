@@ -128,6 +128,7 @@ define([
 
               $scope.annotation_text_script = $scope.getSelectionEntity(text[0], script);
               $scope.selectedEntity = $scope.annotation_text_script.annotationSlideScript;
+              $rootScope.annotationSlideText = $scope.annotation_text_script.annotationSlideText;
 
               var ent = $scope.selectedEntity;
               var eId = ($scope.currIndex) + '_' + ent.text + '_' + ent.start + ':' + ent.end;
@@ -235,29 +236,55 @@ define([
             var script = $scope.tabs;
             $scope.getSelectionEntity = function(slideText, slideScript) {
               var text = "";
-              var start = 0;
-              var end = 0;
 
               if (window.getSelection) {
                  text = window.getSelection().toString();
                  if (text.length > 0) {
-                   text = text.trim();
-                   start = slideScript.match(text).index;
-                   end = start + text.length;
-                   var annotations = [];
 
-                   var regexScript = RegExp(text, 'g');
-                   var iter;
-                   while ((iter = regexScript.exec(slideScript)) !== null) {
-                      annotations.push({text, start: iter.index, end: regexScript.lastIndex});
-                    }
+                   if (slideScript) {
+                     var start = 0;
+                     var end = 0;
+                     text = text.trim();
+                     start = slideScript.match(text).index;
+                     end = start + text.length;
+                     var annotations = [];
 
-                    var annotationSlideScript = {
-                      text,
-                      start,
-                      end,
-                      annotations
-                    }
+                     var regexScript = RegExp(text, 'g');
+                     var iter;
+                     while ((iter = regexScript.exec(slideScript)) !== null) {
+                        annotations.push({text, start: iter.index, end: regexScript.lastIndex});
+                      }
+
+                      var annotationSlideScript = {
+                        text,
+                        start,
+                        end,
+                        annotations
+                      }
+                   }
+
+                   if (slideText) {
+                     var start = 0;
+                     var end = 0;
+                     text = text.trim();
+                     start = slideText.match(text).index;
+                     end = start + text.length;
+                     var annotations = [];
+
+                     var regexScript = RegExp(text, 'g');
+                     var iter;
+                     while ((iter = regexScript.exec(slideText)) !== null) {
+                        annotations.push({text, start: iter.index, end: regexScript.lastIndex});
+                      }
+
+                      var annotationSlideText = {
+                        text,
+                        start,
+                        end,
+                        annotations
+                      }
+                   }
+
                  }
 
               } else if (document.selection && document.selection.type != "Shift") {
@@ -265,6 +292,7 @@ define([
               }
               text = text.trim();
               return {
+                annotationSlideText,
                 annotationSlideScript
               };
             };

@@ -1,7 +1,7 @@
 <md-dialog ng-controller="NewAnnotationController">
   <md-toolbar class="modal-header" ng-hide="isEntityInDoc" ng-model="isEntityInDoc">
-      <h3 class="modal-title" id="modal-title">Add {{isKeyword ? 'keyword' : 'entity'}}:
-        <span ng-bind="entityName" class="selected-entity"></span>
+      <h3 class="modal-title" id="modal-title">Add:
+        <span ng-bind="newEntity.text" class="selected-entity"></span>
       </h3>
   </md-toolbar>
   <md-toolbar class="modal-header md-warn" ng-show="isEntityInDoc" ng-model="isEntityInDoc">

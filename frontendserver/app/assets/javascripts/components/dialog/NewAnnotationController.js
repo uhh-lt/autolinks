@@ -12,7 +12,7 @@ define([
         .controller('NewAnnotationController', ['$window', '$scope', '$rootScope', '$mdDialog', '$q', 'EndPointService', '$mdToast', '$timeout',
         function ($window, $scope, $rootScope, $mdDialog, $q, EndPointService, $mdToast, $timeout) {
 
-          // $scope.entityName = selectedEntity.text
+          $scope.newEntity = $rootScope.annotationSlideText;
           $scope.entityTypes = $rootScope.newAnnotationTypes;
           $scope.selectedType = '';
           // $scope.isEntityInDoc = $scope.$resolve.parentScope.isEntityInDoc;
