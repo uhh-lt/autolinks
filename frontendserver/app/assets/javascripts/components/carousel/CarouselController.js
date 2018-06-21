@@ -77,7 +77,9 @@ define([
               texts:[text],
               scripts: [$sce.trustAsHtml(compiledString)],
               id: $scope.currIndex,
-              entity: entity
+              entity: entity,
+              start: $scope.sentenceFrom,
+              end: $scope.sentenceTo
             });
 
             $scope.currIndex++;
@@ -273,8 +275,10 @@ define([
 
                      var regexScript = RegExp(text, 'g');
                      var iter;
+                     var selectedSentence = _.filter($scope.slides, function(slide){ return slide.id === $scope.active});
+                     var sentenceStart = selectedSentence[0].start;
                      while ((iter = regexScript.exec(slideText)) !== null) {
-                        annotations.push({text, start: iter.index, end: regexScript.lastIndex});
+                        annotations.push({text, start: sentenceStart + iter.index, end: sentenceStart + regexScript.lastIndex});
                       }
 
                       var annotationSlideText = {
