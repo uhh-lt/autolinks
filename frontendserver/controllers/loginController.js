@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var request = require('request');
-var config = require('config.json');
+var config = require('config');
 
 router.get('/', function (req, res) {
     // log user out
@@ -17,7 +17,7 @@ router.get('/', function (req, res) {
 
 router.post('/', function (req, res) {
     // authenticate using api to maintain clean separation between layers
-    const conf_url = config.apiUrl.replace('http://', '');
+    const conf_url = config().apiUrl.replace('http://', '');
     const url = 'http://' + req.body.username + ':' + req.body.password + '@' + conf_url + '/user/info';
     request.get({
         url: url,

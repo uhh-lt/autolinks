@@ -50,7 +50,7 @@ define([
            $rootScope.$emit('toggleSearchbar');
          };
 
-         $scope.uploadFile = function(ev){
+         $scope.uploadFile = function(ev) {
            $mdDialog.show({
               templateUrl: '/app/assets/partials/dialog/uploadFile.html',
               parent: angular.element(document.body),

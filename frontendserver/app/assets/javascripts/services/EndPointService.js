@@ -92,6 +92,12 @@ define([
                 });
               },
 
+              annotationDid: function(annotations) {
+                return $http.post('/api/storage/postAnnotationDid', { data: annotations }).then(function(response) {
+                  return response;
+                });
+              },
+
               editResource: function(data) {
                 return $http.post('/api/storage/editResource', { data }).then(function(response) {
                   return response;

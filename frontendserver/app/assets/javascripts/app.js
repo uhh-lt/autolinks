@@ -2,6 +2,7 @@ define([
     'angular',
     './components/bottom/BottomSheetController',
     './components/carousel/CarouselController',
+      './components/dialog/NewAnnotationController',
     './components/dialog/UploadFileController',
     './components/navs/CirclenavController',
     './components/navs/SidenavController',
@@ -25,7 +26,7 @@ define([
 
     var app = angular.module('autolinks', [
             'ui.layout', 'ui.router', 'ui.bootstrap', 'lodash', 'autolinks.graphConfig', 'autolinks.bottom', 'autolinks.upload', 'autolinks.carousel', 'autolinks.graph',
-            'autolinks.input', 'autolinks.viewer', 'ngMaterial', 'ngTouch', 'autolinks.entityservice', 'autolinks.circlenav', 'autolinks.sidenav',
+            'autolinks.input', 'autolinks.viewer', 'ngMaterial', 'ngTouch', 'autolinks.entityservice', 'autolinks.circlenav', 'autolinks.sidenav', 'autolinks.annotation',
             'autolinks.mainnav', 'autolinks.endpointservice'
           ]);
 
