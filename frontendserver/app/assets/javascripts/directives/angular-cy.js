@@ -267,7 +267,7 @@ define([
 
                       cy.on('mouseover', 'node', function(e) {
                           var sel = e.target;
-                          var label = sel.data('metadata').label ? sel.data('metadata').label : null;
+                          var label = (sel.data('metadata') && sel.data('metadata').label) ? sel.data('metadata').label : null;
                           var name = sel.data('name');
                           // cy.elements().difference(sel.outgoers()).not(sel).addClass('semitransp');
                           sel.addClass('hoverNode').outgoers().addClass('highlight');
@@ -275,7 +275,7 @@ define([
                           sel.incomers().addClass('highlight');
                           if (label || name) {
                             var sameLabelNodes = cy.nodes().filter(function( ele ) {
-                              var eleLabel = ele.data('metadata').label ? ele.data('metadata').label: null ;
+                              var eleLabel = (ele.data('metadata') && ele.data('metadata').label) ? ele.data('metadata').label: null ;
                               var eleName = ele.data('name');
                               return ((eleLabel ? eleLabel : eleName) == (label ? label : name) && ele.visible());
                             });
