@@ -36,6 +36,8 @@ define([
             var offset = 0;
             var compiledString = "";
 
+            entity = _.orderBy(entity, ['doffset.offsets[0].from'], ['asc']); //ordering entities to fix fragment bug
+
             entity.forEach(function(e) {
                 var from = e.doffset.offsets[0].from - $scope.sentenceFrom;
                 var to = (e.doffset.offsets[0].from + e.doffset.offsets[0].length) - $scope.sentenceFrom;
