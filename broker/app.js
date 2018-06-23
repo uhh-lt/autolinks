@@ -8,7 +8,8 @@ require('events').EventEmitter.defaultMaxListeners = 100; // prevent: (node:24) 
 /* imports */
 const
   SwaggerExpress = require('swagger-express-mw'),
-  app = require('express')(),
+  express = require('express'),
+  app = express(),
   swaggerUi = require('swagger-ui-express'),
   yaml = require('yamljs'),
   nodeCleanup = require('node-cleanup'),
@@ -95,6 +96,16 @@ SwaggerExpress.create(config, function(err, swaggerExpress) {
 app.get('/', function(req, res){
   res.redirect('api-docs');
 });
+
+// start admin UI
+require('./app/watchify-app');
+// serve static
+app.use('/admin', express.static(__dirname + '/app/public'));
+// serve dynamic content
+// app.get('/test', function(req, res, next) {
+//   res.end(next);
+// });
+
 
 // cleanup stuff at the end
 nodeCleanup(function (exitCode, signal) {

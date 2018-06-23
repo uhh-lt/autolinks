@@ -25,14 +25,20 @@
     "swagger-express-mw": "^0.1.0",
     "swagger-ui-express": "^2.0.10",
     "winston": "^2.4.0",
-    "yamljs": "^0.3.0"
+    "yamljs": "^0.3.0",
+    "jquery": "^3.3.1"
   },
   "devDependencies": {
+    "browserify": "^15.2.0",
+    "hbs": "^4.0.1",
+    "watchify": "^3.9.0",
     "should": "^7.1.0",
     "supertest": "^1.0.0"
   },
   "scripts": {
     "start": "node app.js",
-    "test": "swagger project test"
+    "test": "swagger project test",
+    "browserify": "echo 'bundling app' && browserify ./app/browser/main.js -o ./app/public/javascripts/bundle.js",
+    "watchify": "echo 'continuously bundling app' && watchify ./app/browser/main.js -o ./app/public/javascripts/bundle.js"
   }
 }
