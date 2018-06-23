@@ -40,5 +40,8 @@
     "test": "swagger project test",
     "browserify": "echo 'bundling app' && browserify ./app/browser/main.js -o ./app/public/javascripts/bundle.js",
     "watchify": "echo 'continuously bundling app' && watchify ./app/browser/main.js -o ./app/public/javascripts/bundle.js"
+  },
+  "nodemonConfig": {
+    "ignore": [ "app/*", "app/public/javascripts/*" ]
   }
 }

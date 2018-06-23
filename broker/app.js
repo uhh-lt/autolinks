@@ -57,6 +57,17 @@ nlp.init(function(err){
 auth.init(app);
 
 /*
+ * init admin UI
+ */
+require('./app/browserify');
+// serve static
+app.use('/admin', express.static(__dirname + '/app/public'));
+// serve dynamic content
+// app.get('/test', function(req, res, next) {
+//   res.end(next);
+// });
+
+/*
  * swagger variables
  */
 const swaggerDocument = yaml.load('api/swagger/swagger.yaml');
@@ -96,16 +107,6 @@ SwaggerExpress.create(config, function(err, swaggerExpress) {
 app.get('/', function(req, res){
   res.redirect('api-docs');
 });
-
-// start admin UI
-require('./app/watchify-app');
-// serve static
-app.use('/admin', express.static(__dirname + '/app/public'));
-// serve dynamic content
-// app.get('/test', function(req, res, next) {
-//   res.end(next);
-// });
-
 
 // cleanup stuff at the end
 nodeCleanup(function (exitCode, signal) {
