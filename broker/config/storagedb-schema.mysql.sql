@@ -386,7 +386,6 @@ BEGIN
   end if;
 END //
 
-
 create procedure get_parent_resources( IN uid_ int unsigned, IN rid_ int unsigned)
 READS SQL DATA
 BEGIN
@@ -396,6 +395,5 @@ BEGIN
     select rid from userTripleResources where uid = uid_ and ( subj = rid_ or obj = rid_ or pred = rid_ )
   ) _;
 END //
-
 
 DELIMITER ;
