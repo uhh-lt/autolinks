@@ -150,6 +150,8 @@ drop procedure if exists edit_resourceContainer;
 
 drop procedure if exists search_resource;
 
+drop procedure if exists get_parent_resources;
+
 DELIMITER //
 
 create procedure reset_database( )
