@@ -626,7 +626,13 @@ define([
                         let o = n.value.object;
 
                         if (_.isArray(s.value)) {
-                          var es = extractList(s.value);
+                          var es = "";
+                          if (s.value.length > 0) {
+                            es = extractList(s.value);
+                          } else {
+                            s.value = "";
+                            es = o;
+                          }
                           var subject = assignEntity(es, parent);
                         } else if (_.isObject(s.value)) {
                           var es = extractResource(s);
@@ -636,7 +642,13 @@ define([
                         }
 
                         if (_.isArray(o.value)) {
-                          var eo = extractList(o.value);
+                          var eo = "";
+                          if (o.value.length > 0) {
+                            eo = extractList(o.value);
+                          } else {
+                            o.value = "";
+                            eo = o;
+                          }
                           var object = assignEntity(eo, parent);
                         } else if (_.isObject(o.value)) {
                           var eo = extractResource(o);
@@ -646,7 +658,13 @@ define([
                         }
 
                         if (_.isArray(p.value)) {
-                          var ep = extractList(p.value);
+                          var ep = "";
+                          if (p.value.length > 0) {
+                            ep = extractList(p.value);
+                          } else {
+                            p.value = "";
+                            ep = o;
+                          }
                           var edge = assignRelation(ep, subject, object);
                         } else if (_.isObject(p.value)) {
                           var ep = extractResource(p);
