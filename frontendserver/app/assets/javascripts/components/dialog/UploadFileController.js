@@ -27,7 +27,7 @@ define([
                   url: '/api/storage/postDocuments', //webAPI exposed to upload the file
                   data:{ docFile: file, overwrite } //pass file as data, should be user ng-model
               }).then(function (resp) { //upload function returns a promise
-                  if(resp.status === 200) { //validate success
+                  if(resp.status === 200 && resp.data.did) { //validate success
                     $mdToast.show(
                           $mdToast.simple()
                             .textContent('Document ' + resp.data.name + ' with did: ' + resp.data.did + ' is uploaded!')
@@ -35,12 +35,21 @@ define([
                             .theme("primary-toast")
                             .hideDelay(3500)
                         );
-                     $rootScope.$emit('addDocument', resp.data);
+                     if (resp.config.data.overwrite !== "true") {
+                       $rootScope.$emit('addDocument', resp.data);
+                     }
                      EndPointService.setSelectedDoc(resp.data);
                       // $window.alert('Success ' + resp.data.name + 'with did: ' + resp.data.did + ' uploaded');
                      EndPointService.interpretDoc(resp.data.did);
                   } else {
-                      $window.alert('an error occured');
+                      // $window.alert(resp.data.message);
+                    $mdToast.show(
+                          $mdToast.simple()
+                            .textContent(resp.data.message)
+                            .position('top right')
+                            .theme("warn-toast")
+                            .hideDelay(4500)
+                        );
                   }
                   // var file = $('#docFile');
                   //
@@ -67,12 +76,19 @@ define([
                   // }
                   $mdDialog.hide();
               }, function (resp) { //catch error
-                  // console.log('Error status: ' + resp.status);
-                  // $window.alert('Error status: ' + resp.status);
+                  console.log('Error status: ' + resp.data.message);
+                  // $window.alert('Error status: ' + resp.data.message);
+                  $mdToast.show(
+                        $mdToast.simple()
+                          .textContent(resp.data.message)
+                          .position('top right')
+                          .theme("warn-toast")
+                          .hideDelay(4500)
+                      );
               }, function (evt) {
                   console.log(evt);
-                  // var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
-                  // console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
+                  //var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
+                  //console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
                   // vm.progress = 'progress: ' + progressPercentage + '% '; // capture upload progress
               });
           };
