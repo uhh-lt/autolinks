@@ -8,7 +8,8 @@ require('events').EventEmitter.defaultMaxListeners = 100; // prevent: (node:24) 
 /* imports */
 const
   SwaggerExpress = require('swagger-express-mw'),
-  app = require('express')(),
+  express = require('express'),
+  app = express(),
   swaggerUi = require('swagger-ui-express'),
   yaml = require('yamljs'),
   nodeCleanup = require('node-cleanup'),
@@ -54,6 +55,17 @@ nlp.init(function(err){
  * init authentication
  */
 auth.init(app);
+
+/*
+ * init admin UI
+ */
+require('./app/browserify');
+// serve static
+app.use('/admin', express.static(__dirname + '/app/public'));
+// serve dynamic content
+// app.get('/test', function(req, res, next) {
+//   res.end(next);
+// });
 
 /*
  * swagger variables

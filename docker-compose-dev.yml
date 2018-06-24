@@ -42,7 +42,7 @@ services:
 
   # BEGIN: broker
   broker:
-    image: remstef/node-swagger:latest
+    image: remstef/node-swagger:10.5
     volumes:
       - ${PWD}/broker:/opt/project/broker
       - ${PWD}/data:/opt/project/data
@@ -57,6 +57,7 @@ services:
     entrypoint: bash
     environment:
       - NODE_ENV=development
+      - WATCHIFYAPP=TRUE
       - COOKIE_SECRET=YOUR_COOKIE_SECRET
       - STORAGE=mysql
       - NLP=stupid
@@ -66,33 +67,9 @@ services:
       - LOGLEVEL=debug
   # END: broker
 
-  # BEGIN: minimal frontend
-  uimin:
-    image: remstef/node-swagger:latest
-    volumes:
-      - ${PWD}/uimin:/opt/project/uimin
-      - ${PWD}/broker:/opt/project/broker
-      - ${PWD}/data:/opt/project/data
-    ports:
-      - 10001:10010
-      - 3001:3001
-    networks:
-      - anet
-    stdin_open: true
-    tty: true
-    working_dir: /opt/project/uimin
-    entrypoint: bash
-    environment:
-      - NODE_ENV=development
-      - COOKIE_SECRET=YOUR_COOKIE_SECRET
-      #- BROKER_URL=http://broker:10010
-      - BROKER_URL=http://ltdemos.informatik.uni-hamburg.de:8093
-      - LOGLEVEL=debug
-  # END: minimal frontend
-
   # BEGIN: mysql
   mysql:
-    image: "mysql:5.7"
+    image: mysql:5.7
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=yes
       - MYSQL_DATABASE=autolinks
@@ -126,7 +103,7 @@ services:
   ##
   # BEGIN: demo service
   demo:
-    image: remstef/node-swagger:latest
+    image: remstef/node-swagger:10.5
     volumes:
       - ${PWD}/services/demo:/opt/project/services/demo
       - ${PWD}/broker:/opt/project/broker
@@ -148,7 +125,7 @@ services:
 
   # BEGIN: wikiservice
   wiki:
-    image: remstef/node-swagger:latest
+    image: remstef/node-swagger:10.5
     volumes:
       - ${PWD}/services/wikiservice/wikiservice-node:/opt/project/services/wikiservice/wikiservice-node
       - ${PWD}/broker:/opt/project/broker
@@ -176,7 +153,7 @@ services:
 
   # BEGIN: demo service
   cooc:
-    image: remstef/node-swagger:latest
+    image: remstef/node-swagger:9.5
     volumes:
       - ${PWD}/services/cooc:/opt/project/services/cooc
       - ${PWD}/broker:/opt/project/broker

@@ -103,14 +103,6 @@ CREATE TABLE IF NOT EXISTS storageItemToResource (
   KEY (rid)
 ) ENGINE=MyISAM;
 
--- CREATE TABLE IF NOT EXISTS users (
---  uid         int unsigned NOT NULL AUTO_INCREMENT,
---  name        varchar(32),
---  isgroup     boolean DEFAULT NULL,
---  PRIMARY KEY (uid),
---  UNIQUE (name)
--- ) ENGINE=MyISAM;
-
 -- CREATE HELPER VIEWS
 CREATE OR REPLACE VIEW userResourceMetadata  AS SELECT r1.uid, r2.* FROM resources r1 JOIN resourceMetadata  r2 ON (r1.rid = r2.rid);
 
@@ -142,9 +134,7 @@ drop function if exists get_or_add_storageItem;
 
 drop function if exists create_storageItemToResourceMapping;
 
--- drop function if exists get_uid;
-
--- drop function if exists get_or_add_user;
+-- DEFINE SOME HELPER PROCEDURES
 
 drop procedure if exists remove_document;
 
@@ -157,6 +147,10 @@ drop procedure if exists remove_tripleResourceFromContainer;
 drop procedure if exists remove_listResourceFromContainer;
 
 drop procedure if exists edit_resourceContainer;
+
+drop procedure if exists search_resource;
+
+drop procedure if exists get_parent_resources;
 
 DELIMITER //
 
@@ -307,31 +301,6 @@ BEGIN
   return mapping_existed;
 END //
 
---create function get_uid ( name_ varchar(32) )
---RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
---BEGIN
---  declare uid_ int unsigned default 0;
---  if name_ is NULL then
---    return uid_;
---  end if;
---  select uid into uid_ from users where name = name_ limit 1;
---  return uid_;
---END //
-
---create function get_or_add_user ( name_ varchar(32), isgroup_ boolean )
---RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
---BEGIN
---  declare uid_ int unsigned default 0;
---  if name_ is NULL then
---    return uid_;
---  end if;
---  select get_uid( name_ ) into uid_;
---  if uid_ = 0 then
---    insert into users set name = name_, isgroup = isgroup_;
---  end if;
---  return uid_;
---END //
-
 create procedure remove_document( IN uid_ int unsigned, IN did_ int unsigned )
 MODIFIES SQL DATA
 BEGIN
@@ -399,5 +368,34 @@ BEGIN
   COMMIT ;
 END //
 
+create procedure search_resource( IN uid_ int unsigned, IN term varchar(256), IN casesensitive boolean)
+READS SQL DATA
+BEGIN
+  if casesensitive then
+    -- default collation utf8mb4_bin
+    select distinct(rid), label from (
+      select rid as rid, mvalue as label from userResourceMetadata where mkey = 'label' and uid = uid_ and mvalue = term
+      union
+      select rid as rid, surfaceForm as label from userStringResources where uid = uid_ and surfaceForm = term
+    ) _;
+  else
+    -- use collation utf8mb4_general_ci for searching
+    select distinct(rid), label from (
+      select rid as rid, mvalue as label from  userResourceMetadata where mkey = 'label' and uid = uid_ and mvalue COLLATE utf8mb4_general_ci = term
+      union
+      select rid as rid, surfaceForm as label from userStringResources where uid = uid_ and surfaceForm COLLATE utf8mb4_general_ci = term
+    ) _;
+  end if;
+END //
+
+create procedure get_parent_resources( IN uid_ int unsigned, IN rid_ int unsigned)
+READS SQL DATA
+BEGIN
+  select distinct(rid) from (
+    select rid from userListResourceItems where uid = uid_ and itemrid = rid_
+    union
+    select rid from userTripleResources where uid = uid_ and ( subj = rid_ or obj = rid_ or pred = rid_ )
+  ) _;
+END //
 
 DELIMITER ;
