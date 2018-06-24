@@ -19,7 +19,13 @@ const myLogFormatter = winston.format.printf(info => {
     colorcode = info.level.substring(0, info.level.search('m') + 1);
     resetcolorcode = '\u001b[0;39m';
   }
-  return `${info.level} ${colorcode}${info.timestamp}${resetcolorcode} ${colorcode}[${info.label}]:${resetcolorcode} ${info.message}`;
+  const x = Object.assign({}, info);
+  const level = info.level; delete x.level;
+  const message = info.message; delete x.message;
+  const timestamp = info.timestamp; delete x.timestamp;
+  const label = info.label; delete x.label;
+  const objstring = Object.keys(x).length && ' ' + JSON.stringify(x) || '';
+  return `${level} ${colorcode}${timestamp}${resetcolorcode} ${colorcode}[${label}]:${resetcolorcode} ${message}${objstring}`;
 });
 
 module.exports = function(callingModule) {
@@ -29,7 +35,6 @@ module.exports = function(callingModule) {
     const aModulesLabel = getLabel(callingModule);
     const logger = winston.createLogger({
       format: winston.format.combine(
-        winston.format.splat(),
         winston.format.label({ label: aModulesLabel }),
         winston.format.timestamp(),
         myLogFormatter
@@ -49,7 +54,6 @@ module.exports = function(callingModule) {
       level: loglevel,
       format: winston.format.combine(
         winston.format.colorize({ all: true }),
-        winston.format.splat(),
         winston.format.label({ label: aModulesLabel }),
         winston.format.timestamp(),
         myLogFormatter
@@ -65,10 +69,10 @@ module.exports = function(callingModule) {
         level: loglevel,
         format: winston.format.combine(
           winston.format.colorize({ all: true }),
-          winston.format.splat(),
           winston.format.label({ label: callingModule }),
           winston.format.timestamp(),
           myLogFormatter
+          // winston.format.simple()
         )
       })
     ]
