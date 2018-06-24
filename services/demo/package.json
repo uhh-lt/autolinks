@@ -1,6 +1,6 @@
 {
   "name": "autolinks-service-demo",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "description": "Autolinks Demo Service",
   "keywords": [],
@@ -8,17 +8,14 @@
   "license": "",
   "main": "app.js",
   "dependencies": {
-    "express": "^4.12.3",
+    "express": "^4.16.3",
     "node-cleanup": "^2.1.2",
-    "request": "^2.83.0",
-    "swagger-express-mw": "^0.1.0",
-    "swagger-ui-express": "^2.0.11",
+    "request": "^2.87.0",
+    "swagger-express-mw": "^0.7.0",
+    "swagger-ui-express": "^3.0.10",
     "yamljs": "^0.3.0"
   },
-  "devDependencies": {
-    "should": "^7.1.0",
-    "supertest": "^1.0.0"
-  },
+  "devDependencies": {},
   "scripts": {
     "start": "node app.js",
     "test": "swagger project test"
