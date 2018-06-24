@@ -406,17 +406,19 @@ define([
                       }
 
                       cy.expandCollapse({
-                        layoutBy: {
-                          name: "cose-bilkent",
-                          animate: true,
-                          randomize: false,
-                          fit: true
-                        },
+                        // layoutBy: {
+                        //   // name: 'cose-bilkent',
+                        //   animate: 'end',
+                        //   randomize: false,
+                        //   fit: true
+                        // },
+                        layoutBy: null,
                         fisheye: false,
                         animate: false,
                         undoable: false
-                      });
+                      }).collapseAll();
 
+                      // api.collapseAll();
                         // the default values of each option are outlined below:
                         var defaults = {
                           zoomFactor: 0.05, // zoom factor per zoom tick
