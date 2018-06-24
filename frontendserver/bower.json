@@ -31,7 +31,7 @@
     "angular-ui-bootstrap": "^2.5.1",
     "ng-magnify": "*",
     "cytoscape": "^3.2.11",
-    "cytoscape-expand-collapse": "^3.1.1",
+    "cytoscape-expand-collapse": "^3.1.2",
     "cytoscape-panzoom": "^2.5.2",
     "cytoscape.js-undo-redo": "^1.2.14",
     "cytoscape-qtip": "^2.7.1",
