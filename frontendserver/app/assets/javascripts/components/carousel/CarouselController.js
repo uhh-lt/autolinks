@@ -246,12 +246,11 @@ define([
 
               if (window.getSelection) {
                  text = window.getSelection().toString();
+                 text = text.trim();
                  if (text.length > 0) {
-
                    if (slideScript) {
                      var start = 0;
                      var end = 0;
-                     text = text.trim();
                      start = slideScript.match(text).index;
                      end = start + text.length;
                      var annotations = [];
@@ -273,7 +272,6 @@ define([
                    if (slideText) {
                      var start = 0;
                      var end = 0;
-                     text = text.trim();
                      var annotations = [];
 
                      var regexScript = RegExp(text, 'g');
