@@ -164,7 +164,7 @@ define([
                        $scope.doffsetAnnotation = $scope.doffsetAnnotation.concat(...doffsetAnno);
                      }
                      // Move the node creation inside prompt success
-                     $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation });
+                     // $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation });
                      $scope.doffsetAnnotation = '';
                    }, function() {
                      $scope.status = 'You cancelled the dialog.';
@@ -274,14 +274,14 @@ define([
                      var start = 0;
                      var end = 0;
                      text = text.trim();
-                     start = slideText.match(text).index;
-                     end = start + text.length;
                      var annotations = [];
 
                      var regexScript = RegExp(text, 'g');
                      var iter;
                      var selectedSentence = _.filter($scope.slides, function(slide){ return slide.id === $scope.active});
                      var sentenceStart = selectedSentence[0].start;
+                     start = sentenceStart + slideText.match(text).index;
+                     end = start + text.length;
                      while ((iter = regexScript.exec(slideText)) !== null) {
                         annotations.push({text, start: sentenceStart + iter.index, end: sentenceStart + regexScript.lastIndex});
                       }
