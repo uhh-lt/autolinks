@@ -42,7 +42,7 @@ services:
 
   # BEGIN: broker
   broker:
-    image: remstef/node-swagger:latest
+    image: remstef/node-swagger:10.5
     volumes:
       - ${PWD}/broker:/opt/project/broker
       - ${PWD}/data:/opt/project/data

@@ -9,9 +9,10 @@
   "main": "app.js",
   "dependencies": {
     "basic-auth": "^2.0.0",
-    "events": "^1.1.1",
-    "express": "^4.12.3",
-    "lodash": "^4.17.4",
+    "events": "^3.0.0",
+    "express": "^4.16.3",
+    "jquery": "^3.3.1",
+    "lodash": "^4.17.10",
     "murmurhash-native": "^3.2.3",
     "mysql": "^2.15.0",
     "node-cleanup": "^2.1.2",
@@ -19,21 +20,18 @@
     "passport-http": "^0.3.0",
     "passport-local": "^1.0.0",
     "random-words": "0.0.1",
-    "request": "^2.83.0",
+    "request": "^2.87.0",
     "request-promise-native": "^1.0.5",
-    "sqlite3": "^3.1.13",
-    "swagger-express-mw": "^0.1.0",
-    "swagger-ui-express": "^2.0.10",
-    "winston": "^2.4.0",
-    "yamljs": "^0.3.0",
-    "jquery": "^3.3.1"
+    "sqlite3": "^4.0.1",
+    "swagger-express-mw": "^0.7.0",
+    "swagger-ui-express": "^3.0.10",
+    "winston": "^3.0.0",
+    "yamljs": "^0.3.0"
   },
   "devDependencies": {
-    "browserify": "^15.2.0",
+    "browserify": "^16.2.2",
     "hbs": "^4.0.1",
-    "watchify": "^3.9.0",
-    "should": "^7.1.0",
-    "supertest": "^1.0.0"
+    "watchify": "^3.11.0"
   },
   "scripts": {
     "start": "node app.js",
@@ -42,6 +40,9 @@
     "watchify": "echo 'continuously bundling app' && watchify ./app/browser/main.js -o ./app/public/javascripts/bundle.js"
   },
   "nodemonConfig": {
-    "ignore": [ "app/*", "app/public/javascripts/*" ]
+    "ignore": [
+      "app/*",
+      "app/public/javascripts/*"
+    ]
   }
 }
