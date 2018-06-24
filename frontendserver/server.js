@@ -31,4 +31,5 @@ require('api/routes')(app); // pass our application into our routes
 // start server
 var server = app.listen(port, function () {
     console.log('Server listening at http://' + server.address().address + ':' + server.address().port);
+    console.log('BROKER_URL=' + process.env.BROKER_URL);
 });

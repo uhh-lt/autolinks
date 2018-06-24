@@ -32,8 +32,20 @@ define([
           $scope.ok = function () {
             // this.$resolve.parentScope.whitelist(selectedEntity, $scope.selectedType, doc);
             var selectedDoc = EndPointService.getSelectedDoc();
-            var type = $scope.selectedType.replace(/\s/g,'');
-            EndPointService.annotationDid({did: selectedDoc.did, type, newAnnotations: $scope.newAnnotation});
+            $scope.newAnnoType = $scope.selectedType.replace(/\s/g,'');
+            EndPointService.annotationDid({did: selectedDoc.did, type: $scope.newAnnoType, newAnnotations: $scope.newAnnotation}).then(function(response) {
+              if (response.status == 200) {
+                EndPointService.loadDoc(selectedDoc.did).then(function(response) {
+                  $rootScope.$emit('activateCarouselFromDoc', response.data);
+                  var offsets = [$scope.newAnnotation.start, $scope.newAnnotation.end];
+                  EndPointService.interpretOffset(selectedDoc.did, offsets).then(function(response) {
+                    var dataPath = { endpoint: { path: 'annotationNode' }}
+                    $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
+                    $rootScope.$emit('addNewAnnoType', $scope.newAnnoType);
+                  });
+                });
+              };
+            });
             $mdDialog.hide();
             //this.modalClose();
           };

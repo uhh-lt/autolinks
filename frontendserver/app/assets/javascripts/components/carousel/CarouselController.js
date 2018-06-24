@@ -36,6 +36,8 @@ define([
             var offset = 0;
             var compiledString = "";
 
+            entity = _.orderBy(entity, ['doffset.offsets[0].from'], ['asc']); //ordering entities to fix fragment bug
+
             entity.forEach(function(e) {
                 var from = e.doffset.offsets[0].from - $scope.sentenceFrom;
                 var to = (e.doffset.offsets[0].from + e.doffset.offsets[0].length) - $scope.sentenceFrom;
@@ -130,77 +132,80 @@ define([
 
               $scope.annotation_text_script = $scope.getSelectionEntity(text[0], script);
               $scope.selectedEntity = $scope.annotation_text_script.annotationSlideScript;
-              $rootScope.annotationSlideText = $scope.annotation_text_script.annotationSlideText;
 
-              var ent = $scope.selectedEntity;
-              var eId = ($scope.currIndex) + '_' + ent.text + '_' + ent.start + ':' + ent.end;
-              var highlightElement = createNeHighlight(eId, ent.text);
+              if ($scope.selectedEntity) {
+                $rootScope.annotationSlideText = $scope.annotation_text_script.annotationSlideText;
 
-              var newScript = replaceAt(script, ent.text, highlightElement, ent.start, ent.end);
+                var ent = $scope.selectedEntity;
+                var eId = ($scope.currIndex) + '_' + ent.text + '_' + ent.start + ':' + ent.end;
+                var highlightElement = createNeHighlight(eId, ent.text);
 
-              // var selectedDoc = $scope.tabs.find((t) => { return t.id === doc.id; });
-              // var isInDoc = isEntityInDoc(selectedDoc, $scope.selectedEntity);
-              if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ')) {
+                var newScript = replaceAt(script, ent.text, highlightElement, ent.start, ent.end);
 
-                $mdDialog.show({
-                   templateUrl: '/app/assets/partials/dialog/newAnnotation.html',
-                   parent: angular.element(document.body),
-                   // targetEvent: ev,
-                   clickOutsideToClose:true,
-                   fullscreen: $scope.customFullscreen // Only for -xs, -sm breakpoints.
-                 })
-                 .then(function(answer) {
-                   // $scope.status = 'You said the information was "' + answer + '".';
-                   $('#' + id + '_script-area').html(newScript);
-                   $scope.slides[id].scripts = [$sce.trustAsHtml(newScript)];
-                   if ($scope.doffsetAnnotation.length === 0) {
-                     $scope.doffsetAnnotation = ent.text;
-                   } else {
-                     var doffsetAnno = [' ', ent.text]
-                     $scope.doffsetAnnotation = $scope.doffsetAnnotation.concat(...doffsetAnno);
-                   }
-                   // Move the node creation inside prompt success
-                   $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation });
-                   $scope.doffsetAnnotation = '';
-                 }, function() {
-                   $scope.status = 'You cancelled the dialog.';
-                 });
+                // var selectedDoc = $scope.tabs.find((t) => { return t.id === doc.id; });
+                // var isInDoc = isEntityInDoc(selectedDoc, $scope.selectedEntity);
+                if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ')) {
 
-                //
-                // var confirm = $mdDialog.prompt()
-                //    .title('Annotation Type?')
-                //    .initialValue('AnatomicalSiteMention')
-                //    // .targetEvent(ev)
-                //    .required(true)
-                //    .ok('Okay!')
-                //    .cancel('Cancel');
-                //
-                //  $mdDialog.show(confirm).then(function(result) {
-                //    // $scope.status = 'You decided to name your dog ' + result + '.';
-                //    $('#' + id + '_script-area').html(newScript);
-                //    $scope.slides[id].scripts = [$sce.trustAsHtml(newScript)];
-                //    if ($scope.doffsetAnnotation.length === 0) {
-                //      $scope.doffsetAnnotation = ent.text;
-                //    } else {
-                //      var doffsetAnno = [' ', ent.text]
-                //      $scope.doffsetAnnotation = $scope.doffsetAnnotation.concat(...doffsetAnno);
-                //    }
-                //    // Move the node creation inside prompt success
-                //    $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation });
-                //    $scope.doffsetAnnotation = '';
-                //  }, function() {
-                //    // $scope.status = 'You didn\'t name your dog.';
-                //  });
+                  $mdDialog.show({
+                     templateUrl: '/app/assets/partials/dialog/newAnnotation.html',
+                     parent: angular.element(document.body),
+                     // targetEvent: ev,
+                     clickOutsideToClose:true,
+                     fullscreen: $scope.customFullscreen // Only for -xs, -sm breakpoints.
+                   })
+                   .then(function(answer) {
+                     // $scope.status = 'You said the information was "' + answer + '".';
+                     $('#' + id + '_script-area').html(newScript);
+                     $scope.slides[id].scripts = [$sce.trustAsHtml(newScript)];
+                     if ($scope.doffsetAnnotation.length === 0) {
+                       $scope.doffsetAnnotation = ent.text;
+                     } else {
+                       var doffsetAnno = [' ', ent.text]
+                       $scope.doffsetAnnotation = $scope.doffsetAnnotation.concat(...doffsetAnno);
+                     }
+                     // Move the node creation inside prompt success
+                     // $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation });
+                     $scope.doffsetAnnotation = '';
+                   }, function() {
+                     $scope.status = 'You cancelled the dialog.';
+                   });
+
+                  //
+                  // var confirm = $mdDialog.prompt()
+                  //    .title('Annotation Type?')
+                  //    .initialValue('AnatomicalSiteMention')
+                  //    // .targetEvent(ev)
+                  //    .required(true)
+                  //    .ok('Okay!')
+                  //    .cancel('Cancel');
+                  //
+                  //  $mdDialog.show(confirm).then(function(result) {
+                  //    // $scope.status = 'You decided to name your dog ' + result + '.';
+                  //    $('#' + id + '_script-area').html(newScript);
+                  //    $scope.slides[id].scripts = [$sce.trustAsHtml(newScript)];
+                  //    if ($scope.doffsetAnnotation.length === 0) {
+                  //      $scope.doffsetAnnotation = ent.text;
+                  //    } else {
+                  //      var doffsetAnno = [' ', ent.text]
+                  //      $scope.doffsetAnnotation = $scope.doffsetAnnotation.concat(...doffsetAnno);
+                  //    }
+                  //    // Move the node creation inside prompt success
+                  //    $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation });
+                  //    $scope.doffsetAnnotation = '';
+                  //  }, function() {
+                  //    // $scope.status = 'You didn\'t name your dog.';
+                  //  });
 
 
-                 /////////////////7
-                // $rootScope.$emit('createNode', { name: ent.text });
+                   /////////////////7
+                  // $rootScope.$emit('createNode', { name: ent.text });
 
-              //   // $scope.isEntityInDoc = false;
-              //   $scope.open($scope, script, 'static');
-              // } else if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ')){
-              //   // $scope.isEntityInDoc = true;
-              //   $scope.open($scope, script, 'true');
+                //   // $scope.isEntityInDoc = false;
+                //   $scope.open($scope, script, 'static');
+                // } else if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ')){
+                //   // $scope.isEntityInDoc = true;
+                //   $scope.open($scope, script, 'true');
+                }
               }
           };
 
@@ -269,14 +274,14 @@ define([
                      var start = 0;
                      var end = 0;
                      text = text.trim();
-                     start = slideText.match(text).index;
-                     end = start + text.length;
                      var annotations = [];
 
                      var regexScript = RegExp(text, 'g');
                      var iter;
                      var selectedSentence = _.filter($scope.slides, function(slide){ return slide.id === $scope.active});
                      var sentenceStart = selectedSentence[0].start;
+                     start = sentenceStart + slideText.match(text).index;
+                     end = start + text.length;
                      while ((iter = regexScript.exec(slideText)) !== null) {
                         annotations.push({text, start: sentenceStart + iter.index, end: sentenceStart + regexScript.lastIndex});
                       }

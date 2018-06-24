@@ -31,7 +31,7 @@ define([
                   $rootScope.activeServices.push(service.path);
                 } else {
                   _.pull($rootScope.activeServices, service.path);
-                  $rootScope.$broadcast('disableEndpoint', service.path);
+                  $rootScope.$emit('disableEndpoint', service.path);
                 }
                 // return $rootScope.listServices;
               },
@@ -43,7 +43,7 @@ define([
                   _.pull($rootScope.activeTypes, type.name);
                   // $rootScope.$broadcast('disableEndpoint', service.path);
                 }
-                $rootScope.$broadcast('refreshCarouselBasedOnType');
+                $rootScope.$emit('refreshCarouselBasedOnType');
               },
 
               setSelectedDoc: function(doc) {

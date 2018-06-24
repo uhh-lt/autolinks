@@ -267,7 +267,7 @@ define([
 
                       cy.on('mouseover', 'node', function(e) {
                           var sel = e.target;
-                          var label = sel.data('metadata').label;
+                          var label = (sel.data('metadata') && sel.data('metadata').label) ? sel.data('metadata').label : null;
                           var name = sel.data('name');
                           // cy.elements().difference(sel.outgoers()).not(sel).addClass('semitransp');
                           sel.addClass('hoverNode').outgoers().addClass('highlight');
@@ -275,7 +275,7 @@ define([
                           sel.incomers().addClass('highlight');
                           if (label || name) {
                             var sameLabelNodes = cy.nodes().filter(function( ele ) {
-                              var eleLabel = ele.data('metadata').label;
+                              var eleLabel = (ele.data('metadata') && ele.data('metadata').label) ? ele.data('metadata').label: null ;
                               var eleName = ele.data('name');
                               return ((eleLabel ? eleLabel : eleName) == (label ? label : name) && ele.visible());
                             });
@@ -406,17 +406,19 @@ define([
                       }
 
                       cy.expandCollapse({
-                        layoutBy: {
-                          name: "cose-bilkent",
-                          animate: true,
-                          randomize: false,
-                          fit: true
-                        },
+                        // layoutBy: {
+                        //   // name: 'cose-bilkent',
+                        //   animate: 'end',
+                        //   randomize: false,
+                        //   fit: true
+                        // },
+                        layoutBy: null,
                         fisheye: false,
                         animate: false,
                         undoable: false
-                      });
+                      }).collapseAll();
 
+                      // api.collapseAll();
                         // the default values of each option are outlined below:
                         var defaults = {
                           zoomFactor: 0.05, // zoom factor per zoom tick
@@ -626,7 +628,13 @@ define([
                         let o = n.value.object;
 
                         if (_.isArray(s.value)) {
-                          var es = extractList(s.value);
+                          var es = "";
+                          if (s.value.length > 0) {
+                            es = extractList(s.value);
+                          } else {
+                            s.value = "";
+                            es = o;
+                          }
                           var subject = assignEntity(es, parent);
                         } else if (_.isObject(s.value)) {
                           var es = extractResource(s);
@@ -636,7 +644,13 @@ define([
                         }
 
                         if (_.isArray(o.value)) {
-                          var eo = extractList(o.value);
+                          var eo = "";
+                          if (o.value.length > 0) {
+                            eo = extractList(o.value);
+                          } else {
+                            o.value = "";
+                            eo = o;
+                          }
                           var object = assignEntity(eo, parent);
                         } else if (_.isObject(o.value)) {
                           var eo = extractResource(o);
@@ -646,7 +660,13 @@ define([
                         }
 
                         if (_.isArray(p.value)) {
-                          var ep = extractList(p.value);
+                          var ep = "";
+                          if (p.value.length > 0) {
+                            ep = extractList(p.value);
+                          } else {
+                            p.value = "";
+                            ep = o;
+                          }
                           var edge = assignRelation(ep, subject, object);
                         } else if (_.isObject(p.value)) {
                           var ep = extractResource(p);
