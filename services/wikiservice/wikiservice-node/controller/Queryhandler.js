@@ -270,7 +270,6 @@ const wiktionary = function(indexname, esclient) {
       score: hit._score,
       language: hit._source.language,
       www: `https://${hit._source.language}.wiktionary.org/?curid=${hit._id}`,
-      wikibase: `https://www.wikidata.org/wiki/${hit._source.wikibase_item}`,
       description: hit._source.opening_text,
     });
     const categoryResources = hit._source.category.map(c => new Resource(null, c, null, {
@@ -293,7 +292,83 @@ const wiktionary = function(indexname, esclient) {
  *
  *
  */
-const wikidata = generic;
+const wikidata = function(indexname, esclient) {
+
+  logger.info(`Initialized wikidata queryhandler for index '${indexname}'.`);
+
+  this.getResults = function (text){
+    return query(text);
+  };
+
+  function buildquery(text) {
+    const q =
+      {
+        "query":
+          {
+            "query_string":
+              {
+                "query": text,
+                "default_operator": "AND"
+              }
+          },
+        "_source":
+          [
+            "title",
+            "timestamp",
+            "outgoing_link",
+            "labels.en"
+          ],
+        "from": 0,
+        "size": 1
+      };
+    return q;
+  }
+
+  function query(text){
+    // build the query
+    const query = buildquery(text);
+    logger.debug('Query: ', query);
+
+    return esclient.search({
+      index: indexname,
+      body: query
+    }).then(
+      result => {
+        logger.debug(`Found ${result.hits.total} hits for '${indexname}'. Limiting results to ${result.hits.hits.length} hit(s).`);
+        return result;
+      }
+    ).then(result => transformSearchResult(text, result));
+  }
+
+  function transformSearchResult(text, esresult) {
+    return Promise.all(
+      esresult.hits.hits.map((hit, i) =>
+        transformHit(text, hit, i+1))
+    ).then(
+      hitresources => new Resource(null, hitresources, null, { label: indexname, totalhits: esresult.hits.total })
+    );
+  }
+
+  function transformHit(text, hit, i) {
+    const hitresource = new Resource(null, `${hit._index}/${hit._type}/${hit._id}`, null, {
+      id: hit._id,
+      label: hit._source.title,
+      hit: i,
+      index: hit._index,
+      score: hit._score,
+      language: hit._source.language,
+      wikibase: `https://www.wikidata.org/wiki/${hit._source.title}`,
+      description: hit._source.labels.en,
+    });
+    const outlinks = hit._source.outgoing_link.map(ol => new Resource(null, `https://www.wikidata.org/wiki/${ol}`, null, {
+      wikibase: `https://www.wikidata.org/wiki/${ol}`,
+      label: ol,
+    }));
+    const hitOutlinksTriple = Resource.fromValue(new Triple(hitresource, Resource.fromValue('refers to'), new Resource(null, outlinks, null, {label: `${hit._source.title} outlinks`})));
+    return [ hitOutlinksTriple ];
+  }
+
+};
 
 
 
