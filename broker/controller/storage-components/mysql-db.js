@@ -34,6 +34,7 @@ const MAX_FILESIZE = process.env.MAX_FILESIZE || 5e7; // 5 MB by default
 /* connection string: mysql://user:pass@host:port/database?optionkey=optionvalue&optionkey=optionvalue&... */
 const connectionString = process.env.MYSQL || 'mysql://autolinks:autolinks1@mysql:3306/autolinks?debug=false&connectionLimit=100';
 const pool = mysql.createPool(connectionString);
+logger.info(`Using mysql connection string: '${connectionString}'`);
 logger.info(`Using ${pool.config.connectionLimit} connections.`);
 
 function withConnection(callback) {

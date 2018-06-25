@@ -62,10 +62,11 @@ services:
       - NLP=stupid
       # - NLP=ctakes
       - CTAKESURL=http://ctakes-nlp:8080
-      - MYSQL=mysql://autolinks:autolinks1@mysql:3306/autolinks?debug=false&connectionLimit=100
+      - MYSQL=mysql://autolinks:autolinks1@mysql8:3306/autolinks?debug=false&connectionLimit=100
       - LOGLEVEL=debug
   # END: broker
 
+<<<<<<< Updated upstream
   # BEGIN: minimal frontend
   uimin:
     image: remstef/node-swagger:latest
@@ -93,17 +94,44 @@ services:
   # BEGIN: mysql
   mysql:
     image: "mysql:5.7"
+=======
+#  # BEGIN: mysql
+#  mysql:
+#    image: mysql:5.7
+#    environment:
+#      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+#      - MYSQL_DATABASE=autolinks
+#      - MYSQL_USER=autolinks
+#      - MYSQL_PORT=3306
+#      - MYSQL_PASSWORD=autolinks1
+#    volumes:
+#      - ${PWD}/data/mysql:/var/lib/mysql
+#    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_bin"]
+#    healthcheck:
+#      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-pautolinks1", "-uautolinks"]
+#      interval: 20s
+#      timeout: 10s
+#      retries: 3
+#    networks:
+#      - anet
+#  # END: mysql
+
+  # BEGIN: mysql
+  mysql8:
+    image: mysql:8.0
+>>>>>>> Stashed changes
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=yes
+      # - MYSQL_ROOT_PASSWORD=toor
       - MYSQL_DATABASE=autolinks
       - MYSQL_USER=autolinks
       - MYSQL_PORT=3306
       - MYSQL_PASSWORD=autolinks1
     volumes:
-      - ${PWD}/data/mysql:/var/lib/mysql
-    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_bin"]
+      - ${PWD}/data/mysql8:/var/lib/mysql
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_bin", "--default-authentication-plugin=mysql_native_password", "--log_bin_trust_function_creators=1"]
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-pautolinks1", "-uautolinks"]
+      test: "/usr/bin/mysql -hlocalhost -pautolinks1 -uautolinks -Dautolinks -e'SELECT 1;'"
       interval: 20s
       timeout: 10s
       retries: 3
