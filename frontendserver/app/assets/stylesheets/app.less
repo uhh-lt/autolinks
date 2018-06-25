@@ -220,6 +220,59 @@ div.popupMenu {
 	}
 }
 
+.auto-tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.auto-tooltip .auto-tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: transparent;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: relative;
+    z-index: 1;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -60px;
+}
+
+.auto-tooltip .auto-tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: black transparent transparent transparent;
+}
+
+.auto-tooltip:hover .auto-tooltiptext {
+    visibility: visible;
+}
+
+.md-select {
+    margin: 20px 0;
+    align-items: center;
+    padding: 2px 2px 1px;
+    border: none;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: rgba(0,0,0,0.12);
+    background-color: transparent;
+    position: relative;
+    box-sizing: content-box;
+    width: 100%;
+    -webkit-box-flex: 1;
+    -webkit-flex-grow: 1;
+    flex-grow: 1;
+}
+
 md-toast.md-warn-toast-theme {
     .md-toast-content {
         background-color: @red_material;

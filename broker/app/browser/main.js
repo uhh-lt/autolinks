@@ -13,7 +13,7 @@ window.$ = jq;
 window.init = function () {
   // window.alert(window.location.href);
   // window.alert($("#head").text() + " within index.js");
-  console.log('Initializing autlinks minimized frontend.');
+  console.log('Initializing autlinks admin area.');
 };
 
 window.renderServices = function() {

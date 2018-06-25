@@ -61,12 +61,12 @@ definitions:
   Endpoint:
     type: object
     properties:
-      name:
+      path:
         type: string
-        description: the name of the endpoint
+        description: the path of the endpoint
       method:
         type: string
-        description: the name of the endpoint
+        description: the method of the endpoint {get,post}
       requireslogin:
         type: boolean
         description: does the service require a user to be logged in?

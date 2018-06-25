@@ -1,5 +1,5 @@
 var request = require('request');
-﻿var config = require('config.json');
+﻿var config = require('config');
 var express = require('express');
 var router = express.Router();
 var nlpAnalyze = require('./analyze');
@@ -15,7 +15,7 @@ module.exports = router;
 function analyze(req, res){
     const token = req.session.token;
     const data = req.body.data;
-    const options = nlpAnalyze(config.apiUrl, token, req.body.text);
+    const options = nlpAnalyze(config().apiUrl, token, req.body.text);
     request(options, function (error, response, body) {
       res.send(body);
     });
@@ -24,7 +24,7 @@ function analyze(req, res){
 function analyzeDid(req, res){
     const token = req.session.token;
     const did = req.body.did;
-    const options = nlpAnalyzeDid(config.apiUrl, token, did);
+    const options = nlpAnalyzeDid(config().apiUrl, token, did);
     request(options, function (error, response, body) {
       res.send(body);
     });
@@ -33,7 +33,7 @@ function analyzeDid(req, res){
 function interpretDid(req, res){
     const token = req.session.token;
     const data = req.body;
-    const options = nlpInterpretDid(config.apiUrl, token, data);
+    const options = nlpInterpretDid(config().apiUrl, token, data);
     request(options, function (error, response, body) {
       res.send(body);
     });

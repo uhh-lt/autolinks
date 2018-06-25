@@ -25,7 +25,7 @@ define([
           // == HELPER FUNCTIONS == //
 
           var self = this;
-          $scope.isActive = false;
+          $scope.isActive = true;
 
           self.readonly = false;
 
