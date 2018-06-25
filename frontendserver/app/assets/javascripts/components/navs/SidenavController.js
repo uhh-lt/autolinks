@@ -157,7 +157,17 @@ define([
           };
 
           $scope.add = function () {
-            $scope.metadata_keys.push("");
+            if ($scope.selectedEntity.data('metadata')) {
+              $scope.metadata_keys.push("");
+            } else  {
+              $scope.selectedEntity.data().metadata = {};
+              const metadata = $scope.selectedEntity.data('metadata');
+              $scope.metadata = metadata;
+              $scope.metadata_before = _.clone($scope.selectedEntity.data('metadata'));
+              $scope.metadata_keys = Object.keys($scope.metadata);
+              $scope.metadata_keys.push("");
+            }
+
           };
 
           $scope.close = function () {
