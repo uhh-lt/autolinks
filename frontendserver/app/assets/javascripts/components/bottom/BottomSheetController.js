@@ -22,7 +22,7 @@ define([
               { name: 'Clear', icon: 'far fa-square fa-2x' },
               { name: 'Add', icon: 'fas fa-plus-square fa-2x' },
               { name: 'Edit', icon: 'fas fa-edit fa-2x' },
-              { name: 'Delete', icon: 'fas fa-trash-alt fa-2x' },
+              { name: 'Merge', icon: 'fas fa-external-link-alt fa-2x' },
               { name: 'Compound', icon: 'fa fa-object-group fa-2x' }
             ];
 
@@ -62,7 +62,27 @@ define([
                   break;
                 case 'Edit':
                   break;
-                case 'Delete':
+                case 'Merge':
+                  if (cy.$(':selected').length > 0) {
+                    $mdBottomSheet.hide();
+                    $mdToast.show(
+                          $mdToast.simple()
+                            .textContent('Please select the target parent')
+                            .position('top right')
+                            .theme("primary-toast")
+                            .hideDelay(3500)
+                        );
+                    $rootScope.$emit('mergeToParent');
+                  } else {
+                    $mdToast.show(
+                          $mdToast.simple()
+                            .textContent('Please select one or more nodes to merge to parent')
+                            .position('top right')
+                            .theme("warn-toast")
+                            .hideDelay(3500)
+                        );
+                    console.log('Please select one or more nodes to merge to parent');
+                  }
                   break;
                 case 'Compound':
                   if (cy.$(':selected').length > 0) {
@@ -70,12 +90,12 @@ define([
                   } else {
                     $mdToast.show(
                           $mdToast.simple()
-                            .textContent('Please select one or more node to be children')
+                            .textContent('Please select one or more nodes to be children')
                             .position('top right')
                             .theme("warn-toast")
                             .hideDelay(3500)
                         );
-                    console.log('Please select one or more node to be children');
+                    console.log('Please select one or more nodes to be children');
                   }
                   break;
                 default:
