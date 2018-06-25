@@ -588,7 +588,8 @@ define([
                               var nodeObj = {
                                   data: {
                                     id: 'n' + scope.data.nodes.length,
-                                    name: 'new'
+                                    name: 'new',
+                                    metadata: {}
                                   },
                                   position: {
                                     x,
