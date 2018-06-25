@@ -31,9 +31,9 @@ define([
            $mdBottomSheet.show({
              templateUrl: '/app/assets/partials/bottom.html',
              controller: 'BottomSheetController',
-             clickOutsideToClose: false,
-             disableBackdrop: true,
-             disableParentScroll: false
+             clickOutsideToClose: true,
+             disableBackdrop: false,
+             disableParentScroll: true
            }).then(function(clickedItem) {
              $mdToast.show(
                    $mdToast.simple()
