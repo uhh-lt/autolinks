@@ -66,7 +66,6 @@ services:
       - LOGLEVEL=debug
   # END: broker
 
-<<<<<<< Updated upstream
   # BEGIN: minimal frontend
   uimin:
     image: remstef/node-swagger:latest
@@ -91,10 +90,6 @@ services:
       - LOGLEVEL=debug
   # END: minimal frontend
 
-  # BEGIN: mysql
-  mysql:
-    image: "mysql:5.7"
-=======
 #  # BEGIN: mysql
 #  mysql:
 #    image: mysql:5.7
@@ -119,7 +114,6 @@ services:
   # BEGIN: mysql
   mysql8:
     image: mysql:8.0
->>>>>>> Stashed changes
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=yes
       # - MYSQL_ROOT_PASSWORD=toor
