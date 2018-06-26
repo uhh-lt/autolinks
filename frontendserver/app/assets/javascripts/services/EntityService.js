@@ -17,7 +17,6 @@ define([
                 // $mdComponentRegistry.when('right', true).then(function() {
                   // Now you can use $mdSidenav('left') or $mdSidenav('left', true) without getting an error.
                   $rootScope.$emit('sidenavReinit');
-                  $mdSidenav('right').open();
                 // });
                 }, 100);
               },
