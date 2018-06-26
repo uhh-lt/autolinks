@@ -16,7 +16,7 @@ define([
           $scope.metadata = {};
 
           $scope.init = function() {
-            $timeout( function() {
+            // $timeout( function() {
               $scope.selectedEntity = EntityService.getRootScopeEntity();
               const entity = $scope.selectedEntity;
               if (entity._private) {
@@ -61,11 +61,13 @@ define([
                 document.getElementById("propertify").innerHTML = JSON.stringify($scope.selectedEntity._private.data, undefined, 4);
               }
               console.log($scope.selectedEntity);
-            }, 1000);
+            // }, 1000);
+            // return 'OK';
           };
 
           $rootScope.$on('sidenavReinit', function (event, args) {
             $scope.init();
+            $mdSidenav('right').open();
           });
 
           $scope.init();
@@ -93,7 +95,6 @@ define([
               } else {
                 entity.data().metadata = $scope.metadata;
               }
-              // document.getElementById("cy-network").trigger('tap');
               $mdSidenav('right').close();
               cy.$(':selected').trigger('tap');
 

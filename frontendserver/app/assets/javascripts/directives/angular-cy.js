@@ -258,11 +258,12 @@ define([
                       // Events collection : mouseover, taphold, tapend, tap
                       cy.on('tapend', 'node', function(evt) {
                         var node = evt.target;
-                        var x = scope.coordinate.x;
-                        var y = scope.coordinate.y;
                         var nodeLabel = node.data('metadata') && node.data('metadata').label ? node.data('metadata').label : node.data('name');
                         if (scope.mergeMode) {
-                          debugger;
+                          scope.coordinate = evt.position;
+                          // var x = scope.coordinate.x;
+                          // var y = scope.coordinate.y;
+                          scope.mergeToParentNodes = {parent: node, node: scope.selectedNodesToMerge, descendants: scope.selectedNodesToMerge.descendants()}
                           var confirm = scope.$parent.$mdDialog.confirm()
                                .title('merge to ' + nodeLabel +'?')
                                // .targetEvent(doc)
@@ -270,20 +271,24 @@ define([
                                .cancel('Cancel');
 
                           scope.$parent.$mdDialog.show(confirm).then(function() {
+                            const nodeData = scope.mergeToParentNodes.node;
+                            const parentData = scope.mergeToParentNodes.parent;
+                            const descendantsData = scope.mergeToParentNodes.node.descendants().length > 0 ? true : false;
+
                             const after = {
                               "rid": 0,
                               "cid": 0,
-                              "metadata": { label: "new" },
-                              "value": "new_no_" + scope.data.nodes.length,
+                              "metadata": { label: nodeData.data('metadata') && nodeData.data('metadata').label ? nodeData.data('metadata').label : nodeData.data('name') },
+                              "value": nodeData.data('name'),
                             };
                             const data = { before: null, after: after };
-                            // addNewNode(data, e);
+                            addNewNode(data, parentData, descendantsData);
                           });
                           scope.mergeMode = false;
                           // $rootScope.$emit('mergeToParent');
                         } else {
                           console.log( 'tapend ' + node.id() );
-                          console.log(x, y);
+                          //console.log(x, y);
                         }
                         // evt.neighborhood('edge').style( { 'line-color' : 'black' });
                         // evt.connectedEdges().style( { 'line-color' : 'black' });
@@ -472,7 +477,7 @@ define([
 
                         cy.panzoom( defaults );
 
-                        function addNewNode(data, parent) {
+                        function addNewNode(data, parent, descendants = false) {
                           if (parent.data('rid')) {
                             scope.$parent.EndPointService.editResource(data).then(function(response) {
                                 const before = {
@@ -513,6 +518,19 @@ define([
                                     scope.data.nodes.push(nodeObj);
                                     nodeTipExtension(n);
                                     // cy.fit();
+                                    if (descendants) {
+                                      const descendantsData = scope.mergeToParentNodes.node.descendants();
+                                      _.forEach(descendantsData, function(desc) {
+                                        const after = {
+                                          "rid": 0,
+                                          "cid": 0,
+                                          "metadata": { label: desc.data('metadata') && desc.data('metadata').label ? desc.data('metadata').label : desc.data('name') },
+                                          "value": desc.data('name'),
+                                        };
+                                        const data = { before: null, after: after };
+                                        // addNewNode(data, nodeData);
+                                      });
+                                    }
                                   }
                                 });
                             });
@@ -634,6 +652,7 @@ define([
                         if ( parent === 'outermostParentEntity' ) {
                           return {
                               id: e.rid,
+                              rid: e.rid,
                               name: e.rid,
                               metadata: e.metadata,
                               path: scope.path,
