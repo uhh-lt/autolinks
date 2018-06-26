@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: '0.0.2'
+  version: '0.0.3'
   title: Autolinks Broker Service
 
 ## the domain of the service
@@ -642,6 +642,33 @@ paths:
           description: Success. Return the new resource. 
           schema:
             $ref: "#/definitions/Resource"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Exception"
+            
+  /storage/findresources:
+    x-swagger-router-controller: storage
+    get:
+      operationId: findresource
+      tags:
+        - Storage
+      description: Find resources based on a search query
+      parameters:
+        - name: q
+          in: query
+          description: Get details for each document
+          type: string
+          allowEmptyValue: false
+      security:
+        - broker_auth: []
+      responses:
+        200:
+          description: Success. Return the resource results.
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Resource"
         default:
           description: Error
           schema:
