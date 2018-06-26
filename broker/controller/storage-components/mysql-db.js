@@ -782,13 +782,22 @@ module.exports.getStorageKeys = function(uid, rids){
     .then(res => res.rows.map(r => r.storagekey));
 };
 
-module.exports.promisedFindResources = function(uid, query, caseinsensitive) {
-  const keys = new Set();
+module.exports.promisedFindResources = function(uid, query, caseinsensitive, sourcesonly) {
+  if(sourcesonly){
+    const keys = new Set();
+    return this.getSimilarResources(uid, query, caseinsensitive)
+      .then(rids => this.getSourcesRecursive(uid, rids, keys, 1))
+      .catch(e => Exception.fromError(e).log(logger.warn))
+      .then(_ => Array.from(keys) );
+  }
+  // else
   return this.getSimilarResources(uid, query, caseinsensitive)
-    .then(rids => this.getSourcesRecursive(uid, rids, keys, 1))
-    .catch(e => Exception.fromError(e).log(logger.warn))
-    .then(_ => keys );
+    .then(rids => rids.map(rid => Promise.all( // TODO here is still an error!
+      this.getResource(rid).then(r => this.fillSourcesRecursive(uid, r))
+    )));
 };
+
+
 
 module.exports.getSimilarResources = function(uid, query, caseinsensitive) {
   logger.debug(`Searching for similar resources to '${query}' for user ${uid}.`);

@@ -44,10 +44,13 @@ module.exports.findresources = function(req, res, next) {
     }
     const query = req.swagger.params.q.value;
     const caseinsensitive = req.swagger.params.ci && req.swagger.params.ci.value || false;
-    storage.promisedFindResources(user.id, query, caseinsensitive).then(
+    const notsourcesonly = req.swagger.params.sourcesonly && !req.swagger.params.sourcesonly.value || true;
+
+    return storage.promisedFindResources(user.id, query, caseinsensitive, !notsourcesonly).then(
       result => res.json(Array.from(result)).end(next),
       err => Exception.fromError(err, 'Finding resource failed.').handleResponse(res).end(next)
     );
+
 
   });
 };

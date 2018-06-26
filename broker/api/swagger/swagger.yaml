@@ -653,11 +653,11 @@ paths:
       operationId: findresources
       tags:
         - Storage
-      description: Find resources based on a search query
+      description: Find resources based on a search query and return their sources
       parameters:
         - name: q
           in: query
-          description: Find resources whose label or sufaceform is like the query
+          description: Find resources whose label or surfaceform is similar to the query
           type: string
           allowEmptyValue: false
         - name: ci
@@ -665,15 +665,20 @@ paths:
           description: search query caseinsensitive
           type: boolean
           allowEmptyValue: true
+        - name: sourcesonly
+          in: query
+          description: return sources only (default)
+          type: boolean
+          allowEmptyValue: true
       security:
         - broker_auth: []
       responses:
         200:
-          description: Success. Return the resource results.
+          description: Success. Return the resources or source strings.
           schema:
             type: array
             items:
-              type: string
+              $ref: "#/definitions/Any"
         default:
           description: Error
           schema:

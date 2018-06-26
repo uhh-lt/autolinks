@@ -82,8 +82,8 @@ module.exports.promisedEditResource = function(userid, resourceBefore, resourceA
  * @param caseinsensitive
  * @return [{Resource}]
  */
-module.exports.promisedFindResources = function(userid, query, casinsensitive) {
-  return explicitStorage.promisedFindResources(userid, query, casinsensitive);
+module.exports.promisedFindResources = function(userid, query, casinsensitive, sourcesonly) {
+  return explicitStorage.promisedFindResources(userid, query, casinsensitive, sourcesonly);
 };
 
 /**
