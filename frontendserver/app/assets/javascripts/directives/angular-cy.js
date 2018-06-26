@@ -263,7 +263,7 @@ define([
                           scope.coordinate = evt.position;
                           // var x = scope.coordinate.x;
                           // var y = scope.coordinate.y;
-                          scope.mergeToParentNodes = {parent: node, node: scope.selectedNodesToMerge, descendants: scope.selectedNodesToMerge.descendants()}
+                          scope.mergeToParentNodes = {parent: node, node: scope.selectedNodesToMerge, children: scope.selectedNodesToMerge.children()}
                           var confirm = scope.$parent.$mdDialog.confirm()
                                .title('merge to ' + nodeLabel +'?')
                                // .targetEvent(doc)
@@ -273,7 +273,7 @@ define([
                           scope.$parent.$mdDialog.show(confirm).then(function() {
                             const nodeData = scope.mergeToParentNodes.node;
                             const parentData = scope.mergeToParentNodes.parent;
-                            const descendantsData = scope.mergeToParentNodes.node.descendants().length > 0 ? true : false;
+                            const hasChildren = scope.mergeToParentNodes.node.children().length > 0 ? true : false;
 
                             const after = {
                               "rid": 0,
@@ -282,9 +282,10 @@ define([
                               "value": nodeData.data('name'),
                             };
                             const data = { before: null, after: after };
-                            addNewNode(data, parentData, descendantsData);
+                            addNewNode(data, parentData, hasChildren);
                           });
                           scope.mergeMode = false;
+                          scope.selectedNodesToMerge.hide();
                           // $rootScope.$emit('mergeToParent');
                         } else {
                           console.log( 'tapend ' + node.id() );
@@ -477,7 +478,13 @@ define([
 
                         cy.panzoom( defaults );
 
-                        function addNewNode(data, parent, descendants = false) {
+                        function addNewNode(data, parent, hasChildren = false) {
+                          if (hasChildren) {
+                            scope.hasChildren = true;
+                            scope.childrenNodes = scope.mergeToParentNodes.node.children();
+                          } else {
+                            scope.hasChildren = false;
+                          }
                           if (parent.data('rid')) {
                             scope.$parent.EndPointService.editResource(data).then(function(response) {
                                 const before = {
@@ -489,14 +496,14 @@ define([
 
                                 const after = {
                                   "rid": response.data.rid,
-                                  "cid": parseInt(parent.id()),
+                                  "cid": parseInt(parent.data('rid') ? parent.data('rid') : parent.id()),
                                   "metadata": response.data.metadata,
                                   "value": response.data.value
                                 };
                                 const data = { before: before, after: after };
 
                                 scope.$parent.EndPointService.editResource(data).then(function(response) {
-                                  if (parent.isParent()) {
+                                  if (parent.isParent() || parent.isNode()) {
                                     var x = scope.coordinate.x;
                                     var y = scope.coordinate.y;
                                     var data = response.data;
@@ -517,19 +524,29 @@ define([
                                     var n = cy.add(nodeObj);
                                     scope.data.nodes.push(nodeObj);
                                     nodeTipExtension(n);
-                                    // cy.fit();
-                                    if (descendants) {
-                                      const descendantsData = scope.mergeToParentNodes.node.descendants();
-                                      _.forEach(descendantsData, function(desc) {
+
+                                    scope.mergeToParentNodes.parent = n;
+                                    if (scope.hasChildren) {
+                                      const childrenData = scope.mergeToParentNodes.node.children();
+                                      _.forEach(childrenData, function(child) {
+                                        scope.mergeToParentNodes.node = child;
+                                        const hasChildren = child.children().length > 0 ? true : false;
                                         const after = {
                                           "rid": 0,
                                           "cid": 0,
-                                          "metadata": { label: desc.data('metadata') && desc.data('metadata').label ? desc.data('metadata').label : desc.data('name') },
-                                          "value": desc.data('name'),
+                                          "metadata": { label: child.data('metadata') && child.data('metadata').label ? child.data('metadata').label : child.data('name') },
+                                          "value": child.data('name'),
                                         };
                                         const data = { before: null, after: after };
-                                        // addNewNode(data, nodeData);
+                                        debugger;
+                                        if (hasChildren) {
+                                          addNewNode(data, scope.mergeToParentNodes.parent, hasChildren);
+                                        } else {
+                                          addNewNode(data, scope.mergeToParentNodes.parent);
+                                        }
                                       });
+                                    } else {
+                                      scope.hasChildren = false;
                                     }
                                   }
                                 });
