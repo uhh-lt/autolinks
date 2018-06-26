@@ -78,6 +78,17 @@ module.exports.promisedEditResource = function(userid, resourceBefore, resourceA
 /**
  *
  * @param userid
+ * @param querystring
+ * @param caseinsensitive
+ * @return [{Resource}]
+ */
+module.exports.promisedFindResources = function(userid, query, casinsensitive) {
+  return explicitStorage.promisedFindResources(userid, query, casinsensitive);
+};
+
+/**
+ *
+ * @param userid
  * @param filename
  * @param encoding
  * @param mimetype
@@ -161,16 +172,6 @@ module.exports.promisedGetDocumentAnalysis = function(userid, did) {
  */
 module.exports.updateDocumentAnalysis = function(userid, did, analysis) {
   return explicitStorage.updateDocumentAnalysis(userid, did, analysis);
-};
-
-/**
- *
- * @param userid
- * @param query
- * @return [ ]
- */
-module.exports.getSources = function(userid, query) {
-  return explicitStorage.getSources(userid, query);
 };
 
 /**

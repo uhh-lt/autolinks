@@ -29,13 +29,29 @@ module.exports.editresource = function(req, res, next) {
   auth.handle_authenticated_request(req, res, function(user) {
     storage.promisedEditResource(user.id, data.before, data.after).then(
       result => {
-        res.header('Content-Type', 'text/plain; charset=utf-8').write(JSON.stringify(result));
-        res.end(next);
+        res.json(result).end(next);
       },
       err => Exception.fromError(err, 'Editing resource failed.').handleResponse(res).end(next)
     );
   });
 };
+
+module.exports.findresources = function(req, res, next) {
+  auth.handle_authenticated_request(req, res, function(user) {
+
+    if(!req.swagger.params.q || !req.swagger.params.q.value) {
+      return Exception.fromError(null, 'Query string is missing or empty.').handleResponse(res).end(next);
+    }
+    const query = req.swagger.params.q.value;
+    const caseinsensitive = req.swagger.params.ci && req.swagger.params.ci.value || false;
+    storage.promisedFindResources(user.id, query, caseinsensitive).then(
+      result => res.json(Array.from(result)).end(next),
+      err => Exception.fromError(err, 'Finding resource failed.').handleResponse(res).end(next)
+    );
+
+  });
+};
+
 
 module.exports.document_add = function(req, res, next) {
   auth.handle_authenticated_request(req, res, function(user){

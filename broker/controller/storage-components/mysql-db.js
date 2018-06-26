@@ -782,20 +782,21 @@ module.exports.getStorageKeys = function(uid, rids){
     .then(res => res.rows.map(r => r.storagekey));
 };
 
-module.exports.getSourcesForQuery = function(uid, query) {
+module.exports.promisedFindResources = function(uid, query, caseinsensitive) {
   const keys = new Set();
-  return this.getSimilarResources(uid, query)
+  return this.getSimilarResources(uid, query, caseinsensitive)
     .then(rids => this.getSourcesRecursive(uid, rids, keys, 1))
     .catch(e => Exception.fromError(e).log(logger.warn))
-    .then(_ => keys);
+    .then(_ => keys );
 };
 
-module.exports.getSimilarResources = function(uid, query, casesensitive = false) {
+module.exports.getSimilarResources = function(uid, query, caseinsensitive) {
   logger.debug(`Searching for similar resources to '${query}' for user ${uid}.`);
   // select only unique elements where a resource's label is the query or the resource's surfaceForm is the query
-  return promisedQuery('call search_resource(?, ?, ?)', [ uid, query, casesensitive ])
+  const ci = caseinsensitive || false;
+  return promisedQuery('call search_resource(?, ?, ?)', [ uid, query, ci ])
     .then(res => {
-      const rids = res.rows.map(r => r.rid);
+      const rids = res.rows[0].map(r => r.rid);
       logger.debug(`Found ${rids.length} similar resources to '${query}' for user ${uid}: ${rids}.`);
       return rids;
     });

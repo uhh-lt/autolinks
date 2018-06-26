@@ -611,7 +611,7 @@ paths:
           schema:
             $ref: "#/definitions/Exception"
 
-  /storage/editresource:
+  /storage/resource/edit:
     x-swagger-router-controller: storage
     post:
       operationId: editresource
@@ -647,19 +647,24 @@ paths:
           schema:
             $ref: "#/definitions/Exception"
             
-  /storage/findresources:
+  /storage/resource/search:
     x-swagger-router-controller: storage
     get:
-      operationId: findresource
+      operationId: findresources
       tags:
         - Storage
       description: Find resources based on a search query
       parameters:
         - name: q
           in: query
-          description: Get details for each document
+          description: Find resources whose label or sufaceform is like the query
           type: string
           allowEmptyValue: false
+        - name: ci
+          in: query
+          description: search query caseinsensitive
+          type: boolean
+          allowEmptyValue: true
       security:
         - broker_auth: []
       responses:
@@ -668,7 +673,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: "#/definitions/Resource"
+              type: string
         default:
           description: Error
           schema:
@@ -816,7 +821,7 @@ paths:
           schema:
             $ref: "#/definitions/Exception"
 
-  /storage/annotation/{did}:
+  /storage/document/{did}/addannotation:
     x-swagger-router-controller: storage
     post:
       operationId: add_annotation
