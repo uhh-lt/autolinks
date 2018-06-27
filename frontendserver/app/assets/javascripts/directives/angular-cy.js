@@ -271,21 +271,35 @@ define([
                                .cancel('Cancel');
 
                           scope.$parent.$mdDialog.show(confirm).then(function() {
+                            scope.selectedNodesToMerge.hide();
+                            scope.mergeMode = false;
+
                             const nodeData = scope.mergeToParentNodes.node;
                             const parentData = scope.mergeToParentNodes.parent;
                             const hasChildren = scope.mergeToParentNodes.node.children().length > 0 ? true : false;
 
-                            const after = {
-                              "rid": 0,
-                              "cid": 0,
-                              "metadata": { label: nodeData.data('metadata') && nodeData.data('metadata').label ? nodeData.data('metadata').label : nodeData.data('name') },
-                              "value": nodeData.data('name'),
+                            const before = {
+                              "rid": nodeData.data('rid'),
+                              "cid": nodeData.data('cid'),
+                              "metadata": nodeData.data('metadata'),
+                              "value": nodeData.data('value'),
                             };
-                            const data = { before: null, after: after };
-                            addNewNode(data, parentData, hasChildren);
+
+                            const after = {
+                              "rid": nodeData.data('rid'),
+                              "cid": parentData.data('rid'),
+                              "metadata": nodeData.data('metadata'),
+                              "value": nodeData.data('value'),
+                            };
+                            const data = { before: before, after: after };
+                            scope.$parent.EndPointService.editResource(data).then(function(response) {
+                              nodeData.data().cid = parentData.data('rid');
+                              const mvData = nodeData.move({parent: parentData.data('id')});
+                              nodeTipExtension(mvData);
+                              nodeTipExtension(mvData.descendants());
+                            });
+                            // addNewNode(data, parentData, hasChildren);
                           });
-                          scope.mergeMode = false;
-                          scope.selectedNodesToMerge.hide();
                           // $rootScope.$emit('mergeToParent');
                         } else {
                           console.log( 'tapend ' + node.id() );
@@ -618,23 +632,35 @@ define([
                           {
                             content: '<span class="fa fa-plus-circle fa-2x"></span>',
                             select: function(e){
-                              var x = scope.coordinate.x;
-                              var y = scope.coordinate.y;
-                              var nodeObj = {
-                                  data: {
-                                    id: 'n' + scope.data.nodes.length,
-                                    name: 'new',
-                                    metadata: {}
-                                  },
-                                  position: {
-                                    x,
-                                    y
-                                  }
+                              const after = {
+                                "rid": 0,
+                                "cid": 0,
+                                "metadata": { label: "new" },
+                                "value": "new_value_no_" + scope.data.nodes.length + '_' + scope.username,
                               };
-                              var n = cy.add(nodeObj);
-                              scope.data.nodes.push(nodeObj);
-                              nodeTipExtension(n);
-                              // cy.fit();
+                              const data = { before: null, after: after };
+                              scope.$parent.EndPointService.editResource(data).then(function(response) {
+                                var x = scope.coordinate.x;
+                                var y = scope.coordinate.y;
+                                var data = response.data;
+                                var nodeObj = {
+                                    data: {
+                                      cid: data.cid,
+                                      rid: data.rid,
+                                      metadata: data.metadata,
+                                      id: ( data.value + ( '' ) + data.rid + data.cid ).replace(/\s/g, ''),
+                                      name: data.value + ''
+                                    },
+                                    position: {
+                                      x,
+                                      y
+                                    }
+                                };
+                                var n = cy.add(nodeObj);
+                                scope.data.nodes.push(nodeObj);
+                                nodeTipExtension(n);
+                                // cy.fit();
+                              });
                             }
                           },
 
@@ -891,28 +917,53 @@ define([
 
                       $rootScope.$on('createCompound', function() {
                         var newCompound = angular.element('#newCompound').val();
-                        var nodeObj = {
-                            data: {
-                              id: newCompound + '_as_parent',
-                              name: newCompound
-                            }
+                        const after = {
+                          "rid": 0,
+                          "cid": 0,
+                          "metadata": {"label": newCompound},
+                          "value": []
                         };
-                        scope.newCompound = cy.add(nodeObj);
-                        scope.data.nodes.push(nodeObj);
+
                         var ns = cy.$(':selected');
                         _.forEach(ns, function(n) {
-                          n.data().parent = scope.newCompound.data('id');
+                          after.value.push({"rid": n.data('rid')});
                         });
-                        cy.elements().remove();
-                        cy.add(scope.data);
-                        cy.nodes().forEach(function(n){
-                          nodeTipExtension(n);
+                        const data = { before: null, after: after };
+                        scope.$parent.EndPointService.editResource(data).then(function(response) {
+                          var x = scope.coordinate.x;
+                          var y = scope.coordinate.y;
+                          var data = response.data;
+                          var nodeObj = {
+                              data: {
+                                cid: data.cid,
+                                rid: data.rid,
+                                metadata: data.metadata,
+                                id: ( newCompound + ( '_as_parent_' ) + data.rid + '-' + data.cid + '_' + scope.username  ).replace(/\s/g, ''),
+                                name: newCompound + '_' + scope.username,
+                                value: data.value
+                              },
+                              position: {
+                                x,
+                                y
+                              }
+                          };
+                          scope.newCompound = cy.add(nodeObj);
+                          scope.data.nodes.push(nodeObj);
+                          var ns = cy.$(':selected');
+                          _.forEach(ns, function(n) {
+                            n.data().parent = scope.newCompound.data('id');
+                          });
+                          cy.elements().remove();
+                          cy.add(scope.data);
+                          cy.nodes().forEach(function(n){
+                            nodeTipExtension(n);
+                          });
+                          cy.edges().forEach(function(e) {
+                            edgeTipExtension(e);
+                          });
+                          // cy.layout({name: 'cose-bilkent'}).run();
+                          // cy.fit();
                         });
-                        cy.edges().forEach(function(e) {
-                          edgeTipExtension(e);
-                        });
-                        // cy.layout({name: 'cose-bilkent'}).run();
-                        // cy.fit();
                       });
 
                       $rootScope.$on('createNode', function(event, newName) {
@@ -994,6 +1045,10 @@ define([
                       angular.isFunction(scope.events.onload)) {
                       scope.events.onload(cy);
                   }
+
+                  scope.$parent.EndPointService.getUsername().then(function(response) {
+                    scope.username = response.data;
+                  });
 
                   // When the app object changed = redraw the graph
                   // you can use it to pass data to be added or removed from the object without redrawing it
