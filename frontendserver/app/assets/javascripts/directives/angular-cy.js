@@ -271,21 +271,35 @@ define([
                                .cancel('Cancel');
 
                           scope.$parent.$mdDialog.show(confirm).then(function() {
+                            scope.selectedNodesToMerge.hide();
+                            scope.mergeMode = false;
+
                             const nodeData = scope.mergeToParentNodes.node;
                             const parentData = scope.mergeToParentNodes.parent;
                             const hasChildren = scope.mergeToParentNodes.node.children().length > 0 ? true : false;
 
-                            const after = {
-                              "rid": 0,
-                              "cid": 0,
-                              "metadata": { label: nodeData.data('metadata') && nodeData.data('metadata').label ? nodeData.data('metadata').label : nodeData.data('name') },
-                              "value": nodeData.data('name'),
+                            const before = {
+                              "rid": nodeData.data('rid'),
+                              "cid": nodeData.data('cid'),
+                              "metadata": nodeData.data('metadata'),
+                              "value": nodeData.data('value'),
                             };
-                            const data = { before: null, after: after };
-                            addNewNode(data, parentData, hasChildren);
+
+                            const after = {
+                              "rid": nodeData.data('rid'),
+                              "cid": parentData.data('rid'),
+                              "metadata": nodeData.data('metadata'),
+                              "value": nodeData.data('value'),
+                            };
+                            const data = { before: before, after: after };
+                            scope.$parent.EndPointService.editResource(data).then(function(response) {
+                              nodeData.data().cid = parentData.data('rid');
+                              const mvData = nodeData.move({parent: parentData.data('id')});
+                              nodeTipExtension(mvData);
+                              nodeTipExtension(mvData.descendants());
+                            });
+                            // addNewNode(data, parentData, hasChildren);
                           });
-                          scope.mergeMode = false;
-                          scope.selectedNodesToMerge.hide();
                           // $rootScope.$emit('mergeToParent');
                         } else {
                           console.log( 'tapend ' + node.id() );
@@ -912,7 +926,7 @@ define([
 
                         var ns = cy.$(':selected');
                         _.forEach(ns, function(n) {
-                          after.value.push({"rid": ns.data('rid')});
+                          after.value.push({"rid": n.data('rid')});
                         });
                         const data = { before: null, after: after };
                         scope.$parent.EndPointService.editResource(data).then(function(response) {
@@ -925,7 +939,8 @@ define([
                                 rid: data.rid,
                                 metadata: data.metadata,
                                 id: ( newCompound + ( '_as_parent_' ) + data.rid + '-' + data.cid + '_' + scope.username  ).replace(/\s/g, ''),
-                                name: newCompound + '_' + scope.username
+                                name: newCompound + '_' + scope.username,
+                                value: data.value
                               },
                               position: {
                                 x,
