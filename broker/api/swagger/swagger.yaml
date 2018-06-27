@@ -201,7 +201,7 @@ tags:
   - name: Storage
     description: Everything about reading and writing of user data
   - name: Maintenance
-    description: Everything about the maintenance and availability of the vrok and writing of user data
+    description: Everything about the maintenance and availability of the broker
 
 paths:
 
@@ -875,6 +875,79 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Exception"
+  
+  # more on maintenance (note, you need admin priviliges to do that)
+  /maintenance/userdb/reset:
+    x-swagger-router-controller: maintenance
+    get:
+      operationId: resetuserdb
+      tags:
+        - Maintenance
+      summary: reset users
+      description: |
+        returns 'OK' if success, ERROR otherwise
+      consumes: []
+      produces:
+        - text/plain
+      parameters: []
+      responses:
+        200:
+          description: single string with ok message
+          schema:
+            type: string
+            default: 'OK'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Exception'
+            
+  /maintenance/storagedb/reset:
+    x-swagger-router-controller: maintenance
+    get:
+      operationId: resetstoragedb
+      tags:
+        - Maintenance
+      summary: reset storage. This includes documents, annotations, and resources
+      description: |
+        returns 'OK' if success, ERROR otherwise
+      consumes: []
+      produces:
+        - text/plain
+      parameters: []
+      responses:
+        200:
+          description: single string with ok message
+          schema:
+            type: string
+            default: 'OK'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Exception'
+            
+  /maintenance/servicedb/reset:
+    x-swagger-router-controller: maintenance
+    get:
+      operationId: resetservicedb
+      tags:
+        - Maintenance
+      summary: reset services.
+      description: |
+        returns 'OK' if success, ERROR otherwise
+      consumes: []
+      produces:
+        - text/plain
+      parameters: []
+      responses:
+        200:
+          description: single string with ok message
+          schema:
+            type: string
+            default: 'OK'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Exception'
 
   /swagger:
     x-swagger-pipe: swagger_raw

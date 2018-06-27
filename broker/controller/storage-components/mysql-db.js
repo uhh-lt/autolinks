@@ -505,7 +505,7 @@ module.exports.deleteResource = function (resource, userid) {
   return promisedQuery('call remove_stringResourceFromContainer(?,?)', [r.rid, r.cid])
     .then(result => {
       // if it is an annotation resource we also need to delete the annotation from the analysis
-      // TODO: debug me
+      // TODO: debug me, it doesn't seem to work yet
       // TODO: also from every other container
       if(r.value && !r.value.startsWith('annotation:')) {
         // parse resource value: e.g. annotation::CtakesNLP:AnatomicalSiteMention:1:0:7
@@ -792,12 +792,10 @@ module.exports.promisedFindResources = function(uid, query, caseinsensitive, sou
   }
   // else
   return this.getSimilarResources(uid, query, caseinsensitive)
-    .then(rids => rids.map(rid => Promise.all( // TODO here is still an error!
+    .then(rids => rids.map(rid => Promise.all( // TODO here is still an error!, debug me!!!
       this.getResource(rid).then(r => this.fillSourcesRecursive(uid, r))
     )));
 };
-
-
 
 module.exports.getSimilarResources = function(uid, query, caseinsensitive) {
   logger.debug(`Searching for similar resources to '${query}' for user ${uid}.`);
