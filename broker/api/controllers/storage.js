@@ -44,9 +44,14 @@ module.exports.findresources = function(req, res, next) {
     }
     const query = req.swagger.params.q.value;
     const caseinsensitive = req.swagger.params.ci && req.swagger.params.ci.value || false;
-    const notsourcesonly = req.swagger.params.sourcesonly && !req.swagger.params.sourcesonly.value || true;
+    let sourcesonly = true;
+    if(req.swagger.params.sourcesonly){
+      if(req.swagger.params.sourcesonly.value !== undefined){
+        sourcesonly = req.swagger.params.sourcesonly.value;
+      }
+    }
 
-    return storage.promisedFindResources(user.id, query, caseinsensitive, !notsourcesonly).then(
+    return storage.promisedFindResources(user.id, query, caseinsensitive, sourcesonly).then(
       result => res.json(Array.from(result)).end(next),
       err => Exception.fromError(err, 'Finding resource failed.').handleResponse(res).end(next)
     );

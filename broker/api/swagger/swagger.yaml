@@ -664,12 +664,10 @@ paths:
           in: query
           description: search query caseinsensitive
           type: boolean
-          allowEmptyValue: true
         - name: sourcesonly
           in: query
           description: return sources only (default)
           type: boolean
-          allowEmptyValue: true
       security:
         - broker_auth: []
       responses:

@@ -792,8 +792,16 @@ module.exports.promisedFindResources = function(uid, query, caseinsensitive, sou
   }
   // else
   return this.getSimilarResources(uid, query, caseinsensitive)
-    .then(rids => rids.map(rid => Promise.all( // TODO here is still an error!, debug me!!!
-      this.getResource(rid).then(r => this.fillSourcesRecursive(uid, r))
+    .then(rids => Promise.all(rids.map(rid =>
+      this.getResource(rid)
+        .then(resource => {
+          resource.sources = new Set();
+          return this.getSourcesRecursive(uid, resource.rid, resource.sources, 1)
+            .catch(e => Exception.fromError(e).log(logger.warn))
+            .then(_ => resource.sources = Array.from(resource.sources))
+            .then(_ => logger.debug(`Found ${resource.sources.length} source(s) for string resource ${resource.rid}: ${resource.sources}.`))
+            .then(_ => resource);
+        })
     )));
 };
 
