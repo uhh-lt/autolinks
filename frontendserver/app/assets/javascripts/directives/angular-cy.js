@@ -634,7 +634,7 @@ define([
                             select: function(e){
                               const after = {
                                 "rid": 0,
-                                "cid": -1,
+                                "cid": 0,
                                 "metadata": { label: "new" },
                                 "value": "new_value_no_" + scope.data.nodes.length + '_' + scope.username,
                               };
@@ -919,7 +919,7 @@ define([
                         var newCompound = angular.element('#newCompound').val();
                         const after = {
                           "rid": 0,
-                          "cid": -1,
+                          "cid": 0,
                           "metadata": {"label": newCompound},
                           "value": []
                         };
