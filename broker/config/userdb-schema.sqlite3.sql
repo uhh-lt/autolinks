@@ -16,6 +16,9 @@ create table if not exists users (
   lastseenactive integer not null default -1
 );
 
+-- create admin user
+insert into users(name, password) select 'root','toor' where not exists (select 1 from users where name = 'root');
+
 -- create default user
 insert into users(name, password) select 'john','doe' where not exists (select 1 from users where name = 'john');
 

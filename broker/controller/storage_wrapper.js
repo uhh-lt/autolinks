@@ -186,6 +186,14 @@ module.exports.addAnnotation = function(userid, did, anno){
 
 /**
  *
+ * @return {*}
+ */
+module.exports.resetData = function () {
+  return explicitStorage.resetData();
+};
+
+/**
+ *
  * @param userid
  * @param callback = function(err, info)
  */

@@ -884,6 +884,8 @@ paths:
       summary: reset users
       description: |
         returns 'OK' if success, ERROR otherwise
+      security:
+        - broker_auth: []
       consumes: []
       produces:
         - text/plain
@@ -908,6 +910,8 @@ paths:
       summary: reset storage. This includes documents, annotations, and resources
       description: |
         returns 'OK' if success, ERROR otherwise
+      security:
+        - broker_auth: []
       consumes: []
       produces:
         - text/plain
@@ -932,6 +936,8 @@ paths:
       summary: reset services.
       description: |
         returns 'OK' if success, ERROR otherwise
+      security:
+        - broker_auth: []
       consumes: []
       produces:
         - text/plain

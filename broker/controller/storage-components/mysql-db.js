@@ -110,7 +110,7 @@ module.exports.init = function (callback, resetdata) {
     utils.sequentialPromise(queries, promisedQuery)
       .then(res => {
         if (resetdata) {
-          return module.exports.resetDatabase().then(_ignore => res);
+          return this.resetDatabase().then(_ignore => res);
         }
         return res;
       })
@@ -559,8 +559,53 @@ module.exports.info = function (userid, callback) {
 };
 
 module.exports.resetDatabase = function () {
-  logger.debug('Resetting database.');
+  logger.info('Resetting database.');
   return promisedQuery('call reset_database');
+};
+
+module.exports.resetFilesystem = function () {
+  logger.info(`Resetting filesystem.`);
+  return this.removeEverythingInDir(datadir);
+};
+
+module.exports.removeEverythingInDir = function(dir){
+  logger.debug(`Deleting all files and folders in ${dir}.`);
+  return new Promise((resolve, reject) => {
+    return fs.readdir(dir, (err, files) => {
+      if (err) {
+        return reject(err);
+      }
+      if(!files.length){
+        return resolve(true);
+      }
+      return this.removeFiles(files).then(
+        _ => resolve(true),
+        err => reject(err)
+      );
+    });
+  });
+};
+
+module.exports.removeFiles = function(files){
+  return new Promise((resolve, reject) => {
+    return Promise.all(files.map(file => this.removeFile(file))).then(_ => resolve(true), err => reject(err));
+  });
+};
+
+module.exports.removeFile = function(file){
+  return new Promise((resolve, reject) => fs.unlink(file, err => {
+    if(err) {
+      return reject(err);
+    }
+    return resolve(true);
+  }));
+};
+
+module.exports.resetData = function () {
+  return Promise.all([
+    this.resetDatabase(),
+    this.resetFilesystem()
+  ]).then(_ => true);
 };
 
 module.exports.promisedEditResource = function (userid, resourceBefore, resourceAfter) {
