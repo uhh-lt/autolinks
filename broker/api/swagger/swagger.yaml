@@ -681,6 +681,31 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Exception"
+
+  /storage/resource/get:
+    # tell nodejs where to find the code for this path
+    x-swagger-router-controller: storage
+    get:
+      operationId: get_resource
+      tags:
+        - Storage
+      description: Get the resource for a source key
+      security:
+        - broker_auth: []
+      parameters:
+      - name: key
+        in: query
+        description: The source key
+        type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/Resource'
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Exception"
             
   /storage/document:
     x-swagger-router-controller: storage

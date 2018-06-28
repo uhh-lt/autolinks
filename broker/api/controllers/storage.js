@@ -38,7 +38,6 @@ module.exports.editresource = function(req, res, next) {
 
 module.exports.findresources = function(req, res, next) {
   auth.handle_authenticated_request(req, res, function(user) {
-
     if(!req.swagger.params.q || !req.swagger.params.q.value) {
       return Exception.fromError(null, 'Query string is missing or empty.').handleResponse(res).end(next);
     }
@@ -50,16 +49,26 @@ module.exports.findresources = function(req, res, next) {
         sourcesonly = req.swagger.params.sourcesonly.value;
       }
     }
-
     return storage.promisedFindResources(user.id, query, caseinsensitive, sourcesonly).then(
       result => res.json(Array.from(result)).end(next),
       err => Exception.fromError(err, 'Finding resource failed.').handleResponse(res).end(next)
     );
-
-
   });
 };
 
+module.exports.get_resource = function(req, res, next) {
+  auth.handle_authenticated_request(req, res, function(user) {
+    if(!req.swagger.params.key || !req.swagger.params.key.value) {
+      return Exception.fromError(null, 'Query string is missing or empty.').handleResponse(res).end(next);
+    }
+    const storagekey = req.swagger.params.key.value;
+    return storage.promisedRead(user.id, storagekey)
+      .then(
+        result => res.json(result).end(next),
+        err => Exception.fromError(err, 'Error retrieving service data.').log(logger.warn).handleResponse(res).end(next)
+      );
+  });
+};
 
 module.exports.document_add = function(req, res, next) {
   auth.handle_authenticated_request(req, res, function(user){
