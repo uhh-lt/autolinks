@@ -173,7 +173,7 @@ services:
       - ELASTICSEARCH_INDICES=enwiki,wikidata,enwiktionary
   # END: wikiservice
 
-  # BEGIN: demo service
+  # BEGIN: cooc service
   cooc:
     image: remstef/node-swagger:9.5
     volumes:
@@ -193,7 +193,7 @@ services:
       - NODE_ENV=development
       - COOKIE_SECRET=YOUR_COOKIE_SECRET
       - BROKER_URL=http://broker:10010
-  # END: dummy service
+  # END: cooc service
 
   # BEGIN: elasticsearch index
   es:
