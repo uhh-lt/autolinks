@@ -1,6 +1,6 @@
 module.exports = function(url, token, data) {
   return {
-    url: url + '/nlp/interpret/' + data.did,
+    url: url + '/nlp/interpret/' + parseInt(data.did),
     method: 'POST',
     headers: {
        'Content-Type': 'application/json',
