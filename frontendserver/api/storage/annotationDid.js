@@ -1,6 +1,6 @@
 module.exports = function(url, data, token, username, annotation) {
   return {
-    url: url + '/storage/annotation/' + data.did,
+    url: url + '/storage/document/' + data.did + 'addannotation',
     method: 'POST',
     headers: {
        'Content-Type': 'application/json',

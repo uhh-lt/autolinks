@@ -4,7 +4,7 @@ module.exports = function(url, token, data) {
 
   var body = getBody(before, after);
   return {
-    url: url + '/storage/editresource',
+    url: url + '/storage/resource/edit',
     method: 'POST',
     headers: {
        'Content-Type': 'application/json',
