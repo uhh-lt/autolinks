@@ -3,19 +3,27 @@ var request = require('request');
 var express = require('express');
 var fs = require('fs');
 
-var storageEdit = require('./editResource');
+var annotationDid = require('./annotationDid');
+
+var resourceEdit = require('./editResource');
+var resourceGet = require('./getResource');
+var resourceSearch = require('./searchResource');
+
+var documentDelete = require('./deleteDocument');
 var documentLists = require('./getDocuments');
 var documentUpload = require('./postDocuments');
-var annotationDid = require('./annotationDid');
-var documentDelete = require('./deleteDocument');
 
 var router = express.Router();
 var dir = './uploads/';
 
+router.post('/postAnnotationDid', postAnnotationDid);
+
 router.post('/editResource', editResource);
+router.post('/getResource', getResource);
+router.post('/searchResource', searchResource);
+
 router.get('/getDocuments', getDocuments);
 router.post('/postDocuments', postDocuments);
-router.post('/postAnnotationDid', postAnnotationDid);
 router.post('/deleteDocument', deleteDocument);
 
 module.exports = router;
@@ -23,7 +31,25 @@ module.exports = router;
 function editResource(req, res) {
     const token = req.session.token;
     const data = req.body.data;
-    const options = storageEdit(config().apiUrl, token, data);
+    const options = resourceEdit(config().apiUrl, token, data);
+    request(options, function (error, response, body) {
+      res.send(body);
+    });
+}
+
+function getResource(req, res) {
+    const token = req.session.token;
+    const data = req.body.data;
+    const options = resourceGet(config().apiUrl, token, data);
+    request(options, function (error, response, body) {
+      res.send(body);
+    });
+}
+
+function searchResource(req, res) {
+    const token = req.session.token;
+    const data = req.body.data;
+    const options = resourceSearch(config().apiUrl, token, data);
     request(options, function (error, response, body) {
       res.send(body);
     });

@@ -12,6 +12,7 @@ define([
             $rootScope.serviceName = "";
             $rootScope.serviceVersion = "";
             $rootScope.text = "";
+            $rootScope.localSearch = {local: true, ci: false};
 
             return {
               fetchService: function() {
@@ -119,6 +120,17 @@ define([
               getService: function(data) {
                 return $http.post('/api/service/get', { data: data }).then(function(response) {
                   return data = response.data;
+                });
+              },
+
+              localSearch: function(context, isCi) {
+                return $http.post('/api/storage/searchResource', { data: {context: context, isCi: isCi} }).then(function(response) {
+                  _.forEach(response.data, function(source) {
+                    return $http.post('/api/storage/getResource', { data: source }).then(function(response) {
+                      const dataPath = { endpoint: { path: 'localSearch' }};
+                      $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
+                    });
+                  });
                 });
               },
 
