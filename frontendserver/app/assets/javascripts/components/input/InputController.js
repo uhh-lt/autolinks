@@ -76,37 +76,50 @@ define([
                   const inputLength = i.length;
                   $scope.active = EndPointService.getActiveService();
 
-                  if ($scope.active.length > 0) {
+                  if ($scope.active.length > 0 || $rootScope.localSearch.local) {
                     // _.forEach(annotations, function(anno) {
                       // const offsets = anno.doffset.offsets;
-                      _.forEach($scope.list, function(l) {
+                      if ($scope.active.length > 0) {
+                        _.forEach($scope.list, function(l) {
 
-                        $scope.serviceName = l.name;
-                        $scope.serviceVersion = l.version;
+                          $scope.serviceName = l.name;
+                          $scope.serviceVersion = l.version;
 
-                        _.forEach(l.endpoints, function(e) {
-                          if (_.includes($scope.active, e.path)) {
-                            $scope.data = {
-                              offsets:
-                              {
-                                // from: offsets[0].from ? offsets[0].from : 0,
-                                from: 0,
-                                length: inputLength
-                                // length: offsets[0].length
-                              },
-                              context: $scope.context,
-                              name: $scope.serviceName,
-                              version: $scope.serviceVersion,
-                              endpoint: e
+                          _.forEach(l.endpoints, function(e) {
+                            if (_.includes($scope.active, e.path)) {
+                              $scope.data = {
+                                offsets:
+                                {
+                                  // from: offsets[0].from ? offsets[0].from : 0,
+                                  from: 0,
+                                  length: inputLength
+                                  // length: offsets[0].length
+                                },
+                                context: $scope.context,
+                                name: $scope.serviceName,
+                                version: $scope.serviceVersion,
+                                endpoint: e
+                              };
+
+                              EndPointService.fetchData($scope.data).then(function(response) {
+                                  EntityService.addEntity(response, $scope.data);
+                              });
                             };
 
-                            EndPointService.fetchData($scope.data).then(function(response) {
-                                EntityService.addEntity(response, $scope.data);
-                            });
-                          };
-
+                          });
                         });
-                      });
+                      };
+
+                      if ($rootScope.localSearch.local) {
+                        const localSearch = $rootScope.localSearch;
+                        if (localSearch.local) {
+                          const context = $scope.context;
+                          EndPointService.localSearch(context, localSearch.ci).then(function(response) {
+                              // const dataPath = { endpoint: { path: 'localSearch' }};
+                              // $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
+                          });
+                        };
+                      }
                     // });
                   } else {
                     $mdToast.show(

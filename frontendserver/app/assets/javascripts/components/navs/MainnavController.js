@@ -23,6 +23,7 @@ define([
           $scope.lockLeft = false;
           $scope.toggle = {};
           $scope.selectedDoc = {};
+          $scope.localSearch = $rootScope.localSearch;
 
           $rootScope.$on('toggleMainnav', function() {
             $scope.lockLeft = !$scope.lockLeft;
