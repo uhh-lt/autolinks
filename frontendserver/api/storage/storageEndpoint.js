@@ -16,10 +16,14 @@ var documentUpload = require('./postDocuments');
 var router = express.Router();
 var dir = './uploads/';
 
+router.post('/postAnnotationDid', postAnnotationDid);
+
 router.post('/editResource', editResource);
+router.post('/getResource', getResource);
+router.post('/searchResource', searchResource);
+
 router.get('/getDocuments', getDocuments);
 router.post('/postDocuments', postDocuments);
-router.post('/postAnnotationDid', postAnnotationDid);
 router.post('/deleteDocument', deleteDocument);
 
 module.exports = router;

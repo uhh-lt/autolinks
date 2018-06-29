@@ -1,6 +1,6 @@
-module.exports = function(url, token, query, isCi) {
+module.exports = function(url, token, data) {
   return {
-    url: url + '/storage/resource/search?q=' + service + '&ci=' + isCi + '&sourcesonly=true',
+    url: url + '/storage/resource/search?q=' + data.context + '&ci=' + data.isCi + '&sourcesonly=true',
     method: 'GET',
     headers: {
        'Content-Type': 'application/json',
