@@ -847,8 +847,8 @@ define([
                             scope.outermostId = entity.rid;
                             extractEntity(entity);
                             var outermostEntity = assignEntity(entity, 'outermostParentEntity');
-                          } else {
-                            return;
+                          } else if (typeof entity.value === "string") {
+                            var outermostEntity = assignEntity(entity);
                           }
 
                           if (outermostEntity) {
