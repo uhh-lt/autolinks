@@ -62,6 +62,14 @@ define([
             });
           };
 
+          $scope.loadNewDoc = function(doc) {
+            EndPointService.setSelectedDoc(doc);
+            EndPointService.loadDoc(doc.did).then(function(response) {
+              $rootScope.$emit('activateCarouselFromDoc', response.data);
+              EndPointService.interpretDoc(doc.did);
+            });
+          };
+
           $scope.deleteDoc = function(doc, index) {
             $scope.trash = doc;
             $scope.trashIndex = index;
@@ -93,11 +101,13 @@ define([
             $scope.selectedDoc = doc;
           });
 
-          $rootScope.$on('addDocument', function(event, newDoc) {
+          $rootScope.$on('addDocument', function(event, newDoc, overwrite = false) {
             $scope.selectedDoc = { did: newDoc.did, name: newDoc.name };
-            $scope.loadDoc(newDoc);
+            $scope.loadNewDoc(newDoc);
             newDoc.filename = newDoc.name;
-            $scope.documents.push(newDoc);
+            if (!overwrite) {
+              $scope.documents.push(newDoc);
+            }
             $mdSidenav('left').toggle();
             $scope.toggle.doc;
           });

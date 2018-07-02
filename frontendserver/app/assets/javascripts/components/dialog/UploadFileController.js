@@ -35,12 +35,13 @@ define([
                             .theme("primary-toast")
                             .hideDelay(3500)
                         );
-                     if (resp.config.data.overwrite !== "true") {
+                     if (resp.config.data.overwrite === "true") {
+                       $rootScope.$emit('addDocument', resp.data, true);
+                     } else {
                        $rootScope.$emit('addDocument', resp.data);
                      }
                      EndPointService.setSelectedDoc(resp.data);
                       // $window.alert('Success ' + resp.data.name + 'with did: ' + resp.data.did + ' uploaded');
-                     EndPointService.interpretDoc(resp.data.did);
                   } else {
                       // $window.alert(resp.data.message);
                     $mdToast.show(
