@@ -848,7 +848,7 @@ define([
                             extractEntity(entity);
                             var outermostEntity = assignEntity(entity, 'outermostParentEntity');
                           } else if (typeof entity.value === "string") {
-                            var outermostEntity = assignEntity(entity);
+                            var outermostEntity = assignEntity(entity, 'outermostParentEntity');
                           }
 
                           if (outermostEntity) {
