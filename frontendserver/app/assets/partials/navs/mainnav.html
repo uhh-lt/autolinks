@@ -38,20 +38,38 @@
 
         <md-list-item class="main-subheader" ng-click="toggle.service = !toggle.service">
           <span flex>Service lists:</span>
-          <i ng-show="toggle.service" class="fa fa-chevron-down" aria-hidden="true"></i>
-          <i ng-show="!toggle.service" class="fa fa-chevron-right" aria-hidden="true"></i>
+          <i ng-show="!toggle.service" class="fa fa-chevron-down" aria-hidden="true"></i>
+          <i ng-show="toggle.service" class="fa fa-chevron-right" aria-hidden="true"></i>
         </md-list-item>
         <md-divider></md-divider>
-        <div ng-repeat="list in lists" ng-show="!toggle.service">
-          <md-subheader class="md-no-sticky">
-            <h5>{{ list.name }}</h5>
-            <p>{{ list.description }}</p>
-          </md-subheader>
-          <md-list-item ng-repeat="endpoint in list.endpoints">
-            <p>{{ endpoint.path }}</p>
-            <md-switch class="md-secondary" ng-model="endpoint.enabled" ng-model-options="{ getterSetter: true, updateOn: 'default' }" ng-change="navigateTo(endpoint)"></md-switch>
-          </md-list-item>
-          <md-divider></md-divider>
+        <div ng-show="toggle.service">
+          <div class="autolinks-local-search">
+            <md-list-item class="main-subheader">
+              <md-input-container dir="rtl" class="autolinks-input-checkbox">
+                 <md-checkbox ng-model="localSearch.local">
+                  Local Search
+                 </md-checkbox>
+              </md-input-container>
+            </md-list-item>
+            <md-list-item ng-show="localSearch.local">
+              <md-input-container dir="rtl" class="autolinks-input-checkbox-ci">
+                 <md-checkbox ng-model="localSearch.ci">
+                  ?case insensitive
+                 </md-checkbox>
+              </md-input-container>
+            </md-list-item>
+          </div>
+          <div class="autolinks-service-list" ng-repeat="list in lists" >
+            <md-subheader class="md-no-sticky">
+              <h5>{{ list.name }}</h5>
+              <p>{{ list.description }}</p>
+            </md-subheader>
+            <md-list-item ng-repeat="endpoint in list.endpoints">
+              <p>{{ endpoint.path }}</p>
+              <md-switch class="md-secondary" ng-model="endpoint.enabled" ng-model-options="{ getterSetter: true, updateOn: 'default' }" ng-change="navigateTo(endpoint)"></md-switch>
+            </md-list-item>
+            <md-divider></md-divider>
+          </div>
         </div>
 
         <md-list flex>
