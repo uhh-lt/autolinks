@@ -35,6 +35,7 @@ define([
               self.cy = cy;
           }
 
+          $scope.progressBarIsActive = false;
           $scope.EntityService = EntityService;
           $scope.EndPointService = EndPointService;
           $scope.$mdDialog = $mdDialog;
@@ -264,11 +265,18 @@ define([
           };
 
           // reset the sample nodes
-          $scope.layoutReset = function(){
+          $scope.layoutReset = function() {
               $scope.mapData = [];
               $scope.edgeData = [];
               $rootScope.$broadcast('layoutReset');
-          }
+          };
+
+          $rootScope.$on('activateProgressBar', function() {
+              $scope.progressBarIsActive = true;
+          });
+          $rootScope.$on('deactivateProgressBar', function() {
+              $scope.progressBarIsActive = false;
+          });
         }
     ]);
 });
