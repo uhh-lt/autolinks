@@ -23,7 +23,7 @@ define([
           }
           vm.upload = function (file, overwrite) {
               // upload API
-              $rootScope.$emit('activateProgressBar');
+              $rootScope.$emit('activateProgressBar', 'uploading a file');
               Upload.upload({
                   url: '/api/storage/postDocuments', //webAPI exposed to upload the file
                   data:{ docFile: file, overwrite } //pass file as data, should be user ng-model

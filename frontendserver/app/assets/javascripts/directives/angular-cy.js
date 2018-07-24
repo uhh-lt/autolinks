@@ -878,6 +878,7 @@ define([
                           cy.layout(scope.options.layout).run();
                         }
                         $rootScope.$emit('switchNodesBasedOnTypes');
+                        $rootScope.$emit('deactivateProgressBar');
                       });
 
                       if (!$rootScope.$$listenerCount.addEdge) {
@@ -1066,7 +1067,7 @@ define([
                   });
 
                   $(document).on('click', "#addEdge", function(e){
-                    $rootScope.$broadcast('addEdge');
+                    $rootScope.$emit('addEdge');
                   });
 
                   $(document).on('click', "#moveNode", function(event, n){

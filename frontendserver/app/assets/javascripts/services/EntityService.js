@@ -31,11 +31,11 @@ define([
 
               updateRootScopeEntity: function(entity) {
                 $rootScope.entity = entity;
-                $rootScope.$broadcast('updateNode');
+                $rootScope.$emit('updateNode');
               },
 
               addEntity: function(entity, data) {
-                $rootScope.$broadcast('addEntity', { entity: entity, data: data });
+                $rootScope.$emit('addEntity', { entity: entity, data: data });
               },
 
               deleteEntity: function() {

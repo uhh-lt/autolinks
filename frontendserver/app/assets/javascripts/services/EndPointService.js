@@ -42,7 +42,7 @@ define([
                   $rootScope.activeTypes.push(type.name);
                 } else {
                   _.pull($rootScope.activeTypes, type.name);
-                  // $rootScope.$broadcast('disableEndpoint', service.path);
+                  // $rootScope.$emit('disableEndpoint', service.path);
                 }
                 $rootScope.$emit('refreshCarouselBasedOnType');
               },
@@ -70,12 +70,14 @@ define([
               },
 
               loadDoc: function(did) {
+                $rootScope.$emit('activateProgressBar', 'Preparing a document');
                 return $http.post('/api/nlp/analyzeDid', { did: did }).then(function(response) {
                   return response;
                 });
               },
 
               interpretDoc: function(did) {
+                $rootScope.$emit('activateProgressBar', 'Interpreting the document');
                 return $http.post('/api/nlp/interpretDid', { did: did }).then(function(response) {
                   return response;
                 });
@@ -138,6 +140,7 @@ define([
 
               fetchData: function(data) {
                 const promise = $q.defer();
+                $rootScope.$emit('activateProgressBar', 'Extracting knowledge graph');
                 // let data = [];
                 // let list = $rootScope.listServices;
                 // $rootScope.text = text;

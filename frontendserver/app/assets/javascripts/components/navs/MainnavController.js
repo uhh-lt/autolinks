@@ -67,8 +67,9 @@ define([
             EndPointService.setSelectedDoc(doc);
             EndPointService.loadDoc(doc.did).then(function(response) {
               $rootScope.$emit('activateCarouselFromDoc', response.data);
-              EndPointService.interpretDoc(doc.did);
-              $rootScope.$emit('deactivateProgressBar');
+              EndPointService.interpretDoc(doc.did).then(function(response) {
+                $rootScope.$emit('deactivateProgressBar');
+              });
             });
           };
 

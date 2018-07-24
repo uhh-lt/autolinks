@@ -36,6 +36,7 @@ define([
           }
 
           $scope.progressBarIsActive = false;
+          $scope.progressStatus = 'Loading';
           $scope.EntityService = EntityService;
           $scope.EndPointService = EndPointService;
           $scope.$mdDialog = $mdDialog;
@@ -212,7 +213,7 @@ define([
               // adding the new Node to the nodes array
               $scope.mapData.push(newNode);
               // broadcasting the event
-              $rootScope.$broadcast('appChanged');
+              $rootScope.$emit('appChanged');
               // resetting the form
               $scope.form.obj = {};
           };
@@ -228,7 +229,7 @@ define([
               // adding the new edge object to the adges array
               $scope.edgeData.push(newEdge);
               // broadcasting the event
-              $rootScope.$broadcast('appChanged');
+              $rootScope.$emit('appChanged');
               // resetting the form
               $scope.formEdges = '';
           };
@@ -268,11 +269,12 @@ define([
           $scope.layoutReset = function() {
               $scope.mapData = [];
               $scope.edgeData = [];
-              $rootScope.$broadcast('layoutReset');
+              $rootScope.$emit('layoutReset');
           };
 
-          $rootScope.$on('activateProgressBar', function() {
+          $rootScope.$on('activateProgressBar', function(event, status) {
               $scope.progressBarIsActive = true;
+              $scope.progressStatus = status;
           });
           $rootScope.$on('deactivateProgressBar', function() {
               $scope.progressBarIsActive = false;

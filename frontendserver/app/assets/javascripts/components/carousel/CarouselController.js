@@ -372,7 +372,7 @@ define([
 
               EndPointService.interpretOffset(selectedDoc.did, offsets).then(function(response) {
                 var dataPath = { endpoint: { path: 'annotationNode' }}
-                $rootScope.$broadcast('addEntity', { entity: response.data, data: dataPath });
+                $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
                 // EntityService.addEntity(response.data);
               });
               console.log($scope.text);

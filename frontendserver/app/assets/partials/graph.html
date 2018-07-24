@@ -1,5 +1,10 @@
 <div id="content" class="container">
-  <md-progress-linear md-mode="indeterminate" ng-show="progressBarIsActive"></md-progress-linear>
+  <div class="progressBar" ng-show="progressBarIsActive">
+    <md-progress-linear md-mode="indeterminate"></md-progress-linear>
+    <div class="bottom-block">
+      <span>{{ progressStatus }}<span class="loader__dot">.</span><span class="loader__dot">.</span><span class="loader__dot">.</span></span>
+    </div>
+  </div>
     <!-- <div class="row">
       <div class="col-xs-8">
         <span>Node:</span>
