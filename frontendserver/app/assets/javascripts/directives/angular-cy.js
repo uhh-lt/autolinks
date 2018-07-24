@@ -809,7 +809,8 @@ define([
                         if (_.isArray(n.value)) {
                           if (n.value.length > 0) {
                             _.forEach(n.value, function(e) {
-                              n.value = 'parent';
+                              // n.value = 'parent';
+                              n.value = n.rid + '';
                               var subject = assignEntity(n, parent);
                               scope.newNode.push(subject);
                               extractEntity(e, subject);
