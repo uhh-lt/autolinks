@@ -196,7 +196,7 @@ define([
                                     };
                                     addedEles.data().name = 'has relation';
                                     // adding the edge object to the edges array
-                                    scope.data.edges.push(edgeObj);
+                                    // scope.data.edges.push(edgeObj);
                                     edgeTipExtension(addedEles);
                                 });
                             });
@@ -536,7 +536,7 @@ define([
                                         }
                                     };
                                     var n = cy.add(nodeObj);
-                                    scope.data.nodes.push(nodeObj);
+                                    // scope.data.nodes.push(nodeObj);
                                     nodeTipExtension(n);
 
                                     scope.mergeToParentNodes.parent = n;
@@ -582,7 +582,7 @@ define([
                                   }
                               };
                               var n = cy.add(nodeObj);
-                              scope.data.nodes.push(nodeObj);
+                              // scope.data.nodes.push(nodeObj);
                               nodeTipExtension(n);
                             }
                           }
@@ -657,7 +657,7 @@ define([
                                     }
                                 };
                                 var n = cy.add(nodeObj);
-                                scope.data.nodes.push(nodeObj);
+                                // scope.data.nodes.push(nodeObj);
                                 nodeTipExtension(n);
                                 // cy.fit();
                               });
@@ -950,7 +950,7 @@ define([
                               }
                           };
                           scope.newCompound = cy.add(nodeObj);
-                          scope.data.nodes.push(nodeObj);
+                          // scope.data.nodes.push(nodeObj);
                           var ns = cy.$(':selected');
                           _.forEach(ns, function(n) {
                             n.data().parent = scope.newCompound.data('id');
@@ -981,7 +981,7 @@ define([
                             }
                         };
                         var n = cy.add(nodeObj);
-                        scope.data.nodes.push(nodeObj);
+                        // scope.data.nodes.push(nodeObj);
                         nodeTipExtension(n);
                         // cy.layout({name: 'cose-bilkent'}).run();
                         // cy.fit();
