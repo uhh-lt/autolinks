@@ -126,6 +126,7 @@ define([
               },
 
               localSearch: function(context, isCi) {
+                $rootScope.$emit('activateProgressBar', 'local search');
                 return $http.post('/api/storage/searchResource', { data: {context: context, isCi: isCi} }).then(function(response) {
                   _.forEach(response.data, function(source) {
                     if (!_.includes(source, 'annotations::')) {
