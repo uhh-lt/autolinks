@@ -24,6 +24,9 @@ define([
           $scope.toggle = {};
           $scope.selectedDoc = {};
           $scope.localSearch = $rootScope.localSearch;
+          $scope.documentLense = true;
+          $scope.types = [];
+          $scope.documents = [];
 
           $rootScope.$on('toggleMainnav', function() {
             $scope.lockLeft = !$scope.lockLeft;
@@ -47,6 +50,14 @@ define([
 
           $scope.navigateTo = function(service) {
             EndPointService.toggleService(service);
+          };
+
+          $scope.toggleLense = function() {
+            if($scope.documentLense) {
+              $rootScope.$emit('activateCarousel');
+            } else {
+              $rootScope.$emit('deactivateCarousel');
+            }
           };
 
           //TODO: this argument is named as typ, to avoid reserved words
@@ -85,6 +96,10 @@ define([
             $mdDialog.show(confirm).then(function() {
               $scope.documents.splice($scope.trashIndex, 1);
               EndPointService.deleteDoc($scope.trash.did);
+              if ($scope.trash.did === $scope.selectedDoc.did) {
+                $scope.types = [];
+                $rootScope.$emit('deleteSlide');
+              }
             });
           };
 
