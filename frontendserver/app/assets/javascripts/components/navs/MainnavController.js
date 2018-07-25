@@ -24,6 +24,9 @@ define([
           $scope.toggle = {};
           $scope.selectedDoc = {};
           $scope.localSearch = $rootScope.localSearch;
+          $scope.documentLense = true;
+          $scope.types = [];
+          $scope.documents = [];
 
           $rootScope.$on('toggleMainnav', function() {
             $scope.lockLeft = !$scope.lockLeft;
@@ -49,6 +52,14 @@ define([
             EndPointService.toggleService(service);
           };
 
+          $scope.toggleLense = function() {
+            if($scope.documentLense) {
+              $rootScope.$emit('activateCarousel');
+            } else {
+              $rootScope.$emit('deactivateCarousel');
+            }
+          };
+
           //TODO: this argument is named as typ, to avoid reserved words
           $scope.toggleTypeTo = function(typ) {
             EndPointService.toggleTypes(typ);
@@ -59,6 +70,7 @@ define([
             EndPointService.setSelectedDoc(doc);
             EndPointService.loadDoc(doc.did).then(function(response) {
               $rootScope.$emit('activateCarouselFromDoc', response.data);
+              $rootScope.$emit('deactivateProgressBar');
             });
           };
 
@@ -66,7 +78,9 @@ define([
             EndPointService.setSelectedDoc(doc);
             EndPointService.loadDoc(doc.did).then(function(response) {
               $rootScope.$emit('activateCarouselFromDoc', response.data);
-              EndPointService.interpretDoc(doc.did);
+              EndPointService.interpretDoc(doc.did).then(function(response) {
+                $rootScope.$emit('deactivateProgressBar');
+              });
             });
           };
 
@@ -82,6 +96,10 @@ define([
             $mdDialog.show(confirm).then(function() {
               $scope.documents.splice($scope.trashIndex, 1);
               EndPointService.deleteDoc($scope.trash.did);
+              if ($scope.trash.did === $scope.selectedDoc.did) {
+                $scope.types = [];
+                $rootScope.$emit('deleteSlide');
+              }
             });
           };
 

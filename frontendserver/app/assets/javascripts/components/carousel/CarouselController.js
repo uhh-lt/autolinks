@@ -372,7 +372,7 @@ define([
 
               EndPointService.interpretOffset(selectedDoc.did, offsets).then(function(response) {
                 var dataPath = { endpoint: { path: 'annotationNode' }}
-                $rootScope.$broadcast('addEntity', { entity: response.data, data: dataPath });
+                $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
                 // EntityService.addEntity(response.data);
               });
               console.log($scope.text);
@@ -424,7 +424,7 @@ define([
           $scope.resetSlides = function(loadType) {
             $scope.myInterval = 5000;
             $scope.noWrapSlides = true;
-            if (!loadType === 'refresh') {
+            if (loadType !== 'refresh') {
               $scope.active = 0;
             }
             $scope.isActive = false;
@@ -440,9 +440,22 @@ define([
           //   $scope.addSlide(sentence.properties.surface);
           // }
 
+          $rootScope.$on('activateCarousel', function() {
+            if ($scope.slides.length > 0) {
+                $scope.isActive = true;
+            }
+          });
+
+          $rootScope.$on('deactivateCarousel', function() {
+              $scope.isActive = false;
+          });
+
+          $rootScope.$on('deleteSlide', function() {
+              $scope.slides = [];
+              $scope.isActive = false;
+          });
+
           $rootScope.$on('activateCarouselFromDoc', function(event, data) {
-              // $scope.resetSlides();
-              // $scope.isActive = true;
               $scope.doc = data.text;
               textAnnotations(data);
           });

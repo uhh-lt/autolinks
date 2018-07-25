@@ -23,10 +23,12 @@ define([
           }
           vm.upload = function (file, overwrite) {
               // upload API
+              $rootScope.$emit('activateProgressBar', 'uploading a file');
               Upload.upload({
                   url: '/api/storage/postDocuments', //webAPI exposed to upload the file
                   data:{ docFile: file, overwrite } //pass file as data, should be user ng-model
               }).then(function (resp) { //upload function returns a promise
+                  $mdDialog.hide();
                   if(resp.status === 200 && resp.data.did) { //validate success
                     $mdToast.show(
                           $mdToast.simple()
@@ -51,6 +53,7 @@ define([
                             .theme("warn-toast")
                             .hideDelay(4500)
                         );
+                    $rootScope.$emit('deactivateProgressBar');
                   }
                   // var file = $('#docFile');
                   //
@@ -75,7 +78,6 @@ define([
                   // } else {
                   //     alert('Please upload a file before continuing')
                   // }
-                  $mdDialog.hide();
               }, function (resp) { //catch error
                   console.log('Error status: ' + resp.data.message);
                   // $window.alert('Error status: ' + resp.data.message);

@@ -196,7 +196,7 @@ define([
                                     };
                                     addedEles.data().name = 'has relation';
                                     // adding the edge object to the edges array
-                                    scope.data.edges.push(edgeObj);
+                                    // scope.data.edges.push(edgeObj);
                                     edgeTipExtension(addedEles);
                                 });
                             });
@@ -536,7 +536,7 @@ define([
                                         }
                                     };
                                     var n = cy.add(nodeObj);
-                                    scope.data.nodes.push(nodeObj);
+                                    // scope.data.nodes.push(nodeObj);
                                     nodeTipExtension(n);
 
                                     scope.mergeToParentNodes.parent = n;
@@ -582,7 +582,7 @@ define([
                                   }
                               };
                               var n = cy.add(nodeObj);
-                              scope.data.nodes.push(nodeObj);
+                              // scope.data.nodes.push(nodeObj);
                               nodeTipExtension(n);
                             }
                           }
@@ -657,7 +657,7 @@ define([
                                     }
                                 };
                                 var n = cy.add(nodeObj);
-                                scope.data.nodes.push(nodeObj);
+                                // scope.data.nodes.push(nodeObj);
                                 nodeTipExtension(n);
                                 // cy.fit();
                               });
@@ -809,7 +809,8 @@ define([
                         if (_.isArray(n.value)) {
                           if (n.value.length > 0) {
                             _.forEach(n.value, function(e) {
-                              n.value = 'parent';
+                              // n.value = 'parent';
+                              n.value = n.rid + '';
                               var subject = assignEntity(n, parent);
                               scope.newNode.push(subject);
                               extractEntity(e, subject);
@@ -878,6 +879,7 @@ define([
                           cy.layout(scope.options.layout).run();
                         }
                         $rootScope.$emit('switchNodesBasedOnTypes');
+                        $rootScope.$emit('deactivateProgressBar');
                       });
 
                       if (!$rootScope.$$listenerCount.addEdge) {
@@ -948,7 +950,7 @@ define([
                               }
                           };
                           scope.newCompound = cy.add(nodeObj);
-                          scope.data.nodes.push(nodeObj);
+                          // scope.data.nodes.push(nodeObj);
                           var ns = cy.$(':selected');
                           _.forEach(ns, function(n) {
                             n.data().parent = scope.newCompound.data('id');
@@ -979,7 +981,7 @@ define([
                             }
                         };
                         var n = cy.add(nodeObj);
-                        scope.data.nodes.push(nodeObj);
+                        // scope.data.nodes.push(nodeObj);
                         nodeTipExtension(n);
                         // cy.layout({name: 'cose-bilkent'}).run();
                         // cy.fit();
@@ -1066,7 +1068,7 @@ define([
                   });
 
                   $(document).on('click', "#addEdge", function(e){
-                    $rootScope.$broadcast('addEdge');
+                    $rootScope.$emit('addEdge');
                   });
 
                   $(document).on('click', "#moveNode", function(event, n){

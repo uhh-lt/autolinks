@@ -100,7 +100,7 @@ define([
 
               // $scope.selectedEntity = EntityService.updateRootScopeEntity($scope.selectedEntity);
               // // broadcasting the event
-              // // $rootScope.$broadcast('appChanged');
+              // // $rootScope.$emit('appChanged');
               // $mdSidenav('right').close();
           };
 
@@ -109,7 +109,7 @@ define([
             if (_.includes(pvc.origin, 'service::')) {
               $scope.dataPath = { endpoint: { path: pvc.path }}
               EndPointService.getService(pvc.surface).then(function(response) {
-                $rootScope.$broadcast('addEntity', { entity: response, data: $scope.dataPath });
+                $rootScope.$emit('addEntity', { entity: response, data: $scope.dataPath });
               });
             } else {
               EndPointService.loadDoc(pvc.did).then(function(response) {
