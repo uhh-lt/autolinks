@@ -951,13 +951,16 @@ define([
                               }
                           };
                           scope.newCompound = cy.add(nodeObj);
-                          // scope.data.nodes.push(nodeObj);
+
                           var ns = cy.$(':selected');
                           _.forEach(ns, function(n) {
                             n.data().parent = scope.newCompound.data('id');
                           });
+
+                          var tempCy = cy.elements();
                           cy.elements().remove();
-                          cy.add(scope.data);
+                          cy.add(tempCy);
+
                           cy.nodes().forEach(function(n){
                             nodeTipExtension(n);
                           });

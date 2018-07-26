@@ -62,7 +62,7 @@ define([
                   break;
                 case 'Edit':
                   break;
-                case 'Merge':
+                case 'Move into':
                   if (cy.$(':selected').length > 0) {
                     $mdBottomSheet.hide();
                     $mdToast.show(
@@ -84,7 +84,7 @@ define([
                     console.log('Please select one or more nodes to merge to parent');
                   }
                   break;
-                case 'Compound':
+                case 'Create new compound':
                   if (cy.$(':selected').length > 0) {
                     EntityService.openSideNav('createCompound');
                   } else {

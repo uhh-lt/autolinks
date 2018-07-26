@@ -117,6 +117,7 @@ define([
                   const resp = {data: response.data, pvc: $scope.selectedPvc};
                   $rootScope.$emit('navigateToDocFromSource', resp);
                   $rootScope.$emit('checkedDoc', {did: resp.pvc.did, name: resp.pvc.filename});
+                  $rootScope.$emit('deactivateProgressBar');
                 }
               });
             }
