@@ -70,14 +70,14 @@ define([
               },
 
               loadDoc: function(did) {
-                $rootScope.$emit('activateProgressBar', 'Preparing a document');
+                $rootScope.$emit('activateProgressBar', 'loading a document');
                 return $http.post('/api/nlp/analyzeDid', { did: did }).then(function(response) {
                   return response;
                 });
               },
 
               interpretDoc: function(did) {
-                $rootScope.$emit('activateProgressBar', 'Interpreting the document');
+                $rootScope.$emit('activateProgressBar', 'interpreting the document');
                 return $http.post('/api/nlp/interpretDid', { did: did }).then(function(response) {
                   return response;
                 });
@@ -120,13 +120,18 @@ define([
               },
 
               getService: function(data) {
+                $rootScope.$emit('activateProgressBar', 'calling a service from source');
                 return $http.post('/api/service/get', { data: data }).then(function(response) {
                   return data = response.data;
                 });
               },
 
               localSearch: function(context, isCi) {
+                $rootScope.$emit('activateProgressBar', 'local search');
                 return $http.post('/api/storage/searchResource', { data: {context: context, isCi: isCi} }).then(function(response) {
+                  if (response.data.length < 1) {
+                    $rootScope.$emit('deactivateProgressBar');
+                  }
                   _.forEach(response.data, function(source) {
                     if (!_.includes(source, 'annotations::')) {
                       return $http.post('/api/storage/getResource', { data: source }).then(function(response) {

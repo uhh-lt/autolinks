@@ -117,6 +117,7 @@ define([
                   const resp = {data: response.data, pvc: $scope.selectedPvc};
                   $rootScope.$emit('navigateToDocFromSource', resp);
                   $rootScope.$emit('checkedDoc', {did: resp.pvc.did, name: resp.pvc.filename});
+                  $rootScope.$emit('deactivateProgressBar');
                 }
               });
             }
@@ -136,7 +137,7 @@ define([
           $scope.delete = function(ev) {
               const entity = $scope.selectedEntity;
               const label = $scope.label;
-              var entName = entity.data('metadata').label ?  entity.data('metadata').label : entity.data('name');
+              var entName = entity.data('metadata') && entity.data('metadata').label ?  entity.data('metadata').label : entity.data('name');
 
               var confirm = $mdDialog.confirm()
                    .title('Are you sure to delete ' + entName + ' node ?')

@@ -159,7 +159,7 @@ define([
                               "metadata": {},
                               "value": { "subject": { "rid": sourceNode.data().rid },
                                          "predicate": {
-                                           "value": "has new relation_no_" + scope.data.edges.length,
+                                           "value": "has new relation_no_" + cy.edges().length,
                                             "metadata": { "label": "has relation" } },
                                          "object": { "rid": targetNode.data().rid }
                                        }
@@ -573,7 +573,7 @@ define([
                               var nodeObj = {
                                   data: {
                                     parent: parent.id(),
-                                    id: 'n' + scope.data.nodes.length,
+                                    id: 'n' + cy.nodes().length,
                                     name: 'new'
                                   },
                                   position: {
@@ -600,7 +600,7 @@ define([
                                   "rid": 0,
                                   "cid": 0,
                                   "metadata": { label: "new" },
-                                  "value": "new_no_" + scope.data.nodes.length,
+                                  "value": "new_no_" + cy.nodes().length,
                                 };
                                 const data = { before: null, after: after };
                                 addNewNode(data, e);
@@ -636,7 +636,7 @@ define([
                                 "rid": 0,
                                 "cid": 0,
                                 "metadata": { label: "new" },
-                                "value": "new_value_no_" + scope.data.nodes.length + '_' + scope.username,
+                                "value": "new_value_no_" + cy.nodes().length + '_' + scope.username,
                               };
                               const data = { before: null, after: after };
                               scope.$parent.EndPointService.editResource(data).then(function(response) {
@@ -830,8 +830,8 @@ define([
 
                       $rootScope.$on('addEntity', function(event, res) {
                         var entity = res.entity;
-                        var nodes = scope.data.nodes;
-                        var edges = scope.data.edges;
+                        // var nodes = scope.data.nodes;
+                        // var edges = scope.data.edges;
 
                         scope.path = res.data ? res.data.endpoint.path : [];
                         scope.newNode = [];
@@ -874,8 +874,9 @@ define([
                           nodeTipExtension(n);
                           edgeTipExtension(e);
 
-                          scope.data.nodes = _.union(nodes, filterNode);
-                          scope.data.edges = _.union(edges, scope.newEdge);
+                          //TODO: remove temporary variable
+                          // scope.data.nodes = _.union(nodes, filterNode);
+                          // scope.data.edges = _.union(edges, scope.newEdge);
                           cy.layout(scope.options.layout).run();
                         }
                         $rootScope.$emit('switchNodesBasedOnTypes');
@@ -950,13 +951,16 @@ define([
                               }
                           };
                           scope.newCompound = cy.add(nodeObj);
-                          // scope.data.nodes.push(nodeObj);
+
                           var ns = cy.$(':selected');
                           _.forEach(ns, function(n) {
                             n.data().parent = scope.newCompound.data('id');
                           });
+
+                          var tempCy = cy.elements();
                           cy.elements().remove();
-                          cy.add(scope.data);
+                          cy.add(tempCy);
+
                           cy.nodes().forEach(function(n){
                             nodeTipExtension(n);
                           });
@@ -971,7 +975,7 @@ define([
                       $rootScope.$on('createNode', function(event, newName) {
                         var nodeObj = {
                             data: {
-                              id: 'n' + scope.data.nodes.length,
+                              id: 'n' + cy.nodes().length,
                               name: newName.name,
                               metadata: { label: newName.name }
                             },
