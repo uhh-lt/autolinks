@@ -14,6 +14,7 @@ define([
           $scope.label = '';
           $scope.toggle = {};
           $scope.metadata = {};
+          $scope.provenances = [];
 
           $scope.init = function() {
             // $timeout( function() {
@@ -24,9 +25,9 @@ define([
 
                 EndPointService.getDocuments().then(function(response) {
                   $scope.documents = response.data;
-                  $scope.provenances = [];
+
                   let sources = _.clone(entity._private.data.provenances);
-                  sources = _.forEach(sources, function(source) {
+                  sources = _.forEach(_.uniq(sources), function(source) {
                     if (_.includes(source, 'service::')) {
                       const split = _.split(_.split(source, '::')[1], ':');
                       $scope.provenances.push({
