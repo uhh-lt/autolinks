@@ -147,7 +147,7 @@ define([
 
                       var edgeHandleProps = {
                         preview: false,
-                        complete: function( sourceNode, targetNode, addedEles ){
+                        complete: function( sourceNode, targetNode, addedEles ) {
                           // fired when edgehandles is done and elements are added
                           // build the edge object
                           // get edge source
@@ -224,11 +224,11 @@ define([
                                       };
                                     }
 
-                                    addedEles.data().name = response.data.value.predicate.value;
-                                    addedEles.data().cid = response.data.cid;
-                                    addedEles.data().rid = response.data.value.predicate.rid;
-                                    addedEles.data().value = response.data.value.predicate.value;
-                                    addedEles.data().metadata = response.data.value.predicate.metadata;
+                                    addedEles.data('name', response.data.value.predicate.value);
+                                    addedEles.data('cid', response.data.cid );
+                                    addedEles.data('rid', response.data.value.predicate.rid);
+                                    addedEles.data('value', response.data.value.predicate.value);
+                                    addedEles.data('metadata', response.data.value.predicate.metadata );
 
                                     // adding the edge object to the edges array
                                     // scope.data.edges.push(edgeObj);

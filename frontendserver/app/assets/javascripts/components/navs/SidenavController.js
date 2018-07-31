@@ -98,7 +98,8 @@ define([
                 entity.data().metadata = $scope.metadata;
               }
               $mdSidenav('right').close();
-              cy.$(':selected').trigger('tap');
+              cy.$(":selected").data('metadata', $scope.metadata); //TODO: alternative to trigger('tap') but needs to do more testing
+              // cy.$(':selected').trigger('tap'); //TODO: change tap, since it triggers x undefined cueUtilities error
 
               // $scope.selectedEntity = EntityService.updateRootScopeEntity($scope.selectedEntity);
               // // broadcasting the event
