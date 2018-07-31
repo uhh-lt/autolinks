@@ -167,6 +167,7 @@ define([
 
                             const data = { before: null, after: after };
 
+
                             scope.$parent.EndPointService.editResource(data).then(function(response) {
 
                                 const before = {
@@ -186,20 +187,55 @@ define([
 
                                 scope.$parent.EndPointService.editResource(data).then(function(response) {
 
-                                    var edgeObj = {
-                                        data:{
-                                          id: sourceNode.data('id') + targetNode.data('id'),
-                                          source: sourceNode.data('id'),
-                                          target: targetNode.data('id'),
-                                          name: 'has relation'
-                                        }
-                                    };
-                                    addedEles.data().name = 'has relation';
+                                    if (sourceNode.data('parent') !== targetNode.data('parent')) {
+                                      var parent = sourceNode.data().parent ? sourceNode.data().parent : '';
+                                      var nodeObj = {
+                                          data: {
+                                            cid: sourceNode.data().cid,
+                                            rid: targetNode.data().rid,
+                                            metadata: targetNode.data().metadata,
+                                            id: ( targetNode.data().name + ( '' ) + targetNode.data().rid + sourceNode.data().cid ).replace(/\s/g, ''),
+                                            id: (parent + '__n-' + targetNode.data().name.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '') + '-' + targetNode.data().rid ).replace(/\s/g, ''),
+                                            name: targetNode.data().name + '',
+                                            parent: parent
+                                          },
+                                          position: {
+                                            x: targetNode.position().x,
+                                            y: targetNode.position().y
+                                          }
+                                      };
+                                      var n = cy.add(nodeObj);
+                                      nodeTipExtension(n);
+                                      // var newTargetNode = targetNode.clone();
+                                      // newTargetNode.data().id = newTargetNode.data('id') + '_' + cy.elements().length;
+                                      // newTargetNode.data().parent = sourceNode.data('parent') ? sourceNode.data('parent') : null;
+                                      // var n = cy.add(newTargetNode.data());
+                                      addedEles.move({
+                                        target: n.data('id')
+                                      })
+                                    } else {
+                                      var edgeObj = {
+                                          data:{
+                                            id: sourceNode.data('id') + targetNode.data('id'),
+                                            source: sourceNode.data('id'),
+                                            target: targetNode.data('id'),
+                                            name: 'has relation'
+                                          }
+                                      };
+                                    }
+
+                                    addedEles.data().name = response.data.value.predicate.value;
+                                    addedEles.data().cid = response.data.cid;
+                                    addedEles.data().rid = response.data.value.predicate.rid;
+                                    addedEles.data().value = response.data.value.predicate.value;
+                                    addedEles.data().metadata = response.data.value.predicate.metadata;
+
                                     // adding the edge object to the edges array
                                     // scope.data.edges.push(edgeObj);
                                     edgeTipExtension(addedEles);
                                 });
                             });
+
                           }
                           eh.enabled = false;
                           //this.enabled = false; TODO: Temporary commented for Steffen machine
