@@ -27,7 +27,7 @@ define([
                   $scope.documents = response.data;
 
                   let sources = _.clone(entity._private.data.provenances);
-                  sources = _.forEach(_.uniq(sources), function(source) {
+                  sources = _.forEach(sources, function(source) {
                     if (_.includes(source, 'service::')) {
                       const split = _.split(_.split(source, '::')[1], ':');
                       $scope.provenances.push({
@@ -52,6 +52,7 @@ define([
                       }
                     };
                   });
+                  $scope.provenances = _.uniqBy($scope.provenances, 'surface');
                 });
 
                 if (metadata) {
