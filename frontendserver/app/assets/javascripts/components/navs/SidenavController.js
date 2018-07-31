@@ -14,6 +14,7 @@ define([
           $scope.label = '';
           $scope.toggle = {};
           $scope.metadata = {};
+          $scope.provenances = [];
 
           $scope.init = function() {
             // $timeout( function() {
@@ -24,7 +25,7 @@ define([
 
                 EndPointService.getDocuments().then(function(response) {
                   $scope.documents = response.data;
-                  $scope.provenances = [];
+
                   let sources = _.clone(entity._private.data.provenances);
                   sources = _.forEach(sources, function(source) {
                     if (_.includes(source, 'service::')) {
@@ -51,6 +52,7 @@ define([
                       }
                     };
                   });
+                  $scope.provenances = _.uniqBy($scope.provenances, 'surface');
                 });
 
                 if (metadata) {
@@ -96,7 +98,8 @@ define([
                 entity.data().metadata = $scope.metadata;
               }
               $mdSidenav('right').close();
-              cy.$(':selected').trigger('tap');
+              cy.$(":selected").data('metadata', $scope.metadata); //TODO: alternative to trigger('tap') but needs to do more testing
+              // cy.$(':selected').trigger('tap'); //TODO: change tap, since it triggers x undefined cueUtilities error
 
               // $scope.selectedEntity = EntityService.updateRootScopeEntity($scope.selectedEntity);
               // // broadcasting the event

@@ -74,6 +74,15 @@
               </div>
             </div>
               <md-divider></md-divider>
+              <md-button ng-click="add()" class="md-primary" style="min-width: 50px">
+                <i class="fa fa-plus-circle fa-2x"></i>
+              </md-button>
+              <md-button ng-click="update()" class="md-primary">
+                Update
+              </md-button>
+              <md-button ng-click="delete()" class="md-warn">
+                Delete
+              </md-button>
             </div>
 
             <!-- <h4>"metadata" :  {</h4>
@@ -139,15 +148,7 @@
               </input>
              </md-input-container> -->
            <!-- <h4>}</h4> -->
-           <md-button ng-click="add()" class="md-primary" style="min-width: 50px">
-             <i class="fa fa-plus-circle fa-2x"></i>
-           </md-button>
-           <md-button ng-click="update()" class="md-primary">
-             Update
-           </md-button>
-           <md-button ng-click="delete()" class="md-warn">
-             Delete
-           </md-button>
+
 
            <md-divider></md-divider>
            <md-list-item class="main-subheader" ng-click="toggle.provenances = !toggle.provenances">

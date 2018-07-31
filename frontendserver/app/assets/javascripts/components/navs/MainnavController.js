@@ -17,8 +17,8 @@ define([
           .defaultIconSet('img/icons/setitems/core-icons.svg', 24);
         })
         // Mainnav Controller
-        .controller('MainnavController', ['$scope', '$rootScope', 'EndPointService', '$mdDialog', '$mdSidenav',
-        function ($scope, $rootScope, EndPointService, $mdDialog, $mdSidenav) {
+        .controller('MainnavController', ['$scope', '$rootScope', 'EndPointService', '$mdDialog', '$mdSidenav', '_',
+        function ($scope, $rootScope, EndPointService, $mdDialog, $mdSidenav, _) {
 
           $scope.lockLeft = false;
           $scope.toggle = {};
@@ -38,7 +38,8 @@ define([
               });
 
               EndPointService.getDocuments().then(function(response) {
-                $scope.documents = response.data;
+                $scope.documents = _.orderBy(response.data, 'filename', 'asc');
+
               });
 
               EndPointService.getUsername().then(function(response) {
@@ -60,7 +61,7 @@ define([
             }
           };
 
-          //TODO: this argument is named as typ, to avoid reserved words
+          //NOTE: this argument is named as typ, to avoid reserved words
           $scope.toggleTypeTo = function(typ) {
             EndPointService.toggleTypes(typ);
             $rootScope.$emit('switchNodesBasedOnTypes');
@@ -112,7 +113,7 @@ define([
           });
 
           $rootScope.$on('addTypes', function(event, types) {
-            $scope.types = types;
+            $scope.types = _.orderBy(types, 'name', 'asc');
           });
 
           $rootScope.$on('checkedDoc', function(event, doc) {
