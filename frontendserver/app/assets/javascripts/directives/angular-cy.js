@@ -260,6 +260,7 @@ define([
                       cy.on('taphold', function(e) {
                           eh.enabled = false;
                           scope.coordinate = e.position;
+                          // console.log(scope.coordinate);
                       });
 
                       cy.nodes().forEach(function(n) {
@@ -742,7 +743,10 @@ define([
                           cid: e.cid,
                           rid: e.rid,
                           metadata: e.metadata,
-                          id: ((parent ? parent.id : scope.outermostId) + '__n-' + e.value.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '') + '-' + e.rid ).replace(/\s/g, ''),
+                          id: ((parent ? parent.id : scope.outermostId) + '__n-' +
+                              // e.value.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '')
+                              e.value.replace(/[^A-Za-z0-9\-_]/g, '-') // NOTE: remove metacharacters, cytoscape rules
+                              + '-' + e.rid ).replace(/\s/g, ''),
                           name: e.value + '',
                           parent: parent ? parent.id : scope.outermostId,
                           path: scope.path,
@@ -1112,7 +1116,15 @@ define([
                   });
 
                   $(document).on('click', "#moveNode", function(event, n){
-                    scope.$parent.EntityService.openSideNav(scope.selectedEntity);
+                    // scope.$parent.EntityService.openSideNav(scope.selectedEntity);
+                    scope.$parent.$mdToast.show(
+                          scope.$parent.$mdToast.simple()
+                            .textContent('Please select the target parent')
+                            .position('top right')
+                            .theme("primary-toast")
+                            .hideDelay(3500)
+                        );
+                    $rootScope.$emit('mergeToParent');
                   });
 
 
