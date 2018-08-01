@@ -115,6 +115,15 @@ define([
                         if (localSearch.local) {
                           const context = $scope.context;
                           EndPointService.localSearch(context, localSearch.ci).then(function(response) {
+                            if ( response.data.length < 1) {
+                              $mdToast.show(
+                                    $mdToast.simple()
+                                      .textContent('No results found for ' + response.context + ' in local search')
+                                      .position('top right')
+                                      .theme("warn-toast")
+                                      .hideDelay(3500)
+                                  );
+                            }
                               // const dataPath = { endpoint: { path: 'localSearch' }};
                               // $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
                           });
