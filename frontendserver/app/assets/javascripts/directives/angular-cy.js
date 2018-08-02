@@ -145,6 +145,18 @@ define([
                             elements: scope.data
                       });
 
+                      const timestamp = new Date().getUTCMilliseconds();
+
+                      var helloNode = {
+                          data: {
+                            metadata: { label: 'Hello Node' },
+                            id: 'hello_node' + timestamp,
+                            name: 'hello_node' + timestamp
+                          },
+                      };
+                      var n = cy.add(helloNode);
+                      n.remove();
+
                       var edgeHandleProps = {
                         preview: false,
                         complete: function( sourceNode, targetNode, addedEles ) {
