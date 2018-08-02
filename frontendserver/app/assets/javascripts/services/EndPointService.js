@@ -140,6 +140,7 @@ define([
                       });
                     }
                   });
+                  return { data: response.data, context };
                 });
               },
 

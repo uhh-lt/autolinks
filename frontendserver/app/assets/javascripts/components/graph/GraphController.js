@@ -13,8 +13,8 @@ define([
     angular.module('autolinks.graph', ['ngCy']);
     angular.module('autolinks.graph')
         // Graph Controller
-        .controller('GraphController', ['$scope', '$q', '$rootScope', 'graphProperties', 'EntityService', 'EndPointService', '_', '$mdDialog',
-        function ($scope, $q, $rootScope, graphProperties, EntityService, EndPointService, _, $mdDialog) {
+        .controller('GraphController', ['$scope', '$q', '$rootScope', 'graphProperties', 'EntityService', 'EndPointService', '_', '$mdDialog', '$mdToast',
+        function ($scope, $q, $rootScope, graphProperties, EntityService, EndPointService, _, $mdDialog, $mdToast) {
 
           var self = this;
           /* Background collection */
@@ -40,6 +40,7 @@ define([
           $scope.EntityService = EntityService;
           $scope.EndPointService = EndPointService;
           $scope.$mdDialog = $mdDialog;
+          $scope.$mdToast = $mdToast;
           // $scope.fetchData = {};
 
           $scope.edgehandler = false;

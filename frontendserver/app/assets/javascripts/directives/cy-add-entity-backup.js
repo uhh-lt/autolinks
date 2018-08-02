@@ -139,3 +139,67 @@ $rootScope.$on('addEntity', function(event, res) {
     cy.layout(scope.options.layout).run();
   }
 });
+
+
+elesfn.move = function (struct) {
+  var cy = this._private.cy;
+
+  if (struct.source !== undefined || struct.target !== undefined) {
+    var srcId = struct.source;
+    var tgtId = struct.target;
+    var srcExists = cy.hasElementWithId(srcId);
+    var tgtExists = cy.hasElementWithId(tgtId);
+
+    if (srcExists || tgtExists) {
+      var jsons = this.jsons();
+
+      this.remove();
+
+      for (var i = 0; i < jsons.length; i++) {
+        var json = jsons[i];
+        var ele = this[i];
+
+        if (json.group === 'edges') {
+          if (srcExists) {
+            json.data.source = srcId;
+          }
+
+          if (tgtExists) {
+            json.data.target = tgtId;
+          }
+
+          json.scratch = ele._private.scratch;
+        }
+      }
+
+      return cy.add(jsons);
+    }
+  } else if (struct.parent !== undefined) {
+    // move node to new parent
+    var parentId = struct.parent;
+    var parentExists = parentId === null || cy.hasElementWithId(parentId);
+
+    if (parentExists) {
+      var _jsons = this.jsons();
+      var descs = this.descendants();
+      var descsEtcJsons = descs.union(descs.union(this).connectedEdges()).jsons();
+
+      this.remove(); // NB: also removes descendants and their connected edges
+
+      for (var _i8 = 0; _i8 < _jsons.length; _i8++) {
+        var _json = _jsons[_i8];
+        var _ele6 = this[_i8];
+
+        if (_json.group === 'nodes') {
+          _json.data.parent = parentId === null ? undefined : parentId;
+
+          _json.scratch = _ele6._private.scratch;
+        }
+      }
+
+      return cy.add(_jsons.concat(descsEtcJsons));
+    }
+  }
+
+  return this; // if nothing done
+};
