@@ -1043,10 +1043,12 @@ define([
 
                       $rootScope.$on('createCompound', function() {
                         var newCompound = angular.element('#newCompound').val();
+                        const timestamp = new Date().getUTCMilliseconds();
+
                         const after = {
                           "rid": 0,
                           "cid": 0,
-                          "metadata": {"label": newCompound},
+                          "metadata": { "label": newCompound },
                           "value": []
                         };
 
@@ -1064,7 +1066,7 @@ define([
                                 cid: data.cid,
                                 rid: data.rid,
                                 metadata: data.metadata,
-                                id: ( newCompound + ( '_as_parent_' ) + data.rid + '-' + data.cid + '_' + scope.username  ).replace(/\s/g, ''),
+                                id: ( newCompound + ( '_as_parent_' ) + data.rid + '-' + data.cid + '_' + scope.username + timestamp  ).replace(/\s/g, ''),
                                 name: newCompound + '_' + scope.username,
                                 value: data.value
                               },
@@ -1073,25 +1075,80 @@ define([
                                 y
                               }
                           };
-                          scope.newCompound = cy.add(nodeObj);
 
-                          var ns = cy.$(':selected');
-                          _.forEach(ns, function(n) {
-                            n.data().parent = scope.newCompound.data('id');
-                          });
+                          if (cy.hasElementWithId(nodeObj.data.id)) {
+                            scope.$parent.$mdToast.show(
+                                  scope.$parent.$mdToast.simple()
+                                    .textContent('You have already created a compound with id' + nodeObj.data.id)
+                                    .position('top right')
+                                    .theme("primary-warn")
+                                    .hideDelay(3500)
+                                );
+                          } else {
+                            scope.newCompound = cy.add(nodeObj);
 
-                          var tempCy = cy.elements();
-                          cy.elements().remove();
-                          cy.add(tempCy);
+                            var ns = cy.$(':selected');
 
-                          cy.nodes().forEach(function(n){
-                            nodeTipExtension(n);
-                          });
-                          cy.edges().forEach(function(e) {
-                            edgeTipExtension(e);
-                          });
-                          // cy.layout({name: 'cose-bilkent'}).run();
-                          // cy.fit();
+                            _.forEach(ns, function(n) {
+
+                              if (n.data().parent) {
+                                var parentId = scope.newCompound.data('id');
+                                var _jsons = n.jsons();
+                                var descs = n.descendants().jsons();
+                                var descEdges = n.descendants().connectedEdges().jsons();
+
+
+                                const timestamp = new Date().getUTCMilliseconds();
+
+
+                                _.forEach(_jsons, function(json) {
+                                  if (json.group === 'nodes') {
+                                    json.data.id = (parentId === null ? 'null_' : parentId) + json.data.id;
+                                    json.data.parent = parentId === null ? undefined : parentId;
+                                    json.position.x = (json.position.x) * 9 / 10;
+                                    json.position.y = (json.position.y) * 9 / 10;
+                                  }
+                                });
+
+                                if (!cy.hasElementWithId(_jsons[0].data.id)) {
+                                  _.forEach(descs, function(desc) {
+                                    if (desc.group === 'nodes') {
+                                      desc.data.id = (parentId === null ? 'null_' : parentId) + desc.data.id;
+                                      desc.data.parent = (parentId === null ? 'null_' : parentId) + desc.data.parent;
+                                      desc.position.x = (desc.position.x) * 9 / 10;
+                                      desc.position.y = (desc.position.y) * 9 / 10;
+                                    }
+                                  });
+
+                                  _.forEach(descEdges, function(descEdge) {
+                                    if (descEdge.group === 'edges') {
+                                      descEdge.data.id = (parentId === null ? 'null_' : parentId) + descEdge.data.id;
+                                      descEdge.data.source = (parentId === null ? 'null_' : parentId) + descEdge.data.source;
+                                      descEdge.data.target = (parentId === null ? 'null_' : parentId) + descEdge.data.target;
+                                    }
+                                  });
+                                  var n = cy.add(_jsons.concat(descs).concat(descEdges));
+                                  nodeTipExtension(n);
+                                }
+
+                              } else {
+                                n.data().parent = scope.newCompound.data('id');
+                              }
+                            });
+
+                            var tempCy = cy.elements();
+                            cy.elements().remove();
+                            cy.add(tempCy);
+
+                            cy.nodes().forEach(function(n){
+                              nodeTipExtension(n);
+                            });
+                            cy.edges().forEach(function(e) {
+                              edgeTipExtension(e);
+                            });
+                            // cy.layout({name: 'cose-bilkent'}).run();
+                            cy.fit();
+                          }
                         });
                       });
 
