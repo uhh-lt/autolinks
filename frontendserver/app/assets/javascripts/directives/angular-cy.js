@@ -1097,9 +1097,7 @@ define([
                                 var descs = n.descendants().jsons();
                                 var descEdges = n.descendants().connectedEdges().jsons();
 
-
                                 const timestamp = new Date().getUTCMilliseconds();
-
 
                                 _.forEach(_jsons, function(json) {
                                   if (json.group === 'nodes') {
