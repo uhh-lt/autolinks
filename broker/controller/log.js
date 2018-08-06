@@ -37,11 +37,12 @@ module.exports = function(callingModule) {
       format: winston.format.combine(
         winston.format.label({ label: aModulesLabel }),
         winston.format.timestamp(),
-        myLogFormatter
+        // myLogFormatter
+        winston.format.simple()
       ),
       transports: [
         new winston.transports.File({
-          level: 'debug',
+          level: 'warn',
           maxsize:'10000000',
           maxFiles: 10,
           filename: path.resolve(global.__datadir && path.join(global.__datadir, 'server.log') || 'server.log'),

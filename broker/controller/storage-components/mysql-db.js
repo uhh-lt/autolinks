@@ -34,6 +34,7 @@ const MAX_FILESIZE = process.env.MAX_FILESIZE || 5e7; // 5 MB by default
 /* connection string: mysql://user:pass@host:port/database?optionkey=optionvalue&optionkey=optionvalue&... */
 const connectionString = process.env.MYSQL || 'mysql://autolinks:autolinks1@mysql:3306/autolinks?debug=false&connectionLimit=100';
 const pool = mysql.createPool(connectionString);
+logger.info(`Using mysql connection string: '${connectionString}'`);
 logger.info(`Using ${pool.config.connectionLimit} connections.`);
 
 function withConnection(callback) {
@@ -69,16 +70,16 @@ function promisedQuery(query, values) {
           connection.query(query, function (err, rows, fields) {
             connection.release();
             if (err) {
-              return reject(Exception.fromError(err, `Query failed: '${query.sql}'.`, query));
+              return reject(Exception.fromError(err, `Query failed: '${query.sql}'.`, {query: query, values: values}));
             }
             return resolve({ rows: rows, fields: fields });
           });
         } catch (e) {
-          return reject(Exception.fromError(e, `Query failed: '${query.sql}'.`, query));
+          return reject(Exception.fromError(e, `Query failed: '${query.sql}'.`, {query: query, values: values}));
         }
       });
     } catch (e) {
-      return reject(Exception.fromError(e, `Query failed: '${query.sql}'.`, query));
+      return reject(Exception.fromError(e, `Query failed: '${query.sql}'.`, {query: query, values: values}));
     }
   });
 }
@@ -109,7 +110,7 @@ module.exports.init = function (callback, resetdata) {
     utils.sequentialPromise(queries, promisedQuery)
       .then(res => {
         if (resetdata) {
-          return module.exports.resetDatabase().then(_ignore => res);
+          return this.resetDatabase().then(_ignore => res);
         }
         return res;
       })
@@ -122,27 +123,27 @@ module.exports.init = function (callback, resetdata) {
 
 };
 
-module.exports.read = function (userid, storagekey, callback) {
-  return this.promisedRead(userid, storagekey)
+module.exports.read = function (userid, storagekey, skipsources, callback) {
+  return this.promisedRead(userid, storagekey, skipsources)
     .then(
       resource => callback(null, resource),
       err => callback(err, null)
     );
 };
 
-module.exports.promisedRead = function (userid, storagekey) {
-  return this.getStorageResource(userid, storagekey);
+module.exports.promisedRead = function (userid, storagekey, skipsources) {
+  return this.getStorageResource(userid, storagekey, skipsources);
 };
 
-module.exports.write = function (userid, storagekey, resourceList, callback) {
-  return this.promisedWrite(userid, storagekey, resourceList)
+module.exports.write = function (userid, storagekey, resourceList, skipsources, callback) {
+  return this.promisedWrite(userid, storagekey, resourceList, skipsources)
     .then(
       res => callback(null, res),
       err => callback(err, null)
     );
 };
 
-module.exports.promisedWrite = function (userid, storagekey, resourceList) {
+module.exports.promisedWrite = function (userid, storagekey, resourceList, skipsources) {
   // if storagekey is known check if a resource exists for it, otherwise save it.
   if (storagekey) {
     return this.getStorageResourceId(userid, storagekey)
@@ -150,7 +151,12 @@ module.exports.promisedWrite = function (userid, storagekey, resourceList) {
         if (rid) {
           logger.debug(`Resource for storagekey '${storagekey}' and user with id '${userid}' was already stored, skipping write action.`);
           return this.getResource(rid)
-            .then(r => this.fillSourcesRecursive(userid, r));
+            .then(r => {
+              if(skipsources){
+                return r;
+              }
+              return this.fillSourcesRecursive(userid, r);
+            });
         }
         return this.saveNewResourceOrValue(resourceList, userid)
           .then(resource => this.saveStorageItem(userid, storagekey)
@@ -158,7 +164,12 @@ module.exports.promisedWrite = function (userid, storagekey, resourceList) {
           ).then(obj => {
             this.saveStorageItemToResourceMapping(obj.sid, obj.resource.rid);
             return obj.resource;
-          }).then(r => this.fillSourcesRecursive(userid, r));
+          }).then(r => {
+            if(skipsources){
+              return r;
+            }
+            return this.fillSourcesRecursive(userid, r);
+          });
       });
   }
   // if storagekey is unknown save the resource, then use the rid as storagekey
@@ -179,6 +190,10 @@ module.exports.promisedWrite = function (userid, storagekey, resourceList) {
 module.exports.saveNewResourceOrValue = function (resourceOrValue, uid, cid) {
   return new Promise((resolve, reject) => {
     let resource = null;
+    if(!resourceOrValue){
+      const ex = new Exception('IllegalState', `Resource value is null! That shouldn't happen!`).log(logger.warn);
+      return reject(ex);
+    }
     if(resourceOrValue.value || resourceOrValue.rid){
       if(resource instanceof Resource){
         resource = resourceOrValue;
@@ -205,7 +220,8 @@ module.exports.saveNewResourceOrValue = function (resourceOrValue, uid, cid) {
       logger.debug('Resource is a string.');
       return resolve(this.saveStringResource(resource, uid));
     }
-    reject(new Error('This is impossible, a resource has to be one of {list,triple,string}.'));
+    const ex = new Exception('IllegalState', 'This is impossible, a resource has to be one of {list,triple,string}.').log(logger.warn);
+    return reject(ex);
   }).then(
     resource => {
       // fill with metadata if it existed before, otherwise save metadata!
@@ -476,28 +492,58 @@ module.exports.getStorageResourceId = function (uid, storagekey) {
     });
 };
 
-module.exports.getStorageResource = function (userid, storagekey) {
+module.exports.getStorageResource = function (userid, storagekey, skipsources) {
   return this.getStorageResourceId(userid, storagekey)
     .then(rid => rid && this.getResource(rid, -1) || null)
     .then(res => {
       if(res){
+        if(skipsources){
+          return res;
+        }
         return this.fillSourcesRecursive(userid, res);
       }
       return null;
-    })
-    ;
+    });
 };
 
 module.exports.deleteResource = function (resource, userid) {
   const r = Resource.asResource(resource);
   if (r.isListResource()) {
-    return promisedQuery('call remove_listResourceFromContainer(?,?)', [resource.rid, resource.cid]);
+    return promisedQuery('call remove_listResourceFromContainer(?,?)', [r.rid, r.cid]);
   }
   if (r.isTripleResource()) {
-    return promisedQuery('call remove_tripleResourceFromContainer(?,?)', [resource.rid, resource.cid]);
+    return promisedQuery('call remove_tripleResourceFromContainer(?,?)', [r.rid, r.cid]);
   }
   // else its a string resource
-  return promisedQuery('call remove_stringResourceFromContainer(?,?)', [resource.rid, resource.cid]);
+  return promisedQuery('call remove_stringResourceFromContainer(?,?)', [r.rid, r.cid])
+    .then(result => {
+      // if it is an annotation resource we also need to delete the annotation from the analysis
+      // TODO: debug me, it doesn't seem to work yet
+      // TODO: also from every other container
+      if(r.value && !r.value.startsWith('annotation:')) {
+        // parse resource value: e.g. annotation::CtakesNLP:AnatomicalSiteMention:1:0:7
+        const match = r.value.match(/::(.+):(.+):(\d+):(\d+):(\d+)/);
+        const analyzer = match[1];
+        const type = match[2];
+        const did = parseInt(match[3]);
+        const begin = parseInt(match[4]);
+        const end = parseInt(match[5]);
+        return this.getDocumentAnalysis(userid, did)
+          .then(ana => {
+            const aindex = ana.annotations.findIndex(x =>
+              x.analyzer === analyzer &&
+              x.type === type &&
+              x.begin() === begin &&
+              x.end() === end
+            );
+            if(aindex < 0){
+              return Promise.reject(new Exception('IllegalArgument', `Annotation ${r.value} not found in document ${did} for user ${userid}.`).log(logger.warn));
+            }
+            return promisedQuery('update documents set analysis = json_remove(analysis, $.annotations[?]) where uid = ? and did = ?', [aindex, userid, did]);
+          });
+      }
+      return Promise.resolve(result);
+    });
 };
 
 module.exports.moveResource = function (rid, cid_before, cid_after) {
@@ -526,8 +572,53 @@ module.exports.info = function (userid, callback) {
 };
 
 module.exports.resetDatabase = function () {
-  logger.debug('Resetting database.');
+  logger.info('Resetting database.');
   return promisedQuery('call reset_database');
+};
+
+module.exports.resetFilesystem = function () {
+  logger.info(`Resetting filesystem.`);
+  return this.removeEverythingInDir(datadir);
+};
+
+module.exports.removeEverythingInDir = function(dir){
+  logger.debug(`Deleting all files and folders in ${dir}.`);
+  return new Promise((resolve, reject) => {
+    return fs.readdir(dir, (err, files) => {
+      if (err) {
+        return reject(err);
+      }
+      if(!files.length){
+        return resolve(true);
+      }
+      return this.removeFiles(files).then(
+        _ => resolve(true),
+        err => reject(err)
+      );
+    });
+  });
+};
+
+module.exports.removeFiles = function(files){
+  return new Promise((resolve, reject) => {
+    return Promise.all(files.map(file => this.removeFile(file))).then(_ => resolve(true), err => reject(err));
+  });
+};
+
+module.exports.removeFile = function(file){
+  return new Promise((resolve, reject) => fs.unlink(file, err => {
+    if(err) {
+      return reject(err);
+    }
+    return resolve(true);
+  }));
+};
+
+module.exports.resetData = function () {
+  return Promise.all([
+    this.resetDatabase(),
+    this.resetFilesystem()
+  ]).then(_ => true);
 };
 
 module.exports.promisedEditResource = function (userid, resourceBefore, resourceAfter) {
@@ -749,20 +840,45 @@ module.exports.getStorageKeys = function(uid, rids){
     .then(res => res.rows.map(r => r.storagekey));
 };
 
-module.exports.getSourcesForQuery = function(uid, query) {
-  const keys = new Set();
-  return this.getSimilarResources(uid, query)
-    .then(rids => this.getSourcesRecursive(uid, rids, keys, 1))
-    .catch(e => Exception.fromError(e).log(logger.warn))
-    .then(_ => keys);
+module.exports.promisedFindResources = function(uid, query, caseinsensitive, sourcesonly) {
+  if(query.length > 200){
+    logger.warn('Query too long (>200 characters).', query);
+    return Promise.reject(new Exception('IllegalValue', `Query too long (>200 characters): ${query}`).log(logger.warn));
+  }
+  if(sourcesonly){
+    const keys = new Set();
+    return this.getSimilarResources(uid, query, caseinsensitive)
+      .then(rids => this.getSourcesRecursive(uid, rids, keys, 1))
+      .catch(e => Exception.fromError(e).log(logger.warn))
+      .then(_ => Array.from(keys) );
+  }
+  // else
+  return this.getSimilarResources(uid, query, caseinsensitive)
+    .then(rids => Promise.all(rids.map(rid =>
+      this.getResource(rid)
+        .then(resource => {
+          resource.sources = new Set();
+          return this.getSourcesRecursive(uid, resource.rid, resource.sources, 1)
+            .catch(e => Exception.fromError(e).log(logger.warn))
+            .then(_ => resource.sources = Array.from(resource.sources))
+            .then(_ => logger.debug(`Found ${resource.sources.length} source(s) for string resource ${resource.rid}: ${resource.sources}.`))
+            .then(_ => resource);
+        })
+    )));
 };
 
-module.exports.getSimilarResources = function(uid, query, casesensitive = false) {
+module.exports.getSimilarResources = function(uid, query, caseinsensitive) {
+  if(query.length > 200){
+    logger.warn('Query too long (>200 characters).', query);
+    return Promise.resolve([]);
+  }
+
   logger.debug(`Searching for similar resources to '${query}' for user ${uid}.`);
   // select only unique elements where a resource's label is the query or the resource's surfaceForm is the query
-  return promisedQuery('call search_resource(?, ?, ?)', [ uid, query, casesensitive ])
+  const ci = caseinsensitive || false;
+  return promisedQuery('call search_resource(?, ?, ?)', [ uid, query, ci ])
     .then(res => {
-      const rids = res.rows.map(r => r.rid);
+      const rids = res.rows[0].map(r => r.rid);
       logger.debug(`Found ${rids.length} similar resources to '${query}' for user ${uid}: ${rids}.`);
       return rids;
     });

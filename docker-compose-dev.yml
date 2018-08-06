@@ -67,25 +67,49 @@ services:
       - LOGLEVEL=debug
   # END: broker
 
+#  # BEGIN: mysql
+#  mysql:
+#    image: mysql:5.7
+#    environment:
+#      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+#      - MYSQL_DATABASE=autolinks
+#      - MYSQL_USER=autolinks
+#      - MYSQL_PORT=3306
+#      - MYSQL_PASSWORD=autolinks1
+#    volumes:
+#      - ${PWD}/data/mysql:/var/lib/mysql
+#    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_bin"]
+#    healthcheck:
+#      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-pautolinks1", "-uautolinks"]
+#      interval: 20s
+#      timeout: 10s
+#      retries: 3
+#    networks:
+#      - anet
+#  # END: mysql
+
   # BEGIN: mysql
-  mysql:
-    image: mysql:5.7
+  mysql8:
+    image: mysql:8.0
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=yes
+      # - MYSQL_ROOT_PASSWORD=toor
       - MYSQL_DATABASE=autolinks
       - MYSQL_USER=autolinks
       - MYSQL_PORT=3306
       - MYSQL_PASSWORD=autolinks1
     volumes:
-      - ${PWD}/data/mysql:/var/lib/mysql
-    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_bin"]
+      - ${PWD}/data/mysql8:/var/lib/mysql
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_bin", "--default-authentication-plugin=mysql_native_password", "--log_bin_trust_function_creators=1"]
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-pautolinks1", "-uautolinks"]
+      test: "/usr/bin/mysql -hlocalhost -pautolinks1 -uautolinks -Dautolinks -e'SELECT 1;'"
       interval: 20s
       timeout: 10s
       retries: 3
     networks:
-      - anet
+      anet:
+        aliases:
+          - mysql
   # END: mysql
 
   # START: ctakes-nlp
@@ -151,7 +175,7 @@ services:
       - ELASTICSEARCH_INDICES=enwiki,wikidata,enwiktionary
   # END: wikiservice
 
-  # BEGIN: demo service
+  # BEGIN: cooc service
   cooc:
     image: remstef/node-swagger:9.5
     volumes:
@@ -171,7 +195,7 @@ services:
       - NODE_ENV=development
       - COOKIE_SECRET=YOUR_COOKIE_SECRET
       - BROKER_URL=http://broker:10010
-  # END: dummy service
+  # END: cooc service
 
   # BEGIN: elasticsearch index
   es:

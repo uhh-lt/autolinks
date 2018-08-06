@@ -1,5 +1,5 @@
 -- create and use the database if it doesn't exist
--- CREATE DATABASE IF NOT EXISTS autolinks DEFAULT CHARACTER SET binary;
+-- CREATE DATABASE IF NOT EXISTS autolinks;
 -- USE autolinks;
 
 -- create the tables
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS resources (
 CREATE TABLE IF NOT EXISTS resourceMetadata (
   rid          int unsigned NOT NULL,
   mkey         varchar(64) NOT NULL,
-  mvalue       varchar(512) NOT NULL,
+  mvalue       text NOT NULL,
   PRIMARY KEY (rid, mkey),
   KEY (mkey)
 ) ENGINE=MyISAM;
@@ -368,19 +368,19 @@ BEGIN
   COMMIT ;
 END //
 
-create procedure search_resource( IN uid_ int unsigned, IN term varchar(256), IN casesensitive boolean)
+create procedure search_resource( IN uid_ int unsigned, IN term varchar(256), IN caseinsensitive boolean)
 READS SQL DATA
 BEGIN
-  if casesensitive then
+  if not caseinsensitive then
     -- default collation utf8mb4_bin
-    select distinct(rid), label from (
+    select distinct(rid) as rid, label as label from (
       select rid as rid, mvalue as label from userResourceMetadata where mkey = 'label' and uid = uid_ and mvalue = term
       union
       select rid as rid, surfaceForm as label from userStringResources where uid = uid_ and surfaceForm = term
     ) _;
   else
     -- use collation utf8mb4_general_ci for searching
-    select distinct(rid), label from (
+    select distinct(rid) as rid, label as label from (
       select rid as rid, mvalue as label from  userResourceMetadata where mkey = 'label' and uid = uid_ and mvalue COLLATE utf8mb4_general_ci = term
       union
       select rid as rid, surfaceForm as label from userStringResources where uid = uid_ and surfaceForm COLLATE utf8mb4_general_ci = term

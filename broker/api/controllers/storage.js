@@ -29,11 +29,44 @@ module.exports.editresource = function(req, res, next) {
   auth.handle_authenticated_request(req, res, function(user) {
     storage.promisedEditResource(user.id, data.before, data.after).then(
       result => {
-        res.header('Content-Type', 'text/plain; charset=utf-8').write(JSON.stringify(result));
-        res.end(next);
+        res.json(result).end(next);
       },
       err => Exception.fromError(err, 'Editing resource failed.').handleResponse(res).end(next)
     );
+  });
+};
+
+module.exports.findresources = function(req, res, next) {
+  auth.handle_authenticated_request(req, res, function(user) {
+    if(!req.swagger.params.q || !req.swagger.params.q.value) {
+      return Exception.fromError(null, 'Query string is missing or empty.').handleResponse(res).end(next);
+    }
+    const query = req.swagger.params.q.value;
+    const caseinsensitive = req.swagger.params.ci && req.swagger.params.ci.value || false;
+    let sourcesonly = true;
+    if(req.swagger.params.sourcesonly){
+      if(req.swagger.params.sourcesonly.value !== undefined){
+        sourcesonly = req.swagger.params.sourcesonly.value;
+      }
+    }
+    return storage.promisedFindResources(user.id, query, caseinsensitive, sourcesonly).then(
+      result => res.json(Array.from(result)).end(next),
+      err => Exception.fromError(err, 'Finding resource failed.').handleResponse(res).end(next)
+    );
+  });
+};
+
+module.exports.get_resource = function(req, res, next) {
+  auth.handle_authenticated_request(req, res, function(user) {
+    if(!req.swagger.params.key || !req.swagger.params.key.value) {
+      return Exception.fromError(null, 'Query string is missing or empty.').handleResponse(res).end(next);
+    }
+    const storagekey = req.swagger.params.key.value;
+    return storage.promisedRead(user.id, storagekey)
+      .then(
+        result => res.json(result).end(next),
+        err => Exception.fromError(err, 'Error retrieving service data.').log(logger.warn).handleResponse(res).end(next)
+      );
   });
 };
 
