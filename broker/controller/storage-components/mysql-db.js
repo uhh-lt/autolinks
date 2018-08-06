@@ -70,16 +70,16 @@ function promisedQuery(query, values) {
           connection.query(query, function (err, rows, fields) {
             connection.release();
             if (err) {
-              return reject(Exception.fromError(err, `Query failed: '${query.sql}'.`, query));
+              return reject(Exception.fromError(err, `Query failed: '${query.sql}'.`, {query: query, values: values}));
             }
             return resolve({ rows: rows, fields: fields });
           });
         } catch (e) {
-          return reject(Exception.fromError(e, `Query failed: '${query.sql}'.`, query));
+          return reject(Exception.fromError(e, `Query failed: '${query.sql}'.`, {query: query, values: values}));
         }
       });
     } catch (e) {
-      return reject(Exception.fromError(e, `Query failed: '${query.sql}'.`, query));
+      return reject(Exception.fromError(e, `Query failed: '${query.sql}'.`, {query: query, values: values}));
     }
   });
 }
@@ -828,6 +828,10 @@ module.exports.getStorageKeys = function(uid, rids){
 };
 
 module.exports.promisedFindResources = function(uid, query, caseinsensitive, sourcesonly) {
+  if(query.length > 200){
+    logger.warn('Query too long (>200 characters).', query);
+    return Promise.reject(new Exception('IllegalValue', `Query too long (>200 characters): ${query}`).log(logger.warn));
+  }
   if(sourcesonly){
     const keys = new Set();
     return this.getSimilarResources(uid, query, caseinsensitive)
@@ -851,6 +855,11 @@ module.exports.promisedFindResources = function(uid, query, caseinsensitive, sou
 };
 
 module.exports.getSimilarResources = function(uid, query, caseinsensitive) {
+  if(query.length > 200){
+    logger.warn('Query too long (>200 characters).', query);
+    return Promise.resolve([]);
+  }
+
   logger.debug(`Searching for similar resources to '${query}' for user ${uid}.`);
   // select only unique elements where a resource's label is the query or the resource's surfaceForm is the query
   const ci = caseinsensitive || false;
