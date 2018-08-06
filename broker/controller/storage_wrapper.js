@@ -29,8 +29,8 @@ module.exports.init = function(callback) {
  * @param storagekey
  * @param callback = function(err, info)
  */
-module.exports.read = function(userid, storagekey, callback) {
-  return explicitStorage.read(userid, storagekey, callback);
+module.exports.read = function(userid, storagekey, skipsources, callback) {
+  return explicitStorage.read(userid, storagekey, skipsources, callback);
 };
 
 /**
@@ -38,8 +38,8 @@ module.exports.read = function(userid, storagekey, callback) {
  * @param userid
  * @param storagekey
  */
-module.exports.promisedRead = function(userid, storagekey) {
-  return explicitStorage.promisedRead(userid, storagekey);
+module.exports.promisedRead = function(userid, storagekey, skipsources) {
+  return explicitStorage.promisedRead(userid, storagekey, skipsources);
 };
 
 
@@ -60,8 +60,8 @@ module.exports.write = function(userid, storagekey, resourceValue, callback) {
  * @param storagekey
  * @param resourceValue
  */
-module.exports.promisedWrite = function(userid, storagekey, resourceValue) {
-  return explicitStorage.promisedWrite(userid, storagekey, resourceValue);
+module.exports.promisedWrite = function(userid, storagekey, resourceValue, skipsources) {
+  return explicitStorage.promisedWrite(userid, storagekey, resourceValue, skipsources);
 };
 
 /**
@@ -73,6 +73,17 @@ module.exports.promisedWrite = function(userid, storagekey, resourceValue) {
  */
 module.exports.promisedEditResource = function(userid, resourceBefore, resourceAfter) {
   return explicitStorage.promisedEditResource(userid, resourceBefore, resourceAfter);
+};
+
+/**
+ *
+ * @param userid
+ * @param querystring
+ * @param caseinsensitive
+ * @return [{Resource}]
+ */
+module.exports.promisedFindResources = function(userid, query, casinsensitive, sourcesonly) {
+  return explicitStorage.promisedFindResources(userid, query, casinsensitive, sourcesonly);
 };
 
 /**
@@ -166,21 +177,19 @@ module.exports.updateDocumentAnalysis = function(userid, did, analysis) {
 /**
  *
  * @param userid
- * @param query
- * @return [ ]
- */
-module.exports.getSources = function(userid, query) {
-  return explicitStorage.getSources(userid, query);
-};
-
-/**
- *
- * @param userid
  * @param did
  * @param anno
  */
 module.exports.addAnnotation = function(userid, did, anno){
   return explicitStorage.addAnnotation(userid, did, anno);
+};
+
+/**
+ *
+ * @return {*}
+ */
+module.exports.resetData = function () {
+  return explicitStorage.resetData();
 };
 
 /**

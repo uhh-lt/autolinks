@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: '0.0.2'
+  version: '0.0.3'
   title: Autolinks Broker Service
 
 ## the domain of the service
@@ -201,7 +201,7 @@ tags:
   - name: Storage
     description: Everything about reading and writing of user data
   - name: Maintenance
-    description: Everything about the maintenance and availability of the vrok and writing of user data
+    description: Everything about the maintenance and availability of the broker
 
 paths:
 
@@ -485,7 +485,7 @@ paths:
   /nlp/interpret/{did}:
     x-swagger-router-controller: nlp
     post:
-      operationId: interpret_doffset
+      operationId: interpret
       tags:
         - NLP
       description: | 
@@ -500,7 +500,7 @@ paths:
         type: integer
       - name: focus
         in: body
-        description: The DOffset parameter
+        description: Optional DOffset parameter, get only resources within the doffset. Only internally prepare further interpret requests if missing.
         schema:
           $ref: '#/definitions/DOffset'
       responses:
@@ -611,7 +611,7 @@ paths:
           schema:
             $ref: "#/definitions/Exception"
 
-  /storage/editresource:
+  /storage/resource/edit:
     x-swagger-router-controller: storage
     post:
       operationId: editresource
@@ -642,6 +642,66 @@ paths:
           description: Success. Return the new resource. 
           schema:
             $ref: "#/definitions/Resource"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Exception"
+            
+  /storage/resource/search:
+    x-swagger-router-controller: storage
+    get:
+      operationId: findresources
+      tags:
+        - Storage
+      description: Find resources based on a search query and return their sources
+      parameters:
+        - name: q
+          in: query
+          description: Find resources whose label or surfaceform is similar to the query
+          type: string
+          allowEmptyValue: false
+        - name: ci
+          in: query
+          description: search query caseinsensitive
+          type: boolean
+        - name: sourcesonly
+          in: query
+          description: return sources only (default)
+          type: boolean
+      security:
+        - broker_auth: []
+      responses:
+        200:
+          description: Success. Return the resources or source strings.
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Any"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Exception"
+
+  /storage/resource/get:
+    # tell nodejs where to find the code for this path
+    x-swagger-router-controller: storage
+    get:
+      operationId: get_resource
+      tags:
+        - Storage
+      description: Get the resource for a source key
+      security:
+        - broker_auth: []
+      parameters:
+      - name: key
+        in: query
+        description: The source key
+        type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/Resource'
         default:
           description: Error
           schema:
@@ -789,7 +849,7 @@ paths:
           schema:
             $ref: "#/definitions/Exception"
 
-  /storage/annotation/{did}:
+  /storage/document/{did}/addannotation:
     x-swagger-router-controller: storage
     post:
       operationId: add_annotation
@@ -838,6 +898,85 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Exception"
+  
+  # more on maintenance (note, you need admin priviliges to do that)
+  /maintenance/userdb/reset:
+    x-swagger-router-controller: maintenance
+    get:
+      operationId: resetuserdb
+      tags:
+        - Maintenance
+      summary: reset users
+      description: |
+        returns 'OK' if success, ERROR otherwise
+      security:
+        - broker_auth: []
+      consumes: []
+      produces:
+        - text/plain
+      parameters: []
+      responses:
+        200:
+          description: single string with ok message
+          schema:
+            type: string
+            default: 'OK'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Exception'
+            
+  /maintenance/storagedb/reset:
+    x-swagger-router-controller: maintenance
+    get:
+      operationId: resetstoragedb
+      tags:
+        - Maintenance
+      summary: reset storage. This includes documents, annotations, and resources
+      description: |
+        returns 'OK' if success, ERROR otherwise
+      security:
+        - broker_auth: []
+      consumes: []
+      produces:
+        - text/plain
+      parameters: []
+      responses:
+        200:
+          description: single string with ok message
+          schema:
+            type: string
+            default: 'OK'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Exception'
+            
+  /maintenance/servicedb/reset:
+    x-swagger-router-controller: maintenance
+    get:
+      operationId: resetservicedb
+      tags:
+        - Maintenance
+      summary: reset services.
+      description: |
+        returns 'OK' if success, ERROR otherwise
+      security:
+        - broker_auth: []
+      consumes: []
+      produces:
+        - text/plain
+      parameters: []
+      responses:
+        200:
+          description: single string with ok message
+          schema:
+            type: string
+            default: 'OK'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Exception'
 
   /swagger:
     x-swagger-pipe: swagger_raw
