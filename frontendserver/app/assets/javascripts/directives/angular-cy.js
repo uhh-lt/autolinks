@@ -320,7 +320,9 @@ define([
 
                           }
                           eh.enabled = false;
-                          //this.enabled = false; TODO: Temporary commented for Steffen machine
+                        },
+                        stop: function( sourceNode ) {
+                          eh.enabled = false;
                         }
                       }
                       var eh = cy.edgehandles(edgeHandleProps);
