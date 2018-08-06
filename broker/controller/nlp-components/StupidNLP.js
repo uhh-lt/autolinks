@@ -121,7 +121,8 @@ module.exports.analyze = function(text, contentType, source) {
   const ana = new Analysis();
   ana.text = text;
   ana.source = source;
-  logger.info({text: text, contentType: contentType, source: source});
+  logger.info({source: source, contentType: contentType, size: text.length});
+  logger.debug({source: source, text: text});
 
   return utils.promiseSequential([
     this.getSentences(ana),

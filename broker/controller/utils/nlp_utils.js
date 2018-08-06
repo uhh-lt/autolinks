@@ -8,7 +8,7 @@ const
   logger = require('../log')(module);
 
 module.exports.getAnnotationResourcesDoc = function(uid, did, focus) {
-  return storage.promisedGetFile(uid, did, 'analysis')
+  return storage.promisedGetDocumentAnalysis(uid, did)
     .then(
       ana => this.getAnnotationResources(uid, did, ana, focus),
       err => Exception.fromError(err, `Could not get analysis object for document ${did}.`)
