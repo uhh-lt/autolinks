@@ -85,6 +85,7 @@ define([
             });
 
             $scope.currIndex++;
+            document.getElementById('slide-number').value = $scope.active + 1;
           };
 
           function isEntityInDoc(selectedDoc, start, end, id) {
@@ -610,12 +611,33 @@ define([
              //carouselScope.next();
              var index = $scope.active;
              $scope.active = (index >= ($scope.slides.length - 1) ? ($scope.slides.length - 1) : index + 1);
+             document.getElementById('slide-number').value = '';
+             document.getElementById('slide-number').value = $scope.active + 1;
          };
          $scope.goPrev = function() {
            var index = $scope.active;
            $scope.active = (index <= 0 ? 0 : index - 1);
+           document.getElementById('slide-number').value = '';
+           document.getElementById('slide-number').value = $scope.active + 1;
              //carouselScope.prev();
          };
+
+         $scope.isPrevDisabled = function() {
+           return ($scope.active + 1) <= 1 ? true : false;
+         };
+
+         $scope.isNextDisabled = function() {
+           return ($scope.active + 1) >= $scope.slides.length ? true : false;
+         };
+
+         $scope.setSlideNumber = function() {
+           var number = document.getElementById('slide-number').value;
+           if (number === '' || isNaN(number) || number < 0 || number > $scope.slides.length) {
+               return;
+           }
+           $scope.active = parseInt(number) - 1;
+         };
+
          $scope.setActiveSlide = function(number) {
              console.log('>>>>>> : ' + number);
              if (number === '' || isNaN(number) || number < 0 || number > carouselScope.slides.length - 1) {
