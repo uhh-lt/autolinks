@@ -41,7 +41,7 @@ module.exports.getAnnotationResources = function(uid, did, analysis, focus){
       }
 
       const raw_focus_resource = new Resource(null, annotationResources, null, { label: focustext });
-      return get_or_add_resource(uid, focus_storage_key, raw_focus_resource, false);
+      return get_or_add_resource(uid, focus_storage_key, raw_focus_resource, empty_focus);
     });
 };
 
