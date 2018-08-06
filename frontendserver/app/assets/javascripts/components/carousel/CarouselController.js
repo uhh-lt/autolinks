@@ -458,7 +458,10 @@ define([
           $rootScope.$on('activateCarouselFromDoc', function(event, data) {
               $scope.doc = data.text;
               textAnnotations(data);
-              document.getElementById('slide-number').value = $scope.active + 1;
+              var slideNumber = document.getElementById('slide-number');
+              if (slideNumber && slideNumber.value) {
+                slideNumber.value = $scope.active + 1;
+              }
           });
 
           $rootScope.$on('activateCarouselFromUpload', function(event, data) {
@@ -467,7 +470,10 @@ define([
                 // $timeout( function(){
                 textAnnotations(response.data);
                 // }, 2000 );
-                document.getElementById('slide-number').value = $scope.active + 1;
+                var slideNumber = document.getElementById('slide-number');
+                if (slideNumber && slideNumber.value) {
+                  slideNumber.value = $scope.active + 1;
+                }
               });
           });
 
@@ -480,7 +486,10 @@ define([
               $scope.pvc = resp.pvc;
               $scope.doc = resp.data.text;
               textAnnotations(resp.data, 'source');
-              document.getElementById('slide-number').value = $scope.active + 1;
+              var slideNumber = document.getElementById('slide-number');
+              if (slideNumber && slideNumber.value) {
+                slideNumber.value = $scope.active + 1;
+              }
           });
 
           function textAnnotations(data, loadType = '') {
