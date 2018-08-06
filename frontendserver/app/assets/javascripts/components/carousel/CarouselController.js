@@ -43,7 +43,7 @@ define([
                 var to = (e.doffset.offsets[0].from + e.doffset.offsets[0].length) - $scope.sentenceFrom;
                 var fragments = text.slice(offset, from).split('\n');
                 var surface = text.substring(from, to);
-                var eId = ($scope.currIndex) + '_' + surface.replace(/\s/g,'') + '_' + from + ':' + to;
+                var eId = ($scope.currIndex) + '_' + surface.replace(/\s/g,'') + '_' + e.doffset.offsets[0].from + ':' + (e.doffset.offsets[0].from + e.doffset.offsets[0].length);
 
                 fragments.forEach(function(f, i) {
                     compiledString = compiledString.concat(f);
