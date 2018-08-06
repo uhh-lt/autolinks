@@ -485,7 +485,7 @@ paths:
   /nlp/interpret/{did}:
     x-swagger-router-controller: nlp
     post:
-      operationId: interpret_doffset
+      operationId: interpret
       tags:
         - NLP
       description: | 
@@ -500,7 +500,7 @@ paths:
         type: integer
       - name: focus
         in: body
-        description: The DOffset parameter
+        description: Optional DOffset parameter, get only resources within the doffset. Only internally prepare further interpret requests if missing.
         schema:
           $ref: '#/definitions/DOffset'
       responses:

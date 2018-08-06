@@ -29,8 +29,8 @@ module.exports.init = function(callback) {
  * @param storagekey
  * @param callback = function(err, info)
  */
-module.exports.read = function(userid, storagekey, callback) {
-  return explicitStorage.read(userid, storagekey, callback);
+module.exports.read = function(userid, storagekey, skipsources, callback) {
+  return explicitStorage.read(userid, storagekey, skipsources, callback);
 };
 
 /**
@@ -38,8 +38,8 @@ module.exports.read = function(userid, storagekey, callback) {
  * @param userid
  * @param storagekey
  */
-module.exports.promisedRead = function(userid, storagekey) {
-  return explicitStorage.promisedRead(userid, storagekey);
+module.exports.promisedRead = function(userid, storagekey, skipsources) {
+  return explicitStorage.promisedRead(userid, storagekey, skipsources);
 };
 
 
@@ -60,8 +60,8 @@ module.exports.write = function(userid, storagekey, resourceValue, callback) {
  * @param storagekey
  * @param resourceValue
  */
-module.exports.promisedWrite = function(userid, storagekey, resourceValue) {
-  return explicitStorage.promisedWrite(userid, storagekey, resourceValue);
+module.exports.promisedWrite = function(userid, storagekey, resourceValue, skipsources) {
+  return explicitStorage.promisedWrite(userid, storagekey, resourceValue, skipsources);
 };
 
 /**

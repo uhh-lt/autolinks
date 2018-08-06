@@ -123,27 +123,27 @@ module.exports.init = function (callback, resetdata) {
 
 };
 
-module.exports.read = function (userid, storagekey, callback) {
-  return this.promisedRead(userid, storagekey)
+module.exports.read = function (userid, storagekey, skipsources, callback) {
+  return this.promisedRead(userid, storagekey, skipsources)
     .then(
       resource => callback(null, resource),
       err => callback(err, null)
     );
 };
 
-module.exports.promisedRead = function (userid, storagekey) {
-  return this.getStorageResource(userid, storagekey);
+module.exports.promisedRead = function (userid, storagekey, skipsources) {
+  return this.getStorageResource(userid, storagekey, skipsources);
 };
 
-module.exports.write = function (userid, storagekey, resourceList, callback) {
-  return this.promisedWrite(userid, storagekey, resourceList)
+module.exports.write = function (userid, storagekey, resourceList, skipsources, callback) {
+  return this.promisedWrite(userid, storagekey, resourceList, skipsources)
     .then(
       res => callback(null, res),
       err => callback(err, null)
     );
 };
 
-module.exports.promisedWrite = function (userid, storagekey, resourceList) {
+module.exports.promisedWrite = function (userid, storagekey, resourceList, skipsources) {
   // if storagekey is known check if a resource exists for it, otherwise save it.
   if (storagekey) {
     return this.getStorageResourceId(userid, storagekey)
@@ -151,7 +151,12 @@ module.exports.promisedWrite = function (userid, storagekey, resourceList) {
         if (rid) {
           logger.debug(`Resource for storagekey '${storagekey}' and user with id '${userid}' was already stored, skipping write action.`);
           return this.getResource(rid)
-            .then(r => this.fillSourcesRecursive(userid, r));
+            .then(r => {
+              if(skipsources){
+                return r;
+              }
+              return this.fillSourcesRecursive(userid, r);
+            });
         }
         return this.saveNewResourceOrValue(resourceList, userid)
           .then(resource => this.saveStorageItem(userid, storagekey)
@@ -159,7 +164,12 @@ module.exports.promisedWrite = function (userid, storagekey, resourceList) {
           ).then(obj => {
             this.saveStorageItemToResourceMapping(obj.sid, obj.resource.rid);
             return obj.resource;
-          }).then(r => this.fillSourcesRecursive(userid, r));
+          }).then(r => {
+            if(skipsources){
+              return r;
+            }
+            return this.fillSourcesRecursive(userid, r);
+          });
       });
   }
   // if storagekey is unknown save the resource, then use the rid as storagekey
@@ -482,11 +492,14 @@ module.exports.getStorageResourceId = function (uid, storagekey) {
     });
 };
 
-module.exports.getStorageResource = function (userid, storagekey) {
+module.exports.getStorageResource = function (userid, storagekey, skipsources) {
   return this.getStorageResourceId(userid, storagekey)
     .then(rid => rid && this.getResource(rid, -1) || null)
     .then(res => {
       if(res){
+        if(skipsources){
+          return res;
+        }
         return this.fillSourcesRecursive(userid, res);
       }
       return null;
