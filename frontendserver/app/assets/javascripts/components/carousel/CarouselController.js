@@ -43,7 +43,7 @@ define([
                 var to = (e.doffset.offsets[0].from + e.doffset.offsets[0].length) - $scope.sentenceFrom;
                 var fragments = text.slice(offset, from).split('\n');
                 var surface = text.substring(from, to);
-                var eId = ($scope.currIndex) + '_' + surface.replace(/\s/g,'') + '_' + from + ':' + to;
+                var eId = ($scope.currIndex) + '_' + surface.replace(/\s/g,'') + '_' + e.doffset.offsets[0].from + ':' + (e.doffset.offsets[0].from + e.doffset.offsets[0].length);
 
                 fragments.forEach(function(f, i) {
                     compiledString = compiledString.concat(f);
@@ -85,7 +85,6 @@ define([
             });
 
             $scope.currIndex++;
-            document.getElementById('slide-number').value = $scope.active + 1;
           };
 
           function isEntityInDoc(selectedDoc, start, end, id) {
@@ -459,6 +458,10 @@ define([
           $rootScope.$on('activateCarouselFromDoc', function(event, data) {
               $scope.doc = data.text;
               textAnnotations(data);
+              var slideNumber = document.getElementById('slide-number');
+              if (slideNumber && slideNumber.value) {
+                slideNumber.value = $scope.active + 1;
+              }
           });
 
           $rootScope.$on('activateCarouselFromUpload', function(event, data) {
@@ -467,6 +470,10 @@ define([
                 // $timeout( function(){
                 textAnnotations(response.data);
                 // }, 2000 );
+                var slideNumber = document.getElementById('slide-number');
+                if (slideNumber && slideNumber.value) {
+                  slideNumber.value = $scope.active + 1;
+                }
               });
           });
 
@@ -479,6 +486,10 @@ define([
               $scope.pvc = resp.pvc;
               $scope.doc = resp.data.text;
               textAnnotations(resp.data, 'source');
+              var slideNumber = document.getElementById('slide-number');
+              if (slideNumber && slideNumber.value) {
+                slideNumber.value = $scope.active + 1;
+              }
           });
 
           function textAnnotations(data, loadType = '') {

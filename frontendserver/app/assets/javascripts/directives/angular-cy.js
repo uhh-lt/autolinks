@@ -320,7 +320,9 @@ define([
 
                           }
                           eh.enabled = false;
-                          //this.enabled = false; TODO: Temporary commented for Steffen machine
+                        },
+                        stop: function( sourceNode ) {
+                          eh.enabled = false;
                         }
                       }
                       var eh = cy.edgehandles(edgeHandleProps);
@@ -816,7 +818,7 @@ define([
                           return {
                               id: e.rid,
                               rid: e.rid,
-                              name: e.rid,
+                              name: (typeof e.value === "string") ? e.value : e.rid,
                               metadata: e.metadata,
                               path: scope.path,
                               provenances: e.sources
@@ -1097,9 +1099,7 @@ define([
                                 var descs = n.descendants().jsons();
                                 var descEdges = n.descendants().connectedEdges().jsons();
 
-
                                 const timestamp = new Date().getUTCMilliseconds();
-
 
                                 _.forEach(_jsons, function(json) {
                                   if (json.group === 'nodes') {

@@ -84,6 +84,7 @@ define([
               },
 
               interpretOffset: function(did, offsets) {
+                $rootScope.$emit('activateProgressBar', 'interpreting the offset');
                 return $http.post('/api/nlp/interpretDid', { did: did, offsets: offsets }).then(function(response) {
                   return response;
                 });
