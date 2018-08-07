@@ -13,7 +13,7 @@ define([
         function ($window, $scope, $rootScope, $mdDialog, $q, EndPointService, $mdToast, $timeout) {
 
           $scope.newAnnotation = $rootScope.annotationSlideText;
-          $scope.entityTypes = $rootScope.newAnnotationTypes;
+          $scope.entityTypes = _.orderBy($rootScope.newAnnotationTypes, 'name', 'asc');;
           $scope.selectedType = '';
           // $scope.isEntityInDoc = $scope.$resolve.parentScope.isEntityInDoc;
           // $scope.isKeyword = $scope.$resolve.parentScope.isKeyword;

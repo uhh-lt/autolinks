@@ -730,18 +730,11 @@ define([
                             },
 
                             {
-                              content: '<span class="fa fa-star fa-2x"></span>',
+                              content: '<span class="fa fa-bar fa-2x"></span>',
                               select: function(ele){
-                                console.log( ele.data('name') );
+                                console.log( 'cancel adding node' );
                               },
                               disabled: true
-                            },
-
-                            {
-                              content: 'Text',
-                              select: function(ele){
-                                console.log( ele.position() );
-                              }
                             }
                           ]
                         });
@@ -787,9 +780,9 @@ define([
                           },
 
                           {
-                            content: '<span class="fa fa-flash fa-2x"></span>',
+                            content: '<span class="fa fa-ban fa-2x"></span>',
                             select: function(){
-                              console.log( 'function 2' );
+                              console.log( 'cancel adding node' );
                             }
                           }
                         ]

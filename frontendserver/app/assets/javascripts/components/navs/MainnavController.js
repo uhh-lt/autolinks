@@ -106,7 +106,7 @@ define([
 
           $rootScope.$on('addNewAnnoType', function(event, newAnnoType) {
             var selectedType = _.filter($scope.types, function(type) { return type.name === newAnnoType });
-            if (!selectedType[0].enabled) {
+            if (selectedType.length > 0 && !selectedType[0].enabled) {
               selectedType[0].enabled = true;
               EndPointService.toggleTypes(selectedType[0]);
             }
