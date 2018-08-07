@@ -818,7 +818,7 @@ define([
                           return {
                               id: e.rid,
                               rid: e.rid,
-                              name: e.rid,
+                              name: (typeof e.value === "string") ? e.value : e.rid,
                               metadata: e.metadata,
                               path: scope.path,
                               provenances: e.sources
