@@ -145,7 +145,7 @@ define([
                             elements: scope.data
                       });
 
-                      const timestamp = new Date().getUTCMilliseconds();
+                      const timestamp = new Date().getTime();
 
                       var initNode = {
                           data: {
@@ -206,19 +206,23 @@ define([
                                       var descs = target.descendants().jsons();
                                       var descEdges = target.descendants().connectedEdges().jsons();
 
-                                      const timestamp = new Date().getUTCMilliseconds();
+                                      const timestamp = new Date().getTime();;
 
 
                                       _.forEach(_jsons, function(json) {
                                         if (json.group === 'nodes') {
-                                          json.data.id = (parentId === null ? 'null_' : parentId) + json.data.id;
+                                          json.data.id = (parentId === null ? 'null_' : parentId) + json.data.id + '_target_' + target.data().id;
                                           json.data.parent = parentId === null ? undefined : parentId;
                                           json.position.x = (json.position.x + sourceNode.position().x) / 2;
                                           json.position.y = (json.position.y + sourceNode.position().y) / 2;
                                         }
                                       });
 
-                                      if (!cy.hasElementWithId(_jsons[0].data.id)) {
+                                      var existingTarget = _.find(cy.nodes(), function(n) {
+                                        return _.includes(n.data().id, (parentId === null ? 'null_' : parentId) + target.data().id + '_target_' + target.data().id
+                                      )})
+
+                                      if (existingTarget === undefined) {
                                         _.forEach(descs, function(desc) {
                                           // var parentInRoot = _.find(_jsons, function(json) {return _.includes(json.data.id, desc.data.parent)});
                                           // var parentInDescs = _.find(descs, function(des) {return _.includes(des.data.id, desc.data.parent)});
@@ -229,8 +233,8 @@ define([
                                           //   chosenParent = parentInRoot.data.id;
                                           // }
                                           if (desc.group === 'nodes') {
-                                            desc.data.id = (parentId === null ? 'null_' : parentId) + desc.data.id;
-                                            desc.data.parent = (parentId === null ? 'null_' : parentId) + desc.data.parent;
+                                            desc.data.id = (parentId === null ? 'null_' : parentId) + desc.data.id + '_target_' + target.data().id;
+                                            desc.data.parent = (parentId === null ? 'null_' : parentId) + desc.data.parent +'_target_' + target.data().id;
                                             desc.position.x = (desc.position.x + sourceNode.position().x) / 2;
                                             desc.position.y = (desc.position.y + sourceNode.position().y) / 2;
                                           }
@@ -241,8 +245,8 @@ define([
                                           // var chosenTarget = _.find(descs, function(des) {return _.includes(des.data.id, descEdge.data.target)});
                                           if (descEdge.group === 'edges') {
                                             descEdge.data.id = (parentId === null ? 'null_' : parentId) + descEdge.data.id;
-                                            descEdge.data.source = (parentId === null ? 'null_' : parentId) + descEdge.data.source;
-                                            descEdge.data.target = (parentId === null ? 'null_' : parentId) + descEdge.data.target;
+                                            descEdge.data.source = (parentId === null ? 'null_' : parentId) + descEdge.data.source + '_target_' + target.data().id;
+                                            descEdge.data.target = (parentId === null ? 'null_' : parentId) + descEdge.data.target + '_target_' + target.data().id;
                                           }
                                         });
 
@@ -287,9 +291,9 @@ define([
                                         addedEles.move({
                                           target: n.data('id')
                                         })
-                                      } else {
+                                      } else if (existingTarget.length > 0){
                                         addedEles.move({
-                                          target: _jsons[0].data.id
+                                          target: existingTarget[0].data().id
                                         })
                                       }
 
@@ -1039,7 +1043,7 @@ define([
 
                       $rootScope.$on('createCompound', function() {
                         var newCompound = angular.element('#newCompound').val();
-                        const timestamp = new Date().getUTCMilliseconds();
+                        const timestamp = new Date().getTime();;
 
                         const after = {
                           "rid": 0,
@@ -1093,7 +1097,7 @@ define([
                                 var descs = n.descendants().jsons();
                                 var descEdges = n.descendants().connectedEdges().jsons();
 
-                                const timestamp = new Date().getUTCMilliseconds();
+                                const timestamp = new Date().getTime();;
 
                                 _.forEach(_jsons, function(json) {
                                   if (json.group === 'nodes') {
