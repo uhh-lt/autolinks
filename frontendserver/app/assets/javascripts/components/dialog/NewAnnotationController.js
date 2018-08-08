@@ -36,7 +36,7 @@ define([
             EndPointService.annotationDid({did: selectedDoc.did, type: $scope.newAnnoType, newAnnotations: $scope.newAnnotation}).then(function(response) {
               if (response.status == 200) {
                 EndPointService.loadDoc(selectedDoc.did).then(function(response) {
-                  $rootScope.$emit('activateCarouselFromDoc', response.data);
+                  $rootScope.$emit('activateCarouselFromWhitelist', response.data);
                   var offsets = [$scope.newAnnotation.start, $scope.newAnnotation.end];
                   EndPointService.interpretOffset(selectedDoc.did, offsets).then(function(response) {
                     var dataPath = { endpoint: { path: 'annotationNode' }}

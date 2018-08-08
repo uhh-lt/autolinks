@@ -421,6 +421,8 @@ define([
                               nodeTipExtension(mvData.descendants());
                             });
                             // addNewNode(data, parentData, hasChildren);
+                          }, function() {
+                            scope.mergeMode = false;
                           });
                           // $rootScope.$emit('mergeToParent');
                         } else {
