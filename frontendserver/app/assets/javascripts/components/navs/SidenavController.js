@@ -124,7 +124,7 @@ define([
                 }
               });
               var offsets = [pvc.start, pvc.end];
-
+              EndPointService.setSelectedDoc(pvc);
               EndPointService.interpretOffset(pvc.did, offsets).then(function(response) {
                 var dataPath = { endpoint: { path: 'annotationNode' }}
                 $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });

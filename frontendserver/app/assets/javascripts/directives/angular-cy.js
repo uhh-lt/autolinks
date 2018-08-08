@@ -69,7 +69,7 @@ define([
                     var domContainer = document.getElementById('cy-network');
                     console.log(scope.data);
                     // graph  build
-                    scope.doCy = function(){
+                    scope.doCy = function() {
                       // will be triggered on an event broadcast
                       // parse edges
                       // you can build a complete object in the controller and pass it without rebuilding it in the directive.
@@ -147,15 +147,14 @@ define([
 
                       const timestamp = new Date().getUTCMilliseconds();
 
-                      var helloNode = {
+                      var initNode = {
                           data: {
-                            metadata: { label: 'Hello Node' },
-                            id: 'hello_node' + timestamp,
-                            name: 'hello_node' + timestamp
+                            metadata: { label: 'Init Node' },
+                            id: 'init_node' + timestamp,
+                            name: 'init_node' + timestamp
                           },
                       };
-                      var n = cy.add(helloNode);
-                      n.remove();
+                      var initNode = cy.add(initNode);
 
                       var edgeHandleProps = {
                         preview: false,
@@ -421,6 +420,8 @@ define([
                               nodeTipExtension(mvData.descendants());
                             });
                             // addNewNode(data, parentData, hasChildren);
+                          }, function() {
+                            scope.mergeMode = false;
                           });
                           // $rootScope.$emit('mergeToParent');
                         } else {
@@ -730,18 +731,11 @@ define([
                             },
 
                             {
-                              content: '<span class="fa fa-star fa-2x"></span>',
+                              content: '<span class="fa fa-ban fa-2x"></span>',
                               select: function(ele){
-                                console.log( ele.data('name') );
+                                console.log( 'cancel adding node' );
                               },
                               disabled: true
-                            },
-
-                            {
-                              content: 'Text',
-                              select: function(ele){
-                                console.log( ele.position() );
-                              }
                             }
                           ]
                         });
@@ -787,9 +781,9 @@ define([
                           },
 
                           {
-                            content: '<span class="fa fa-flash fa-2x"></span>',
+                            content: '<span class="fa fa-ban fa-2x"></span>',
                             select: function(){
-                              console.log( 'function 2' );
+                              console.log( 'cancel adding node' );
                             }
                           }
                         ]
@@ -1215,6 +1209,7 @@ define([
                         });
                       });
 
+                      initNode.remove();
                     }; // end doCy()
 
                   scope.doCy();

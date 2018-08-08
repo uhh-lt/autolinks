@@ -164,7 +164,7 @@ define([
                        $scope.doffsetAnnotation = $scope.doffsetAnnotation.concat(...doffsetAnno);
                      }
                      // Move the node creation inside prompt success
-                     // $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation });
+                     // $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation }); //TODO: create discontinuous annotation for api
                      $scope.doffsetAnnotation = '';
                    }, function() {
                      $scope.status = 'You cancelled the dialog.';
@@ -458,6 +458,15 @@ define([
           $rootScope.$on('activateCarouselFromDoc', function(event, data) {
               $scope.doc = data.text;
               textAnnotations(data);
+              var slideNumber = document.getElementById('slide-number');
+              if (slideNumber && slideNumber.value) {
+                slideNumber.value = $scope.active + 1;
+              }
+          });
+
+          $rootScope.$on('activateCarouselFromWhitelist', function(event, data) {
+              $scope.doc = data.text;
+              textAnnotations(data, 'refresh');
               var slideNumber = document.getElementById('slide-number');
               if (slideNumber && slideNumber.value) {
                 slideNumber.value = $scope.active + 1;

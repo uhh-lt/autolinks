@@ -62,6 +62,13 @@ define([
             // If no input is given, prompt user to enter articles
             if (!inputs[0]) {
               // noInputDetected();
+              $mdToast.show(
+                    $mdToast.simple()
+                      .textContent('No input given')
+                      .position('top right')
+                      .theme("warn-toast")
+                      .hideDelay(3500)
+                  );
               return;
             }
 
