@@ -69,7 +69,7 @@ define([
                     var domContainer = document.getElementById('cy-network');
                     console.log(scope.data);
                     // graph  build
-                    scope.doCy = function(){
+                    scope.doCy = function() {
                       // will be triggered on an event broadcast
                       // parse edges
                       // you can build a complete object in the controller and pass it without rebuilding it in the directive.
@@ -147,15 +147,14 @@ define([
 
                       const timestamp = new Date().getUTCMilliseconds();
 
-                      var helloNode = {
+                      var initNode = {
                           data: {
-                            metadata: { label: 'Hello Node' },
-                            id: 'hello_node' + timestamp,
-                            name: 'hello_node' + timestamp
+                            metadata: { label: 'Init Node' },
+                            id: 'init_node' + timestamp,
+                            name: 'init_node' + timestamp
                           },
                       };
-                      var n = cy.add(helloNode);
-                      n.remove();
+                      var initNode = cy.add(initNode);
 
                       var edgeHandleProps = {
                         preview: false,
@@ -1210,6 +1209,7 @@ define([
                         });
                       });
 
+                      initNode.remove();
                     }; // end doCy()
 
                   scope.doCy();
