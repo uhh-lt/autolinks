@@ -731,7 +731,7 @@ define([
                             },
 
                             {
-                              content: '<span class="fa fa-bar fa-2x"></span>',
+                              content: '<span class="fa fa-ban fa-2x"></span>',
                               select: function(ele){
                                 console.log( 'cancel adding node' );
                               },
