@@ -47,7 +47,8 @@ CREATE TABLE IF NOT EXISTS stringResources (
   rid         int unsigned NOT NULL,
   surfaceform varchar(256) NOT NULL,
   PRIMARY KEY (rid),
-  UNIQUE (rid, surfaceform(242))
+  KEY (surfaceform(242)),
+  UNIQUE KEY (rid, surfaceform(242))
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS tripleResources (
@@ -92,7 +93,9 @@ CREATE TABLE IF NOT EXISTS storageItems (
   sid        int unsigned NOT NULL AUTO_INCREMENT,
   uid        int unsigned NOT NULL,
   storagekey varchar(512) NOT NULL,
-  PRIMARY KEY (sid, uid, storagekey(234))
+  PRIMARY KEY (sid, uid, storagekey(234)),
+  KEY (uid, storagekey(234)),
+  KEY (storagekey(234))
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS storageItemToResource (
