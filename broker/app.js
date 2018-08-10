@@ -100,7 +100,7 @@ SwaggerExpress.create(config, function(err, swaggerExpress) {
   const port = process.env.PORT || 10010;
   app.listen(port);
   logger.info('server running on port %d.', port);
-  logger.log('silly', swaggerExpress.runner.swagger.paths);
+  logger.trace('serving: ', swaggerExpress.runner.swagger.paths);
 });
 
 // redirect root to swaggers api docs

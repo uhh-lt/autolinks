@@ -25,13 +25,11 @@ module.exports.getAnnotationResources = function(uid, did, analysis, focus){
   if(empty_focus){
     logger.info('Interpreting all annotations.');
     overlappingAnnotations = analysis.annotations;
-    logger.info(`Found ${overlappingAnnotations.length} annotations.`);
   }else{
     logger.info('Computing overlap.');
     overlappingAnnotations = analysis.getAnnotationsWithinDOffset(focus);
   }
-  logger.info(`Found ${overlappingAnnotations.length} annotations.`);
-
+  logger.info(`Found ${overlappingAnnotations.length} annotations to interpret.`);
 
   const annotationResourcePromises = [...overlappingAnnotations].map(anno => {
     const anno_text = anno.doffset.getText(analysis.text);
@@ -40,6 +38,7 @@ module.exports.getAnnotationResources = function(uid, did, analysis, focus){
 
   return Promise.all(annotationResourcePromises)
     .then(annotationResources => {
+      logger.info(`Finished interpretation of ${annotationResources.length} annotation resources.`);
       if(empty_focus){
         return annotationResources.length;
       }else{
