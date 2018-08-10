@@ -107,15 +107,11 @@ CREATE TABLE IF NOT EXISTS storageItemToResource (
 ) ENGINE=MyISAM;
 
 -- CREATE HELPER VIEWS
-CREATE OR REPLACE VIEW userResourceMetadata  AS SELECT r1.uid, r2.* FROM resources r1 JOIN resourceMetadata  r2 ON (r1.rid = r2.rid);
-
-CREATE OR REPLACE VIEW userStringResources   AS SELECT r1.uid, r2.* FROM resources r1 JOIN stringResources   r2 ON (r1.rid = r2.rid);
-
-CREATE OR REPLACE VIEW userTripleResources   AS SELECT r1.uid, r2.* FROM resources r1 JOIN tripleResources   r2 ON (r1.rid = r2.rid);
-
-CREATE OR REPLACE VIEW userListResources     AS SELECT r1.uid, r2.* FROM resources r1 JOIN listResources     r2 ON (r1.rid = r2.rid);
-
-CREATE OR REPLACE VIEW userListResourceItems AS SELECT r1.uid, r2.* FROM resources r1 JOIN listResourceItems r2 ON (r1.rid = r2.rid);
+--CREATE OR REPLACE VIEW userResourceMetadata  AS SELECT r1.uid, r2.* FROM resources r1 JOIN resourceMetadata  r2 ON (r1.rid = r2.rid);
+--CREATE OR REPLACE VIEW userStringResources   AS SELECT r1.uid, r2.* FROM resources r1 JOIN stringResources   r2 ON (r1.rid = r2.rid);
+--CREATE OR REPLACE VIEW userTripleResources   AS SELECT r1.uid, r2.* FROM resources r1 JOIN tripleResources   r2 ON (r1.rid = r2.rid);
+--CREATE OR REPLACE VIEW userListResources     AS SELECT r1.uid, r2.* FROM resources r1 JOIN listResources     r2 ON (r1.rid = r2.rid);
+--CREATE OR REPLACE VIEW userListResourceItems AS SELECT r1.uid, r2.* FROM resources r1 JOIN listResourceItems r2 ON (r1.rid = r2.rid);
 
 -- DEFINE SOME HELPER FUNCTIONS
 
@@ -234,7 +230,7 @@ BEGIN
   if surfaceform_ is NULL then
     return rid_;
   end if;
-  select rid into rid_ from userStringResources where surfaceform = surfaceform_ and uid = uid_ limit 1;
+  select r1.rid into rid_ from resources r1 JOIN stringResources r2 ON (r1.rid = r2.rid) where r2.surfaceform = surfaceform_ and r1.uid = uid_ limit 1;
   if rid_ = 0 then
     select add_resource(TRUE, NULL, NULL, uid_) into rid_;
     insert into stringResources set rid = rid_, surfaceform = surfaceform_;
@@ -246,7 +242,7 @@ create function get_or_add_tripleResource ( subj_ int unsigned, pred_ int unsign
 RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
 BEGIN
   declare rid_ int unsigned default 0;
-  select rid into rid_ from userTripleResources where subj = subj_ and pred = pred_ and obj = obj_ and uid = uid_ limit 1;
+  select r1.rid into rid_ from resources r1 JOIN tripleResources r2 ON (r1.rid = r2.rid) where r2.subj = subj_ and r2.pred = pred_ and r2.obj = obj_ and r1.uid = uid_ limit 1;
   if rid_ = 0 then
     select add_resource(NULL, TRUE, NULL, uid_) into rid_;
     insert into tripleResources set rid = rid_, subj = subj_, pred = pred_, obj = obj_;
@@ -261,7 +257,7 @@ BEGIN
   if listdescriptor_ is NULL then
     return rid_;
   end if;
-  select rid into rid_ from userListResources where listdescriptor = listdescriptor_ and uid = uid_ limit 1;
+  select r1.rid into rid_ from resources r1 JOIN listResources r2 ON (r1.rid = r2.rid) where r2.listdescriptor = listdescriptor_ and r1.uid = uid_ limit 1;
   if rid_ = 0 then
     select add_resource(NULL, NULL, TRUE, uid_) into rid_;
     insert into listResources set rid = rid_, listdescriptor = listdescriptor_;
@@ -377,16 +373,16 @@ BEGIN
   if not caseinsensitive then
     -- default collation utf8mb4_bin
     select distinct(rid) as rid, label as label from (
-      select rid as rid, mvalue as label from userResourceMetadata where mkey = 'label' and uid = uid_ and mvalue = term
+      select r1.rid as rid, r2.mvalue as label from resources r1 JOIN resourceMetadata r2 ON (r1.rid = r2.rid) where r2.mkey = 'label' and r1.uid = uid_ and r2.mvalue = term
       union
-      select rid as rid, surfaceForm as label from userStringResources where uid = uid_ and surfaceForm = term
+      select r1.rid as rid, r2.surfaceForm as label from resources r1 JOIN stringResources r2 ON (r1.rid = r2.rid) where r1.uid = uid_ and r2.surfaceForm = term
     ) _;
   else
     -- use collation utf8mb4_general_ci for searching
     select distinct(rid) as rid, label as label from (
-      select rid as rid, mvalue as label from  userResourceMetadata where mkey = 'label' and uid = uid_ and mvalue COLLATE utf8mb4_general_ci = term
+      select r1.rid as rid, r2.mvalue as label from resources r1 JOIN resourceMetadata r2 ON (r1.rid = r2.rid) where r2.mkey = 'label' and r1.uid = uid_ and r2.mvalue COLLATE utf8mb4_general_ci = term
       union
-      select rid as rid, surfaceForm as label from userStringResources where uid = uid_ and surfaceForm COLLATE utf8mb4_general_ci = term
+      select r1.rid as rid, r2.surfaceForm as label from resources r1 JOIN stringResources r2 ON (r1.rid = r2.rid) where r1.uid = uid_ and r2.surfaceForm COLLATE utf8mb4_general_ci = term
     ) _;
   end if;
 END //
@@ -395,9 +391,9 @@ create procedure get_parent_resources( IN uid_ int unsigned, IN rid_ int unsigne
 READS SQL DATA
 BEGIN
   select distinct(rid) from (
-    select rid from userListResourceItems where uid = uid_ and itemrid = rid_
+    select r1.rid as rid from resources r1 JOIN listResourceItems r2 ON (r1.rid = r2.rid) where r1.uid = uid_ and r2.itemrid = rid_
     union
-    select rid from userTripleResources where uid = uid_ and ( subj = rid_ or obj = rid_ or pred = rid_ )
+    select r1.rid as rid from resources r1 JOIN tripleResources r2 ON (r1.rid = r2.rid) where r1.uid = uid_ and ( r2.subj = rid_ or r2.obj = rid_ or r2.pred = rid_ )
   ) _;
 END //
 

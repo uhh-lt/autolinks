@@ -281,7 +281,7 @@ module.exports.saveListResource = function (listResource, uid) {
     ).then(
       obj => {
         // check if the listresource already exists before adding elements to it!
-        return promisedQuery('select * from userListResources where listdescriptor = ? and uid = ?', [obj.desc, uid]).then(
+        return promisedQuery('select r2.* from resources r1 JOIN listResources r2 ON (r1.rid = r2.rid) where r2.listdescriptor = ? and r1.uid = ?', [obj.desc, uid]).then(
           res => {
             if(res.rows.length){
               obj.rid = res.rows[0].rid;
@@ -892,9 +892,9 @@ module.exports.getParentResources = function(uid, rids) {
   // select only unique elements where the resources are items in another listresource or take part in a tripleresource
   return promisedQuery(
     `select distinct(rid) from (
-      select rid from userListResourceItems where uid = ? and itemrid in ( ? )
+      select r1.rid as rid from resources r1 JOIN listResourceItems r2 ON (r1.rid = r2.rid) where r1.uid = ? and r2.itemrid in ( ? )
       union 
-      select rid from userTripleResources where uid = ? and ( subj in ( ? ) or obj in ( ? ) or pred in ( ? ) )
+      select r1.rid as rid from resources r1 JOIN tripleResources r2 ON (r1.rid = r2.rid) where r1.uid = ? and ( r2.subj in ( ? ) or r2.obj in ( ? ) or r2.pred in ( ? ) )
      ) _`,
     [ uid, rids, uid, rids, rids, rids ]
   ).then(res => res.rows.map(r => r.rid));
