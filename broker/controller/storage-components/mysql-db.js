@@ -209,15 +209,15 @@ module.exports.saveNewResourceOrValue = function (resourceOrValue, uid, cid) {
     resource.cid = cid;
     // a resource can be an array of resources, a triple or a string
     if (resource.isListResource()) {
-      logger.debug('Resource is an array.');
+      // logger.trace('Resource is an array.');
       return resolve(this.saveListResource(resource, uid));
     }
     if (resource.isTripleResource()) {
-      logger.debug('Resource is a triple.');
+      // logger.trace('Resource is a triple.');
       return resolve(this.saveTripleResource(resource, uid));
     }
     if (resource.isStringResource()) {
-      logger.debug('Resource is a string.');
+      // logger.trace('Resource is a string.');
       return resolve(this.saveStringResource(resource, uid));
     }
     const ex = new Exception('IllegalState', 'This is impossible, a resource has to be one of {list,triple,string}.').log(logger.warn);
@@ -281,7 +281,7 @@ module.exports.saveListResource = function (listResource, uid) {
     ).then(
       obj => {
         // check if the listresource already exists before adding elements to it!
-        return promisedQuery('select * from userListResources where listdescriptor = ? and uid = ?', [obj.desc, uid]).then(
+        return promisedQuery('select r2.* from resources r1 JOIN listResources r2 ON (r1.rid = r2.rid) where r2.listdescriptor = ? and r1.uid = ?', [obj.desc, uid]).then(
           res => {
             if(res.rows.length){
               obj.rid = res.rows[0].rid;
@@ -363,11 +363,11 @@ module.exports.saveListResourceItem = function (desc_rid, item_rid) {
 
 module.exports.saveStringResource = function (stringResource, uid) {
   return new Promise((resolve, reject) => {
-    logger.debug(`Saving resource value '${stringResource.value}' for user with id '${uid}'.`);
+    // logger.trace(`Saving resource value '${stringResource.value}' for user with id '${uid}'.`);
     promisedQuery('select get_or_add_stringResource(?, ?) as rid', [stringResource.value, uid]).then(
       res => {
         const rid = res.rows[0].rid;
-        logger.debug(`Successfully saved resource value '${stringResource.value}' with rid '${rid}'.`);
+        // logger.trace(`Successfully saved resource value '${stringResource.value}' with rid '${rid}'.`);
         stringResource.rid = rid;
         return resolve(stringResource);
       },
@@ -377,12 +377,12 @@ module.exports.saveStringResource = function (stringResource, uid) {
 };
 
 module.exports.saveStorageItem = function (userid, storagekey) {
-  logger.debug(`Saving storage '${storagekey}' for user with id '${userid}'.`);
+  // logger.trace(`Saving storage '${storagekey}' for user with id '${userid}'.`);
   return promisedQuery('select get_or_add_storageItem(?,?) as sid', [userid, storagekey])
     .then(
       res => {
         const sid = res.rows[0].sid;
-        logger.debug(`Successfully saved storgae '${storagekey}' for user with id '${userid}'.`);
+        // logger.trace(`Successfully saved storgae '${storagekey}' for user with id '${userid}'.`);
         return sid;
       }
     );
@@ -390,11 +390,11 @@ module.exports.saveStorageItem = function (userid, storagekey) {
 
 module.exports.saveStorageItemToResourceMapping = function (sid, rid) {
   return new Promise((resolve, reject) => {
-    logger.debug(`Saving storage resource mapping (${sid},${rid}).`);
+    // logger.trace(`Saving storage resource mapping (${sid},${rid}).`);
     promisedQuery('select create_storageItemToResourceMapping(?,?) as mapping_existed', [sid, rid]).then(
       res => {
         const mapping_existed = res.rows[0].mapping_existed;
-        logger.debug(`Successfully saved storage-resource mapping (${sid},${rid}). Existed before: ${mapping_existed}.`);
+        // logger.trace(`Successfully saved storage-resource mapping (${sid},${rid}). Existed before: ${mapping_existed}.`);
         return resolve(mapping_existed);
       },
       err => reject(err)
@@ -482,10 +482,10 @@ module.exports.fillMetadata = function (resource) {
 };
 
 module.exports.getStorageResourceId = function (uid, storagekey) {
-  return promisedQuery('select s2r.rid as rid from storageItems s, storageItemToResource s2r where s2r.sid = s.sid and s.storagekey = ? and s.uid = ?', [storagekey, uid])
+  return promisedQuery('select s2r.rid as rid from storageItems s join storageItemToResource s2r on (s2r.sid = s.sid) where s.storagekey = ? and s.uid = ?', [storagekey, uid])
     .then(res => {
       if (!res.rows.length) {
-        logger.debug(`Storage item '${storagekey}' for user with id '${uid}' does not exist`);
+        // logger.trace(`Storage item '${storagekey}' for user with id '${uid}' does not exist`);
         return null;
       }
       return res.rows[0].rid;
@@ -892,9 +892,9 @@ module.exports.getParentResources = function(uid, rids) {
   // select only unique elements where the resources are items in another listresource or take part in a tripleresource
   return promisedQuery(
     `select distinct(rid) from (
-      select rid from userListResourceItems where uid = ? and itemrid in ( ? )
+      select r1.rid as rid from resources r1 JOIN listResourceItems r2 ON (r1.rid = r2.rid) where r1.uid = ? and r2.itemrid in ( ? )
       union 
-      select rid from userTripleResources where uid = ? and ( subj in ( ? ) or obj in ( ? ) or pred in ( ? ) )
+      select r1.rid as rid from resources r1 JOIN tripleResources r2 ON (r1.rid = r2.rid) where r1.uid = ? and ( r2.subj in ( ? ) or r2.obj in ( ? ) or r2.pred in ( ? ) )
      ) _`,
     [ uid, rids, uid, rids, rids, rids ]
   ).then(res => res.rows.map(r => r.rid));

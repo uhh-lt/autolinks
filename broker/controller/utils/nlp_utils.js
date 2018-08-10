@@ -21,11 +21,15 @@ module.exports.getAnnotationResources = function(uid, did, analysis, focus){
   let empty_focus = !!focus ? !Object.keys( focus ).length : true;
   empty_focus = empty_focus || focus.maxlength() === 0;
   let overlappingAnnotations = null;
+
   if(empty_focus){
-    overlappingAnnotations = analysis.getAnnotationsWithinDOffset(new DOffset([new Offset(0, analysis.text.length)]));
+    logger.info('Interpreting all annotations.');
+    overlappingAnnotations = analysis.annotations;
   }else{
+    logger.info('Computing overlap.');
     overlappingAnnotations = analysis.getAnnotationsWithinDOffset(focus);
   }
+  logger.info(`Found ${overlappingAnnotations.length} annotations to interpret.`);
 
   const annotationResourcePromises = [...overlappingAnnotations].map(anno => {
     const anno_text = anno.doffset.getText(analysis.text);
@@ -34,6 +38,7 @@ module.exports.getAnnotationResources = function(uid, did, analysis, focus){
 
   return Promise.all(annotationResourcePromises)
     .then(annotationResources => {
+      logger.info(`Finished interpretation of ${annotationResources.length} annotation resources.`);
       if(empty_focus){
         return annotationResources.length;
       }else{
@@ -54,11 +59,5 @@ module.exports.getAnnotationResource = function(uid, did, anno, text, skipsource
 
 
 function get_or_add_resource(userid, storagekey, rawresource, skipsources) {
-  return storage.promisedRead(userid, storagekey, skipsources).then(resource => {
-    if (resource) {
-      return resource;
-    }
-    // else create resource
-    return storage.promisedWrite(userid, storagekey, rawresource, skipsources);
-  });
+  return storage.promisedWrite(userid, storagekey, rawresource, skipsources);
 }
