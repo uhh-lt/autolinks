@@ -3,7 +3,7 @@
 /* some global settings and requirements */
 require('./serversetup')(module);
 process.setMaxListeners(0); // prevent: (node:308) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 uncaughtException listeners added. Use emitter.setMaxListeners() to increase limit
-require('events').EventEmitter.defaultMaxListeners = 100; // prevent: (node:24) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 error listeners added. Use emitter.setMaxListeners() to increase limit
+require('events').EventEmitter.defaultMaxListeners = 1000; // prevent: (node:24) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 error listeners added. Use emitter.setMaxListeners() to increase limit
 
 /* imports */
 const

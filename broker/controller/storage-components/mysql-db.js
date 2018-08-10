@@ -2,8 +2,8 @@
 
 // requires
 const
-  fs = require('fs'),
   path = require('path'),
+  fs = require('fs-extra'),
   nodeCleanup = require('node-cleanup'),
   mysql = require('mysql'),
   Exception = require('../../model/Exception').model,
@@ -582,7 +582,6 @@ module.exports.resetFilesystem = function () {
 };
 
 module.exports.removeEverythingInDir = function(dir){
-  logger.debug(`Deleting all files and folders in ${dir}.`);
   return new Promise((resolve, reject) => {
     return fs.readdir(dir, (err, files) => {
       if (err) {
@@ -591,7 +590,7 @@ module.exports.removeEverythingInDir = function(dir){
       if(!files.length){
         return resolve(true);
       }
-      return this.removeFiles(files).then(
+      return this.removeDirOrFiles(dir, files).then(
         _ => resolve(true),
         err => reject(err)
       );
@@ -599,19 +598,15 @@ module.exports.removeEverythingInDir = function(dir){
   });
 };
 
-module.exports.removeFiles = function(files){
+module.exports.removeDirOrFiles = function(dir, files){
   return new Promise((resolve, reject) => {
-    return Promise.all(files.map(file => this.removeFile(file))).then(_ => resolve(true), err => reject(err));
+    return Promise.all(files.map(file => this.removeDirOrFile(path.join(dir, file)))).then(_ => resolve(true), err => reject(err));
   });
 };
 
-module.exports.removeFile = function(file){
-  return new Promise((resolve, reject) => fs.unlink(file, err => {
-    if(err) {
-      return reject(err);
-    }
-    return resolve(true);
-  }));
+module.exports.removeDirOrFile = function(file_or_dir){
+  logger.info(`Deleting '${file_or_dir}'.`);
+  return fs.remove(file_or_dir);
 };
 
 module.exports.resetData = function () {

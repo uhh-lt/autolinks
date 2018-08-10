@@ -507,7 +507,9 @@ paths:
         200:
           description: Success
           schema:
-            $ref: '#/definitions/Resource'
+            type: array
+            items:
+              $ref: '#/definitions/Resource'
         default:
           description: Error
           schema:
