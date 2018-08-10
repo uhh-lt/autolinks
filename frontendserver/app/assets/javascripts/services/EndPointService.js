@@ -17,12 +17,17 @@ define([
             return {
               fetchService: function() {
                 return $http.get('/api/service/listServices').then(function(response) {
+                  var activeAPIServices = [];
                   _.forEach(response.data, function(l) {
-                    _.forEach(l.endpoints, function(e) {
-                      e["enabled"] = false;
-                    });
+                    if (l.active > 0) {
+                      _.forEach(l.endpoints, function(e) {
+                        e["enabled"] = false;
+                      });
+                      activeAPIServices.push(l);
+                    }
                   });
-                  $rootScope.listServices = response.data;
+                  $rootScope.listServices = activeAPIServices;
+                  response.data = activeAPIServices;
                   return response;
                  });
               },
