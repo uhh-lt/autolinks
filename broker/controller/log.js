@@ -18,7 +18,7 @@ module.exports = function(callingModule) {
     // if callingModule is not a module use simply the string and no file logger
     label = callingModule;
   }
-  const dest = pino.extreme();
+  const dest = process.env.LOGBUFFER && (JSON.parse(process.env.LOGBUFFER) && pino.extreme() || null) || null;
   const logger = pino({
     level: loglevel,
     name: label,
