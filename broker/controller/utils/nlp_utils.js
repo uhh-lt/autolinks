@@ -21,11 +21,17 @@ module.exports.getAnnotationResources = function(uid, did, analysis, focus){
   let empty_focus = !!focus ? !Object.keys( focus ).length : true;
   empty_focus = empty_focus || focus.maxlength() === 0;
   let overlappingAnnotations = null;
+
   if(empty_focus){
-    overlappingAnnotations = analysis.getAnnotationsWithinDOffset(new DOffset([new Offset(0, analysis.text.length)]));
+    logger.info('Interpreting all annotations.');
+    overlappingAnnotations = analysis.annotations;
+    logger.info(`Found ${overlappingAnnotations.length} annotations.`);
   }else{
+    logger.info('Computing overlap.');
     overlappingAnnotations = analysis.getAnnotationsWithinDOffset(focus);
   }
+  logger.info(`Found ${overlappingAnnotations.length} annotations.`);
+
 
   const annotationResourcePromises = [...overlappingAnnotations].map(anno => {
     const anno_text = anno.doffset.getText(analysis.text);
