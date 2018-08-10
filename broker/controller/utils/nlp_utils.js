@@ -18,7 +18,8 @@ module.exports.getAnnotationResourcesDoc = function(uid, did, focus) {
 };
 
 module.exports.getAnnotationResources = function(uid, did, analysis, focus){
-  const empty_focus = !!focus ? !Object.keys( focus ).length : true;
+  let empty_focus = !!focus ? !Object.keys( focus ).length : true;
+  empty_focus = empty_focus || focus.maxlength() === 0;
   let overlappingAnnotations = null;
   if(empty_focus){
     overlappingAnnotations = analysis.getAnnotationsWithinDOffset(new DOffset([new Offset(0, analysis.text.length)]));
@@ -33,15 +34,11 @@ module.exports.getAnnotationResources = function(uid, did, analysis, focus){
 
   return Promise.all(annotationResourcePromises)
     .then(annotationResources => {
-      let focustext = analysis.source;
-      let focus_storage_key = `annotations::${did}:0:${analysis.text.length}`;
-      if(!empty_focus){
-        focustext = focus.getText(analysis.text);
-        focus_storage_key = `annotations::${did}:${focus.begin()}:${focus.end()}`;
+      if(empty_focus){
+        return annotationResources.length;
+      }else{
+        return annotationResources;
       }
-
-      const raw_focus_resource = new Resource(null, annotationResources, null, { label: focustext });
-      return get_or_add_resource(uid, focus_storage_key, raw_focus_resource, empty_focus);
     });
 };
 

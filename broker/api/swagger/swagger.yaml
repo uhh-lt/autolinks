@@ -495,7 +495,7 @@ paths:
       parameters:
       - name: did
         in: path
-        description: Document id to get the analysis from
+        description: Document id to get the analysis from which should be interpreted
         required: true
         type: integer
       - name: focus
@@ -505,11 +505,9 @@ paths:
           $ref: '#/definitions/DOffset'
       responses:
         200:
-          description: Success
+          description: Success, returns a list of resources if focus parameter was not empty, otherwise the number of prepared resources will be returned
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/Resource'
+            $ref: '#/definitions/Any'
         default:
           description: Error
           schema:
