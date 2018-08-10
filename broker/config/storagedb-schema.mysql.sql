@@ -14,7 +14,8 @@ CREATE TABLE IF NOT EXISTS documents (
   KEY (did),
   KEY (uid),
   KEY (name(250))
-) ENGINE=MyISAM;
+);
+-- ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS resourceToDocument (
   did int unsigned NOT NULL,
@@ -22,7 +23,8 @@ CREATE TABLE IF NOT EXISTS resourceToDocument (
   PRIMARY KEY (did, rid),
   KEY (did),
   KEY (rid)
-) ENGINE=MyISAM;
+);
+-- ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS resources (
   rid         int unsigned NOT NULL AUTO_INCREMENT,
@@ -33,7 +35,8 @@ CREATE TABLE IF NOT EXISTS resources (
   PRIMARY KEY (rid, uid),
   KEY (rid),
   KEY (uid)
-) ENGINE=MyISAM;
+);
+--ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS resourceMetadata (
   rid          int unsigned NOT NULL,
@@ -41,7 +44,8 @@ CREATE TABLE IF NOT EXISTS resourceMetadata (
   mvalue       text NOT NULL,
   PRIMARY KEY (rid, mkey),
   KEY (mkey)
-) ENGINE=MyISAM;
+);
+--ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS stringResources (
   rid         int unsigned NOT NULL,
@@ -49,7 +53,8 @@ CREATE TABLE IF NOT EXISTS stringResources (
   PRIMARY KEY (rid),
   KEY (surfaceform(242)),
   UNIQUE KEY (rid, surfaceform(242))
-) ENGINE=MyISAM;
+);
+-- ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS tripleResources (
   rid  int unsigned NOT NULL,
@@ -61,7 +66,8 @@ CREATE TABLE IF NOT EXISTS tripleResources (
   KEY (pred),
   KEY (obj),
   UNIQUE spo (rid, subj, pred, obj)
-) ENGINE=MyISAM;
+);
+-- ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS listResources (
   rid            int unsigned NOT NULL,
@@ -69,7 +75,8 @@ CREATE TABLE IF NOT EXISTS listResources (
   PRIMARY KEY (rid),
   KEY (listdescriptor(250)),
   UNIQUE (rid, listdescriptor(242))
-) ENGINE=MyISAM;
+);
+-- ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS listResourceItems (
   rid     int unsigned NOT NULL,
@@ -77,7 +84,8 @@ CREATE TABLE IF NOT EXISTS listResourceItems (
   PRIMARY KEY (rid, itemrid),
   KEY (rid),
   KEY (itemrid)
-) ENGINE=MyISAM;
+);
+-- ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS resourcePermission (
   rid         int unsigned NOT NULL,
@@ -87,7 +95,8 @@ CREATE TABLE IF NOT EXISTS resourcePermission (
   PRIMARY KEY (rid, uid),
   KEY (uid),
   KEY (rid)
-) ENGINE=MyISAM;
+);
+-- ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS storageItems (
   sid        int unsigned NOT NULL AUTO_INCREMENT,
@@ -96,7 +105,8 @@ CREATE TABLE IF NOT EXISTS storageItems (
   PRIMARY KEY (sid, uid, storagekey(234)),
   KEY (uid, storagekey(234)),
   KEY (storagekey(234))
-) ENGINE=MyISAM;
+);
+-- ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS storageItemToResource (
   sid int unsigned NOT NULL,
@@ -104,7 +114,8 @@ CREATE TABLE IF NOT EXISTS storageItemToResource (
   PRIMARY KEY (sid, rid),
   KEY (sid),
   KEY (rid)
-) ENGINE=MyISAM;
+);
+-- ENGINE=MyISAM;
 
 -- CREATE HELPER VIEWS
 --CREATE OR REPLACE VIEW userResourceMetadata  AS SELECT r1.uid, r2.* FROM resources r1 JOIN resourceMetadata  r2 ON (r1.rid = r2.rid);
