@@ -828,9 +828,9 @@ define([
                           metadata: e.metadata,
                           id: ((parent ? parent.id : scope.outermostId) + '__n-' +
                               // e.value.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '')
-                              e.value.replace(/[^A-Za-z0-9\-_]/g, '-') // NOTE: remove metacharacters, cytoscape rules
+                              ((typeof e.value === "string") ? e.value.replace(/[^A-Za-z0-9\-_]/g, '-') : e.rid) // NOTE: remove metacharacters, cytoscape rules
                               + '-' + e.rid ).replace(/\s/g, ''),
-                          name: e.value + '',
+                          name: ((typeof e.value === "string") ? e.value : e.rid) + '',
                           parent: parent ? parent.id : scope.outermostId,
                           path: scope.path,
                           provenances: e.sources
@@ -861,14 +861,15 @@ define([
                         let o = n.value.object;
 
                         if (_.isArray(s.value)) {
-                          var es = "";
-                          if (s.value.length > 0) {
-                            es = extractList(s.value);
-                          } else {
-                            s.value = "";
-                            es = o;
-                          }
-                          var subject = assignEntity(es, parent);
+                          //TODO: at the moment, list extractions are commented out since we dont take compound properties from the first array index of single nodes
+                          // var es = "";
+                          // if (s.value.length > 0) {
+                          //   es = extractList(s.value);
+                          // } else {
+                          //   s.value = "";
+                          //   es = o;
+                          // }
+                          var subject = assignEntity(s, parent);
                         } else if (_.isObject(s.value)) {
                           var es = extractResource(s);
                           var subject = assignEntity(es, parent);
@@ -877,14 +878,14 @@ define([
                         }
 
                         if (_.isArray(o.value)) {
-                          var eo = "";
-                          if (o.value.length > 0) {
-                            eo = extractList(o.value);
-                          } else {
-                            o.value = "";
-                            eo = o;
-                          }
-                          var object = assignEntity(eo, parent);
+                          // var eo = "";
+                          // if (o.value.length > 0) {
+                          //   eo = extractList(o.value);
+                          // } else {
+                          //   o.value = "";
+                          //   eo = o;
+                          // }
+                          var object = assignEntity(o, parent);
                         } else if (_.isObject(o.value)) {
                           var eo = extractResource(o);
                           var object = assignEntity(eo, parent);
@@ -893,14 +894,14 @@ define([
                         }
 
                         if (_.isArray(p.value)) {
-                          var ep = "";
-                          if (p.value.length > 0) {
-                            ep = extractList(p.value);
-                          } else {
-                            p.value = "";
-                            ep = o;
-                          }
-                          var edge = assignRelation(ep, subject, object);
+                          // var ep = "";
+                          // if (p.value.length > 0) {
+                          //   ep = extractList(p.value);
+                          // } else {
+                          //   p.value = "";
+                          //   ep = o;
+                          // }
+                          var edge = assignRelation(p, subject, object);
                         } else if (_.isObject(p.value)) {
                           var ep = extractResource(p);
                           var edge = assignEntity(ep, parent);
