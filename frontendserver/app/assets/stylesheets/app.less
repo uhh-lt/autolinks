@@ -220,6 +220,19 @@ div.popupMenu {
 	}
 }
 
+.progressBar {
+	position: absolute;
+	width: 98%;
+	z-index: 2;
+	.bottom-block {
+    text-align: center;
+	}
+	@keyframes blink {50% { color: transparent }}
+	.loader__dot { animation: 1s blink infinite }
+	.loader__dot:nth-child(2) { animation-delay: 250ms }
+	.loader__dot:nth-child(3) { animation-delay: 500ms }
+}
+
 .auto-tooltip {
     position: relative;
     display: inline-block;

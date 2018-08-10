@@ -17,13 +17,16 @@ define([
           .defaultIconSet('img/icons/setitems/core-icons.svg', 24);
         })
         // Mainnav Controller
-        .controller('MainnavController', ['$scope', '$rootScope', 'EndPointService', '$mdDialog', '$mdSidenav',
-        function ($scope, $rootScope, EndPointService, $mdDialog, $mdSidenav) {
+        .controller('MainnavController', ['$scope', '$rootScope', 'EndPointService', '$mdDialog', '$mdSidenav', '_',
+        function ($scope, $rootScope, EndPointService, $mdDialog, $mdSidenav, _) {
 
           $scope.lockLeft = false;
           $scope.toggle = {};
           $scope.selectedDoc = {};
           $scope.localSearch = $rootScope.localSearch;
+          $scope.documentLense = true;
+          $scope.types = [];
+          $scope.documents = [];
 
           $rootScope.$on('toggleMainnav', function() {
             $scope.lockLeft = !$scope.lockLeft;
@@ -35,7 +38,8 @@ define([
               });
 
               EndPointService.getDocuments().then(function(response) {
-                $scope.documents = response.data;
+                $scope.documents = _.orderBy(response.data, 'filename', 'asc');
+
               });
 
               EndPointService.getUsername().then(function(response) {
@@ -49,7 +53,15 @@ define([
             EndPointService.toggleService(service);
           };
 
-          //TODO: this argument is named as typ, to avoid reserved words
+          $scope.toggleLense = function() {
+            if($scope.documentLense) {
+              $rootScope.$emit('activateCarousel');
+            } else {
+              $rootScope.$emit('deactivateCarousel');
+            }
+          };
+
+          //NOTE: this argument is named as typ, to avoid reserved words
           $scope.toggleTypeTo = function(typ) {
             EndPointService.toggleTypes(typ);
             $rootScope.$emit('switchNodesBasedOnTypes');
@@ -59,6 +71,7 @@ define([
             EndPointService.setSelectedDoc(doc);
             EndPointService.loadDoc(doc.did).then(function(response) {
               $rootScope.$emit('activateCarouselFromDoc', response.data);
+              $rootScope.$emit('deactivateProgressBar');
             });
           };
 
@@ -66,7 +79,9 @@ define([
             EndPointService.setSelectedDoc(doc);
             EndPointService.loadDoc(doc.did).then(function(response) {
               $rootScope.$emit('activateCarouselFromDoc', response.data);
-              EndPointService.interpretDoc(doc.did);
+              EndPointService.interpretDoc(doc.did).then(function(response) {
+                $rootScope.$emit('deactivateProgressBar');
+              });
             });
           };
 
@@ -82,19 +97,23 @@ define([
             $mdDialog.show(confirm).then(function() {
               $scope.documents.splice($scope.trashIndex, 1);
               EndPointService.deleteDoc($scope.trash.did);
+              if ($scope.trash.did === $scope.selectedDoc.did) {
+                $scope.types = [];
+                $rootScope.$emit('deleteSlide');
+              }
             });
           };
 
           $rootScope.$on('addNewAnnoType', function(event, newAnnoType) {
             var selectedType = _.filter($scope.types, function(type) { return type.name === newAnnoType });
-            if (!selectedType[0].enabled) {
+            if (selectedType.length > 0 && !selectedType[0].enabled) {
               selectedType[0].enabled = true;
               EndPointService.toggleTypes(selectedType[0]);
             }
           });
 
           $rootScope.$on('addTypes', function(event, types) {
-            $scope.types = types;
+            $scope.types = _.orderBy(types, 'name', 'asc');
           });
 
           $rootScope.$on('checkedDoc', function(event, doc) {

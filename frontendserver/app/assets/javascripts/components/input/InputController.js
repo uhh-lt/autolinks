@@ -62,6 +62,13 @@ define([
             // If no input is given, prompt user to enter articles
             if (!inputs[0]) {
               // noInputDetected();
+              $mdToast.show(
+                    $mdToast.simple()
+                      .textContent('No input given')
+                      .position('top right')
+                      .theme("warn-toast")
+                      .hideDelay(3500)
+                  );
               return;
             }
 
@@ -103,23 +110,51 @@ define([
 
                               EndPointService.fetchData($scope.data).then(function(response) {
                                   EntityService.addEntity(response, $scope.data);
+                                  if ($rootScope.localSearch.local) {
+                                    const localSearch = $rootScope.localSearch;
+                                    if (localSearch.local) {
+                                      const context = $scope.context;
+                                      EndPointService.localSearch(context, localSearch.ci).then(function(response) {
+                                        if ( response.data.length < 1) {
+                                          $mdToast.show(
+                                                $mdToast.simple()
+                                                  .textContent('No results found for ' + response.context + ' in local search')
+                                                  .position('top right')
+                                                  .theme("warn-toast")
+                                                  .hideDelay(3500)
+                                              );
+                                        }
+                                          // const dataPath = { endpoint: { path: 'localSearch' }};
+                                          // $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
+                                      });
+                                    };
+                                  }
                               });
                             };
 
                           });
                         });
-                      };
-
-                      if ($rootScope.localSearch.local) {
-                        const localSearch = $rootScope.localSearch;
-                        if (localSearch.local) {
-                          const context = $scope.context;
-                          EndPointService.localSearch(context, localSearch.ci).then(function(response) {
-                              // const dataPath = { endpoint: { path: 'localSearch' }};
-                              // $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
-                          });
+                      } else {
+                        if ($rootScope.localSearch.local) {
+                          const localSearch = $rootScope.localSearch;
+                          if (localSearch.local) {
+                            const context = $scope.context;
+                            EndPointService.localSearch(context, localSearch.ci).then(function(response) {
+                              if ( response.data.length < 1) {
+                                $mdToast.show(
+                                      $mdToast.simple()
+                                        .textContent('No results found for ' + response.context + ' in local search')
+                                        .position('top right')
+                                        .theme("warn-toast")
+                                        .hideDelay(3500)
+                                    );
+                              }
+                                // const dataPath = { endpoint: { path: 'localSearch' }};
+                                // $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
+                            });
+                          }
                         };
-                      }
+                      };
                     // });
                   } else {
                     $mdToast.show(

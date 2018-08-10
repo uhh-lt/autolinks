@@ -11,11 +11,19 @@
         </md-card>
       </div>
     </div>
-    <ol class="carousel-indicators custom-carousel" ng-show="slides.length > 1" style="bottom: 50px">
-      <li ng-repeat="slide in slides | orderBy:indexOfSlide track by $index" ng-class="{ active: isSlideActive(slide) }" ng-click="selectSlide(slide)">
+    <ol class="carousel-indicators custom-carousel" ng-show="slides.length > 1" style="bottom: 38px">
+      <input
+         class="slide-number"
+         id="slide-number"
+         value="{{active + 1}}"
+         ng-submit="setSlideNumber()"
+         ng-keyup="$event.keyCode == 13 && setSlideNumber()"
+       >
+     </input> / <span> {{ slides.length }} </span>
+      <!-- <li ng-repeat="slide in slides | orderBy:indexOfSlide track by $index" ng-class="{ active: isSlideActive(slide) }" ng-click="selectSlide(slide)">
           <img ng-src="{{slide.slide.actual.thumb}}">
           <span class="sr-only">slide {{ $index + 1 }} of {{ slides.length }}<span ng-if="isSlideActive(slide)">, currently active</span></span>
-      </li>
+      </li> -->
    </ol>
     <!-- <div class="row">
      <div class="col col-xs-6">
@@ -32,12 +40,14 @@
      </div>
    </div> -->
   </div>
-  <a role="button" href class="left carousel-control custom-carousel" ng-click="goPrev()" ng-class="{ disabled: isPrevDisabled() }" style="display: block"
+  <a role="button" href class="left carousel-control custom-carousel" ng-click="isPrevDisabled() ? '' :goPrev()"
+     ng-class="{ 'carousel-disabled': isPrevDisabled() }"
      ng-show="slides.length > 1">
       <span aria-hidden="true" class="glyphicon glyphicon-chevron-left"></span>
       <span class="sr-only">previous</span>
   </a>
-  <a role="button" href class="right carousel-control custom-carousel" ng-click="goNext()" ng-class="{ disabled: isNextDisabled() }" style="display: block"
+  <a role="button" href class="right carousel-control custom-carousel" ng-click="isNextDisabled() ? '' :goNext()"
+     ng-class="{ 'carousel-disabled': isNextDisabled() }"
      ng-show="slides.length > 1">
       <span aria-hidden="true" class="glyphicon glyphicon-chevron-right"></span>
       <span class="sr-only">next</span>

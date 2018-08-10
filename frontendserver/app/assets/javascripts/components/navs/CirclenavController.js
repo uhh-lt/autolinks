@@ -117,7 +117,7 @@ define([
           };
 
           $scope.layoutReset = function(){
-            $rootScope.$broadcast('layoutReset');
+            $rootScope.$emit('layoutReset');
           };
 
           $scope.toggleSidenav = function() {

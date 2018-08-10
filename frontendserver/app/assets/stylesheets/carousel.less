@@ -75,6 +75,29 @@
 		display: block !important;
 	}
 }
+
+.slide-number {
+	border: none;
+	border-bottom: 1px solid black;
+	width: 25px;
+	text-align: center;
+	md-input-container {
+		margin: 0;
+	}
+	&:focus {
+		outline: none !important;
+		border: none;
+		border-bottom: 1px solid blue;
+	}
+}
+
+.carousel-disabled {
+	// pointer-events: none;
+	cursor: not-allowed !important;
+	&:hover {
+  	opacity: .2 !important;
+	}
+}
 //
 // .display-mode {
 //   height: 0;

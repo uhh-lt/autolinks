@@ -20,10 +20,10 @@ define([
               { name: 'Fit', icon: 'fa fa-expand fa-2x' },
               { name: 'Fix Layout', icon: 'fa fa-retweet fa-2x' },
               { name: 'Clear', icon: 'far fa-square fa-2x' },
-              { name: 'Add', icon: 'fas fa-plus-square fa-2x' },
-              { name: 'Edit', icon: 'fas fa-edit fa-2x' },
-              { name: 'Merge', icon: 'fas fa-external-link-alt fa-2x' },
-              { name: 'Compound', icon: 'fa fa-object-group fa-2x' }
+              // { name: 'Add', icon: 'fas fa-plus-square fa-2x' },
+              // { name: 'Edit', icon: 'fas fa-edit fa-2x' },
+              { name: 'Move into', icon: 'fas fa-external-link-alt fa-2x' },
+              { name: 'Create new compound', icon: 'fa fa-object-group fa-2x' }
             ];
 
             $scope.listItemClick = function($index) {
@@ -62,7 +62,7 @@ define([
                   break;
                 case 'Edit':
                   break;
-                case 'Merge':
+                case 'Move into':
                   if (cy.$(':selected').length > 0) {
                     $mdBottomSheet.hide();
                     $mdToast.show(
@@ -84,7 +84,7 @@ define([
                     console.log('Please select one or more nodes to merge to parent');
                   }
                   break;
-                case 'Compound':
+                case 'Create new compound':
                   if (cy.$(':selected').length > 0) {
                     EntityService.openSideNav('createCompound');
                   } else {

@@ -10,13 +10,13 @@
          </h1>
        </md-toolbar>
      <md-content>
-       <h3 class="md-toolbar-tools">
+       <!-- <h3 class="md-toolbar-tools">
          <label>Welcome onboard {{ username }}!</label>
        </h3>
        <md-list ng-cloak>
          <md-subheader class="md-no-sticky">
            <h5>In this main menu, services, documents, and annotation types can be set.</h5>
-         </md-subheader>
+         </md-subheader> -->
 
         <!-- <md-divider></md-divider>
 
@@ -71,8 +71,6 @@
             <md-divider></md-divider>
           </div>
         </div>
-
-        <md-list flex>
           <md-list-item class="main-subheader" ng-click="toggle.doc = !toggle.doc">
             <span flex>Document lists:</span>
             <i ng-show="!toggle.doc" class="fa fa-chevron-down" aria-hidden="true"></i>
@@ -84,33 +82,43 @@
               <md-switch class="md-secondary" ng-model="doc" ng-model-options="{ getterSetter: true, updateOn: 'default' }" ng-change="loadDoc(doc)"></md-switch>
             </md-list-item>
           </div> -->
+          <div ng-show="toggle.doc">
+            <md-list-item class="main-subheader">
+              <md-input-container dir="rtl" class="autolinks-input-checkbox">
+                 <md-checkbox ng-model="documentLense" ng-change="toggleLense()">
+                  Document Lense
+                 </md-checkbox>
+              </md-input-container>
+            </md-list-item>
 
-          <md-radio-group
-            ng-show="toggle.doc"
-            ng-model="selectedDoc.did"
-            ng-model-options="{ getterSetter: true, updateOn: 'default' }"
-            ng-change="loadDoc(selectedDoc)"
-          >
-           <md-list-item ng-if="!documents.length > 0">No uploaded documents were found!</md-list-item>
-           <div ng-repeat='doc in documents' class="row-reverse">
-             <div flex layout='row' layout-padding layout-align="start center" >
-               <md-list-item>
-                 <md-radio-button flex
-                     ng-value="doc.did"
-                     ng-attr-id="{{doc.did + doc.filename}}"
-                     ng-checked="true"
-                  >
-                    {{$index + 1}}. {{ doc.filename }}
-                 </md-radio-button>
-                 <a href="" ng-click="deleteDoc(doc, $index)" class="delete-doc">
-                   <i id="circle-fit" class="fa fa-trash-alt" aria-hidden="true"></i>
-                 </a>
-               </md-list-item>
+            <md-radio-group
+              ng-model="selectedDoc.did"
+              ng-model-options="{ getterSetter: true, updateOn: 'default' }"
+              ng-change="loadDoc(selectedDoc)"
+            >
+             <md-list-item ng-if="!documents.length > 0">No uploaded documents were found!</md-list-item>
+             <div ng-repeat='doc in documents' class="row-reverse">
+               <div flex layout='row' layout-padding layout-align="start center" >
+                 <md-list-item>
+                   <md-radio-button flex
+                       ng-value="doc.did"
+                       ng-attr-id="{{doc.did + doc.filename}}"
+                       ng-checked="true"
+                    >
+                      {{$index + 1}}. {{ doc.filename }}
+                   </md-radio-button>
+                   <a href="" ng-click="deleteDoc(doc, $index)" class="delete-doc">
+                     <i id="circle-fit" class="fa fa-trash-alt" aria-hidden="true"></i>
+                   </a>
+                 </md-list-item>
+               </div>
              </div>
-           </div>
-         </md-radio-group>
-         <md-divider></md-divider>
-        </md-list>
+           </md-radio-group>
+           <md-divider></md-divider>
+          </md-list>
+          </div>
+
+        <md-divider></md-divider>
 
         <md-list-item class="main-subheader" ng-click="toggle.annotation = !toggle.annotation">
           <span flex>Annotation Types:</span>
@@ -119,7 +127,7 @@
         </md-list-item>
         <md-divider></md-divider>
         <div ng-show="toggle.annotation">
-          <md-list-item ng-if="!types"> Please select a document first!</md-list-item>
+          <md-list-item ng-if="!types.length > 0"> Please select a document first!</md-list-item>
           <md-list-item ng-repeat="typ in types">
             <p>{{ typ.name }}</p>
             <md-switch class="md-secondary" ng-model="typ.enabled" ng-change="toggleTypeTo(typ)"></md-switch>
@@ -135,7 +143,6 @@
 
         <md-divider></md-divider>
 
-      </md-list>
      </md-content>
      <md-toolbar class="md-scroll-shrink">
       <a ng-href="/login" target="_self" layout="row" layout-align="center center" flex style="cursor: pointer;color: white;">

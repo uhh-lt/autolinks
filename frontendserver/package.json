@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/uhh-lt/autolinks#readme",
   "dependencies": {
-    "angular": "^1.7.2",
+    "angular": "^1.7.3",
     "body-parser": "^1.18.3",
     "connect-multiparty": "^2.1.1",
     "ejs": "^2.6.1",
@@ -34,7 +34,7 @@
     "express-session": "^1.15.6",
     "form-data": "^2.3.2",
     "multer": "^1.3.1",
-    "multiparty": "^4.1.4",
+    "multiparty": "^4.2.0",
     "request": "^2.87.0",
     "rootpath": "^0.1.2"
   }

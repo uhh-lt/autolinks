@@ -17,12 +17,17 @@ define([
             return {
               fetchService: function() {
                 return $http.get('/api/service/listServices').then(function(response) {
+                  var activeAPIServices = [];
                   _.forEach(response.data, function(l) {
-                    _.forEach(l.endpoints, function(e) {
-                      e["enabled"] = false;
-                    });
+                    if (l.active > 0) {
+                      _.forEach(l.endpoints, function(e) {
+                        e["enabled"] = false;
+                      });
+                      activeAPIServices.push(l);
+                    }
                   });
-                  $rootScope.listServices = response.data;
+                  $rootScope.listServices = activeAPIServices;
+                  response.data = activeAPIServices;
                   return response;
                  });
               },
@@ -42,7 +47,7 @@ define([
                   $rootScope.activeTypes.push(type.name);
                 } else {
                   _.pull($rootScope.activeTypes, type.name);
-                  // $rootScope.$broadcast('disableEndpoint', service.path);
+                  // $rootScope.$emit('disableEndpoint', service.path);
                 }
                 $rootScope.$emit('refreshCarouselBasedOnType');
               },
@@ -70,18 +75,21 @@ define([
               },
 
               loadDoc: function(did) {
+                $rootScope.$emit('activateProgressBar', 'loading a document');
                 return $http.post('/api/nlp/analyzeDid', { did: did }).then(function(response) {
                   return response;
                 });
               },
 
               interpretDoc: function(did) {
+                $rootScope.$emit('activateProgressBar', 'interpreting the document');
                 return $http.post('/api/nlp/interpretDid', { did: did }).then(function(response) {
                   return response;
                 });
               },
 
               interpretOffset: function(did, offsets) {
+                $rootScope.$emit('activateProgressBar', 'interpreting the offset');
                 return $http.post('/api/nlp/interpretDid', { did: did, offsets: offsets }).then(function(response) {
                   return response;
                 });
@@ -118,13 +126,18 @@ define([
               },
 
               getService: function(data) {
+                $rootScope.$emit('activateProgressBar', 'calling a service from source');
                 return $http.post('/api/service/get', { data: data }).then(function(response) {
                   return data = response.data;
                 });
               },
 
               localSearch: function(context, isCi) {
+                $rootScope.$emit('activateProgressBar', 'local search');
                 return $http.post('/api/storage/searchResource', { data: {context: context, isCi: isCi} }).then(function(response) {
+                  if (response.data.length < 1) {
+                    $rootScope.$emit('deactivateProgressBar');
+                  }
                   _.forEach(response.data, function(source) {
                     if (!_.includes(source, 'annotations::')) {
                       return $http.post('/api/storage/getResource', { data: source }).then(function(response) {
@@ -133,11 +146,13 @@ define([
                       });
                     }
                   });
+                  return { data: response.data, context };
                 });
               },
 
               fetchData: function(data) {
                 const promise = $q.defer();
+                $rootScope.$emit('activateProgressBar', 'Extracting knowledge graph');
                 // let data = [];
                 // let list = $rootScope.listServices;
                 // $rootScope.text = text;

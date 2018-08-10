@@ -14,6 +14,7 @@ define([
           $scope.label = '';
           $scope.toggle = {};
           $scope.metadata = {};
+          $scope.provenances = [];
 
           $scope.init = function() {
             // $timeout( function() {
@@ -24,7 +25,7 @@ define([
 
                 EndPointService.getDocuments().then(function(response) {
                   $scope.documents = response.data;
-                  $scope.provenances = [];
+
                   let sources = _.clone(entity._private.data.provenances);
                   sources = _.forEach(sources, function(source) {
                     if (_.includes(source, 'service::')) {
@@ -51,6 +52,7 @@ define([
                       }
                     };
                   });
+                  $scope.provenances = _.uniqBy($scope.provenances, 'surface');
                 });
 
                 if (metadata) {
@@ -96,11 +98,12 @@ define([
                 entity.data().metadata = $scope.metadata;
               }
               $mdSidenav('right').close();
-              cy.$(':selected').trigger('tap');
+              cy.$(":selected").data('metadata', $scope.metadata); //TODO: alternative to trigger('tap') but needs to do more testing
+              // cy.$(':selected').trigger('tap'); //TODO: change tap, since it triggers x undefined cueUtilities error
 
               // $scope.selectedEntity = EntityService.updateRootScopeEntity($scope.selectedEntity);
               // // broadcasting the event
-              // // $rootScope.$broadcast('appChanged');
+              // // $rootScope.$emit('appChanged');
               // $mdSidenav('right').close();
           };
 
@@ -109,7 +112,7 @@ define([
             if (_.includes(pvc.origin, 'service::')) {
               $scope.dataPath = { endpoint: { path: pvc.path }}
               EndPointService.getService(pvc.surface).then(function(response) {
-                $rootScope.$broadcast('addEntity', { entity: response, data: $scope.dataPath });
+                $rootScope.$emit('addEntity', { entity: response, data: $scope.dataPath });
               });
             } else {
               EndPointService.loadDoc(pvc.did).then(function(response) {
@@ -117,7 +120,15 @@ define([
                   const resp = {data: response.data, pvc: $scope.selectedPvc};
                   $rootScope.$emit('navigateToDocFromSource', resp);
                   $rootScope.$emit('checkedDoc', {did: resp.pvc.did, name: resp.pvc.filename});
+                  $rootScope.$emit('deactivateProgressBar');
                 }
+              });
+              var offsets = [pvc.start, pvc.end];
+              EndPointService.setSelectedDoc(pvc);
+              EndPointService.interpretOffset(pvc.did, offsets).then(function(response) {
+                var dataPath = { endpoint: { path: 'annotationNode' }}
+                $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
+                // EntityService.addEntity(response.data);
               });
             }
           }
@@ -136,7 +147,7 @@ define([
           $scope.delete = function(ev) {
               const entity = $scope.selectedEntity;
               const label = $scope.label;
-              var entName = entity.data('metadata').label ?  entity.data('metadata').label : entity.data('name');
+              var entName = entity.data('metadata') && entity.data('metadata').label ?  entity.data('metadata').label : entity.data('name');
 
               var confirm = $mdDialog.confirm()
                    .title('Are you sure to delete ' + entName + ' node ?')

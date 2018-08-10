@@ -13,8 +13,8 @@ define([
     angular.module('autolinks.graph', ['ngCy']);
     angular.module('autolinks.graph')
         // Graph Controller
-        .controller('GraphController', ['$scope', '$q', '$rootScope', 'graphProperties', 'EntityService', 'EndPointService', '_', '$mdDialog',
-        function ($scope, $q, $rootScope, graphProperties, EntityService, EndPointService, _, $mdDialog) {
+        .controller('GraphController', ['$scope', '$q', '$rootScope', 'graphProperties', 'EntityService', 'EndPointService', '_', '$mdDialog', '$mdToast',
+        function ($scope, $q, $rootScope, graphProperties, EntityService, EndPointService, _, $mdDialog, $mdToast) {
 
           var self = this;
           /* Background collection */
@@ -35,9 +35,12 @@ define([
               self.cy = cy;
           }
 
+          $scope.progressBarIsActive = false;
+          $scope.progressStatus = 'Loading';
           $scope.EntityService = EntityService;
           $scope.EndPointService = EndPointService;
           $scope.$mdDialog = $mdDialog;
+          $scope.$mdToast = $mdToast;
           // $scope.fetchData = {};
 
           $scope.edgehandler = false;
@@ -211,7 +214,7 @@ define([
               // adding the new Node to the nodes array
               $scope.mapData.push(newNode);
               // broadcasting the event
-              $rootScope.$broadcast('appChanged');
+              $rootScope.$emit('appChanged');
               // resetting the form
               $scope.form.obj = {};
           };
@@ -227,7 +230,7 @@ define([
               // adding the new edge object to the adges array
               $scope.edgeData.push(newEdge);
               // broadcasting the event
-              $rootScope.$broadcast('appChanged');
+              $rootScope.$emit('appChanged');
               // resetting the form
               $scope.formEdges = '';
           };
@@ -264,11 +267,19 @@ define([
           };
 
           // reset the sample nodes
-          $scope.layoutReset = function(){
+          $scope.layoutReset = function() {
               $scope.mapData = [];
               $scope.edgeData = [];
-              $rootScope.$broadcast('layoutReset');
-          }
+              $rootScope.$emit('layoutReset');
+          };
+
+          $rootScope.$on('activateProgressBar', function(event, status) {
+              $scope.progressBarIsActive = true;
+              $scope.progressStatus = status;
+          });
+          $rootScope.$on('deactivateProgressBar', function() {
+              $scope.progressBarIsActive = false;
+          });
         }
     ]);
 });

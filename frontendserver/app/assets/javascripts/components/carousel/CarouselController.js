@@ -43,7 +43,7 @@ define([
                 var to = (e.doffset.offsets[0].from + e.doffset.offsets[0].length) - $scope.sentenceFrom;
                 var fragments = text.slice(offset, from).split('\n');
                 var surface = text.substring(from, to);
-                var eId = ($scope.currIndex) + '_' + surface.replace(/\s/g,'') + '_' + from + ':' + to;
+                var eId = ($scope.currIndex) + '_' + surface.replace(/\s/g,'') + '_' + e.doffset.offsets[0].from + ':' + (e.doffset.offsets[0].from + e.doffset.offsets[0].length);
 
                 fragments.forEach(function(f, i) {
                     compiledString = compiledString.concat(f);
@@ -164,7 +164,7 @@ define([
                        $scope.doffsetAnnotation = $scope.doffsetAnnotation.concat(...doffsetAnno);
                      }
                      // Move the node creation inside prompt success
-                     // $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation });
+                     // $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation }); //TODO: create discontinuous annotation for api
                      $scope.doffsetAnnotation = '';
                    }, function() {
                      $scope.status = 'You cancelled the dialog.';
@@ -372,7 +372,7 @@ define([
 
               EndPointService.interpretOffset(selectedDoc.did, offsets).then(function(response) {
                 var dataPath = { endpoint: { path: 'annotationNode' }}
-                $rootScope.$broadcast('addEntity', { entity: response.data, data: dataPath });
+                $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
                 // EntityService.addEntity(response.data);
               });
               console.log($scope.text);
@@ -424,7 +424,7 @@ define([
           $scope.resetSlides = function(loadType) {
             $scope.myInterval = 5000;
             $scope.noWrapSlides = true;
-            if (!loadType === 'refresh') {
+            if (loadType !== 'refresh') {
               $scope.active = 0;
             }
             $scope.isActive = false;
@@ -440,11 +440,37 @@ define([
           //   $scope.addSlide(sentence.properties.surface);
           // }
 
+          $rootScope.$on('activateCarousel', function() {
+            if ($scope.slides.length > 0) {
+                $scope.isActive = true;
+            }
+          });
+
+          $rootScope.$on('deactivateCarousel', function() {
+              $scope.isActive = false;
+          });
+
+          $rootScope.$on('deleteSlide', function() {
+              $scope.slides = [];
+              $scope.isActive = false;
+          });
+
           $rootScope.$on('activateCarouselFromDoc', function(event, data) {
-              // $scope.resetSlides();
-              // $scope.isActive = true;
               $scope.doc = data.text;
               textAnnotations(data);
+              var slideNumber = document.getElementById('slide-number');
+              if (slideNumber && slideNumber.value) {
+                slideNumber.value = $scope.active + 1;
+              }
+          });
+
+          $rootScope.$on('activateCarouselFromWhitelist', function(event, data) {
+              $scope.doc = data.text;
+              textAnnotations(data, 'refresh');
+              var slideNumber = document.getElementById('slide-number');
+              if (slideNumber && slideNumber.value) {
+                slideNumber.value = $scope.active + 1;
+              }
           });
 
           $rootScope.$on('activateCarouselFromUpload', function(event, data) {
@@ -453,6 +479,10 @@ define([
                 // $timeout( function(){
                 textAnnotations(response.data);
                 // }, 2000 );
+                var slideNumber = document.getElementById('slide-number');
+                if (slideNumber && slideNumber.value) {
+                  slideNumber.value = $scope.active + 1;
+                }
               });
           });
 
@@ -465,6 +495,10 @@ define([
               $scope.pvc = resp.pvc;
               $scope.doc = resp.data.text;
               textAnnotations(resp.data, 'source');
+              var slideNumber = document.getElementById('slide-number');
+              if (slideNumber && slideNumber.value) {
+                slideNumber.value = $scope.active + 1;
+              }
           });
 
           function textAnnotations(data, loadType = '') {
@@ -597,12 +631,33 @@ define([
              //carouselScope.next();
              var index = $scope.active;
              $scope.active = (index >= ($scope.slides.length - 1) ? ($scope.slides.length - 1) : index + 1);
+             document.getElementById('slide-number').value = '';
+             document.getElementById('slide-number').value = $scope.active + 1;
          };
          $scope.goPrev = function() {
            var index = $scope.active;
            $scope.active = (index <= 0 ? 0 : index - 1);
+           document.getElementById('slide-number').value = '';
+           document.getElementById('slide-number').value = $scope.active + 1;
              //carouselScope.prev();
          };
+
+         $scope.isPrevDisabled = function() {
+           return ($scope.active + 1) <= 1 ? true : false;
+         };
+
+         $scope.isNextDisabled = function() {
+           return ($scope.active + 1) >= $scope.slides.length ? true : false;
+         };
+
+         $scope.setSlideNumber = function() {
+           var number = document.getElementById('slide-number').value;
+           if (number === '' || isNaN(number) || number < 0 || number > $scope.slides.length) {
+               return;
+           }
+           $scope.active = parseInt(number) - 1;
+         };
+
          $scope.setActiveSlide = function(number) {
              console.log('>>>>>> : ' + number);
              if (number === '' || isNaN(number) || number < 0 || number > carouselScope.slides.length - 1) {
