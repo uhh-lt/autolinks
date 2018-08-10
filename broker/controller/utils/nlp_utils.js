@@ -59,11 +59,5 @@ module.exports.getAnnotationResource = function(uid, did, anno, text, skipsource
 
 
 function get_or_add_resource(userid, storagekey, rawresource, skipsources) {
-  return storage.promisedRead(userid, storagekey, skipsources).then(resource => {
-    if (resource) {
-      return resource;
-    }
-    // else create resource
-    return storage.promisedWrite(userid, storagekey, rawresource, skipsources);
-  });
+  return storage.promisedWrite(userid, storagekey, rawresource, skipsources);
 }
