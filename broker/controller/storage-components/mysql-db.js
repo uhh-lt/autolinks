@@ -209,15 +209,15 @@ module.exports.saveNewResourceOrValue = function (resourceOrValue, uid, cid) {
     resource.cid = cid;
     // a resource can be an array of resources, a triple or a string
     if (resource.isListResource()) {
-      logger.debug('Resource is an array.');
+      // logger.trace('Resource is an array.');
       return resolve(this.saveListResource(resource, uid));
     }
     if (resource.isTripleResource()) {
-      logger.debug('Resource is a triple.');
+      // logger.trace('Resource is a triple.');
       return resolve(this.saveTripleResource(resource, uid));
     }
     if (resource.isStringResource()) {
-      logger.debug('Resource is a string.');
+      // logger.trace('Resource is a string.');
       return resolve(this.saveStringResource(resource, uid));
     }
     const ex = new Exception('IllegalState', 'This is impossible, a resource has to be one of {list,triple,string}.').log(logger.warn);
@@ -363,11 +363,11 @@ module.exports.saveListResourceItem = function (desc_rid, item_rid) {
 
 module.exports.saveStringResource = function (stringResource, uid) {
   return new Promise((resolve, reject) => {
-    logger.debug(`Saving resource value '${stringResource.value}' for user with id '${uid}'.`);
+    // logger.trace(`Saving resource value '${stringResource.value}' for user with id '${uid}'.`);
     promisedQuery('select get_or_add_stringResource(?, ?) as rid', [stringResource.value, uid]).then(
       res => {
         const rid = res.rows[0].rid;
-        logger.debug(`Successfully saved resource value '${stringResource.value}' with rid '${rid}'.`);
+        // logger.trace(`Successfully saved resource value '${stringResource.value}' with rid '${rid}'.`);
         stringResource.rid = rid;
         return resolve(stringResource);
       },
@@ -377,12 +377,12 @@ module.exports.saveStringResource = function (stringResource, uid) {
 };
 
 module.exports.saveStorageItem = function (userid, storagekey) {
-  logger.debug(`Saving storage '${storagekey}' for user with id '${userid}'.`);
+  // logger.trace(`Saving storage '${storagekey}' for user with id '${userid}'.`);
   return promisedQuery('select get_or_add_storageItem(?,?) as sid', [userid, storagekey])
     .then(
       res => {
         const sid = res.rows[0].sid;
-        logger.debug(`Successfully saved storgae '${storagekey}' for user with id '${userid}'.`);
+        // logger.trace(`Successfully saved storgae '${storagekey}' for user with id '${userid}'.`);
         return sid;
       }
     );
@@ -390,11 +390,11 @@ module.exports.saveStorageItem = function (userid, storagekey) {
 
 module.exports.saveStorageItemToResourceMapping = function (sid, rid) {
   return new Promise((resolve, reject) => {
-    logger.debug(`Saving storage resource mapping (${sid},${rid}).`);
+    // logger.trace(`Saving storage resource mapping (${sid},${rid}).`);
     promisedQuery('select create_storageItemToResourceMapping(?,?) as mapping_existed', [sid, rid]).then(
       res => {
         const mapping_existed = res.rows[0].mapping_existed;
-        logger.debug(`Successfully saved storage-resource mapping (${sid},${rid}). Existed before: ${mapping_existed}.`);
+        // logger.trace(`Successfully saved storage-resource mapping (${sid},${rid}). Existed before: ${mapping_existed}.`);
         return resolve(mapping_existed);
       },
       err => reject(err)
@@ -482,10 +482,10 @@ module.exports.fillMetadata = function (resource) {
 };
 
 module.exports.getStorageResourceId = function (uid, storagekey) {
-  return promisedQuery('select s2r.rid as rid from storageItems s, storageItemToResource s2r where s2r.sid = s.sid and s.storagekey = ? and s.uid = ?', [storagekey, uid])
+  return promisedQuery('select s2r.rid as rid from storageItems s join storageItemToResource s2r on (s2r.sid = s.sid) where s.storagekey = ? and s.uid = ?', [storagekey, uid])
     .then(res => {
       if (!res.rows.length) {
-        logger.debug(`Storage item '${storagekey}' for user with id '${uid}' does not exist`);
+        // logger.trace(`Storage item '${storagekey}' for user with id '${uid}' does not exist`);
         return null;
       }
       return res.rows[0].rid;
