@@ -343,6 +343,7 @@ define([
                       scope.coordinate = {};
                       scope.selectedEntity = {};
                       scope.mergeMode = false;
+                      scope.annotationHighlighted = null;
 
                       cy.on('taphold', function(e) {
                           eh.enabled = false;
@@ -454,6 +455,13 @@ define([
                               sameLabelNodes.addClass('sameLabelHighlight');
                             }
                           }
+                          if (sel.data().path === 'annotationNode') {
+                            scope.annotationHighlighted = sel.data().rid;
+                            var targetHighlighted = document.getElementById(scope.annotationHighlighted);
+                            if (targetHighlighted) {
+                              targetHighlighted.classList.add('annotation-highlighted');
+                            }
+                          }
                       });
 
                       cy.on('mouseout', 'node', function(e) {
@@ -464,6 +472,11 @@ define([
                           sel.removeClass('highlight').outgoers().removeClass('highlight');
                           sel.removeClass('highlight').incomers().removeClass('highlight');
                           // sel.removeClass('highlight').incomers().removeClass('highlight');
+                          var targetHighlighted = document.getElementById(scope.annotationHighlighted);
+                          if (scope.annotationHighlighted && targetHighlighted) {
+                            targetHighlighted.classList.remove('annotation-highlighted');
+                            scope.annotationHighlighted = null;
+                          }
                       });
 
                       cy.on('tap', 'node', function(e) {
