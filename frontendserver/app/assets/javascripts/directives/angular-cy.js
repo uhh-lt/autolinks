@@ -164,163 +164,173 @@ define([
                           // get edge source
                           if (sourceNode.data && targetNode.data) {
                             // build the edge object
-                            const after = {
-                              "rid": 0,
-                              "cid": 0,
-                              "metadata": {},
-                              "value": { "subject": { "rid": sourceNode.data().rid },
-                                         "predicate": {
-                                           "value": "has new relation_no_" + cy.edges().length,
-                                            "metadata": { "label": "has relation" } },
-                                         "object": { "rid": targetNode.data().rid }
-                                       }
-                            };
+                            if (sourceNode.data().parent !== targetNode.data().id) {
+                              const after = {
+                                "rid": 0,
+                                "cid": 0,
+                                "metadata": {},
+                                "value": { "subject": { "rid": sourceNode.data().rid },
+                                           "predicate": {
+                                             "value": "has new relation_no_" + cy.edges().length,
+                                              "metadata": { "label": "has relation" } },
+                                           "object": { "rid": targetNode.data().rid }
+                                         }
+                              };
 
-                            const data = { before: null, after: after };
+                              const data = { before: null, after: after };
 
-                            scope.$parent.EndPointService.editResource(data).then(function(response) {
+                              scope.$parent.EndPointService.editResource(data).then(function(response) {
 
-                                const before = {
-                                  "rid": response.data.rid,
-                                  "cid": response.data.cid,
-                                  "metadata": response.data.metadata,
-                                  "value": response.data.value
-                                };
+                                  const before = {
+                                    "rid": response.data.rid,
+                                    "cid": response.data.cid,
+                                    "metadata": response.data.metadata,
+                                    "value": response.data.value
+                                  };
 
-                                const after = {
-                                  "rid": response.data.rid,
-                                  "cid": sourceNode.data().cid,
-                                  "metadata": response.data.metadata,
-                                  "value": response.data.value
-                                };
-                                const data = { before: before, after: after };
+                                  const after = {
+                                    "rid": response.data.rid,
+                                    "cid": sourceNode.data().cid,
+                                    "metadata": response.data.metadata,
+                                    "value": response.data.value
+                                  };
+                                  const data = { before: before, after: after };
 
-                                scope.$parent.EndPointService.editResource(data).then(function(response) {
+                                  scope.$parent.EndPointService.editResource(data).then(function(response) {
 
-                                    if (sourceNode.data('parent') !== targetNode.data('parent')) {
+                                      if (sourceNode.data('parent') !== targetNode.data('parent')) {
 
-                                      var parentId = sourceNode.data().parent ? sourceNode.data().parent : null;
-                                      var target = targetNode;
+                                        var parentId = sourceNode.data().parent ? sourceNode.data().parent : null;
+                                        var target = targetNode;
 
-                                      var _jsons = target.jsons();
-                                      var descs = target.descendants().jsons();
-                                      var descEdges = target.descendants().connectedEdges().jsons();
+                                        var _jsons = target.jsons();
+                                        var descs = target.descendants().jsons();
+                                        var descEdges = target.descendants().connectedEdges().jsons();
 
-                                      const timestamp = new Date().getTime();;
+                                        const timestamp = new Date().getTime();;
 
 
-                                      _.forEach(_jsons, function(json) {
-                                        if (json.group === 'nodes') {
-                                          json.data.id = (parentId === null ? 'null_' : parentId) + json.data.id + '_target_' + target.data().id;
-                                          json.data.parent = parentId === null ? undefined : parentId;
-                                          json.position.x = (json.position.x + sourceNode.position().x) / 2;
-                                          json.position.y = (json.position.y + sourceNode.position().y) / 2;
-                                        }
-                                      });
+                                        _.forEach(_jsons, function(json) {
+                                          if (json.group === 'nodes') {
+                                            json.data.id = (parentId === null ? 'null_' : parentId) + json.data.id + '_target_' + target.data().id;
+                                            json.data.parent = parentId === null ? undefined : parentId;
+                                            json.position.x = (json.position.x + sourceNode.position().x) / 2;
+                                            json.position.y = (json.position.y + sourceNode.position().y) / 2;
+                                          }
+                                        });
 
-                                      var existingTarget = _.find(cy.nodes(), function(n) {
-                                        return _.includes(n.data().id, (parentId === null ? 'null_' : parentId) + target.data().id + '_target_' + target.data().id
-                                      )})
+                                        var existingTarget = _.find(cy.nodes(), function(n) {
+                                          return _.includes(n.data().id, (parentId === null ? 'null_' : parentId) + target.data().id + '_target_' + target.data().id
+                                        )})
 
-                                      if (existingTarget === undefined) {
-                                        _.forEach(descs, function(desc) {
-                                          // var parentInRoot = _.find(_jsons, function(json) {return _.includes(json.data.id, desc.data.parent)});
-                                          // var parentInDescs = _.find(descs, function(des) {return _.includes(des.data.id, desc.data.parent)});
-                                          // var chosenParent = '';
-                                          // if (parentInDescs) {
-                                          //   chosenParent = parentInDescs.data.id;
-                                          // } else {
-                                          //   chosenParent = parentInRoot.data.id;
+                                        if (existingTarget === undefined) {
+                                          _.forEach(descs, function(desc) {
+                                            // var parentInRoot = _.find(_jsons, function(json) {return _.includes(json.data.id, desc.data.parent)});
+                                            // var parentInDescs = _.find(descs, function(des) {return _.includes(des.data.id, desc.data.parent)});
+                                            // var chosenParent = '';
+                                            // if (parentInDescs) {
+                                            //   chosenParent = parentInDescs.data.id;
+                                            // } else {
+                                            //   chosenParent = parentInRoot.data.id;
+                                            // }
+                                            if (desc.group === 'nodes') {
+                                              desc.data.id = (parentId === null ? 'null_' : parentId) + desc.data.id + '_target_' + target.data().id;
+                                              desc.data.parent = (parentId === null ? 'null_' : parentId) + desc.data.parent +'_target_' + target.data().id;
+                                              desc.position.x = (desc.position.x + sourceNode.position().x) / 2;
+                                              desc.position.y = (desc.position.y + sourceNode.position().y) / 2;
+                                            }
+                                          });
+
+                                          _.forEach(descEdges, function(descEdge) {
+                                            // var chosenSource =  _.find(descs, function(des) {return _.includes(des.data.id, descEdge.data.source)});
+                                            // var chosenTarget = _.find(descs, function(des) {return _.includes(des.data.id, descEdge.data.target)});
+                                            if (descEdge.group === 'edges') {
+                                              descEdge.data.id = (parentId === null ? 'null_' : parentId) + descEdge.data.id;
+                                              descEdge.data.source = (parentId === null ? 'null_' : parentId) + descEdge.data.source + '_target_' + target.data().id;
+                                              descEdge.data.target = (parentId === null ? 'null_' : parentId) + descEdge.data.target + '_target_' + target.data().id;
+                                            }
+                                          });
+
+                                          // var descsEtcJsons = descs.union(descs.union(target).connectedEdges()).jsons();
+
+                                          //
+                                          // for (var _i8 = 0; _i8 < descsEtcJsons.length; _i8++) {
+                                          //   var _etcJson = descsEtcJsons[_i8];
+                                          //   var _ele6 = target[_i8];
+                                          //
+                                          //   if (_etcJson.group === 'nodes') {
+                                          //     _etcJson.data.id = 'clone_' + _etcJson.data.id;
+                                          //     _etcJson.data.parent = parentId === null ? undefined : parentId;
+                                          //
+                                          //     // _etcJson.scratch = _ele6._private.scratch;
+                                          //   }
                                           // }
-                                          if (desc.group === 'nodes') {
-                                            desc.data.id = (parentId === null ? 'null_' : parentId) + desc.data.id + '_target_' + target.data().id;
-                                            desc.data.parent = (parentId === null ? 'null_' : parentId) + desc.data.parent +'_target_' + target.data().id;
-                                            desc.position.x = (desc.position.x + sourceNode.position().x) / 2;
-                                            desc.position.y = (desc.position.y + sourceNode.position().y) / 2;
-                                          }
-                                        });
+                                          var n = cy.add(_jsons.concat(descs).concat(descEdges));
+                                          // n[0].position('x', (n[0].position.x + sourceNode.position().x) / 2);
+                                          // n[0].position('y', (n[0].position.y + sourceNode.position().y) / 2);
 
-                                        _.forEach(descEdges, function(descEdge) {
-                                          // var chosenSource =  _.find(descs, function(des) {return _.includes(des.data.id, descEdge.data.source)});
-                                          // var chosenTarget = _.find(descs, function(des) {return _.includes(des.data.id, descEdge.data.target)});
-                                          if (descEdge.group === 'edges') {
-                                            descEdge.data.id = (parentId === null ? 'null_' : parentId) + descEdge.data.id;
-                                            descEdge.data.source = (parentId === null ? 'null_' : parentId) + descEdge.data.source + '_target_' + target.data().id;
-                                            descEdge.data.target = (parentId === null ? 'null_' : parentId) + descEdge.data.target + '_target_' + target.data().id;
-                                          }
-                                        });
+                                          // var nodeObj = {
+                                          //     data: {
+                                          //       cid: sourceNode.data().cid,
+                                          //       rid: targetNode.data().rid,
+                                          //       metadata: targetNode.data().metadata,
+                                          //       id: (parent + '__n-' + targetNode.data().name.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '') + '-' + targetNode.data().rid ).replace(/\s/g, ''),
+                                          //       name: targetNode.data().name + '',
+                                          //       parent: parent
+                                          //     },
+                                          //     position: {
+                                          //       x: targetNode.position().x,
+                                          //       y: targetNode.position().y
+                                          //     }
+                                          // };
+                                          // var n = cy.add(nodeObj);
+                                          nodeTipExtension(n);
+                                          // var newTargetNode = targetNode.clone();
+                                          // newTargetNode.data().id = newTargetNode.data('id') + '_' + cy.elements().length;
+                                          // newTargetNode.data().parent = sourceNode.data('parent') ? sourceNode.data('parent') : null;
+                                          // var n = cy.add(newTargetNode.data());
+                                          addedEles.move({
+                                            target: n.data('id')
+                                          })
+                                        } else if (existingTarget.length > 0){
+                                          addedEles.move({
+                                            target: existingTarget[0].data().id
+                                          })
+                                        }
 
-                                        // var descsEtcJsons = descs.union(descs.union(target).connectedEdges()).jsons();
 
-                                        //
-                                        // for (var _i8 = 0; _i8 < descsEtcJsons.length; _i8++) {
-                                        //   var _etcJson = descsEtcJsons[_i8];
-                                        //   var _ele6 = target[_i8];
-                                        //
-                                        //   if (_etcJson.group === 'nodes') {
-                                        //     _etcJson.data.id = 'clone_' + _etcJson.data.id;
-                                        //     _etcJson.data.parent = parentId === null ? undefined : parentId;
-                                        //
-                                        //     // _etcJson.scratch = _ele6._private.scratch;
-                                        //   }
-                                        // }
-                                        var n = cy.add(_jsons.concat(descs).concat(descEdges));
-                                        // n[0].position('x', (n[0].position.x + sourceNode.position().x) / 2);
-                                        // n[0].position('y', (n[0].position.y + sourceNode.position().y) / 2);
-
-                                        // var nodeObj = {
-                                        //     data: {
-                                        //       cid: sourceNode.data().cid,
-                                        //       rid: targetNode.data().rid,
-                                        //       metadata: targetNode.data().metadata,
-                                        //       id: (parent + '__n-' + targetNode.data().name.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '') + '-' + targetNode.data().rid ).replace(/\s/g, ''),
-                                        //       name: targetNode.data().name + '',
-                                        //       parent: parent
-                                        //     },
-                                        //     position: {
-                                        //       x: targetNode.position().x,
-                                        //       y: targetNode.position().y
-                                        //     }
-                                        // };
-                                        // var n = cy.add(nodeObj);
-                                        nodeTipExtension(n);
-                                        // var newTargetNode = targetNode.clone();
-                                        // newTargetNode.data().id = newTargetNode.data('id') + '_' + cy.elements().length;
-                                        // newTargetNode.data().parent = sourceNode.data('parent') ? sourceNode.data('parent') : null;
-                                        // var n = cy.add(newTargetNode.data());
-                                        addedEles.move({
-                                          target: n.data('id')
-                                        })
-                                      } else if (existingTarget.length > 0){
-                                        addedEles.move({
-                                          target: existingTarget[0].data().id
-                                        })
+                                      } else {
+                                        var edgeObj = {
+                                            data:{
+                                              id: sourceNode.data('id') + targetNode.data('id'),
+                                              source: sourceNode.data('id'),
+                                              target: targetNode.data('id'),
+                                              name: 'has relation'
+                                            }
+                                        };
                                       }
 
+                                      addedEles.data('name', response.data.value.predicate.value);
+                                      addedEles.data('cid', response.data.cid );
+                                      addedEles.data('rid', response.data.value.predicate.rid);
+                                      addedEles.data('value', response.data.value.predicate.value);
+                                      addedEles.data('metadata', response.data.value.predicate.metadata );
 
-                                    } else {
-                                      var edgeObj = {
-                                          data:{
-                                            id: sourceNode.data('id') + targetNode.data('id'),
-                                            source: sourceNode.data('id'),
-                                            target: targetNode.data('id'),
-                                            name: 'has relation'
-                                          }
-                                      };
-                                    }
-
-                                    addedEles.data('name', response.data.value.predicate.value);
-                                    addedEles.data('cid', response.data.cid );
-                                    addedEles.data('rid', response.data.value.predicate.rid);
-                                    addedEles.data('value', response.data.value.predicate.value);
-                                    addedEles.data('metadata', response.data.value.predicate.metadata );
-
-                                    // adding the edge object to the edges array
-                                    // scope.data.edges.push(edgeObj);
-                                    edgeTipExtension(addedEles);
-                                });
-                            });
-
+                                      // adding the edge object to the edges array
+                                      // scope.data.edges.push(edgeObj);
+                                      edgeTipExtension(addedEles);
+                                  });
+                              });
+                            } else {
+                              scope.$parent.$mdToast.show(
+                                    scope.$parent.$mdToast.simple()
+                                      .textContent('Creating edges to its own parent is not allowed')
+                                      .position('top right')
+                                      .theme("warn-toast")
+                                      .hideDelay(3500)
+                                  );
+                              addedEles.remove();
+                            }
                           }
                           eh.enabled = false;
                         },
@@ -692,7 +702,6 @@ define([
                                           "value": child.data('name'),
                                         };
                                         const data = { before: null, after: after };
-                                        debugger;
                                         if (hasChildren) {
                                           addNewNode(data, scope.mergeToParentNodes.parent, hasChildren);
                                         } else {
@@ -1095,7 +1104,7 @@ define([
                                   scope.$parent.$mdToast.simple()
                                     .textContent('You have already created a compound with id' + nodeObj.data.id)
                                     .position('top right')
-                                    .theme("primary-warn")
+                                    .theme("warn-toast")
                                     .hideDelay(3500)
                                 );
                           } else {
