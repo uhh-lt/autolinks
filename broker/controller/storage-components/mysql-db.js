@@ -820,6 +820,11 @@ module.exports.addAnnotation = function(userid, did, anno){
     });
 };
 
+
+module.exports.linkResourceToDocument = function(userid, rid, did){
+  return promisedQuery(`INSERT IGNORE INTO resourceToDocument (did, rid) VALUES (?,?)`, [did, rid]);
+};
+
 /*
  * @param rids can be a single rid or an array of rids or null
  */
@@ -939,7 +944,7 @@ module.exports.fillSources = function(uid, resource) {
     .then(rids => this.getSourcesRecursive(uid, rids, resource.sources, 1))
     .catch(e => Exception.fromError(e).log(logger, logger.warn))
     .then(_ => resource.sources = Array.from(resource.sources))
-    .then(_ => logger.debug(`Found ${resource.sources.length} sources for string resource ${resource.rid}: ${resource.sources}.`))
+    .then(_ => logger.trace(`Found ${resource.sources.length} sources for string resource ${resource.rid}.`))
     .then(_ => resource);
 };
 

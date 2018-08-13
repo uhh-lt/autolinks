@@ -57,7 +57,7 @@ module.exports.getAnnotationResource = function(uid, did, anno, text, skipsource
     label : text
   });
   Object.assign(raw_annotation_resource.metadata, anno.properties);
-  return get_or_add_resource(uid, resource_storage_key, raw_annotation_resource, skipsources)
+  return get_or_add_resource(uid, resource_storage_key, raw_annotation_resource, did, skipsources)
     .then(
       r => r,
       err => {
@@ -68,6 +68,7 @@ module.exports.getAnnotationResource = function(uid, did, anno, text, skipsource
 };
 
 
-function get_or_add_resource(userid, storagekey, rawresource, skipsources) {
-  return storage.promisedWrite(userid, storagekey, rawresource, skipsources);
+function get_or_add_resource(userid, storagekey, rawresource, did, skipsources) {
+  return storage.promisedWrite(userid, storagekey, rawresource, skipsources)
+    .then(r => storage.linkResourceToDocument(userid, r.rid, did).then(_ => r));
 }
