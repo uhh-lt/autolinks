@@ -128,6 +128,8 @@ define([
               EndPointService.interpretOffset(pvc.did, offsets).then(function(response) {
                 var dataPath = { endpoint: { path: 'annotationNode' }}
                 $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
+                var annoType = _.split(_.split(pvc.origin, '::')[1], ':')[1];
+                $rootScope.$emit('addNewAnnoType', annoType);
                 // EntityService.addEntity(response.data);
               });
             }
