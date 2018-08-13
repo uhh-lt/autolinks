@@ -32,7 +32,7 @@ function getFileLocation(userid, basename) {
 const MAX_FILESIZE = process.env.MAX_FILESIZE || 5e7; // 5 MB by default
 
 /* connection string: mysql://user:pass@host:port/database?optionkey=optionvalue&optionkey=optionvalue&... */
-const connectionString = process.env.MYSQL || 'mysql://autolinks:autolinks1@mysql:3306/autolinks?debug=false&connectionLimit=100';
+const connectionString = process.env.MYSQL || 'mysql://autolinks:autolinks1@mysql:3306/autolinks?debug=false&connectionLimit=100&multipleStatements=true';
 const pool = mysql.createPool(connectionString);
 logger.info(`Using mysql connection string: '${connectionString}'`);
 logger.info(`Using ${pool.config.connectionLimit} connections.`);
@@ -255,9 +255,9 @@ module.exports.saveTripleResource = function (tripleResource, uid) {
         tripleResource.value.object = resources[2];
         const rids = resources.map(r => r.rid);
         logger.debug(`Saving triple ${rids} for user with id '${uid}'.`);
-        return promisedQuery('select get_or_add_tripleResource(?,?,?,?) as rid', rids.concat(uid))
+        return promisedQuery('SET @var = 0; call get_or_add_tripleResource(?,?,?,?,@var); SELECT @var as rid;', rids.concat(uid))
           .then(res => {
-            tripleResource.rid = res.rows[0].rid;
+            tripleResource.rid = res.rows[2][0].rid;
             return resolve(tripleResource);
           });
       },
@@ -336,9 +336,9 @@ function computeListResourceDescriptor(list_of_ints){
 module.exports.saveListResourceDescriptor = function (listResourceDescriptor, uid) {
   return new Promise((resolve, reject) => {
     logger.debug(`Saving listResourceDesriptor '${listResourceDescriptor}' for user with id '${uid}'.`);
-    promisedQuery('select get_or_add_listResource(?, ?) as rid', [listResourceDescriptor, uid]).then(
+    promisedQuery('SET @var = 0; call get_or_add_listResource(?, ?, @var); SELECT @var as rid;', [listResourceDescriptor, uid]).then(
       res => {
-        const rid = res.rows[0].rid;
+        const rid = res.rows[2][0].rid;
         logger.debug(`Successfully saved resource '${listResourceDescriptor}' with id ${rid}.`);
         return resolve(rid);
       },
@@ -350,9 +350,9 @@ module.exports.saveListResourceDescriptor = function (listResourceDescriptor, ui
 module.exports.saveListResourceItem = function (desc_rid, item_rid) {
   return new Promise((resolve, reject) => {
     logger.debug(`Saving list resource item (${desc_rid},${item_rid}).`);
-    promisedQuery('select add_listResourceItem(?, ?) as existed', [desc_rid, item_rid]).then(
+    promisedQuery('SET @var = 0; call add_listResourceItem(?, ?, @var); SELECT @var as list_item_existed;', [desc_rid, item_rid]).then(
       res => {
-        const existed = res.rows[0].existed;
+        const existed = res.rows[2][0].list_item_existed;
         logger.debug(`Successfully saved list resource item (${desc_rid},${item_rid}). Existed before: ${existed}.`);
         return resolve(existed);
       },
@@ -364,9 +364,9 @@ module.exports.saveListResourceItem = function (desc_rid, item_rid) {
 module.exports.saveStringResource = function (stringResource, uid) {
   return new Promise((resolve, reject) => {
     // logger.trace(`Saving resource value '${stringResource.value}' for user with id '${uid}'.`);
-    promisedQuery('select get_or_add_stringResource(?, ?) as rid', [stringResource.value, uid]).then(
+    promisedQuery('SET @var = 0; call get_or_add_stringResource(?, ?, @var); SELECT @var as rid;', [stringResource.value, uid]).then(
       res => {
-        const rid = res.rows[0].rid;
+        const rid = res.rows[2][0].rid;
         // logger.trace(`Successfully saved resource value '${stringResource.value}' with rid '${rid}'.`);
         stringResource.rid = rid;
         return resolve(stringResource);
@@ -378,10 +378,10 @@ module.exports.saveStringResource = function (stringResource, uid) {
 
 module.exports.saveStorageItem = function (userid, storagekey) {
   // logger.trace(`Saving storage '${storagekey}' for user with id '${userid}'.`);
-  return promisedQuery('select get_or_add_storageItem(?,?) as sid', [userid, storagekey])
+  return promisedQuery('SET @var = 0; call get_or_add_storageItem(?,?, @var); SELECT @var as sid;', [userid, storagekey])
     .then(
       res => {
-        const sid = res.rows[0].sid;
+        const sid = res.rows[2][0].sid;
         // logger.trace(`Successfully saved storgae '${storagekey}' for user with id '${userid}'.`);
         return sid;
       }
@@ -391,9 +391,9 @@ module.exports.saveStorageItem = function (userid, storagekey) {
 module.exports.saveStorageItemToResourceMapping = function (sid, rid) {
   return new Promise((resolve, reject) => {
     // logger.trace(`Saving storage resource mapping (${sid},${rid}).`);
-    promisedQuery('select create_storageItemToResourceMapping(?,?) as mapping_existed', [sid, rid]).then(
+    promisedQuery('SET @var = 0; call create_storageItemToResourceMapping(?,?,@var); SELECT @var as mapping_existed;', [sid, rid]).then(
       res => {
-        const mapping_existed = res.rows[0].mapping_existed;
+        const mapping_existed = res.rows[2][0].mapping_existed;
         // logger.trace(`Successfully saved storage-resource mapping (${sid},${rid}). Existed before: ${mapping_existed}.`);
         return resolve(mapping_existed);
       },
@@ -573,7 +573,7 @@ module.exports.info = function (userid, callback) {
 
 module.exports.resetDatabase = function () {
   logger.info('Resetting database.');
-  return promisedQuery('call reset_database');
+  return promisedQuery('call reset_database()');
 };
 
 module.exports.resetFilesystem = function () {
@@ -683,10 +683,10 @@ module.exports.promisedSaveFile = function(userid, filename, encoding, mimetype,
       if(size > MAX_FILESIZE) {
         return reject(new Exception('IllegalState', `Size of the file is too large (${size} > ${MAX_FILESIZE}). Upload smaller files or ask your administrator to increase the file size limit.`));
       }
-      return promisedQuery('select add_document(?,?,?,?) as did', [userid, filename, encoding, mimetype])
+      return promisedQuery('SET @var=0; call add_document(?,?,?,?, @var); select @var as did;', [userid, filename, encoding, mimetype])
         .then(
           res => {
-            const did = res.rows[0].did;
+            const did = res.rows[2][0].did;
             logger.debug(`Successfully saved file '${filename}' for user with id '${userid}'.`);
             const storeAt = getFileLocation(userid, did);
             logger.debug(`Saving file '${storeAt}'.`);
