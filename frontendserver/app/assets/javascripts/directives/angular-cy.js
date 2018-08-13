@@ -562,13 +562,23 @@ define([
                                     event.stopPropagation();
                                     scope.selectedEntity = n;
                                     console.log(scope.selectedEntity.id());
-                                    return (
-                                    '<div class="node-buttons">' +
-                                    '<button id="moveNode" class="node-button"><i class="fa fa-arrows-alt fa-2x"/></button>' +
-                                    '<button id="addEdge" class="node-button"><i class="fa fa-link fa-2x"/></button> ' +
-                                    '<button id="editNode" class="node-button"><i class="fa fa-edit fa-2x"/></button>' +
-                                    '</div>'
-                                    )
+
+                                    //NOTE: annotation resources (container and nodes) are not editable and movable
+                                    if (n.data('path') !== 'annotationNode') {
+                                      return (
+                                      '<div class="node-buttons">' +
+                                      '<button id="moveNode" class="node-button"><i class="fa fa-arrows-alt fa-2x"/></button>' +
+                                      '<button id="addEdge" class="node-button"><i class="fa fa-link fa-2x"/></button> ' +
+                                      '<button id="editNode" class="node-button"><i class="fa fa-edit fa-2x"/></button>' +
+                                      '</div>'
+                                      )
+                                    } else {
+                                      return (
+                                      '<div class="node-buttons">' +
+                                      '<button id="editNode" class="node-button"><i class="fa fa-edit fa-2x"/></button>' +
+                                      '</div>'
+                                      )
+                                    }
                                   }
                               },
                               show: {
