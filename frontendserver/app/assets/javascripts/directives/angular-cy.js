@@ -165,7 +165,7 @@ define([
                           if (sourceNode.data && targetNode.data) {
                             // build the edge object
 
-                            var hasAncestors = _.find(sourceNode.ancestors(), function(a) { return a.data().id === targetNode.data().id });
+                            var hasAncestors = _.filter(sourceNode.ancestors(), function(a) { return a.data().id === targetNode.data().id });
 
                             if (hasAncestors.length < 1) {
                               const after = {
