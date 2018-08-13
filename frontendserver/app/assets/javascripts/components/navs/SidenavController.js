@@ -194,10 +194,6 @@ define([
           };
 
           $scope.close = function () {
-            // Component lookup should always be available since we are not using `ng-if`
-            // $route.reload();
-            EndPointService.fetchData();
-
             $mdSidenav('right').close()
               .then(function () {
                 document.getElementById("propertify").innerHTML = '{}';
