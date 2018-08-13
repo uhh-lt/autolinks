@@ -61,7 +61,7 @@ module.exports.baz = function(req, res, next) {
     let r4 = new Resource(null,
         new Triple(new Resource(null, username), new Resource(null, "is same as"),
         new Resource(null, new Triple(new Resource(null, etext), new Resource(null, 'is a'), new Resource(null, 'human')))));
-    let r5 = new Resource(null, new Triple(r4, new Resource().fromString("says"), r2));
+    let r5 = new Resource(null, new Triple(r4, new Resource(null, "says"), r2));
 
     let result = new Resource(null, [r5, r3]);
 
