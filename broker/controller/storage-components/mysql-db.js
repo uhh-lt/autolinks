@@ -191,7 +191,7 @@ module.exports.saveNewResourceOrValue = function (resourceOrValue, uid, cid) {
   return new Promise((resolve, reject) => {
     let resource = null;
     if(!resourceOrValue){
-      const ex = new Exception('IllegalState', `Resource value is null! That shouldn't happen!`).log(logger.warn);
+      const ex = new Exception('IllegalState', `Resource value is null! That shouldn't happen!`).log(logger, logger.warn);
       return reject(ex);
     }
     if(resourceOrValue.value || resourceOrValue.rid){
@@ -220,7 +220,7 @@ module.exports.saveNewResourceOrValue = function (resourceOrValue, uid, cid) {
       // logger.trace('Resource is a string.');
       return resolve(this.saveStringResource(resource, uid));
     }
-    const ex = new Exception('IllegalState', 'This is impossible, a resource has to be one of {list,triple,string}.').log(logger.warn);
+    const ex = new Exception('IllegalState', 'This is impossible, a resource has to be one of {list,triple,string}.').log(logger, logger.warn);
     return reject(ex);
   }).then(
     resource => {
@@ -537,7 +537,7 @@ module.exports.deleteResource = function (resource, userid) {
               x.end() === end
             );
             if(aindex < 0){
-              return Promise.reject(new Exception('IllegalArgument', `Annotation ${r.value} not found in document ${did} for user ${userid}.`).log(logger.warn));
+              return Promise.reject(new Exception('IllegalArgument', `Annotation ${r.value} not found in document ${did} for user ${userid}.`).log(logger, logger.warn));
             }
             return promisedQuery('update documents set analysis = json_remove(analysis, $.annotations[?]) where uid = ? and did = ?', [aindex, userid, did]);
           });
@@ -793,7 +793,7 @@ module.exports.getDocumentAnalysis = function(uid, did) {
       const row = res.rows[0];
       if(!row.analysis) {
         const ex = new Exception('IllegalState', `Document '${did}' for user '${uid}' has not yet been analyzed.`);
-        ex.log(logger.info);
+        ex.log(logger, logger.info);
         return reject(ex);
       }
       return resolve(new Analysis().deepAssign(JSON.parse(row.analysis)));
@@ -838,13 +838,13 @@ module.exports.getStorageKeys = function(uid, rids){
 module.exports.promisedFindResources = function(uid, query, caseinsensitive, sourcesonly) {
   if(query.length > 200){
     logger.warn('Query too long (>200 characters).', query);
-    return Promise.reject(new Exception('IllegalValue', `Query too long (>200 characters): ${query}`).log(logger.warn));
+    return Promise.reject(new Exception('IllegalValue', `Query too long (>200 characters): ${query}`).log(logger, logger.warn));
   }
   if(sourcesonly){
     const keys = new Set();
     return this.getSimilarResources(uid, query, caseinsensitive)
       .then(rids => this.getSourcesRecursive(uid, rids, keys, 1))
-      .catch(e => Exception.fromError(e).log(logger.warn))
+      .catch(e => Exception.fromError(e).log(logger, logger.warn))
       .then(_ => Array.from(keys) );
   }
   // else
@@ -854,7 +854,7 @@ module.exports.promisedFindResources = function(uid, query, caseinsensitive, sou
         .then(resource => {
           resource.sources = new Set();
           return this.getSourcesRecursive(uid, resource.rid, resource.sources, 1)
-            .catch(e => Exception.fromError(e).log(logger.warn))
+            .catch(e => Exception.fromError(e).log(logger, logger.warn))
             .then(_ => resource.sources = Array.from(resource.sources))
             .then(_ => logger.debug(`Found ${resource.sources.length} source(s) for string resource ${resource.rid}: ${resource.sources}.`))
             .then(_ => resource);
@@ -916,7 +916,7 @@ module.exports.getSourcesRecursive = function(uid, rids, storagekeys, c){
     .then(_ => this.getParentResources(uid, rids)) // for each of the rids get the parent resource rids
     .then(parentrids => {
       return this.getSourcesRecursive(uid, parentrids, storagekeys, c+1) // repeat the process
-        .catch(e => Exception.fromError(e).log(logger.warn));
+        .catch(e => Exception.fromError(e).log(logger, logger.warn));
     });
 };
 
@@ -927,7 +927,7 @@ module.exports.fillSources = function(uid, resource) {
     logger.debug(`Getting sources for non-string resource: ${resource.rid}.`);
     return Promise.resolve(resource.rid)
       .then(rid => this.getSourcesRecursive(uid, [ rid ], resource.sources, 1))
-      .catch(e => Exception.fromError(e).log(logger.info))
+      .catch(e => Exception.fromError(e).log(logger, logger.info))
       .then(_ => resource.sources = Array.from(resource.sources))
       .then(_ => logger.debug(`Found ${resource.sources.length} sources for non-string resource ${resource.rid}: ${resource.sources}.`))
       .then(_ => resource);
@@ -937,7 +937,7 @@ module.exports.fillSources = function(uid, resource) {
   return Promise.resolve(resource.metadata.label || resource.value)
     .then(label => this.getSimilarResources(uid, label))
     .then(rids => this.getSourcesRecursive(uid, rids, resource.sources, 1))
-    .catch(e => Exception.fromError(e).log(logger.warn))
+    .catch(e => Exception.fromError(e).log(logger, logger.warn))
     .then(_ => resource.sources = Array.from(resource.sources))
     .then(_ => logger.debug(`Found ${resource.sources.length} sources for string resource ${resource.rid}: ${resource.sources}.`))
     .then(_ => resource);
@@ -947,7 +947,7 @@ module.exports.fillSourcesRecursive = function(uid, resource) {
   if(resource.isListResource()){
     return Promise.all(resource.value.map(r => this.fillSourcesRecursive(uid, r)))
       .then(_ => this.fillSources(uid, resource))
-      .catch(e => Exception.fromError(e).log(logger.warn));
+      .catch(e => Exception.fromError(e).log(logger, logger.warn));
   }
   if(resource.isTripleResource()){
     return Promise.all(
@@ -956,11 +956,11 @@ module.exports.fillSourcesRecursive = function(uid, resource) {
         resource.value.predicate,
         resource.value.object,
       ].map(r => this.fillSourcesRecursive(uid, r))
-    ).catch(e => Exception.fromError(e).log(logger.warn))
+    ).catch(e => Exception.fromError(e).log(logger, logger.warn))
       .then(_ => this.fillSources(uid, resource));
   }
   // else resource is a string resource
-  return this.fillSources(uid, resource).catch(e => Exception.fromError(e).log(logger.info));
+  return this.fillSources(uid, resource).catch(e => Exception.fromError(e).log(logger, logger.info));
 };
 
 module.exports.close = function (callback) {

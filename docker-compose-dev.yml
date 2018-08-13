@@ -25,7 +25,7 @@ services:
     volumes:
       - ${PWD}/frontendserver:/opt/project/frontendserver
     ports:
-      - 10001:9090
+      - 11001:9090
       - 3001:3001
     networks:
       - anet
@@ -47,7 +47,7 @@ services:
       - ${PWD}/broker:/opt/project/broker
       - ${PWD}/data:/opt/project/data
     ports:
-      - 10000:10010
+      - 11000:10010
       - 3000:3001
     networks:
       - anet
@@ -134,7 +134,7 @@ services:
       - ${PWD}/broker:/opt/project/broker
       - ${PWD}/data:/opt/project/data
     ports:
-      - 10010:10010
+      - 11010:10010
       - 3010:3001
     networks:
       - anet
@@ -156,7 +156,7 @@ services:
       - ${PWD}/broker:/opt/project/broker
       - ${PWD}/data:/opt/project/data
     ports:
-      - 10011:10010
+      - 11011:10010
       - 3011:3001
     networks:
       - anet
@@ -184,7 +184,7 @@ services:
       - ${PWD}/broker:/opt/project/broker
       - ${PWD}/data:/opt/project/data
     ports:
-      - 10012:10010
+      - 11012:10010
       - 3012:3001
     networks:
       - anet

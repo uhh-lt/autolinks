@@ -505,7 +505,7 @@ const wikidata = function(indexname, esclient) {
 //  *
 //  */
 // const wikidata = function(text, offset, limit) {
-//   new Exception('NotImplemented', 'Method not yet implemented. Returning genericly built query!').log(logger.debug);
+//   new Exception('NotImplemented', 'Method not yet implemented. Returning genericly built query!').log(logger, logger.debug);
 //   return generic(text, offset, limit);
 // };
 // /**

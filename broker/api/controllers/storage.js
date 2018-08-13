@@ -13,7 +13,7 @@ module.exports.info = function(req, res, next) {
     res.header('Content-Type', 'application/json; charset=utf-8');
     storage.info(user.name, function(err, info){
       if(err) {
-        return Exception.fromError(err, 'Could not get info.').log(logger.warn).handleResponse(res).end(next);
+        return Exception.fromError(err, 'Could not get info.').log(logger, logger.warn).handleResponse(res).end(next);
       }
       res.json(info);
       res.end(next);
@@ -65,7 +65,7 @@ module.exports.get_resource = function(req, res, next) {
     return storage.promisedRead(user.id, storagekey)
       .then(
         result => res.json(result).end(next),
-        err => Exception.fromError(err, 'Error retrieving service data.').log(logger.warn).handleResponse(res).end(next)
+        err => Exception.fromError(err, 'Error retrieving service data.').log(logger, logger.warn).handleResponse(res).end(next)
       );
   });
 };
