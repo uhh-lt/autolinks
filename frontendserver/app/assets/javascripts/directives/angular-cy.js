@@ -164,7 +164,10 @@ define([
                           // get edge source
                           if (sourceNode.data && targetNode.data) {
                             // build the edge object
-                            if (sourceNode.data().parent !== targetNode.data().id) {
+
+                            var hasAncestors = _.find(sourceNode.ancestors(), function(a) { return a.data().id === targetNode.data().id });
+
+                            if (hasAncestors.length < 1) {
                               const after = {
                                 "rid": 0,
                                 "cid": 0,
@@ -324,7 +327,7 @@ define([
                             } else {
                               scope.$parent.$mdToast.show(
                                     scope.$parent.$mdToast.simple()
-                                      .textContent('Creating edges to its own parent is not allowed')
+                                      .textContent('Creating edges to its own parents is not allowed')
                                       .position('top right')
                                       .theme("warn-toast")
                                       .hideDelay(3500)
