@@ -22,8 +22,8 @@ define([
               { name: 'Clear', icon: 'far fa-square fa-2x' },
               // { name: 'Add', icon: 'fas fa-plus-square fa-2x' },
               // { name: 'Edit', icon: 'fas fa-edit fa-2x' },
-              { name: 'Move into', icon: 'fas fa-external-link-alt fa-2x' },
-              { name: 'Create new compound', icon: 'fa fa-object-group fa-2x' }
+              // { name: 'Move into', icon: 'fas fa-external-link-alt fa-2x' },
+              // { name: 'Create new compound', icon: 'fa fa-object-group fa-2x' }
             ];
 
             $scope.listItemClick = function($index) {

@@ -375,7 +375,7 @@ define([
 
                 var containerId = (e.target.id).replace(/[^A-Za-z0-9\-_]/g, '-');
                 _.forEach(response.data, function(data) { data.cid = containerId});
-                var annotationContainer = { rid: containerId, value: response.data, metadata: { label: 'Anno:' + $scope.text, type: 'annotationContainer' }, cid: 0 };
+                var annotationContainer = { rid: containerId, value: response.data, metadata: { label: 'Annotations', type: 'annotationContainer' }, cid: 0 };
 
                 $rootScope.$emit('addEntity', { entity: annotationContainer, data: dataPath });
                 // EntityService.addEntity(response.data);

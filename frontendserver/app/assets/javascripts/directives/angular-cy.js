@@ -488,7 +488,7 @@ define([
                             }
                           }
                           if (sel.data().path === 'annotationNode') {
-                            scope.annotationHighlighted = sel.data().rid;
+                            scope.annotationHighlighted = sel.isParent() ? sel.data().rid : sel.data().cid;
                             var targetHighlighted = document.getElementById(scope.annotationHighlighted);
                             if (targetHighlighted) {
                               targetHighlighted.classList.add('annotation-highlighted');
