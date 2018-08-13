@@ -73,8 +73,10 @@ services:
       # - NLP=stupid
       - NLP=ctakes
       - CTAKESURL=http://ctakes-nlp:8080
-      - MYSQL=mysql://autolinks:autolinks1@mysql:3306/autolinks?debug=false&connectionLimit=100&multipleStatements=true
+      - MYSQL=mysql://autolinks:autolinks1@mysql:3306/autolinks?debug=false&connectionLimit=150&multipleStatements=true
       - LOGLEVEL=info
+      - LOGBUFFER=false
+      - WATCHIFYAPP=false
     depends_on:
       mysql8:
         condition: service_healthy
@@ -91,7 +93,7 @@ services:
       - MYSQL_PASSWORD=autolinks1
     volumes:
       - ${PWD}/data/mysql8:/var/lib/mysql
-    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_bin", "--default-authentication-plugin=mysql_native_password", "--log_bin_trust_function_creators=1"]
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_bin", "--default-authentication-plugin=mysql_native_password", "--log_bin_trust_function_creators=1",  "--key-buffer-size=4294967296", "--max-connections=250" ]
     healthcheck:
       test: "/usr/bin/mysql -hlocalhost -pautolinks1 -uautolinks -Dautolinks -e'SELECT 1;'"
       interval: 20s

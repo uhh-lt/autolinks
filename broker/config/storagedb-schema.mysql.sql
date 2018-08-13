@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS documents (
   KEY (did),
   KEY (uid),
   KEY (name(250))
-); -- ENGINE=MyISAM ROW_FORMAT=Fixed;
+) ENGINE=MyISAM ROW_FORMAT=Fixed;
 
 CREATE TABLE IF NOT EXISTS resourceToDocument (
   did int unsigned NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS resourceToDocument (
   PRIMARY KEY (did, rid),
   KEY (did),
   KEY (rid)
-); -- ENGINE=MyISAM ROW_FORMAT=Fixed;
+) ENGINE=MyISAM ROW_FORMAT=Fixed;
 
 CREATE TABLE IF NOT EXISTS resources (
   rid         int unsigned NOT NULL AUTO_INCREMENT,
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS resources (
   PRIMARY KEY (rid, uid),
   KEY (rid),
   KEY (uid)
-); -- ENGINE=MyISAM ROW_FORMAT=Fixed;
+) ENGINE=MyISAM ROW_FORMAT=Fixed;
 
 CREATE TABLE IF NOT EXISTS resourceMetadata (
   rid          int unsigned NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS resourceMetadata (
   mvalue       text NOT NULL,
   PRIMARY KEY (rid, mkey),
   KEY (mkey)
-); -- ENGINE=MyISAM ROW_FORMAT=Fixed;
+) ENGINE=MyISAM ROW_FORMAT=Fixed;
 
 CREATE TABLE IF NOT EXISTS stringResources (
   rid         int unsigned NOT NULL,
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS stringResources (
   PRIMARY KEY (rid),
   KEY (surfaceform(242)),
   UNIQUE KEY (rid, surfaceform(242))
-); -- ENGINE=MyISAM ROW_FORMAT=Fixed;
+) ENGINE=MyISAM ROW_FORMAT=Fixed;
 
 CREATE TABLE IF NOT EXISTS tripleResources (
   rid  int unsigned NOT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS tripleResources (
   KEY (pred),
   KEY (obj),
   UNIQUE spo (rid, subj, pred, obj)
-); -- ENGINE=MyISAM ROW_FORMAT=Fixed;
+) ENGINE=MyISAM ROW_FORMAT=Fixed;
 
 CREATE TABLE IF NOT EXISTS listResources (
   rid            int unsigned NOT NULL,
@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS listResources (
   PRIMARY KEY (rid),
   KEY (listdescriptor(250)),
   UNIQUE (rid, listdescriptor(242))
-); -- ENGINE=MyISAM ROW_FORMAT=Fixed;
+) ENGINE=MyISAM ROW_FORMAT=Fixed;
 
 CREATE TABLE IF NOT EXISTS listResourceItems (
   rid     int unsigned NOT NULL,
@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS listResourceItems (
   PRIMARY KEY (rid, itemrid),
   KEY (rid),
   KEY (itemrid)
-); -- ENGINE=MyISAM ROW_FORMAT=Fixed;
+) ENGINE=MyISAM ROW_FORMAT=Fixed;
 
 CREATE TABLE IF NOT EXISTS resourcePermission (
   rid         int unsigned NOT NULL,
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS resourcePermission (
   PRIMARY KEY (rid, uid),
   KEY (uid),
   KEY (rid)
-); -- ENGINE=MyISAM ROW_FORMAT=Fixed;
+) ENGINE=MyISAM ROW_FORMAT=Fixed;
 
 CREATE TABLE IF NOT EXISTS storageItems (
   sid        int unsigned NOT NULL AUTO_INCREMENT,
@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS storageItems (
   PRIMARY KEY (sid, uid, storagekey(234)),
   KEY (uid, storagekey(234)),
   KEY (storagekey(234))
-); -- ENGINE=MyISAM ROW_FORMAT=Fixed;
+) ENGINE=MyISAM ROW_FORMAT=Fixed;
 
 CREATE TABLE IF NOT EXISTS storageItemToResource (
   sid int unsigned NOT NULL,
@@ -104,18 +104,14 @@ CREATE TABLE IF NOT EXISTS storageItemToResource (
   PRIMARY KEY (sid, rid),
   KEY (sid),
   KEY (rid)
-); -- ENGINE=MyISAM ROW_FORMAT=Fixed;
+) ENGINE=MyISAM ROW_FORMAT=Fixed;
 
 -- CREATE HELPER VIEWS
-CREATE OR REPLACE VIEW userResourceMetadata  AS SELECT r1.uid, r2.* FROM resources r1 JOIN resourceMetadata  r2 ON (r1.rid = r2.rid);
-
-CREATE OR REPLACE VIEW userStringResources   AS SELECT r1.uid, r2.* FROM resources r1 JOIN stringResources   r2 ON (r1.rid = r2.rid);
-
-CREATE OR REPLACE VIEW userTripleResources   AS SELECT r1.uid, r2.* FROM resources r1 JOIN tripleResources   r2 ON (r1.rid = r2.rid);
-
-CREATE OR REPLACE VIEW userListResources     AS SELECT r1.uid, r2.* FROM resources r1 JOIN listResources     r2 ON (r1.rid = r2.rid);
-
-CREATE OR REPLACE VIEW userListResourceItems AS SELECT r1.uid, r2.* FROM resources r1 JOIN listResourceItems r2 ON (r1.rid = r2.rid);
+--CREATE OR REPLACE VIEW userResourceMetadata  AS SELECT r1.uid, r2.* FROM resources r1 JOIN resourceMetadata  r2 ON (r1.rid = r2.rid);
+--CREATE OR REPLACE VIEW userStringResources   AS SELECT r1.uid, r2.* FROM resources r1 JOIN stringResources   r2 ON (r1.rid = r2.rid);
+--CREATE OR REPLACE VIEW userTripleResources   AS SELECT r1.uid, r2.* FROM resources r1 JOIN tripleResources   r2 ON (r1.rid = r2.rid);
+--CREATE OR REPLACE VIEW userListResources     AS SELECT r1.uid, r2.* FROM resources r1 JOIN listResources     r2 ON (r1.rid = r2.rid);
+--CREATE OR REPLACE VIEW userListResourceItems AS SELECT r1.uid, r2.* FROM resources r1 JOIN listResourceItems r2 ON (r1.rid = r2.rid);
 
 -- DEFINE SOME HELPER PROCEDURES
 
@@ -123,7 +119,7 @@ drop procedure if exists reset_database;
 
 drop procedure if exists add_document;
 
-drop procedure if exists add_resource;
+-- drop procedure if exists add_resource;
 
 drop procedure if exists get_or_add_stringResource;
 
@@ -162,7 +158,7 @@ DELIMITER //
 create procedure reset_database( )
 MODIFIES SQL DATA
 BEGIN
-  START TRANSACTION ;
+  START TRANSACTION READ WRITE;
     truncate documents;
     truncate resourceToDocument;
     truncate stringResources;
@@ -200,7 +196,7 @@ create procedure add_document ( uid_ int unsigned, name_ varchar(512), encoding_
 MODIFIES SQL DATA
 BEGIN
   set did_ = 0;
-  START TRANSACTION ;
+  START TRANSACTION READ WRITE;
     if name_ is NOT NULL then
       select did into did_ from documents where name = name_ and uid = uid_ limit 1;
       if did_ = 0 then
@@ -228,23 +224,23 @@ END //
 --  return rid_;
 --END //
 
-create procedure add_resource ( isstring_ boolean, istriple_ boolean, islist_ boolean, uid_ int unsigned, INOUT rid_ int unsigned)
-MODIFIES SQL DATA
-BEGIN
-  set rid_ = 0;
-  START TRANSACTION ;
-    -- TODO: check if permutated values are set
-    if isstring_ OR istriple_ OR islist_ then
-      insert into resources set uid = uid_, isstring = isstring_, istriple = istriple_, islist = islist_;
-      select LAST_INSERT_ID() into rid_;
-    end if;
-  COMMIT ;
-END //
+--create procedure add_resource ( isstring_ boolean, istriple_ boolean, islist_ boolean, uid_ int unsigned, INOUT rid_ int unsigned)
+--MODIFIES SQL DATA
+--BEGIN
+--  set rid_ = 0;
+--  START TRANSACTION READ WRITE;
+--    -- TODO: check if permutated values are set
+--    if isstring_ OR istriple_ OR islist_ then
+--      insert into resources set uid = uid_, isstring = isstring_, istriple = istriple_, islist = islist_;
+--      select LAST_INSERT_ID() into rid_;
+--    end if;
+--  COMMIT ;
+--END //
 
 create procedure full_delete_resource( IN rid_ int unsigned )
 MODIFIES SQL DATA
 BEGIN
-  START TRANSACTION ;
+  START TRANSACTION READ WRITE;
     -- delete the resource from every possible entry there might be
     delete from resources where rid = rid_;
     delete from listResourceItems where itemrid = rid_;
@@ -277,14 +273,16 @@ END //
 --END //
 
 create procedure get_or_add_stringResource ( surfaceform_ varchar(512), uid_ int unsigned, INOUT rid_ int unsigned)
-MODIFIES SQL DATA
+DETERMINISTIC MODIFIES SQL DATA
 BEGIN
-  set rid_ = 0;
-  START TRANSACTION ;
+  START TRANSACTION READ WRITE;
+    set rid_ = 0;
     if surfaceform_ is NOT NULL then
       select r1.rid into rid_ from resources r1 JOIN stringResources r2 ON (r1.rid = r2.rid) where r2.surfaceform = surfaceform_ and r1.uid = uid_ limit 1;
       if rid_ = 0 then
-        call add_resource(TRUE, NULL, NULL, uid_, rid_);
+        --call add_resource(TRUE, NULL, NULL, uid_, rid_);
+        insert into resources set uid = uid_, isstring = TRUE;
+        select LAST_INSERT_ID() into rid_;
         insert into stringResources set rid = rid_, surfaceform = surfaceform_;
       end if;
     end if;
@@ -304,13 +302,15 @@ END //
 --END //
 
 create procedure get_or_add_tripleResource ( subj_ int unsigned, pred_ int unsigned, obj_ int unsigned, uid_ int unsigned, INOUT rid_ int unsigned)
-MODIFIES SQL DATA
+DETERMINISTIC MODIFIES SQL DATA
 BEGIN
   set rid_ = 0;
-  START TRANSACTION ;
+  START TRANSACTION READ WRITE;
     select r1.rid into rid_ from resources r1 JOIN tripleResources r2 ON (r1.rid = r2.rid) where r2.subj = subj_ and r2.pred = pred_ and r2.obj = obj_ and r1.uid = uid_ limit 1;
     if rid_ = 0 then
-      call add_resource(NULL, TRUE, NULL, uid_, rid_);
+      -- call add_resource(NULL, TRUE, NULL, uid_, rid_);
+      insert into resources set uid = uid_, istriple = TRUE;
+      select LAST_INSERT_ID() into rid_;
       insert into tripleResources set rid = rid_, subj = subj_, pred = pred_, obj = obj_;
     end if;
   COMMIT ;
@@ -332,14 +332,16 @@ END //
 --END //
 
 create procedure get_or_add_listResource ( listdescriptor_ varchar(512), uid_ int unsigned, INOUT rid_ int unsigned )
-MODIFIES SQL DATA
+DETERMINISTIC MODIFIES SQL DATA
 BEGIN
   set rid_ = 0;
-  START TRANSACTION ;
+  START TRANSACTION READ WRITE;
     if listdescriptor_ is NOT NULL then
       select r1.rid into rid_ from resources r1 JOIN listResources r2 ON (r1.rid = r2.rid) where r2.listdescriptor = listdescriptor_ and r1.uid = uid_ limit 1;
       if rid_ = 0 then
-        call add_resource(NULL, NULL, TRUE, uid_, rid_);
+        -- call add_resource(NULL, NULL, TRUE, uid_, rid_);
+        insert into resources set uid = uid_, islist = TRUE;
+        select LAST_INSERT_ID() into rid_;
         insert into listResources set rid = rid_, listdescriptor = listdescriptor_;
       end if;
     end if;
@@ -350,7 +352,7 @@ create function add_listResourceItem ( rid_ int unsigned, itemrid_ int unsigned 
 RETURNS boolean DETERMINISTIC MODIFIES SQL DATA
 BEGIN
   declare list_item_existed boolean default false;
-  select count(*) > 0 into list_item_existed from listResourceItems where rid = rid_ and itemrid = itemrid_ limit 1;
+  select count(*) > 0 into list_item_existed from listResourceItems where rid = rid_ and itemrid = itemrid_ limit 1 FOR UPDATE;
   if not list_item_existed then
     insert into listResourceItems set rid = rid_, itemrid = itemrid_;
   end if;
@@ -358,10 +360,10 @@ BEGIN
 END //
 
 create procedure add_listResourceItem ( rid_ int unsigned, itemrid_ int unsigned, INOUT list_item_existed boolean )
-MODIFIES SQL DATA
+DETERMINISTIC MODIFIES SQL DATA
 BEGIN
   set list_item_existed = false;
-  START TRANSACTION ;
+  START TRANSACTION READ WRITE;
     select count(*) > 0 into list_item_existed from listResourceItems where rid = rid_ and itemrid = itemrid_ limit 1;
     if not list_item_existed then
       insert into listResourceItems set rid = rid_, itemrid = itemrid_;
@@ -383,10 +385,10 @@ END //
 --END //
 
 create procedure get_or_add_storageItem ( uid_ int unsigned, storagekey_ varchar(512), INOUT sid_ int unsigned )
-MODIFIES SQL DATA
+DETERMINISTIC MODIFIES SQL DATA
 BEGIN
   set sid_ = 0;
-  START TRANSACTION ;
+  START TRANSACTION READ WRITE;
     -- get the sid
     select sid into sid_ from storageItems where uid = uid_ and storagekey = storagekey_ limit 1;
     if sid_ = 0 then
@@ -407,11 +409,12 @@ END //
 --  return mapping_existed;
 --END //
 
+
 create procedure create_storageItemToResourceMapping ( sid_ int unsigned, rid_ int unsigned, INOUT mapping_existed boolean)
-MODIFIES SQL DATA
+DETERMINISTIC MODIFIES SQL DATA
 BEGIN
   set mapping_existed = false;
-  START TRANSACTION ;
+  START TRANSACTION READ WRITE;
     select count(*) > 0 into mapping_existed from storageItemToResource where sid = sid_ and rid = rid_ limit 1;
     if not mapping_existed then
       insert into storageItemToResource set sid = sid_, rid = rid_;
@@ -422,7 +425,7 @@ END //
 create procedure remove_document( IN uid_ int unsigned, IN did_ int unsigned )
 MODIFIES SQL DATA
 BEGIN
-  START TRANSACTION ;
+  START TRANSACTION READ WRITE;
     -- delete the linked resources for the document
     delete from resourceToDocument where did = did_;
     -- delete the document
@@ -439,7 +442,7 @@ BEGIN
   DECLARE triplecur CURSOR FOR SELECT rid FROM tripleResources WHERE subj = rid_ OR pred = rid_ OR obj = rid_;
   DECLARE CONTINUE HANDLER FOR NOT FOUND SET done := TRUE;
   --
-  START TRANSACTION ;
+  START TRANSACTION READ WRITE;
     -- find triples associated with rid_ and delete them from container with rid = cid_
     OPEN triplecur;
       tripleloop: LOOP
@@ -458,7 +461,7 @@ END //
 create procedure remove_tripleResourceFromContainer( IN rid_ int unsigned, IN cid_ int unsigned )
 MODIFIES SQL DATA
 BEGIN
-  START TRANSACTION ;
+  START TRANSACTION READ WRITE;
     -- delete the resource rid_ from the current view / container with rid = cid_
     delete from listResourceItems where rid = cid_ and itemrid = rid_;
     -- get subj and obj and make an entry for them in the list if it doesn't exist yet
@@ -477,7 +480,7 @@ END //
 create procedure edit_resourceContainer( IN rid_ int unsigned, IN cid_old int unsigned, IN cid_new int unsigned)
 MODIFIES SQL DATA
 BEGIN
-  START TRANSACTION ;
+  START TRANSACTION READ WRITE;
     -- delete the resource rid_ from the current view / container with rid = cid_old
     delete from listResourceItems where rid = cid_old and itemrid = rid_;
     -- make an entry for the rid_ in the list of the new container with rid = cid_new
