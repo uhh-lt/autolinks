@@ -164,7 +164,10 @@ define([
                           // get edge source
                           if (sourceNode.data && targetNode.data) {
                             // build the edge object
-                            if (sourceNode.data().parent !== targetNode.data().id) {
+
+                            var hasAncestors = _.find(sourceNode.ancestors(), function(a) { return a.data().id === targetNode.data().id });
+
+                            if (hasAncestors.length < 1) {
                               const after = {
                                 "rid": 0,
                                 "cid": 0,
@@ -324,7 +327,7 @@ define([
                             } else {
                               scope.$parent.$mdToast.show(
                                     scope.$parent.$mdToast.simple()
-                                      .textContent('Creating edges to its own parent is not allowed')
+                                      .textContent('Creating edges to its own parents is not allowed')
                                       .position('top right')
                                       .theme("warn-toast")
                                       .hideDelay(3500)
@@ -485,7 +488,7 @@ define([
                             }
                           }
                           if (sel.data().path === 'annotationNode') {
-                            scope.annotationHighlighted = sel.data().rid;
+                            scope.annotationHighlighted = sel.isParent() ? sel.data().rid : sel.data().cid;
                             var targetHighlighted = document.getElementById(scope.annotationHighlighted);
                             if (targetHighlighted) {
                               targetHighlighted.classList.add('annotation-highlighted');
@@ -562,13 +565,25 @@ define([
                                     event.stopPropagation();
                                     scope.selectedEntity = n;
                                     console.log(scope.selectedEntity.id());
-                                    return (
-                                    '<div class="node-buttons">' +
-                                    '<button id="moveNode" class="node-button"><i class="fa fa-arrows-alt fa-2x"/></button>' +
-                                    '<button id="addEdge" class="node-button"><i class="fa fa-link fa-2x"/></button> ' +
-                                    '<button id="editNode" class="node-button"><i class="fa fa-edit fa-2x"/></button>' +
-                                    '</div>'
-                                    )
+
+                                    //NOTE: annotation resources (container and nodes) are not editable and movable
+                                    if (n.data('path') !== 'annotationNode') {
+                                      return (
+                                      '<div class="node-buttons">' +
+                                      '<button id="moveNode" class="node-button"><i class="fa fa-arrows-alt fa-2x"/></button>' +
+                                      '<button id="addEdge" class="node-button"><i class="fa fa-link fa-2x"/></button> ' +
+                                      '<button id="editNode" class="node-button"><i class="fa fa-edit fa-2x"/></button>' +
+                                      '</div>'
+                                      )
+                                    } else {
+                                      if (!n.isParent()) {
+                                        return (
+                                        '<div class="node-buttons">' +
+                                        '<button id="editNode" class="node-button"><i class="fa fa-edit fa-2x"/></button>' +
+                                        '</div>'
+                                        )
+                                      }
+                                    }
                                   }
                               },
                               show: {
