@@ -573,11 +573,13 @@ define([
                                       '</div>'
                                       )
                                     } else {
-                                      return (
-                                      '<div class="node-buttons">' +
-                                      '<button id="editNode" class="node-button"><i class="fa fa-edit fa-2x"/></button>' +
-                                      '</div>'
-                                      )
+                                      if (!n.isParent()) {
+                                        return (
+                                        '<div class="node-buttons">' +
+                                        '<button id="editNode" class="node-button"><i class="fa fa-edit fa-2x"/></button>' +
+                                        '</div>'
+                                        )
+                                      }
                                     }
                                   }
                               },
