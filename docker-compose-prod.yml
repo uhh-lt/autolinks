@@ -16,29 +16,29 @@ services:
   # Main components and their dependencies
   ##
   # BEGIN: frontend
-  frontend:
-    image: node:9.2.0
-    volumes:
-      - ${PWD}/frontendserver:/opt/project/frontendserver
-    ports:
-      - 20001:9090
-    networks:
-      - anet
-    working_dir: /opt/project
-    entrypoint:
-      - /bin/sh
-      - -c
-      - |
-        echo installing modules ...
-        sh init-repo.sh
-        echo starting server ...
-        npm start
-    environment:
-      - NODE_ENV=production
-      - COOKIE_SECRET=bsiusussg78
-      - BROKER_URL=http://broker:10010
-      - LOGLEVEL=debug
-    restart: unless-stopped
+#  frontend:
+#    image: node:9.2.0
+#    volumes:
+#      - ${PWD}/frontendserver:/opt/project/frontendserver
+#    ports:
+#      - 20001:9090
+#    networks:
+#      - anet
+#    working_dir: /opt/project
+#    entrypoint:
+#      - /bin/sh
+#      - -c
+#      - |
+#        echo installing modules ...
+#        sh init-repo.sh
+#        echo starting server ...
+#        npm start
+#    environment:
+#      - NODE_ENV=production
+#      - COOKIE_SECRET=bsiusussg78
+#      - BROKER_URL=http://broker:10010
+#      - LOGLEVEL=debug
+#    restart: unless-stopped
   # END: frontend
 
   # BEGIN: broker
@@ -147,77 +147,77 @@ services:
   # END: demo service
 
   # BEGIN: wikiservice
-  wiki:
-    image: node:10.5
-    volumes:
-      - ${PWD}/services/wikiservice/wikiservice-node:/opt/project/services/wikiservice/wikiservice-node
-      - ${PWD}/broker:/opt/project/broker
-      - ${PWD}/data:/opt/project/data
-    networks:
-      - anet
-    stdin_open: true
-    tty: true
-    working_dir: /opt/project/services/wikiservice/wikiservice-node
-    entrypoint:
-      - /bin/sh
-      - -c
-      - |
-        echo installing modules ...
-        npm install
-        echo starting server ...
-        npm start
-    environment:
-      - NODE_ENV=production
-      - COOKIE_SECRET=98ydiaug9f7asjb
-      - BROKER_URL=http://broker:10010
-#      - ELASTICSEARCH_URLS=http://0.0.0.0:9200
-#      - ELASTICSEARCH_URLS=http://elasticsearch:9200
-      - ELASTICSEARCH_URLS=http://ltdocker.informatik.uni-hamburg.de:10004
-      - ELASTICSEARCH_VERSION=5.5
-#      - ELASTICSEARCH_INDICES=simplewiki
-      - ELASTICSEARCH_INDICES=enwiki,wikidata,enwiktionary
-    depends_on:
-      broker:
-        condition: service_healthy
+#  wiki:
+#    image: node:10.5
+#    volumes:
+#      - ${PWD}/services/wikiservice/wikiservice-node:/opt/project/services/wikiservice/wikiservice-node
+#      - ${PWD}/broker:/opt/project/broker
+#      - ${PWD}/data:/opt/project/data
+#    networks:
+#      - anet
+#    stdin_open: true
+#    tty: true
+#    working_dir: /opt/project/services/wikiservice/wikiservice-node
+#    entrypoint:
+#      - /bin/sh
+#      - -c
+#      - |
+#        echo installing modules ...
+#        npm install
+#        echo starting server ...
+#        npm start
+#    environment:
+#      - NODE_ENV=production
+#      - COOKIE_SECRET=98ydiaug9f7asjb
+#      - BROKER_URL=http://broker:10010
+##      - ELASTICSEARCH_URLS=http://0.0.0.0:9200
+##      - ELASTICSEARCH_URLS=http://elasticsearch:9200
+#      - ELASTICSEARCH_URLS=http://ltdocker.informatik.uni-hamburg.de:10004
+#      - ELASTICSEARCH_VERSION=5.5
+##      - ELASTICSEARCH_INDICES=simplewiki
+#      - ELASTICSEARCH_INDICES=enwiki,wikidata,enwiktionary
+#    depends_on:
+#      broker:
+#        condition: service_healthy
   # END: wikiservice
 
   # BEGIN: elasticsearch index
-  es:
-    image: custom-elasticsearch:5.5.2
-    build:
-      context: services/wikiservice/es-docker
-      dockerfile: Dockerfile
-#      args:
-#        CUSTOM_UID: 39000
-#        CUSTOM_GID: 390
-    environment:
-      - cluster.name=escluster
-      - bootstrap.memory_lock=true
-      - xpack.security.enabled=false
-      - http.host=0.0.0.0
-      - transport.host=0.0.0.0
-      - discovery.type=single-node
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-      nofile:
-        soft: 131072
-        hard: 131072
-      nproc:
-        soft: 8192
-        hard: 8192
-    cap_add:
-      - IPC_LOCK
-    volumes:
-      - ${PWD}/data/es:/usr/share/elasticsearch/data
-    networks:
-      anet:
-        aliases:
-          - elasticsearch
-    healthcheck:
-      test: curl --silent --fail 'localhost:9200/_cluster/health' || exit 1
-      interval: 5s
-      timeout: 2s
-      retries: 12
+#  es:
+#    image: custom-elasticsearch:5.5.2
+#    build:
+#      context: services/wikiservice/es-docker
+#      dockerfile: Dockerfile
+##      args:
+##        CUSTOM_UID: 39000
+##        CUSTOM_GID: 390
+#    environment:
+#      - cluster.name=escluster
+#      - bootstrap.memory_lock=true
+#      - xpack.security.enabled=false
+#      - http.host=0.0.0.0
+#      - transport.host=0.0.0.0
+#      - discovery.type=single-node
+#    ulimits:
+#      memlock:
+#        soft: -1
+#        hard: -1
+#      nofile:
+#        soft: 131072
+#        hard: 131072
+#      nproc:
+#        soft: 8192
+#        hard: 8192
+#    cap_add:
+#      - IPC_LOCK
+#    volumes:
+#      - ${PWD}/data/es:/usr/share/elasticsearch/data
+#    networks:
+#      anet:
+#        aliases:
+#          - elasticsearch
+#    healthcheck:
+#      test: curl --silent --fail 'localhost:9200/_cluster/health' || exit 1
+#      interval: 5s
+#      timeout: 2s
+#      retries: 12
   # END: elasticsearch index
