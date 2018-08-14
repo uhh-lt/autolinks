@@ -1,6 +1,6 @@
 module.exports = function(url, token, data) {
-  const before = data.before;
-  let after = data.after;
+  const before = (data && data.before) ? data.before : '';
+  let after = (data && data.after) ? data.after : '';
 
   var body = getBody(before, after);
   return {
