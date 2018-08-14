@@ -107,25 +107,28 @@ CREATE TABLE IF NOT EXISTS storageItemToResource (
 ) ENGINE=MyISAM ROW_FORMAT=Fixed;
 
 -- CREATE HELPER VIEWS
---CREATE OR REPLACE VIEW userResourceMetadata  AS SELECT r1.uid, r2.* FROM resources r1 JOIN resourceMetadata  r2 ON (r1.rid = r2.rid);
---CREATE OR REPLACE VIEW userStringResources   AS SELECT r1.uid, r2.* FROM resources r1 JOIN stringResources   r2 ON (r1.rid = r2.rid);
---CREATE OR REPLACE VIEW userTripleResources   AS SELECT r1.uid, r2.* FROM resources r1 JOIN tripleResources   r2 ON (r1.rid = r2.rid);
---CREATE OR REPLACE VIEW userListResources     AS SELECT r1.uid, r2.* FROM resources r1 JOIN listResources     r2 ON (r1.rid = r2.rid);
---CREATE OR REPLACE VIEW userListResourceItems AS SELECT r1.uid, r2.* FROM resources r1 JOIN listResourceItems r2 ON (r1.rid = r2.rid);
+
+CREATE OR REPLACE VIEW userResourceMetadata  AS SELECT r1.uid, r2.* FROM resources r1 JOIN resourceMetadata  r2 ON (r1.rid = r2.rid);
+
+CREATE OR REPLACE VIEW userStringResources   AS SELECT r1.uid, r2.* FROM resources r1 JOIN stringResources   r2 ON (r1.rid = r2.rid);
+
+CREATE OR REPLACE VIEW userTripleResources   AS SELECT r1.uid, r2.* FROM resources r1 JOIN tripleResources   r2 ON (r1.rid = r2.rid);
+
+CREATE OR REPLACE VIEW userListResources     AS SELECT r1.uid, r2.* FROM resources r1 JOIN listResources     r2 ON (r1.rid = r2.rid);
+
+CREATE OR REPLACE VIEW userListResourceItems AS SELECT r1.uid, r2.* FROM resources r1 JOIN listResourceItems r2 ON (r1.rid = r2.rid);
 
 -- DEFINE SOME HELPER PROCEDURES
 
-drop procedure if exists reset_database;
+drop procedure if exists reset_db;
 
 drop procedure if exists add_document;
 
--- drop procedure if exists add_resource;
+drop function if exists get_or_add_stringResource;
 
-drop procedure if exists get_or_add_stringResource;
+drop function if exists get_or_add_tripleResource;
 
-drop procedure if exists get_or_add_tripleResource;
-
-drop procedure if exists get_or_add_listResource;
+drop function if exists get_or_add_listResource;
 
 drop function if exists add_listResourceItem;
 
@@ -155,7 +158,7 @@ drop procedure if exists get_parent_resources;
 
 DELIMITER //
 
-create procedure reset_database( )
+create procedure reset_db( )
 MODIFIES SQL DATA
 BEGIN
   START TRANSACTION READ WRITE;
@@ -173,32 +176,13 @@ BEGIN
   COMMIT ;
 END //
 
---create function add_document ( uid_ int unsigned, name_ varchar(512), encoding_ varchar(64), mimetype_ varchar(128) )
---RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
---BEGIN
---  declare did_ int unsigned default 0;
---  if name_ is NULL then
---    return did_;
---  end if;
---  select did into did_ from documents where name = name_ and uid = uid_ limit 1;
---  if did_ = 0 then
---    insert into documents set uid = uid_, name = name_, encoding = encoding_, mimetype = mimetype_, analysis = null;
---    select LAST_INSERT_ID() into did_;
---  else
---    -- delete the linked resources for the document
---    delete from resourceToDocument where did = did_;
---    replace into documents set did = did_, uid = uid_, name = name_, encoding = encoding_, mimetype = mimetype_, analysis = null;
---  end if;
---  return did_;
---END //
-
 create procedure add_document ( uid_ int unsigned, name_ varchar(512), encoding_ varchar(64), mimetype_ varchar(128), INOUT did_ int unsigned )
 MODIFIES SQL DATA
 BEGIN
   set did_ = 0;
   START TRANSACTION READ WRITE;
     if name_ is NOT NULL then
-      select did into did_ from documents where name = name_ and uid = uid_ limit 1;
+      select did into did_ from documents where name = name_ and uid = uid_ limit 1 FOR SHARE OF documents;
       if did_ = 0 then
         insert into documents set uid = uid_, name = name_, encoding = encoding_, mimetype = mimetype_, analysis = null;
         select LAST_INSERT_ID() into did_;
@@ -210,32 +194,6 @@ BEGIN
     end if;
   COMMIT ;
 END //
-
---create function add_resource ( isstring_ boolean, istriple_ boolean, islist_ boolean, uid_ int unsigned )
---RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
---BEGIN
---  declare rid_ int unsigned default 0;
---  -- TODO: check if permutated values are set
---  if NOT ( isstring_ AND istriple_ AND islist_) then
---    return rid_;
---  end if;
---  insert into resources set uid = uid_, isstring = isstring_, istriple = istriple_, islist = islist_;
---  select LAST_INSERT_ID() into rid_;
---  return rid_;
---END //
-
---create procedure add_resource ( isstring_ boolean, istriple_ boolean, islist_ boolean, uid_ int unsigned, INOUT rid_ int unsigned)
---MODIFIES SQL DATA
---BEGIN
---  set rid_ = 0;
---  START TRANSACTION READ WRITE;
---    -- TODO: check if permutated values are set
---    if isstring_ OR istriple_ OR islist_ then
---      insert into resources set uid = uid_, isstring = isstring_, istriple = istriple_, islist = islist_;
---      select LAST_INSERT_ID() into rid_;
---    end if;
---  COMMIT ;
---END //
 
 create procedure full_delete_resource( IN rid_ int unsigned )
 MODIFIES SQL DATA
@@ -257,95 +215,52 @@ BEGIN
   COMMIT ;
 END //
 
---create function get_or_add_stringResource ( surfaceform_ varchar(512), uid_ int unsigned )
---RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
---BEGIN
---  declare rid_ int unsigned default 0;
---  if surfaceform_ is NULL then
---    return rid_;
---  end if;
---  select r1.rid into rid_ from resources r1 JOIN stringResources r2 ON (r1.rid = r2.rid) where r2.surfaceform = surfaceform_ and r1.uid = uid_ limit 1;
---  if rid_ = 0 then
---    select add_resource(TRUE, NULL, NULL, uid_) into rid_;
---    insert into stringResources set rid = rid_, surfaceform = surfaceform_;
---  end if;
---  return rid_;
---END //
-
-create procedure get_or_add_stringResource ( surfaceform_ varchar(512), uid_ int unsigned, INOUT rid_ int unsigned)
-DETERMINISTIC MODIFIES SQL DATA
+create function get_or_add_stringResource ( surfaceform_ varchar(512), uid_ int unsigned )
+RETURNS int unsigned NOT DETERMINISTIC MODIFIES SQL DATA
 BEGIN
-  START TRANSACTION READ WRITE;
-    set rid_ = 0;
-    if surfaceform_ is NOT NULL then
-      select r1.rid into rid_ from resources r1 JOIN stringResources r2 ON (r1.rid = r2.rid) where r2.surfaceform = surfaceform_ and r1.uid = uid_ limit 1;
-      if rid_ = 0 then
-        --call add_resource(TRUE, NULL, NULL, uid_, rid_);
-        insert into resources set uid = uid_, isstring = TRUE;
-        select LAST_INSERT_ID() into rid_;
-        insert into stringResources set rid = rid_, surfaceform = surfaceform_;
-      end if;
-    end if;
-  COMMIT ;
+  declare rid_ int unsigned default 0;
+  if surfaceform_ is NULL then
+    return rid_;
+  end if;
+  select r1.rid into rid_ from (select rid from resources where uid = uid_ for share) r1, (select rid from stringResources where surfaceform = surfaceform_ for share) r2 where r1.rid=r2.rid;
+  if rid_ > 0 then
+    return rid_;
+  end if;
+  insert into resources set uid = uid_, isstring = TRUE;
+  select LAST_INSERT_ID() into rid_;
+  insert into stringResources set rid = rid_, surfaceform = surfaceform_;
+  return rid_;
 END //
 
---create function get_or_add_tripleResource ( subj_ int unsigned, pred_ int unsigned, obj_ int unsigned, uid_ int unsigned)
---RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
---BEGIN
---  declare rid_ int unsigned default 0;
---  select r1.rid into rid_ from resources r1 JOIN tripleResources r2 ON (r1.rid = r2.rid) where r2.subj = subj_ and r2.pred = pred_ and r2.obj = obj_ and r1.uid = uid_ limit 1;
---  if rid_ = 0 then
---    select add_resource(NULL, TRUE, NULL, uid_) into rid_;
---    insert into tripleResources set rid = rid_, subj = subj_, pred = pred_, obj = obj_;
---  end if;
---  return rid_;
---END //
-
-create procedure get_or_add_tripleResource ( subj_ int unsigned, pred_ int unsigned, obj_ int unsigned, uid_ int unsigned, INOUT rid_ int unsigned)
-DETERMINISTIC MODIFIES SQL DATA
+create function get_or_add_tripleResource ( subj_ int unsigned, pred_ int unsigned, obj_ int unsigned, uid_ int unsigned)
+RETURNS int unsigned NOT DETERMINISTIC MODIFIES SQL DATA
 BEGIN
-  set rid_ = 0;
-  START TRANSACTION READ WRITE;
-    select r1.rid into rid_ from resources r1 JOIN tripleResources r2 ON (r1.rid = r2.rid) where r2.subj = subj_ and r2.pred = pred_ and r2.obj = obj_ and r1.uid = uid_ limit 1;
-    if rid_ = 0 then
-      -- call add_resource(NULL, TRUE, NULL, uid_, rid_);
-      insert into resources set uid = uid_, istriple = TRUE;
-      select LAST_INSERT_ID() into rid_;
-      insert into tripleResources set rid = rid_, subj = subj_, pred = pred_, obj = obj_;
-    end if;
-  COMMIT ;
+  declare rid_ int unsigned default 0;
+  select r1.rid into rid_ from (select rid from resources where uid = uid_ for share) r1, (select rid from tripleResources where subj = subj_ and pred = pred_ and obj = obj_ for share) r2 where r1.rid=r2.rid;
+  if rid_ > 0 then
+    return rid_;
+  end if;
+  insert into resources set uid = uid_, istriple = TRUE;
+  select LAST_INSERT_ID() into rid_;
+  insert into tripleResources set rid = rid_, subj = subj_, pred = pred_, obj = obj_;
+  return rid_;
 END //
 
---create function get_or_add_listResource ( listdescriptor_ varchar(512), uid_ int unsigned )
---RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
---BEGIN
---  declare rid_ int unsigned default 0;
---  if listdescriptor_ is NULL then
---    return rid_;
---  end if;
---  select r1.rid into rid_ from resources r1 JOIN listResources r2 ON (r1.rid = r2.rid) where r2.listdescriptor = listdescriptor_ and r1.uid = uid_ limit 1;
---  if rid_ = 0 then
---    select add_resource(NULL, NULL, TRUE, uid_) into rid_;
---    insert into listResources set rid = rid_, listdescriptor = listdescriptor_;
---  end if;
---  return rid_;
---END //
-
-create procedure get_or_add_listResource ( listdescriptor_ varchar(512), uid_ int unsigned, INOUT rid_ int unsigned )
-DETERMINISTIC MODIFIES SQL DATA
+create function get_or_add_listResource ( listdescriptor_ varchar(512), uid_ int unsigned )
+RETURNS int unsigned NOT DETERMINISTIC MODIFIES SQL DATA
 BEGIN
-  set rid_ = 0;
-  START TRANSACTION READ WRITE;
-    if listdescriptor_ is NOT NULL then
-      select r1.rid into rid_ from resources r1 JOIN listResources r2 ON (r1.rid = r2.rid) where r2.listdescriptor = listdescriptor_ and r1.uid = uid_ limit 1;
-      if rid_ = 0 then
-        -- call add_resource(NULL, NULL, TRUE, uid_, rid_);
-        insert into resources set uid = uid_, islist = TRUE;
-        select LAST_INSERT_ID() into rid_;
-        insert into listResources set rid = rid_, listdescriptor = listdescriptor_;
-      end if;
-    end if;
-  COMMIT ;
+  declare rid_ int unsigned default 0;
+  if listdescriptor_ is NULL then
+    return rid_;
+  end if;
+  select r1.rid into rid_ from (select rid from resources where uid = uid_ for share) r1, (select rid from listResources where listdescriptor = listdescriptor_ for share) r2 where r1.rid=r2.rid;
+  if rid_ > 0 then
+    return rid_;
+  end if;
+  insert into resources set uid = uid_, islist = TRUE;
+  select LAST_INSERT_ID() into rid_;
+  insert into listResources set rid = rid_, listdescriptor = listdescriptor_;
+  return rid_;
 END //
 
 create function add_listResourceItem ( rid_ int unsigned, itemrid_ int unsigned )
@@ -371,19 +286,6 @@ BEGIN
   COMMIT ;
 END //
 
---create function get_or_add_storageItem ( uid_ int unsigned, storagekey_ varchar(512) )
---RETURNS int unsigned DETERMINISTIC MODIFIES SQL DATA
---BEGIN
---  declare sid_ int unsigned default 0;
---  -- get the sid
---  select sid into sid_ from storageItems where uid = uid_ and storagekey = storagekey_ limit 1;
---  if sid_ = 0 then
---    insert into storageItems set uid = uid_, storagekey = storagekey_;
---    select LAST_INSERT_ID() into sid_;
---  end if;
---  return sid_;
---END //
-
 create procedure get_or_add_storageItem ( uid_ int unsigned, storagekey_ varchar(512), INOUT sid_ int unsigned )
 DETERMINISTIC MODIFIES SQL DATA
 BEGIN
@@ -397,18 +299,6 @@ BEGIN
     end if;
   COMMIT ;
 END //
-
---create function create_storageItemToResourceMapping ( sid_ int unsigned, rid_ int unsigned )
---RETURNS boolean DETERMINISTIC MODIFIES SQL DATA
---BEGIN
---  declare mapping_existed boolean default false;
---  select count(*) > 0 into mapping_existed from storageItemToResource where sid = sid_ and rid = rid_ limit 1;
---  if not mapping_existed then
---    insert into storageItemToResource set sid = sid_, rid = rid_;
---  end if;
---  return mapping_existed;
---END //
-
 
 create procedure create_storageItemToResourceMapping ( sid_ int unsigned, rid_ int unsigned, INOUT mapping_existed boolean)
 DETERMINISTIC MODIFIES SQL DATA
@@ -518,6 +408,5 @@ BEGIN
     select r1.rid as rid from resources r1 JOIN tripleResources r2 ON (r1.rid = r2.rid) where r1.uid = uid_ and ( r2.subj = rid_ or r2.obj = rid_ or r2.pred = rid_ )
   ) _;
 END //
-
 
 DELIMITER ;

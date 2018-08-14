@@ -209,15 +209,12 @@ module.exports.saveNewResourceOrValue = function (resourceOrValue, uid, cid) {
     resource.cid = cid;
     // a resource can be an array of resources, a triple or a string
     if (resource.isListResource()) {
-      // logger.trace('Resource is an array.');
       return resolve(this.saveListResource(resource, uid));
     }
     if (resource.isTripleResource()) {
-      // logger.trace('Resource is a triple.');
       return resolve(this.saveTripleResource(resource, uid));
     }
     if (resource.isStringResource()) {
-      // logger.trace('Resource is a string.');
       return resolve(this.saveStringResource(resource, uid));
     }
     const ex = new Exception('IllegalState', 'This is impossible, a resource has to be one of {list,triple,string}.').log(logger, logger.warn);
@@ -254,10 +251,10 @@ module.exports.saveTripleResource = function (tripleResource, uid) {
         tripleResource.value.predicate = resources[1];
         tripleResource.value.object = resources[2];
         const rids = resources.map(r => r.rid);
-        logger.debug(`Saving triple ${rids} for user with id '${uid}'.`);
-        return promisedQuery('SET @var = 0; call get_or_add_tripleResource(?,?,?,?,@var); SELECT @var as rid;', rids.concat(uid))
+        logger.trace(`Saving triple ${rids} for user with id '${uid}'.`);
+        return promisedQuery('select get_or_add_tripleResource(?,?,?,?) as rid;', rids.concat(uid))
           .then(res => {
-            tripleResource.rid = res.rows[2][0].rid;
+            tripleResource.rid = res.rows[0].rid;
             return resolve(tripleResource);
           });
       },
@@ -316,7 +313,7 @@ module.exports.saveListResource = function (listResource, uid) {
 };
 
 function propagateApplyCid(resource, cid) {
-  logger.debug(`Propagating cid '${cid}' to rid '${resource.rid}' (value !== null? ${resource.value !== null}).`);
+  // logger.trace(`Propagating cid '${cid}' to rid '${resource.rid}' (value !== null? ${resource.value !== null}).`);
   resource.cid = cid;
   if (resource.isTripleResource()) {
     propagateApplyCid(resource.value.subject, cid);
@@ -335,11 +332,10 @@ function computeListResourceDescriptor(list_of_ints){
 
 module.exports.saveListResourceDescriptor = function (listResourceDescriptor, uid) {
   return new Promise((resolve, reject) => {
-    logger.debug(`Saving listResourceDesriptor '${listResourceDescriptor}' for user with id '${uid}'.`);
-    promisedQuery('SET @var = 0; call get_or_add_listResource(?, ?, @var); SELECT @var as rid;', [listResourceDescriptor, uid]).then(
+    logger.trace(`Saving listResourceDesriptor '${listResourceDescriptor}' for user with id '${uid}'.`);
+    promisedQuery('select get_or_add_listResource(?, ?) as rid;', [listResourceDescriptor, uid]).then(
       res => {
-        const rid = res.rows[2][0].rid;
-        logger.debug(`Successfully saved resource '${listResourceDescriptor}' with id ${rid}.`);
+        const rid = res.rows[0].rid;
         return resolve(rid);
       },
       err => reject(err)
@@ -349,11 +345,10 @@ module.exports.saveListResourceDescriptor = function (listResourceDescriptor, ui
 
 module.exports.saveListResourceItem = function (desc_rid, item_rid) {
   return new Promise((resolve, reject) => {
-    logger.debug(`Saving list resource item (${desc_rid},${item_rid}).`);
+    logger.trace(`Saving list resource item (${desc_rid},${item_rid}).`);
     promisedQuery('SET @var = 0; call add_listResourceItem(?, ?, @var); SELECT @var as list_item_existed;', [desc_rid, item_rid]).then(
       res => {
         const existed = res.rows[2][0].list_item_existed;
-        logger.debug(`Successfully saved list resource item (${desc_rid},${item_rid}). Existed before: ${existed}.`);
         return resolve(existed);
       },
       err => reject(err)
@@ -363,11 +358,10 @@ module.exports.saveListResourceItem = function (desc_rid, item_rid) {
 
 module.exports.saveStringResource = function (stringResource, uid) {
   return new Promise((resolve, reject) => {
-    // logger.trace(`Saving resource value '${stringResource.value}' for user with id '${uid}'.`);
-    promisedQuery('SET @var = 0; call get_or_add_stringResource(?, ?, @var); SELECT @var as rid;', [stringResource.value, uid]).then(
+    logger.trace(`Saving resource value '${stringResource.value}' for user with id '${uid}'.`);
+    promisedQuery('select get_or_add_stringResource(?, ?) as rid;', [stringResource.value, uid]).then(
       res => {
-        const rid = res.rows[2][0].rid;
-        // logger.trace(`Successfully saved resource value '${stringResource.value}' with rid '${rid}'.`);
+        const rid = res.rows[0].rid;
         stringResource.rid = rid;
         return resolve(stringResource);
       },
@@ -377,12 +371,11 @@ module.exports.saveStringResource = function (stringResource, uid) {
 };
 
 module.exports.saveStorageItem = function (userid, storagekey) {
-  // logger.trace(`Saving storage '${storagekey}' for user with id '${userid}'.`);
+  logger.trace(`Saving storage '${storagekey}' for user with id '${userid}'.`);
   return promisedQuery('SET @var = 0; call get_or_add_storageItem(?,?, @var); SELECT @var as sid;', [userid, storagekey])
     .then(
       res => {
         const sid = res.rows[2][0].sid;
-        // logger.trace(`Successfully saved storgae '${storagekey}' for user with id '${userid}'.`);
         return sid;
       }
     );
@@ -573,7 +566,7 @@ module.exports.info = function (userid, callback) {
 
 module.exports.resetDatabase = function () {
   logger.info('Resetting database.');
-  return promisedQuery('call reset_database()');
+  return promisedQuery('call reset_db()');
 };
 
 module.exports.resetFilesystem = function () {
