@@ -77,7 +77,7 @@ html, body, .container, canvas {
 	margin-left: 200px;
 }
 .node-buttons {
-	width: 171px;
+	max-width: 171px;
 	margin: auto;
 }
 .qtip {
@@ -301,5 +301,12 @@ md-toast.md-primary-toast-theme {
 @media (max-width:960px) {
   .container {
 		padding: 0;
+	}
+}
+
+.md-dialog-container {
+	z-index: 10001 !important;
+	md-dialog {
+		z-index: 1001 !important;
 	}
 }

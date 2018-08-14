@@ -43,7 +43,7 @@ define([
                 var to = (e.doffset.offsets[0].from + e.doffset.offsets[0].length) - $scope.sentenceFrom;
                 var fragments = text.slice(offset, from).split('\n');
                 var surface = text.substring(from, to);
-                var eId = ($scope.currIndex) + '_' + surface.replace(/\s/g,'') + '_' + e.doffset.offsets[0].from + ':' + (e.doffset.offsets[0].from + e.doffset.offsets[0].length);
+                var eId = ($scope.currIndex) + '_' + surface.replace(/\s/g,'') + '_' + e.doffset.offsets[0].from + '-' + (e.doffset.offsets[0].from + e.doffset.offsets[0].length);
 
                 fragments.forEach(function(f, i) {
                     compiledString = compiledString.concat(f);
@@ -368,11 +368,16 @@ define([
 
               var splittedId = _.split(e.target.id, '_');
               var offsets = splittedId[splittedId.length - 1];
-              offsets = _.split(offsets, ':');
+              offsets = _.split(offsets, '-');
 
               EndPointService.interpretOffset(selectedDoc.did, offsets).then(function(response) {
-                var dataPath = { endpoint: { path: 'annotationNode' }}
-                $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
+                var dataPath = { endpoint: { path: 'annotationNode' }};
+
+                var containerId = (e.target.id).replace(/[^A-Za-z0-9\-_]/g, '-');
+                _.forEach(response.data, function(data) { data.cid = containerId});
+                var annotationContainer = { rid: containerId, value: response.data, metadata: { label: 'Annotations', type: 'annotationContainer' }, cid: 0 };
+
+                $rootScope.$emit('addEntity', { entity: annotationContainer, data: dataPath });
                 // EntityService.addEntity(response.data);
               });
               console.log($scope.text);
