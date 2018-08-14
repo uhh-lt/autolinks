@@ -25,7 +25,7 @@ services:
     volumes:
       - ${PWD}/frontendserver:/opt/project/frontendserver
     ports:
-      - 10001:9090
+      - 11001:9090
       - 3001:3001
     networks:
       - anet
@@ -47,7 +47,7 @@ services:
       - ${PWD}/broker:/opt/project/broker
       - ${PWD}/data:/opt/project/data
     ports:
-      - 10000:10010
+      - 11000:10010
       - 3000:3001
     networks:
       - anet
@@ -63,7 +63,7 @@ services:
       - NLP=stupid
       # - NLP=ctakes
       - CTAKESURL=http://ctakes-nlp:8080
-      - MYSQL=mysql://autolinks:autolinks1@mysql:3306/autolinks?debug=false&connectionLimit=100
+      - MYSQL=mysql://autolinks:autolinks1@mysql:3306/autolinks?debug=false&connectionLimit=150&multipleStatements=true
       - LOGLEVEL=debug
       - LOGBUFFER=false
   # END: broker
@@ -101,7 +101,7 @@ services:
       - MYSQL_PASSWORD=autolinks1
     volumes:
       - ${PWD}/data/mysql8:/var/lib/mysql
-    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_bin", "--default-authentication-plugin=mysql_native_password", "--log_bin_trust_function_creators=1"]
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_bin", "--default-authentication-plugin=mysql_native_password", "--log_bin_trust_function_creators=1", "--key-buffer-size=4294967296", "--max-connections=250"]
     healthcheck:
       test: "/usr/bin/mysql -hlocalhost -pautolinks1 -uautolinks -Dautolinks -e'SELECT 1;'"
       interval: 20s
@@ -134,7 +134,7 @@ services:
       - ${PWD}/broker:/opt/project/broker
       - ${PWD}/data:/opt/project/data
     ports:
-      - 10010:10010
+      - 11010:10010
       - 3010:3001
     networks:
       - anet
@@ -156,7 +156,7 @@ services:
       - ${PWD}/broker:/opt/project/broker
       - ${PWD}/data:/opt/project/data
     ports:
-      - 10011:10010
+      - 11011:10010
       - 3011:3001
     networks:
       - anet
@@ -184,7 +184,7 @@ services:
       - ${PWD}/broker:/opt/project/broker
       - ${PWD}/data:/opt/project/data
     ports:
-      - 10012:10010
+      - 11012:10010
       - 3012:3001
     networks:
       - anet

@@ -30,15 +30,18 @@ module.exports.getAnnotationResources = function(uid, did, analysis, focus){
     overlappingAnnotations = analysis.getAnnotationsWithinDOffset(focus);
   }
   logger.info(`Found ${overlappingAnnotations.length} annotations to interpret.`);
+  console.time(`Interpreting`);
 
   const annotationResourcePromises = [...overlappingAnnotations].map(anno => {
     const anno_text = anno.doffset.getText(analysis.text);
-    return this.getAnnotationResource(uid, did, anno, anno_text, true);
+    return this.getAnnotationResource(uid, did, anno, anno_text, empty_focus);
   });
 
   return Promise.all(annotationResourcePromises)
     .then(annotationResources => {
+      annotationResources = annotationResources.filter(r => r !== null);
       logger.info(`Finished interpretation of ${annotationResources.length} annotation resources.`);
+      console.timeEnd(`Interpreting`);
       if(empty_focus){
         return annotationResources.length;
       }else{
@@ -54,10 +57,18 @@ module.exports.getAnnotationResource = function(uid, did, anno, text, skipsource
     label : text
   });
   Object.assign(raw_annotation_resource.metadata, anno.properties);
-  return get_or_add_resource(uid, resource_storage_key, raw_annotation_resource, skipsources);
+  return get_or_add_resource(uid, resource_storage_key, raw_annotation_resource, did, skipsources)
+    .then(
+      r => r,
+      err => {
+        Exception.fromError(err, `Failed to add annotation resource ${raw_annotation_resource} with storage key ${resource_storage_key} for user ${uid}.`)
+          .log(logger, logger.warn);
+        return null;
+      });
 };
 
 
-function get_or_add_resource(userid, storagekey, rawresource, skipsources) {
-  return storage.promisedWrite(userid, storagekey, rawresource, skipsources);
+function get_or_add_resource(userid, storagekey, rawresource, did, skipsources) {
+  return storage.promisedWrite(userid, storagekey, rawresource, skipsources)
+    .then(r => storage.linkResourceToDocument(userid, r.rid, did).then(_ => r));
 }

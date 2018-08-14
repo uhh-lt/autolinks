@@ -16,11 +16,12 @@ module.exports.foo = function(req, res, next) {
       return res.header('Content-Type', 'text/plain; charset=utf-8').end(etext, next);
     }
 
-    let resource_triple = new Resource(null, new Resource(null, new Triple(new Resource(null, etext), new Resource(null, "says"), new Resource(null, "bar"))));
+    let resource_triple = new Resource(null, new Triple(new Resource(null, etext), new Resource(null, "says"), new Resource(null, "bar")));
+    let result = new Resource(null, [ resource_triple ] );
 
-    // this sends back a JSON response
+    // this sends back a JSON response and ends the response
     res.header('Content-Type', 'application/json; charset=utf-8');
-    res.json(resource_triple);
+    res.json(result);
     res.end(next);
   });
 };
@@ -61,7 +62,7 @@ module.exports.baz = function(req, res, next) {
     let r4 = new Resource(null,
         new Triple(new Resource(null, username), new Resource(null, "is same as"),
         new Resource(null, new Triple(new Resource(null, etext), new Resource(null, 'is a'), new Resource(null, 'human')))));
-    let r5 = new Resource(null, new Triple(r4, new Resource().fromString("says"), r2));
+    let r5 = new Resource(null, new Triple(r4, new Resource(null, "says"), r2));
 
     let result = new Resource(null, [r5, r3]);
 

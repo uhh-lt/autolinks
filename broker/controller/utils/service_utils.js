@@ -186,7 +186,7 @@ module.exports.call_service = function (location, path, method, userid, data, se
         });
     })
     .then(data => sendData(data, res).end(next))
-    .catch(err => Exception.fromError(err, err.message).log(logger.warn).handleResponse(res).end(next));
+    .catch(err => Exception.fromError(err, err.message).log(logger, logger.warn).handleResponse(res).end(next));
 };
 
 module.exports.get_service_details = function (servicename, extended, callback) {

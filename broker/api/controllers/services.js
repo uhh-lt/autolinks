@@ -20,13 +20,13 @@ module.exports.register_service = function(req, res, next) {
     service.endpoints,
     function(err){
       if(err) {
-        return Exception.fromError(err, `Adding service '${service.name}:${service.version}' failed.`, {service: service}).log(logger.warn).handleResponse(res);
+        return Exception.fromError(err, `Adding service '${service.name}:${service.version}' failed.`, {service: service}).log(logger, logger.warn).handleResponse(res);
       }
       logger.info(`Sucessfully added service '${service.name}:${service.version}'.`);
     },
     function(endpoint, err) {
       if(err) {
-        return Exception.fromError(err, `Adding endoint '${endpoint.path}' for '${service.name}:${service.version}' failed.`, {service: service}).log(logger.warn).handleResponse(res);
+        return Exception.fromError(err, `Adding endoint '${endpoint.path}' for '${service.name}:${service.version}' failed.`, {service: service}).log(logger, logger.warn).handleResponse(res);
       }
       logger.info(`Sucessfully added endpoint '${endpoint.path}' for '${service.name}:${service.version}'.`);
     },
@@ -41,7 +41,7 @@ module.exports.deregister_service = function(req, res, next) {
   service_db.delete_service(service.name, service.version, function(err){
     res.header('Content-Type', 'application/json; charset=utf-8');
     if(err){
-      return Exception.fromError(err, `De-register service '${service.name}:${service.version}' failed.`, {service: service}).log(logger.warn).handleResponse(res).end(next);
+      return Exception.fromError(err, `De-register service '${service.name}:${service.version}' failed.`, {service: service}).log(logger, logger.warn).handleResponse(res).end(next);
     }
     logger.info(`Sucessfully removed service '${service.name}:${service.version}' and its endpoints.`, service);
     res.end(next);
@@ -53,7 +53,7 @@ module.exports.ping_service = function(req, res, next) {
   service_utils.ping_service(service, function(err) {
     res.header('Content-Type', 'application/json; charset=utf-8');
     if(err){
-      return Exception.fromError(err, `Ping service '${service.name}:${service.version}' failed.`, {service: service}).log(logger.warn).handleResponse(res).end(next);
+      return Exception.fromError(err, `Ping service '${service.name}:${service.version}' failed.`, {service: service}).log(logger, logger.warn).handleResponse(res).end(next);
     }
     res.end(next);
   });
@@ -64,11 +64,11 @@ module.exports.ping_services = function(req, res, next) {
   service_db.get_services(
     (err, service) => {
       if(err){
-        return Exception.fromError(err, `Ping service '${service.name}' failed.`).log(logger.warn).handleResponse(res);
+        return Exception.fromError(err, `Ping service '${service.name}' failed.`).log(logger, logger.warn).handleResponse(res);
       }
       service_utils.ping_service(service, function(err2) {
         if(err2) {
-          return Exception.fromError(err2, `Ping service '${service.name}' failed.`).log(logger.warn).handleResponse(res);
+          return Exception.fromError(err2, `Ping service '${service.name}' failed.`).log(logger, logger.warn).handleResponse(res);
         }
       });
     },
@@ -117,10 +117,10 @@ module.exports.call_service = function(req, res, next) {
       endpointref,
       function (err, row) {
         if (err) {
-          return Exception.fromError(err, 'Error retrieving service endpoint.', {data: data}).log(logger.warn).handleResponse(res).end(next);
+          return Exception.fromError(err, 'Error retrieving service endpoint.', {data: data}).log(logger, logger.warn).handleResponse(res).end(next);
         }
         if (!row) {
-          return new Exception('IllegalState', `Service endpoint not found: service '${serviceref.name}:${serviceref.version}', endpoint: '${endpointref.path}'.`, {data: data}).log(logger.warn).handleResponse(res).end(next);
+          return new Exception('IllegalState', `Service endpoint not found: service '${serviceref.name}:${serviceref.version}', endpoint: '${endpointref.path}'.`, {data: data}).log(logger, logger.warn).handleResponse(res).end(next);
         }
         let path = row.path;
         if (row.requireslogin) {
@@ -167,7 +167,7 @@ module.exports.get_service_data = function(req, res, next) {
     return storage.promisedRead(user.id, storagekey)
       .then(
         result => res.json(result).end(next),
-        err => Exception.fromError(err, 'Error retrieving service data.').log(logger.warn).handleResponse(res).end(next)
+        err => Exception.fromError(err, 'Error retrieving service data.').log(logger, logger.warn).handleResponse(res).end(next)
       );
   });
 

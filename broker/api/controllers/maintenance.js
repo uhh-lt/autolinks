@@ -24,7 +24,7 @@ module.exports.ping = function(req, res, next) {
 
 module.exports.resetuserdb = function(req, res, next) {
   return new Exception('NotImplemented', 'Method is not yet implemented')
-    .log(logger.warn)
+    .log(logger, logger.warn)
     .handleResponse(res)
     .end(next);
 };
@@ -32,7 +32,7 @@ module.exports.resetuserdb = function(req, res, next) {
 
 module.exports.resetservicedb = function(req, res, next) {
   return new Exception('NotImplemented', 'Method is not yet implemented')
-    .log(logger.warn)
+    .log(logger, logger.warn)
     .handleResponse(res)
     .end(next);
 };

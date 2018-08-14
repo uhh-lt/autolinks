@@ -184,6 +184,10 @@ module.exports.addAnnotation = function(userid, did, anno){
   return explicitStorage.addAnnotation(userid, did, anno);
 };
 
+module.exports.linkResourceToDocument = function(userid, rid, did){
+  return explicitStorage.linkResourceToDocument(userid, rid, did);
+};
+
 /**
  *
  * @return {*}

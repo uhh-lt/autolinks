@@ -46,8 +46,15 @@ Exception.fromError = function(err, newMessage, fields) {
   return ex;
 };
 
-Exception.prototype.log = function(logfun) {
-  logfun(this.message, this.fields, this.cause);
+Exception.prototype.log = function(logger, logfun) {
+  const logobj = {};
+  if(this.fields){
+    logobj.fields = this.fields;
+  }
+  if(this.cause){
+    logobj.cause = this.cause;
+  }
+  logfun.call(logger, this.message, logobj);
   return this;
 };
 
