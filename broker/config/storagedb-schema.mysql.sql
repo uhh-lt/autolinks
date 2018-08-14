@@ -10,18 +10,10 @@ CREATE TABLE IF NOT EXISTS documents (
   encoding    varchar(64) NOT NULL,
   mimetype    varchar(128) NOT NULL,
   analysis    JSON DEFAULT NULL,
-  PRIMARY KEY (did, uid),
-  KEY (did),
+  PRIMARY KEY (did),
+  UNIQUE (did, uid),
   KEY (uid),
   KEY (name(250))
-) ENGINE=MyISAM ROW_FORMAT=Fixed;
-
-CREATE TABLE IF NOT EXISTS resourceToDocument (
-  did int unsigned NOT NULL,
-  rid int unsigned NOT NULL,
-  PRIMARY KEY (did, rid),
-  KEY (did),
-  KEY (rid)
 ) ENGINE=MyISAM ROW_FORMAT=Fixed;
 
 CREATE TABLE IF NOT EXISTS resources (
@@ -30,25 +22,34 @@ CREATE TABLE IF NOT EXISTS resources (
   isstring    boolean DEFAULT NULL,
   istriple    boolean DEFAULT NULL,
   islist      boolean DEFAULT NULL,
-  PRIMARY KEY (rid, uid),
-  KEY (rid),
+  PRIMARY KEY (rid),
+  UNIQUE (rid, uid),
   KEY (uid)
+) ENGINE=MyISAM ROW_FORMAT=Fixed;
+
+CREATE TABLE IF NOT EXISTS resourceToDocument (
+  did int unsigned NOT NULL,
+  rid int unsigned NOT NULL,
+  FOREIGN KEY (did) REFERENCES documents (did),
+  FOREIGN KEY (rid) REFERENCES resources (rid),
+  UNIQUE (did, rid)
 ) ENGINE=MyISAM ROW_FORMAT=Fixed;
 
 CREATE TABLE IF NOT EXISTS resourceMetadata (
   rid          int unsigned NOT NULL,
   mkey         varchar(64) NOT NULL,
   mvalue       text NOT NULL,
-  PRIMARY KEY (rid, mkey),
+  FOREIGN KEY (rid) REFERENCES resources (rid),
+  UNIQUE (rid, mkey),
   KEY (mkey)
 ) ENGINE=MyISAM ROW_FORMAT=Fixed;
 
 CREATE TABLE IF NOT EXISTS stringResources (
   rid         int unsigned NOT NULL,
   surfaceform varchar(256) NOT NULL,
-  PRIMARY KEY (rid),
+  FOREIGN KEY (rid) REFERENCES resources (rid),
   KEY (surfaceform(242)),
-  UNIQUE KEY (rid, surfaceform(242))
+  UNIQUE (rid, surfaceform(242))
 ) ENGINE=MyISAM ROW_FORMAT=Fixed;
 
 CREATE TABLE IF NOT EXISTS tripleResources (
@@ -56,17 +57,17 @@ CREATE TABLE IF NOT EXISTS tripleResources (
   subj int unsigned NOT NULL,
   pred int unsigned NOT NULL,
   obj  int unsigned NOT NULL,
-  PRIMARY KEY (rid),
-  KEY (subj),
-  KEY (pred),
-  KEY (obj),
+  FOREIGN KEY (rid) REFERENCES resources (rid),
+  FOREIGN KEY (subj) REFERENCES resources (rid),
+  FOREIGN KEY (pred) REFERENCES resources (rid),
+  FOREIGN KEY (obj) REFERENCES resources (rid),
   UNIQUE spo (rid, subj, pred, obj)
 ) ENGINE=MyISAM ROW_FORMAT=Fixed;
 
 CREATE TABLE IF NOT EXISTS listResources (
   rid            int unsigned NOT NULL,
   listdescriptor varchar(256) NOT NULL,
-  PRIMARY KEY (rid),
+  FOREIGN KEY (rid) REFERENCES resources (rid),
   KEY (listdescriptor(250)),
   UNIQUE (rid, listdescriptor(242))
 ) ENGINE=MyISAM ROW_FORMAT=Fixed;
@@ -74,36 +75,29 @@ CREATE TABLE IF NOT EXISTS listResources (
 CREATE TABLE IF NOT EXISTS listResourceItems (
   rid     int unsigned NOT NULL,
   itemrid int unsigned NOT NULL,
-  PRIMARY KEY (rid, itemrid),
-  KEY (rid),
-  KEY (itemrid)
-) ENGINE=MyISAM ROW_FORMAT=Fixed;
-
-CREATE TABLE IF NOT EXISTS resourcePermission (
-  rid         int unsigned NOT NULL,
-  uid         int unsigned NOT NULL,
-  r           boolean DEFAULT TRUE,
-  w           boolean DEFAULT NULL,
-  PRIMARY KEY (rid, uid),
-  KEY (uid),
-  KEY (rid)
+  FOREIGN KEY (rid) REFERENCES resources (rid),
+  FOREIGN KEY (itemrid) REFERENCES resources (rid),
+  UNIQUE (rid, itemrid)
 ) ENGINE=MyISAM ROW_FORMAT=Fixed;
 
 CREATE TABLE IF NOT EXISTS storageItems (
   sid        int unsigned NOT NULL AUTO_INCREMENT,
   uid        int unsigned NOT NULL,
   storagekey varchar(512) NOT NULL,
-  PRIMARY KEY (sid, uid, storagekey(234)),
+  PRIMARY KEY (sid),
+  UNIQUE (sid, uid, storagekey(234)),
   KEY (uid, storagekey(234)),
-  KEY (storagekey(234))
+  KEY (sid, storagekey(234)),
+  KEY (storagekey(234)),
+  KEY (uid)
 ) ENGINE=MyISAM ROW_FORMAT=Fixed;
 
 CREATE TABLE IF NOT EXISTS storageItemToResource (
   sid int unsigned NOT NULL,
   rid int unsigned NOT NULL,
-  PRIMARY KEY (sid, rid),
-  KEY (sid),
-  KEY (rid)
+  FOREIGN KEY (sid) REFERENCES storageItems (sid),
+  FOREIGN KEY (rid) REFERENCES resources (rid),
+  UNIQUE (sid, rid)
 ) ENGINE=MyISAM ROW_FORMAT=Fixed;
 
 -- CREATE HELPER VIEWS
