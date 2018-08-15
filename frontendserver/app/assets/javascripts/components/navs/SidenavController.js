@@ -130,6 +130,7 @@ define([
                 $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
                 var annoType = _.split(_.split(pvc.origin, '::')[1], ':')[1];
                 $rootScope.$emit('addNewAnnoType', annoType);
+                $rootScope.$emit('switchNodesBasedOnTypes');
                 // EntityService.addEntity(response.data);
               });
             }
@@ -194,10 +195,6 @@ define([
           };
 
           $scope.close = function () {
-            // Component lookup should always be available since we are not using `ng-if`
-            // $route.reload();
-            EndPointService.fetchData();
-
             $mdSidenav('right').close()
               .then(function () {
                 document.getElementById("propertify").innerHTML = '{}';

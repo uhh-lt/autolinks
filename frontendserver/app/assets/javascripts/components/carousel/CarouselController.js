@@ -25,7 +25,9 @@ define([
           $scope.entityInDoc = [];
           $scope.currIndex = 1;
           $scope.doffsetAnnotation = '';
+          $scope.isDoffsets = false;
           $scope.activeTypes = EndPointService.getActiveTypes();
+          $scope.newAnnotations = [];
 
           $scope.addSlide = function(sentence, entity) {
             // var newWidth = 600 + $scope.slides.length + 1;
@@ -40,10 +42,14 @@ define([
 
             entity.forEach(function(e) {
                 var from = e.doffset.offsets[0].from - $scope.sentenceFrom;
-                var to = (e.doffset.offsets[0].from + e.doffset.offsets[0].length) - $scope.sentenceFrom;
+                var to = (e.doffset.offsets[e.doffset.offsets.length - 1].from + e.doffset.offsets[e.doffset.offsets.length - 1].length) - $scope.sentenceFrom;
                 var fragments = text.slice(offset, from).split('\n');
                 var surface = text.substring(from, to);
-                var eId = ($scope.currIndex) + '_' + surface.replace(/\s/g,'') + '_' + e.doffset.offsets[0].from + '-' + (e.doffset.offsets[0].from + e.doffset.offsets[0].length);
+                // var eId = ($scope.currIndex) + '_' + surface.replace(/\s/g,'') + '_' + e.doffset.offsets[0].from + '-' +
+                // (e.doffset.offsets[e.doffset.offsets.length - 1].from + e.doffset.offsets[e.doffset.offsets.length - 1].length);
+
+                var eId = ($rootScope.selectedDoc.did) + '_' + 'anno' + '_' + e.doffset.offsets[0].from + '-' +
+                (e.doffset.offsets[e.doffset.offsets.length - 1].from + e.doffset.offsets[e.doffset.offsets.length - 1].length);
 
                 fragments.forEach(function(f, i) {
                     compiledString = compiledString.concat(f);
@@ -134,7 +140,6 @@ define([
               $scope.selectedEntity = $scope.annotation_text_script.annotationSlideScript;
 
               if ($scope.selectedEntity) {
-                $rootScope.annotationSlideText = $scope.annotation_text_script.annotationSlideText;
 
                 var ent = $scope.selectedEntity;
                 var eId = ($scope.currIndex) + '_' + ent.text + '_' + ent.start + ':' + ent.end;
@@ -142,9 +147,30 @@ define([
 
                 var newScript = replaceAt(script, ent.text, highlightElement, ent.start, ent.end);
 
+
                 // var selectedDoc = $scope.tabs.find((t) => { return t.id === doc.id; });
                 // var isInDoc = isEntityInDoc(selectedDoc, $scope.selectedEntity);
-                if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ')) {
+                // NOTE: doffsetAnnotations
+                if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ') && (event.ctrlKey && event.altKey)) {
+                  $scope.isDoffsets = true;
+                }
+
+                if (!$scope.isDoffsets) {
+                  $scope.doffsetAnnotation = ent.text;
+                } else {
+                  if ($scope.doffsetAnnotation.length < 1) {
+                    $scope.doffsetAnnotation = ent.text;
+                  } else {
+                    var doffsetAnno = [' ', ent.text]
+                    $scope.doffsetAnnotation = $scope.doffsetAnnotation.concat(...doffsetAnno);
+                    $scope.newAnnotations.push($scope.annotation_text_script.annotationSlideText);
+                  }
+                }
+
+                $scope.newAnnotations.push($scope.annotation_text_script.annotationSlideText);
+                $rootScope.newAnnotations = { text: $scope.doffsetAnnotation, offsets: _.uniq($scope.newAnnotations)};
+
+                if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ') && !(event.ctrlKey && event.altKey)) {
 
                   $mdDialog.show({
                      templateUrl: '/app/assets/partials/dialog/newAnnotation.html',
@@ -166,10 +192,14 @@ define([
                      // Move the node creation inside prompt success
                      // $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation }); //TODO: create discontinuous annotation for api
                      $scope.doffsetAnnotation = '';
+                     $scope.newAnnotations = [];
                    }, function() {
+                     $scope.doffsetAnnotation = '';
                      $scope.status = 'You cancelled the dialog.';
+                     $scope.newAnnotations = [];
                    });
-
+                   $scope.newAnnotations = [];
+                   $scope.isDoffsets = false;
                   //
                   // var confirm = $mdDialog.prompt()
                   //    .title('Annotation Type?')
@@ -209,35 +239,35 @@ define([
               }
           };
 
-          document.addEventListener('keydown', (event) => {
-            const keyName = event.key;
-
-            if (keyName === 'Shift') {
-              // do not alert when only Control key is pressed.
-              $scope.doffsetAnnotation = '';
-              return;
-            }
-
-            if (event.ctrlKey) {
-              // Even though event.key is not 'Control' (i.e. 'a' is pressed),
-              // event.ctrlKey may be true if Ctrl key is pressed at the time.
-              // alert(`Combination of ctrlKey + ${keyName}`);
-            } else {
-              // alert(`Key pressed ${keyName}`);
-            }
-          }, false);
-
-          document.addEventListener('keyup', (event) => {
-            const keyName = event.key;
-
-            // As the user release the Ctrl key, the key is no longer active.
-            // So event.ctrlKey is false.
-            if (keyName === 'Shift' && ($scope.doffsetAnnotation.length > 0)) {
-              // $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation });
-              // $scope.doffsetAnnotation = '';
-              // alert('Control key was released');
-            }
-          }, false);
+          // document.addEventListener('keydown', (event) => {
+          //   const keyName = event.key;
+          //
+          //   if (keyName === 'Control') {
+          //     // do not alert when only Control key is pressed.
+          //     $scope.doffsetAnnotation = '';
+          //     return;
+          //   }
+          //
+          //   if (event.ctrlKey) {
+          //     // Even though event.key is not 'Control' (i.e. 'a' is pressed),
+          //     // event.ctrlKey may be true if Ctrl key is pressed at the time.
+          //     // alert(`Combination of ctrlKey + ${keyName}`);
+          //   } else {
+          //     // alert(`Key pressed ${keyName}`);
+          //   }
+          // }, false);
+          //
+          // document.addEventListener('keyup', (event) => {
+          //   const keyName = event.key;
+          //
+          //   // As the user release the Ctrl key, the key is no longer active.
+          //   // So event.ctrlKey is false.
+          //   if (keyName === 'Control' && ($scope.doffsetAnnotation.length > 0)) {
+          //     // $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation });
+          //     // $scope.doffsetAnnotation = '';
+          //     // alert('Control key was released');
+          //   }
+          // }, false);
 
           $scope.selectedType = '';
             var script = $scope.tabs;
@@ -251,7 +281,7 @@ define([
                    if (slideScript) {
                      var start = 0;
                      var end = 0;
-                     start = slideScript.match(text).index;
+                     start = (slideScript.match(text) && slideScript.match(text).index) ? slideScript.match(text).index : 0;
                      end = start + text.length;
                      var annotations = [];
 
@@ -278,7 +308,7 @@ define([
                      var iter;
                      var selectedSentence = _.filter($scope.slides, function(slide){ return slide.id === $scope.active});
                      var sentenceStart = selectedSentence[0].start;
-                     start = sentenceStart + slideText.match(text).index;
+                     start = sentenceStart + ( slideText.match(text) && slideText.match(text).index ? slideText.match(text).index : 0 );
                      end = start + text.length;
                      while ((iter = regexScript.exec(slideText)) !== null) {
                         annotations.push({text, start: sentenceStart + iter.index, end: sentenceStart + regexScript.lastIndex});
@@ -294,7 +324,7 @@ define([
 
                  }
 
-              } else if (document.selection && document.selection.type != "Shift") {
+              } else if (document.selection && document.selection.type != "Control") {
                  text = document.selection.createRange().text;
               }
               text = text.trim();
@@ -371,13 +401,15 @@ define([
               offsets = _.split(offsets, '-');
 
               EndPointService.interpretOffset(selectedDoc.did, offsets).then(function(response) {
-                var dataPath = { endpoint: { path: 'annotationNode' }};
-
-                var containerId = (e.target.id).replace(/[^A-Za-z0-9\-_]/g, '-');
-                _.forEach(response.data, function(data) { data.cid = containerId});
-                var annotationContainer = { rid: containerId, value: response.data, metadata: { label: 'Annotations', type: 'annotationContainer' }, cid: 0 };
-
-                $rootScope.$emit('addEntity', { entity: annotationContainer, data: dataPath });
+                // var dataPath = { endpoint: { path: 'annotationNode' }};
+                //
+                // if (response.data) {
+                //   var containerId = ('annotationContainer').replace(/[^A-Za-z0-9\-_]/g, '-');
+                //   _.forEach(response.data, function(data) { data.cid = containerId});
+                //   var annotationContainer = { rid: containerId, value: response.data, metadata: { label: 'Annotations', type: 'annotationContainer' }, cid: 0 };
+                //
+                //   $rootScope.$emit('addEntity', { entity: annotationContainer, data: dataPath });
+                // }
                 // EntityService.addEntity(response.data);
               });
               console.log($scope.text);

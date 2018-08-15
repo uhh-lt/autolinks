@@ -91,7 +91,15 @@ define([
               interpretOffset: function(did, offsets) {
                 $rootScope.$emit('activateProgressBar', 'interpreting the offset');
                 return $http.post('/api/nlp/interpretDid', { did: did, offsets: offsets }).then(function(response) {
-                  return response;
+                  var dataPath = { endpoint: { path: 'annotationNode' }};
+
+                  if (response.data) {
+                    var containerId = ('annotationContainer');
+                    _.forEach(response.data, function(data) { data.cid = containerId});
+                    var annotationContainer = { rid: containerId, value: response.data, metadata: { label: 'Annotations', type: 'annotationContainer' }, cid: 0 };
+
+                    return $rootScope.$emit('addEntity', { entity: annotationContainer, data: dataPath });
+                  }
                 });
               },
 
@@ -138,11 +146,21 @@ define([
                   if (response.data.length < 1) {
                     $rootScope.$emit('deactivateProgressBar');
                   }
-                  _.forEach(response.data, function(source) {
+                  var selData = [_.find(response.data, function(d) { return _.includes(d, "annotation::") })];
+                  _.forEach(selData, function(source) {
                     if (!_.includes(source, 'annotations::')) {
                       return $http.post('/api/storage/getResource', { data: source }).then(function(response) {
-                        const dataPath = { endpoint: { path: 'localSearch' }};
-                        $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
+                        const dataPath = { endpoint: { path: 'annotationNode' }};
+
+                        if (response.data) {
+                          var containerId = ('annotationContainer').replace(/[^A-Za-z0-9\-_]/g, '-');
+                          // _.forEach(response.data, function(data) { data.cid = containerId});
+                          response.data.cid = containerId
+                          var annotationContainer = { rid: containerId, value: [response.data], metadata: { label: 'Annotations', type: 'annotationContainer' }, cid: 0 };
+
+                          $rootScope.$emit('addEntity', { entity: annotationContainer, data: dataPath });
+                        }
+                        // $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
                       });
                     }
                   });

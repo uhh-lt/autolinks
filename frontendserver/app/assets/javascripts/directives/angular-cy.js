@@ -487,8 +487,10 @@ define([
                               sameLabelNodes.addClass('sameLabelHighlight');
                             }
                           }
-                          if (sel.data().path === 'annotationNode') {
-                            scope.annotationHighlighted = sel.isParent() ? sel.data().rid : sel.data().cid;
+                          if (sel.data().path === 'annotationNode' && !sel.isParent()) {
+                            var anno = _.split(_.split(sel.data().name, '::')[1], ':');
+                            scope.annotationHighlighted = anno[2] + '_anno_' + anno[3] + '-' + anno[4];
+                            // scope.annotationHighlighted = sel.isParent() ? sel.data().rid : sel.data().cid;
                             var targetHighlighted = document.getElementById(scope.annotationHighlighted);
                             if (targetHighlighted) {
                               targetHighlighted.classList.add('annotation-highlighted');
@@ -687,12 +689,12 @@ define([
                                     .hideDelay(3500)
                                 );
                           } else {
-                            // if (hasChildren) {
-                            //   scope.hasChildren = true;
-                            //   scope.childrenNodes = scope.mergeToParentNodes.source.children();
-                            // } else {
-                            //   scope.hasChildren = false;
-                            // }
+                            if (hasChildren) {
+                              scope.hasChildren = true;
+                              scope.childrenNodes = scope.mergeToParentNodes.source.children();
+                            } else {
+                              scope.hasChildren = false;
+                            }
                             if (target.data('rid')) {
                               scope.$parent.EndPointService.editResource(data).then(function(response) {
                                   const before = {
@@ -733,28 +735,28 @@ define([
                                       // scope.data.nodes.push(nodeObj);
                                       nodeTipExtension(n);
 
-                                      // scope.mergeToParentNodes.target = n;
-                                      // if (scope.hasChildren) {
-                                      //   const childrenData = scope.mergeToParentNodes.node.children();
-                                      //   _.forEach(childrenData, function(child) {
-                                      //     scope.mergeToParentNodes.source = child;
-                                      //     const hasChildren = child.children().length > 0 ? true : false;
-                                      //     const after = {
-                                      //       "rid": 0,
-                                      //       "cid": 0,
-                                      //       "metadata": { label: child.data('metadata') && child.data('metadata').label ? child.data('metadata').label : child.data('name') },
-                                      //       "value": child.data('name'),
-                                      //     };
-                                      //     const data = { before: null, after: after };
-                                      //     if (hasChildren) {
-                                      //       addNewNode(data, scope.mergeToParentNodes.target, hasChildren);
-                                      //     } else {
-                                      //       addNewNode(data, scope.mergeToParentNodes.target);
-                                      //     }
-                                      //   });
-                                      // } else {
-                                      //   scope.hasChildren = false;
-                                      // }
+                                      scope.mergeToParentNodes.target = n;
+                                      if (scope.hasChildren) {
+                                        const childrenData = scope.mergeToParentNodes.node.children();
+                                        _.forEach(childrenData, function(child) {
+                                          scope.mergeToParentNodes.source = child;
+                                          const hasChildren = child.children().length > 0 ? true : false;
+                                          const after = {
+                                            "rid": 0,
+                                            "cid": 0,
+                                            "metadata": { label: child.data('metadata') && child.data('metadata').label ? child.data('metadata').label : child.data('name') },
+                                            "value": child.data('name'),
+                                          };
+                                          const data = { before: null, after: after };
+                                          if (hasChildren) {
+                                            addNewNode(data, scope.mergeToParentNodes.target, hasChildren);
+                                          } else {
+                                            addNewNode(data, scope.mergeToParentNodes.target);
+                                          }
+                                        });
+                                      } else {
+                                        scope.hasChildren = false;
+                                      }
                                     }
                                   });
                               });
@@ -1194,9 +1196,20 @@ define([
                               const dataTarget = { before: beforeTarget, after: afterTarget };
 
                               scope.$parent.EndPointService.editResource(dataTarget).then(function(response) {
-                                targetData.data().cid = newCompound.data('rid');
-                                const mvDataTarget = targetData.move({parent: newCompound.data('id')});
-                                nodeTipExtension(mvDataTarget);
+                                if (targetData.connectedEdges().length > 0) {
+                                  var targetJson = targetData.json();
+                                  targetJson.data.id = newCompound.data('id') + targetJson.data.id;
+                                  targetJson.data.parent = newCompound.data('id');
+                                  targetData.data().cid = newCompound.data('rid');
+                                  targetJson.position.x = (targetJson.position.x + sourceData.position().x) / 2;
+                                  targetJson.position.y = (targetJson.position.y + sourceData.position().y) / 2;
+                                  var newTarget = cy.add(targetJson);
+                                  nodeTipExtension(newTarget);
+                                } else {
+                                  targetData.data().cid = newCompound.data('rid');
+                                  const mvDataTarget = targetData.move({parent: newCompound.data('id')});
+                                  nodeTipExtension(mvDataTarget);
+                                }
 
                                 const beforeSource = {
                                   "rid": sourceData.data('rid'),
@@ -1307,23 +1320,21 @@ define([
                                   n.data().parent = scope.newCompound.data('id');
                                 }
                               });
-
-                              var tempCy = cy.elements();
-                              cy.elements().remove();
-                              cy.add(tempCy);
-
-                              cy.nodes().forEach(function(n){
-                                nodeTipExtension(n);
-                              });
-                              cy.edges().forEach(function(e) {
-                                edgeTipExtension(e);
-                              });
-                              // cy.layout({name: 'cose-bilkent'}).run();
-                              cy.fit();
                             }
                           });
                         }
+                        var tempCy = cy.elements();
+                        cy.elements().remove();
+                        cy.add(tempCy);
 
+                        cy.nodes().forEach(function(n){
+                          nodeTipExtension(n);
+                        });
+                        cy.edges().forEach(function(e) {
+                          edgeTipExtension(e);
+                        });
+                        // cy.layout({name: 'cose-bilkent'}).run();
+                        cy.fit();
 
                       });
 
@@ -1386,6 +1397,10 @@ define([
                             ele.show();
                           } else {
                             ele.hide();
+                          }
+
+                          if (!$rootScope.selectedDoc.did) {
+                            ele.show();
                           }
                         });
                       });

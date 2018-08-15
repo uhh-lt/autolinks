@@ -12,7 +12,7 @@ define([
         .controller('NewAnnotationController', ['$window', '$scope', '$rootScope', '$mdDialog', '$q', 'EndPointService', '$mdToast', '$timeout',
         function ($window, $scope, $rootScope, $mdDialog, $q, EndPointService, $mdToast, $timeout) {
 
-          $scope.newAnnotation = $rootScope.annotationSlideText;
+          $scope.newAnnotation = $rootScope.newAnnotations;
           $scope.entityTypes = _.orderBy($rootScope.newAnnotationTypes, 'name', 'asc');;
           $scope.selectedType = '';
           // $scope.isEntityInDoc = $scope.$resolve.parentScope.isEntityInDoc;
@@ -30,18 +30,19 @@ define([
           }
 
           $scope.ok = function () {
+            debugger;
             // this.$resolve.parentScope.whitelist(selectedEntity, $scope.selectedType, doc);
             var selectedDoc = EndPointService.getSelectedDoc();
             $scope.newAnnoType = $scope.selectedType.replace(/\s/g,'');
-            EndPointService.annotationDid({did: selectedDoc.did, type: $scope.newAnnoType, newAnnotations: $scope.newAnnotation}).then(function(response) {
+            EndPointService.annotationDid({did: selectedDoc.did, type: $scope.newAnnoType, newAnnotations: $scope.newAnnotation.offsets[0]}).then(function(response) {
               if (response.status == 200) {
                 EndPointService.loadDoc(selectedDoc.did).then(function(response) {
                   $rootScope.$emit('activateCarouselFromWhitelist', response.data);
-                  var offsets = [$scope.newAnnotation.start, $scope.newAnnotation.end];
+                  var offsets = [$scope.newAnnotation.offsets[0].start, $scope.newAnnotation.offsets[0].end];
                   EndPointService.interpretOffset(selectedDoc.did, offsets).then(function(response) {
-                    var dataPath = { endpoint: { path: 'annotationNode' }}
-                    $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
                     $rootScope.$emit('addNewAnnoType', $scope.newAnnoType);
+                    // var dataPath = { endpoint: { path: 'annotationNode' }}
+                    // $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
                   });
                 });
               };
