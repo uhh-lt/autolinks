@@ -368,7 +368,7 @@ BEGIN
     -- delete the resource rid_ from the current view / container with rid = cid_old
     delete from listResourceItems where rid = cid_old and itemrid = rid_;
     -- make an entry for the rid_ in the list of the new container with rid = cid_new
-    call add_listResourceItem(cid_new, rid_);
+    select add_listResourceItem(cid_new, rid_);
     -- TODO: think what should happen with tripleResources, and triple resources connected to rid_!
   COMMIT ;
 END //
