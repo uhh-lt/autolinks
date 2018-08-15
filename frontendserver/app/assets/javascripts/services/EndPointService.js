@@ -146,7 +146,8 @@ define([
                   if (response.data.length < 1) {
                     $rootScope.$emit('deactivateProgressBar');
                   }
-                  _.forEach(response.data, function(source) {
+                  var selData = [_.find(response.data, function(d) { return _.includes(d, "annotation::") })];
+                  _.forEach(selData, function(source) {
                     if (!_.includes(source, 'annotations::')) {
                       return $http.post('/api/storage/getResource', { data: source }).then(function(response) {
                         const dataPath = { endpoint: { path: 'annotationNode' }};

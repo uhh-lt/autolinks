@@ -1398,6 +1398,10 @@ define([
                           } else {
                             ele.hide();
                           }
+
+                          if (!$rootScope.selectedDoc.did) {
+                            ele.show();
+                          }
                         });
                       });
 

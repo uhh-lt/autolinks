@@ -130,6 +130,7 @@ define([
                 $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
                 var annoType = _.split(_.split(pvc.origin, '::')[1], ':')[1];
                 $rootScope.$emit('addNewAnnoType', annoType);
+                $rootScope.$emit('switchNodesBasedOnTypes');
                 // EntityService.addEntity(response.data);
               });
             }
