@@ -41,12 +41,14 @@ define([
             entity = _.orderBy(entity, ['doffset.offsets[0].from'], ['asc']); //ordering entities to fix fragment bug
 
             entity.forEach(function(e) {
-                debugger;
                 var from = e.doffset.offsets[0].from - $scope.sentenceFrom;
                 var to = (e.doffset.offsets[e.doffset.offsets.length - 1].from + e.doffset.offsets[e.doffset.offsets.length - 1].length) - $scope.sentenceFrom;
                 var fragments = text.slice(offset, from).split('\n');
                 var surface = text.substring(from, to);
-                var eId = ($scope.currIndex) + '_' + surface.replace(/\s/g,'') + '_' + e.doffset.offsets[0].from + '-' +
+                // var eId = ($scope.currIndex) + '_' + surface.replace(/\s/g,'') + '_' + e.doffset.offsets[0].from + '-' +
+                // (e.doffset.offsets[e.doffset.offsets.length - 1].from + e.doffset.offsets[e.doffset.offsets.length - 1].length);
+
+                var eId = ($rootScope.selectedDoc.did) + '_' + 'anno' + '_' + e.doffset.offsets[0].from + '-' +
                 (e.doffset.offsets[e.doffset.offsets.length - 1].from + e.doffset.offsets[e.doffset.offsets.length - 1].length);
 
                 fragments.forEach(function(f, i) {
@@ -399,15 +401,15 @@ define([
               offsets = _.split(offsets, '-');
 
               EndPointService.interpretOffset(selectedDoc.did, offsets).then(function(response) {
-                var dataPath = { endpoint: { path: 'annotationNode' }};
-
-                if (response.data) {
-                  var containerId = (e.target.id).replace(/[^A-Za-z0-9\-_]/g, '-');
-                  _.forEach(response.data, function(data) { data.cid = containerId});
-                  var annotationContainer = { rid: containerId, value: response.data, metadata: { label: 'Annotations', type: 'annotationContainer' }, cid: 0 };
-
-                  $rootScope.$emit('addEntity', { entity: annotationContainer, data: dataPath });
-                }
+                // var dataPath = { endpoint: { path: 'annotationNode' }};
+                //
+                // if (response.data) {
+                //   var containerId = ('annotationContainer').replace(/[^A-Za-z0-9\-_]/g, '-');
+                //   _.forEach(response.data, function(data) { data.cid = containerId});
+                //   var annotationContainer = { rid: containerId, value: response.data, metadata: { label: 'Annotations', type: 'annotationContainer' }, cid: 0 };
+                //
+                //   $rootScope.$emit('addEntity', { entity: annotationContainer, data: dataPath });
+                // }
                 // EntityService.addEntity(response.data);
               });
               console.log($scope.text);

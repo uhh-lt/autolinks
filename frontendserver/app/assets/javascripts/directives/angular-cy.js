@@ -487,8 +487,10 @@ define([
                               sameLabelNodes.addClass('sameLabelHighlight');
                             }
                           }
-                          if (sel.data().path === 'annotationNode') {
-                            scope.annotationHighlighted = sel.isParent() ? sel.data().rid : sel.data().cid;
+                          if (sel.data().path === 'annotationNode' && !sel.isParent()) {
+                            var anno = _.split(_.split(sel.data().name, '::')[1], ':');
+                            scope.annotationHighlighted = anno[2] + '_anno_' + anno[3] + '-' + anno[4];
+                            // scope.annotationHighlighted = sel.isParent() ? sel.data().rid : sel.data().cid;
                             var targetHighlighted = document.getElementById(scope.annotationHighlighted);
                             if (targetHighlighted) {
                               targetHighlighted.classList.add('annotation-highlighted');

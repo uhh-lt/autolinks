@@ -40,9 +40,9 @@ define([
                   $rootScope.$emit('activateCarouselFromWhitelist', response.data);
                   var offsets = [$scope.newAnnotation.start, $scope.newAnnotation.end];
                   EndPointService.interpretOffset(selectedDoc.did, offsets).then(function(response) {
-                    var dataPath = { endpoint: { path: 'annotationNode' }}
-                    $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
-                    $rootScope.$emit('addNewAnnoType', $scope.newAnnoType);
+                    // var dataPath = { endpoint: { path: 'annotationNode' }}
+                    // $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
+                    // $rootScope.$emit('addNewAnnoType', $scope.newAnnoType);
                   });
                 });
               };
