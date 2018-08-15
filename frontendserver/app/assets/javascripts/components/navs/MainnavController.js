@@ -110,6 +110,8 @@ define([
             if (selectedType.length > 0 && !selectedType[0].enabled) {
               selectedType[0].enabled = true;
               EndPointService.toggleTypes(selectedType[0]);
+              $rootScope.$emit('switchNodesBasedOnTypes');
+              $rootScope.$emit('layoutReset');
             }
           });
 
