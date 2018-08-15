@@ -65,6 +65,7 @@ define([
           $scope.toggleTypeTo = function(typ) {
             EndPointService.toggleTypes(typ);
             $rootScope.$emit('switchNodesBasedOnTypes');
+            $rootScope.$emit('layoutReset');
           };
 
           $scope.loadDoc = function(doc) {
