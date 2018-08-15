@@ -48,7 +48,7 @@ define([
                 // var eId = ($scope.currIndex) + '_' + surface.replace(/\s/g,'') + '_' + e.doffset.offsets[0].from + '-' +
                 // (e.doffset.offsets[e.doffset.offsets.length - 1].from + e.doffset.offsets[e.doffset.offsets.length - 1].length);
 
-                var eId = ($rootScope.selectedDoc.did) + '_' + 'anno' + '_' + e.doffset.offsets[0].from + '-' +
+                var eId = ($rootScope.selectedDoc.did) + '_anno_' + e.doffset.offsets[0].from + '-' +
                 (e.doffset.offsets[e.doffset.offsets.length - 1].from + e.doffset.offsets[e.doffset.offsets.length - 1].length);
 
                 fragments.forEach(function(f, i) {
@@ -138,11 +138,12 @@ define([
 
               $scope.annotation_text_script = $scope.getSelectionEntity(text[0], script);
               $scope.selectedEntity = $scope.annotation_text_script.annotationSlideScript;
+              var actualProps = $scope.annotation_text_script.annotationSlideText;
 
               if ($scope.selectedEntity) {
-
                 var ent = $scope.selectedEntity;
-                var eId = ($scope.currIndex) + '_' + ent.text + '_' + ent.start + ':' + ent.end;
+                // var eId = ($scope.currIndex) + '_' + ent.text + '_' + actualProps.start + '-' + actualProps.end;
+                var eId = ($rootScope.selectedDoc.did) + '_anno_' + actualProps.start + '-' + actualProps.end;
                 var highlightElement = createNeHighlight(eId, ent.text);
 
                 var newScript = replaceAt(script, ent.text, highlightElement, ent.start, ent.end);
@@ -281,8 +282,14 @@ define([
                    if (slideScript) {
                      var start = 0;
                      var end = 0;
-                     start = (slideScript.match(text) && slideScript.match(text).index) ? slideScript.match(text).index : 0;
-                     end = start + text.length;
+                     if (window.getSelection().getRangeAt(0)) {
+                       start = (window.getSelection().getRangeAt(0).startOffset) ? window.getSelection().getRangeAt(0).startOffset : 0;
+                       end = start + text.length;
+                     } else {
+                       start = (slideScript.match(text) && slideScript.match(text).index) ? slideScript.match(text).index : 0;
+                       end = start + text.length;
+                     }
+
                      var annotations = [];
 
                      var regexScript = RegExp(text, 'g');
@@ -308,8 +315,13 @@ define([
                      var iter;
                      var selectedSentence = _.filter($scope.slides, function(slide){ return slide.id === $scope.active});
                      var sentenceStart = selectedSentence[0].start;
-                     start = sentenceStart + ( slideText.match(text) && slideText.match(text).index ? slideText.match(text).index : 0 );
-                     end = start + text.length;
+                     if (window.getSelection().getRangeAt(0)) {
+                       start = sentenceStart + ( window.getSelection().getRangeAt(0).startOffset ? window.getSelection().getRangeAt(0).startOffset : 0 );
+                       end = start + text.length;
+                     } else {
+                       start = sentenceStart + ( slideText.match(text) && slideText.match(text).index ? slideText.match(text).index : 0 );
+                       end = start + text.length;
+                     }
                      while ((iter = regexScript.exec(slideText)) !== null) {
                         annotations.push({text, start: sentenceStart + iter.index, end: sentenceStart + regexScript.lastIndex});
                       }
