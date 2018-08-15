@@ -71,15 +71,15 @@ function postAnnotationDid(req, res) {
     const token = req.session.token;
     const username = req.session.username;
     const data = req.body.data;
-    const annotations = data.newAnnotations.annotations;
+    const annotations = data.newAnnotations;
 
     if (annotations) {
-      for (anno in annotations) {
-        const options = annotationDid(config().apiUrl, data, token, username, annotations[anno]);
-        request(options, function (error, response, body) {
-          res.send(body);
-        });
-      }
+      // for (anno in annotations) {
+      const options = annotationDid(config().apiUrl, data, token, username, annotations);
+      request(options, function (error, response, body) {
+        res.send(body);
+      });
+      // }
     }
 }
 
@@ -113,6 +113,6 @@ function deleteDocument(req, res) {
       const options = documentDelete(config().apiUrl, token, docId);
       request(options, function (error, response, body) {
         res.send(body);
-      });  
+      });
     }
 }
