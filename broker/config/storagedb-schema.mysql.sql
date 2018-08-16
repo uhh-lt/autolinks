@@ -164,7 +164,6 @@ BEGIN
     truncate listResourceItems;
     truncate resourceMetadata;
     truncate resources;
-    truncate resourcePermission;
     truncate storageItemToResource;
     truncate storageItems;
   COMMIT ;
