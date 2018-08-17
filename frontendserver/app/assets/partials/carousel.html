@@ -1,12 +1,13 @@
 <div id="carousel-region" ng-if="isActive">
   <!-- <div uib-carousel active="active" data-interval="false" no-wrap="noWrapSlides" ng-swipe-left="changeSlide('left')"
       ng-swipe-right="changeSlide('right')" class="multi-item-carousel"> -->
-  <div uib-carousel active="active" data-interval="false" no-wrap="noWrapSlides" class="multi-item-carousel">
+  <div uib-carousel active="active" data-interval="false" no-wrap="noWrapSlides" class="multi-item-carousel" id="main-script-area">
     <div uib-slide ng-repeat="slide in slides track by slide.id" index="slide.id" class="carousel-card">
       <div id="text-card-div" ng-repeat="script in slide.scripts">
         <md-card id="text-card">
           <md-content-card>
-            <div id="{{slide.id}}_script-area" ng-bind-html="script" ng-model="script" ng-mouseup="showSelectedEntity(slide.texts, script, slide.id)"></div>
+            <div id="{{slide.id}}_script-area" ng-bind-html="script" ng-model="script" ng-mouseup="showSelectedEntity(slide.texts, script, slide.id)" ng-mousedown="mouseDown()"></div>
+            <!-- <div id="{{slide.id}}_script-area" class="text-mask" ng-mouseup="showSelectedEntity(slide.texts, script, slide.id)" ng-mousedown="mouseDown()">{{ slide.texts[0] }}</div> -->
           </md-content-card>
         </md-card>
       </div>
@@ -26,6 +27,19 @@
      </div>
    </div> -->
   </div>
+  <div uib-carousel active="active" data-interval="false" no-wrap="noWrapSlides" class="multi-item-carousel" id="main-text-area">
+    <div uib-slide ng-repeat="slide in slides track by slide.id" index="slide.id" class="carousel-card">
+      <div id="text-card-div" ng-repeat="script in slide.scripts">
+        <md-card id="text-card">
+          <md-content-card>
+            <!-- <div id="{{slide.id}}_script-area" ng-bind-html="script" ng-model="script" ng-mouseup="showSelectedEntity(slide.texts, script, slide.id)" ng-mousedown="mouseDown()"></div> -->
+            <div id="{{slide.id}}_script-area" class="text-mask" ng-mouseup="showSelectedEntity(slide.texts, script, slide.id)" ng-mousedown="mouseDown()">{{ slide.texts[0] }}</div>
+          </md-content-card>
+        </md-card>
+      </div>
+    </div>
+  </div>
+
   <ol class="carousel-indicators custom-carousel" ng-show="slides.length > 1">
     <input
        class="slide-number"

@@ -28,6 +28,7 @@ define([
           $scope.isDoffsets = false;
           $scope.activeTypes = EndPointService.getActiveTypes();
           $scope.newAnnotations = [];
+          $scope.annotationMode = false;
 
           $scope.addSlide = function(sentence, entity) {
             // var newWidth = 600 + $scope.slides.length + 1;
@@ -131,6 +132,12 @@ define([
             	+ input.slice(start, end).replace(search, replace)
               + input.slice(end);
         	}
+
+          // $scope.mouseDown = function() {
+          //   $rootScope.activeTypes = [];
+          //   $scope.activeTypes = [];
+          //   $rootScope.$emit('refreshCarouselBasedOnType');
+          // };
 
           // Enable to select Entity and activate whitelisting modal
           $scope.showSelectedEntity = function(text, script, id) {
@@ -240,35 +247,56 @@ define([
               }
           };
 
-          // document.addEventListener('keydown', (event) => {
-          //   const keyName = event.key;
-          //
-          //   if (keyName === 'Control') {
-          //     // do not alert when only Control key is pressed.
-          //     $scope.doffsetAnnotation = '';
-          //     return;
-          //   }
-          //
-          //   if (event.ctrlKey) {
-          //     // Even though event.key is not 'Control' (i.e. 'a' is pressed),
-          //     // event.ctrlKey may be true if Ctrl key is pressed at the time.
-          //     // alert(`Combination of ctrlKey + ${keyName}`);
-          //   } else {
-          //     // alert(`Key pressed ${keyName}`);
-          //   }
-          // }, false);
-          //
-          // document.addEventListener('keyup', (event) => {
-          //   const keyName = event.key;
-          //
-          //   // As the user release the Ctrl key, the key is no longer active.
-          //   // So event.ctrlKey is false.
-          //   if (keyName === 'Control' && ($scope.doffsetAnnotation.length > 0)) {
-          //     // $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation });
-          //     // $scope.doffsetAnnotation = '';
-          //     // alert('Control key was released');
-          //   }
-          // }, false);
+          // document.addEventListener("mouseup", function(event) {
+          //     $rootScope.activeTypes;
+          //     debugger;
+          // });
+
+          document.addEventListener('keydown', (event) => {
+            const keyName = event.key;
+
+            if (keyName === 'Control') {
+              // do not alert when only Control key is pressed.
+              $scope.doffsetAnnotation = '';
+              return;
+            }
+
+            if (event.altKey && ( event.keyCode == 65)) {
+              // alert("Wow");
+              $scope.annotationMode = true;
+              document.getElementById('main-script-area').style.display="none";
+              document.getElementById('main-text-area').style.display="block";
+              // Even though event.key is not 'Control' (i.e. 'a' is pressed),
+              // event.ctrlKey may be true if Ctrl key is pressed at the time.
+              // alert(`Combination of ctrlKey + ${keyName}`);
+            } else {
+              // alert(`Key pressed ${keyName}`);
+            }
+          }, false);
+
+          document.addEventListener('keyup', (event) => {
+            const keyName = event.key;
+
+            // As the user release the Ctrl key, the key is no longer active.
+            // So event.ctrlKey is false.
+            if (keyName === 'Control' && ($scope.doffsetAnnotation.length > 0)) {
+              $scope.annotationMode = false;
+              // $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation });
+              // $scope.doffsetAnnotation = '';
+              // alert('Control key was released');
+            }
+            if (event.altKey && ( event.keyCode == 65)) {
+              // alert("Wow");
+              $scope.annotationMode = false;
+              document.getElementById('main-script-area').style.display="block";
+              document.getElementById('main-text-area').style.display="none";
+              // Even though event.key is not 'Control' (i.e. 'a' is pressed),
+              // event.ctrlKey may be true if Ctrl key is pressed at the time.
+              // alert(`Combination of ctrlKey + ${keyName}`);
+            } else {
+              // alert(`Key pressed ${keyName}`);
+            }
+          }, false);
 
           $scope.selectedType = '';
             var script = $scope.tabs;
