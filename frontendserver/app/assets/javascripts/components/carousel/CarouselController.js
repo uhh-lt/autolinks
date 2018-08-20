@@ -29,6 +29,7 @@ define([
           $scope.activeTypes = EndPointService.getActiveTypes();
           $scope.newAnnotations = [];
           $scope.annotationMode = false;
+          $scope.doffsetsMode = false;
 
           $scope.addSlide = function(sentence, entity) {
             // var newWidth = 600 + $scope.slides.length + 1;
@@ -159,7 +160,8 @@ define([
                 // var selectedDoc = $scope.tabs.find((t) => { return t.id === doc.id; });
                 // var isInDoc = isEntityInDoc(selectedDoc, $scope.selectedEntity);
                 // NOTE: doffsetAnnotations
-                if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ') && (event.ctrlKey && event.altKey)) {
+                if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ')
+                && $scope.annotationMode && $scope.doffsetsMode) {
                   $scope.isDoffsets = true;
                 }
 
@@ -178,7 +180,8 @@ define([
                 $scope.newAnnotations.push($scope.annotation_text_script.annotationSlideText);
                 $rootScope.newAnnotations = { text: $scope.doffsetAnnotation, offsets: _.uniq($scope.newAnnotations)};
 
-                if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ') && !(event.ctrlKey && event.altKey)) {
+                if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ')
+                && $scope.annotationMode && !$scope.doffsetsMode) {
 
                   $mdDialog.show({
                      templateUrl: '/app/assets/partials/dialog/newAnnotation.html',
@@ -189,14 +192,14 @@ define([
                    })
                    .then(function(answer) {
                      // $scope.status = 'You said the information was "' + answer + '".';
-                     $('#' + id + '_script-area').html(newScript);
-                     $scope.slides[id].scripts = [$sce.trustAsHtml(newScript)];
-                     if ($scope.doffsetAnnotation.length === 0) {
-                       $scope.doffsetAnnotation = ent.text;
-                     } else {
-                       var doffsetAnno = [' ', ent.text]
-                       $scope.doffsetAnnotation = $scope.doffsetAnnotation.concat(...doffsetAnno);
-                     }
+                     // $('#' + id + '_script-area').html(newScript);
+                     // $scope.slides[id].scripts = [$sce.trustAsHtml(newScript)];
+                     // if ($scope.doffsetAnnotation.length === 0) {
+                     //   $scope.doffsetAnnotation = ent.text;
+                     // } else {
+                     //   var doffsetAnno = [' ', ent.text]
+                     //   $scope.doffsetAnnotation = $scope.doffsetAnnotation.concat(...doffsetAnno);
+                     // }
                      // Move the node creation inside prompt success
                      // $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation }); //TODO: create discontinuous annotation for api
                      $scope.doffsetAnnotation = '';
@@ -261,11 +264,14 @@ define([
               return;
             }
 
-            if (event.altKey && ( event.keyCode == 65)) {
+            if (event.altKey) {
               // alert("Wow");
               $scope.annotationMode = true;
               document.getElementById('main-script-area').style.display="none";
               document.getElementById('main-text-area').style.display="block";
+              if (event.keyCode == 65) {
+                $scope.doffsetsMode = true;
+              }
               // Even though event.key is not 'Control' (i.e. 'a' is pressed),
               // event.ctrlKey may be true if Ctrl key is pressed at the time.
               // alert(`Combination of ctrlKey + ${keyName}`);
@@ -296,6 +302,10 @@ define([
             } else {
               // alert(`Key pressed ${keyName}`);
             }
+            $scope.doffsetsMode = false;
+            $scope.annotationMode = false;
+            document.getElementById('main-script-area').style.display="block";
+            document.getElementById('main-text-area').style.display="none";
           }, false);
 
           $scope.selectedType = '';
