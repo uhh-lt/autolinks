@@ -1,4 +1,10 @@
 module.exports = function(url, data, token, username, annotation) {
+  var offsets = [];
+
+  annotation.forEach(function(anno) {
+    offsets.push({ "from": anno.start, "length": (anno.end - anno.start) })
+  });
+
   return {
     url: url + '/storage/document/' + data.did + '/addannotation',
     method: 'POST',
@@ -11,12 +17,7 @@ module.exports = function(url, data, token, username, annotation) {
     body: {
       "type": data.type,
       "doffset": {
-        "offsets": [
-          {
-            "from": annotation.start,
-            "length": (annotation.end - annotation.start)
-          }
-        ]
+        "offsets": offsets
       },
       "properties": {},
       "analyzer": username
