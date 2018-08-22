@@ -426,9 +426,6 @@ define([
                                 console.log('Please select one or more nodes to be children');
                               }
                             } else {
-                              scope.selectedNodesToMerge.hide();
-                              scope.mergeMode = false;
-
                               const sourceData = scope.mergeToParentNodes.source;
                               const targetData = scope.mergeToParentNodes.target;
                               const hasChildren = scope.mergeToParentNodes.source.children().length > 0 ? true : false;
@@ -449,10 +446,34 @@ define([
                               const data = { before: before, after: after };
 
                               scope.$parent.EndPointService.editResource(data).then(function(response) {
-                                sourceData.data().cid = targetData.data('rid');
-                                const mvData = sourceData.move({parent: targetData.data('id')});
-                                nodeTipExtension(mvData);
-                                nodeTipExtension(mvData.descendants());
+
+                                if (sourceData.connectedEdges().length > 0) {
+                                  var sourceJson = sourceData.json();
+                                  sourceJson.data.id = targetData.data('id') + sourceJson.data.id;
+                                  sourceJson.data.parent = targetData.data('id');
+                                  sourceJson.data.cid = targetData.data('rid');
+                                  sourceJson.position.x = (sourceJson.position.x + targetData.position().x) / 2;
+                                  sourceJson.position.y = (sourceJson.position.y + targetData.position().y) / 2;
+                                  var hasDuplicateInTarget = _.filter(targetData.children(), function(d) { return d.data().rid === sourceData.data().rid });
+
+                                  if (!cy.hasElementWithId(sourceJson.data.id) && hasDuplicateInTarget.length < 1) {
+                                    const mvData = cy.add(sourceJson);
+                                    nodeTipExtension(mvData);
+                                    nodeTipExtension(mvData.descendants());
+                                  }
+                                } else {
+                                  scope.selectedNodesToMerge.hide();
+
+                                  // targetData.data().cid = newCompound.data('rid');
+                                  // const mvDataTarget = targetData.move({parent: newCompound.data('id')});
+                                  // nodeTipExtension(mvDataTarget);
+
+                                  sourceData.data().cid = targetData.data('rid');
+                                  const mvData = sourceData.move({parent: targetData.data('id')});
+                                  nodeTipExtension(mvData);
+                                  nodeTipExtension(mvData.descendants());
+                                }
+                                scope.mergeMode = false;
                               });
                             }
 
