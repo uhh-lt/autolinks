@@ -23,7 +23,7 @@ define([
           $scope.lockLeft = false;
           $scope.toggle = {};
           $scope.selectedDoc = {};
-          $scope.localSearch = $rootScope.localSearch;
+          $scope.annotationSearch = $rootScope.annotationSearch;
           $scope.documentLense = true;
           $scope.types = [];
           $scope.documents = [];

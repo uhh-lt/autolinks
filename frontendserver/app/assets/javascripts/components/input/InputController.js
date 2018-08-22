@@ -83,7 +83,7 @@ define([
                   const inputLength = i.length;
                   $scope.active = EndPointService.getActiveService();
 
-                  if ($scope.active.length > 0 || $rootScope.localSearch.local) {
+                  if ($scope.active.length > 0 || $rootScope.annotationSearch.local) {
                     // _.forEach(annotations, function(anno) {
                       // const offsets = anno.doffset.offsets;
                       if ($scope.active.length > 0) {
@@ -110,21 +110,21 @@ define([
 
                               EndPointService.fetchData($scope.data).then(function(response) {
                                   EntityService.addEntity(response, $scope.data);
-                                  if ($rootScope.localSearch.local) {
-                                    const localSearch = $rootScope.localSearch;
-                                    if (localSearch.local) {
+                                  if ($rootScope.annotationSearch.local) {
+                                    const annotationSearch = $rootScope.annotationSearch;
+                                    if (annotationSearch.local) {
                                       const context = $scope.context;
-                                      EndPointService.localSearch(context, localSearch.ci).then(function(response) {
+                                      EndPointService.annotationSearch(context, annotationSearch.ci).then(function(response) {
                                         if ( response.data.length < 1) {
                                           $mdToast.show(
                                                 $mdToast.simple()
-                                                  .textContent('No results found for ' + response.context + ' in local search')
+                                                  .textContent('No results found for ' + response.context + ' in annotation search')
                                                   .position('top right')
                                                   .theme("warn-toast")
                                                   .hideDelay(3500)
                                               );
                                         }
-                                          // const dataPath = { endpoint: { path: 'localSearch' }};
+                                          // const dataPath = { endpoint: { path: 'annotationSearch' }};
                                           // $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
                                       });
                                     };
@@ -135,11 +135,11 @@ define([
                           });
                         });
                       } else {
-                        if ($rootScope.localSearch.local) {
-                          const localSearch = $rootScope.localSearch;
-                          if (localSearch.local) {
+                        if ($rootScope.annotationSearch.local) {
+                          const annotationSearch = $rootScope.annotationSearch;
+                          if (annotationSearch.local) {
                             const context = $scope.context;
-                            EndPointService.localSearch(context, localSearch.ci).then(function(response) {
+                            EndPointService.annotationSearch(context, annotationSearch.ci).then(function(response) {
                               if ( response.data.length < 1) {
                                 $mdToast.show(
                                       $mdToast.simple()
@@ -149,7 +149,7 @@ define([
                                         .hideDelay(3500)
                                     );
                               }
-                                // const dataPath = { endpoint: { path: 'localSearch' }};
+                                // const dataPath = { endpoint: { path: 'annotationSearch' }};
                                 // $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
                             });
                           }

@@ -60,7 +60,7 @@ define([
                   $scope.metadata_before = _.clone(entity._private.data.metadata);
                   $scope.metadata_keys = Object.keys($scope.metadata);
                 }
-                document.getElementById("propertify").innerHTML = JSON.stringify($scope.selectedEntity._private.data, undefined, 4);
+                //document.getElementById("propertify").innerHTML = JSON.stringify($scope.selectedEntity._private.data, undefined, 4);
               }
               console.log($scope.selectedEntity);
             // }, 1000);
@@ -105,6 +105,10 @@ define([
               // // broadcasting the event
               // // $rootScope.$emit('appChanged');
               // $mdSidenav('right').close();
+          };
+
+          $scope.debugNode = function() {
+            console.log($scope.selectedEntity._private.data);
           };
 
           $scope.navigateTo = function(pvc) {

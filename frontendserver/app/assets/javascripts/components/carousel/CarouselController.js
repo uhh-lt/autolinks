@@ -257,6 +257,8 @@ define([
 
           document.addEventListener('keydown', (event) => {
             const keyName = event.key;
+            var mainScriptArea = document.getElementById('main-script-area');
+            var mainTextArea = document.getElementById('main-text-area');
 
             if (keyName === 'Control') {
               // do not alert when only Control key is pressed.
@@ -267,8 +269,10 @@ define([
             if (event.altKey) {
               // alert("Wow");
               $scope.annotationMode = true;
-              document.getElementById('main-script-area').style.display="none";
-              document.getElementById('main-text-area').style.display="block";
+              if (mainScriptArea && mainTextArea) {
+                document.getElementById('main-script-area').style.display="none";
+                document.getElementById('main-text-area').style.display="block";
+              }
               if (event.keyCode == 65) {
                 $scope.doffsetsMode = true;
               }
@@ -282,7 +286,8 @@ define([
 
           document.addEventListener('keyup', (event) => {
             const keyName = event.key;
-
+            var mainScriptArea = document.getElementById('main-script-area');
+            var mainTextArea = document.getElementById('main-text-area');
             // As the user release the Ctrl key, the key is no longer active.
             // So event.ctrlKey is false.
             if (keyName === 'Control' && ($scope.doffsetAnnotation.length > 0)) {
@@ -294,8 +299,11 @@ define([
             if (event.altKey && ( event.keyCode == 65)) {
               // alert("Wow");
               $scope.annotationMode = false;
-              document.getElementById('main-script-area').style.display="block";
-              document.getElementById('main-text-area').style.display="none";
+              if (mainScriptArea && mainTextArea) {
+                mainScriptArea.style.display="block";
+                mainTextArea.style.display="none";
+              }
+
               // Even though event.key is not 'Control' (i.e. 'a' is pressed),
               // event.ctrlKey may be true if Ctrl key is pressed at the time.
               // alert(`Combination of ctrlKey + ${keyName}`);
@@ -304,8 +312,10 @@ define([
             }
             $scope.doffsetsMode = false;
             $scope.annotationMode = false;
-            document.getElementById('main-script-area').style.display="block";
-            document.getElementById('main-text-area').style.display="none";
+            if (mainScriptArea && mainTextArea) {
+              mainScriptArea.style.display="block";
+              mainTextArea.style.display="none";
+            }
           }, false);
 
           $scope.selectedType = '';

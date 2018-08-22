@@ -6,7 +6,7 @@
 >
        <md-toolbar class="md-theme-light">
          <h1 class="md-toolbar-tools">
-           Autolinks
+           Autolinks: {{ username }}
          </h1>
        </md-toolbar>
      <md-content>
@@ -46,14 +46,14 @@
           <div class="autolinks-local-search">
             <md-list-item class="main-subheader">
               <md-input-container dir="rtl" class="autolinks-input-checkbox">
-                 <md-checkbox ng-model="localSearch.local">
-                  Local Search
+                 <md-checkbox ng-model="annotationSearch.local">
+                  Annotation Search
                  </md-checkbox>
               </md-input-container>
             </md-list-item>
-            <md-list-item ng-show="localSearch.local">
+            <md-list-item ng-show="annotationSearch.local">
               <md-input-container dir="rtl" class="autolinks-input-checkbox-ci">
-                 <md-checkbox ng-model="localSearch.ci">
+                 <md-checkbox ng-model="annotationSearch.ci">
                   ?case insensitive
                  </md-checkbox>
               </md-input-container>
