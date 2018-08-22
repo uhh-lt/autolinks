@@ -165,52 +165,55 @@ define([
                   $scope.isDoffsets = true;
                 }
 
-                if (!$scope.isDoffsets) {
-                  $scope.doffsetAnnotation = ent.text;
-                } else {
-                  if ($scope.doffsetAnnotation.length < 1) {
+                if ($scope.annotationMode) {
+                  if (!$scope.isDoffsets) {
                     $scope.doffsetAnnotation = ent.text;
                   } else {
-                    var doffsetAnno = [' ', ent.text]
-                    $scope.doffsetAnnotation = $scope.doffsetAnnotation.concat(...doffsetAnno);
-                    $scope.newAnnotations.push($scope.annotation_text_script.annotationSlideText);
+                    if ($scope.doffsetAnnotation.length < 1) {
+                      $scope.doffsetAnnotation = ent.text;
+                    } else {
+                      var doffsetAnno = [' ', ent.text]
+                      $scope.doffsetAnnotation = $scope.doffsetAnnotation.concat(...doffsetAnno);
+                      $scope.newAnnotations.push($scope.annotation_text_script.annotationSlideText);
+                    }
                   }
+
+                  $scope.newAnnotations.push($scope.annotation_text_script.annotationSlideText);
+                  $rootScope.newAnnotations = { text: $scope.doffsetAnnotation, offsets: _.uniq($scope.newAnnotations)};
+
                 }
 
-                $scope.newAnnotations.push($scope.annotation_text_script.annotationSlideText);
-                $rootScope.newAnnotations = { text: $scope.doffsetAnnotation, offsets: _.uniq($scope.newAnnotations)};
-
-                if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ')
-                && $scope.annotationMode && !$scope.doffsetsMode) {
-
-                  $mdDialog.show({
-                     templateUrl: '/app/assets/partials/dialog/newAnnotation.html',
-                     parent: angular.element(document.body),
-                     // targetEvent: ev,
-                     clickOutsideToClose:true,
-                     fullscreen: $scope.customFullscreen // Only for -xs, -sm breakpoints.
-                   })
-                   .then(function(answer) {
-                     // $scope.status = 'You said the information was "' + answer + '".';
-                     // $('#' + id + '_script-area').html(newScript);
-                     // $scope.slides[id].scripts = [$sce.trustAsHtml(newScript)];
-                     // if ($scope.doffsetAnnotation.length === 0) {
-                     //   $scope.doffsetAnnotation = ent.text;
-                     // } else {
-                     //   var doffsetAnno = [' ', ent.text]
-                     //   $scope.doffsetAnnotation = $scope.doffsetAnnotation.concat(...doffsetAnno);
-                     // }
-                     // Move the node creation inside prompt success
-                     // $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation }); //TODO: create discontinuous annotation for api
-                     $scope.doffsetAnnotation = '';
-                     $scope.newAnnotations = [];
-                   }, function() {
-                     $scope.doffsetAnnotation = '';
-                     $scope.status = 'You cancelled the dialog.';
-                     $scope.newAnnotations = [];
-                   });
-                   $scope.newAnnotations = [];
-                   $scope.isDoffsets = false;
+                // if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ')
+                // && $scope.annotationMode && !$scope.doffsetsMode) {
+                //
+                //   $mdDialog.show({
+                //      templateUrl: '/app/assets/partials/dialog/newAnnotation.html',
+                //      parent: angular.element(document.body),
+                //      // targetEvent: ev,
+                //      clickOutsideToClose: false,
+                //      fullscreen: $scope.customFullscreen // Only for -xs, -sm breakpoints.
+                //    })
+                //    .then(function(answer) {
+                //      // $scope.status = 'You said the information was "' + answer + '".';
+                //      // $('#' + id + '_script-area').html(newScript);
+                //      // $scope.slides[id].scripts = [$sce.trustAsHtml(newScript)];
+                //      // if ($scope.doffsetAnnotation.length === 0) {
+                //      //   $scope.doffsetAnnotation = ent.text;
+                //      // } else {
+                //      //   var doffsetAnno = [' ', ent.text]
+                //      //   $scope.doffsetAnnotation = $scope.doffsetAnnotation.concat(...doffsetAnno);
+                //      // }
+                //      // Move the node creation inside prompt success
+                //      // $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation }); //TODO: create discontinuous annotation for api
+                //      $scope.doffsetAnnotation = '';
+                //      $scope.newAnnotations = [];
+                //    }, function() {
+                //      $scope.doffsetAnnotation = '';
+                //      $scope.status = 'You cancelled the dialog.';
+                //      $scope.newAnnotations = [];
+                //    });
+                //    $scope.newAnnotations = [];
+                //    $scope.isDoffsets = false;
                   //
                   // var confirm = $mdDialog.prompt()
                   //    .title('Annotation Type?')
@@ -246,7 +249,7 @@ define([
                 // } else if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ')){
                 //   // $scope.isEntityInDoc = true;
                 //   $scope.open($scope, script, 'true');
-                }
+                // }
               }
           };
 
@@ -260,61 +263,53 @@ define([
             var mainScriptArea = document.getElementById('main-script-area');
             var mainTextArea = document.getElementById('main-text-area');
 
-            if (keyName === 'Control') {
-              // do not alert when only Control key is pressed.
-              $scope.doffsetAnnotation = '';
-              return;
+            if (mainScriptArea && mainTextArea && event.altKey) {
+              mainScriptArea.style.display = "none";
+              mainTextArea.style.display = "block";
+              $scope.doffsetsMode = true;
+              $scope.annotationMode = true;
+              $scope.isAltKey = true;
             }
 
-            if (event.altKey) {
-              // alert("Wow");
-              $scope.annotationMode = true;
-              if (mainScriptArea && mainTextArea) {
-                document.getElementById('main-script-area').style.display="none";
-                document.getElementById('main-text-area').style.display="block";
-              }
-              if (event.keyCode == 65) {
-                $scope.doffsetsMode = true;
-              }
-              // Even though event.key is not 'Control' (i.e. 'a' is pressed),
-              // event.ctrlKey may be true if Ctrl key is pressed at the time.
-              // alert(`Combination of ctrlKey + ${keyName}`);
-            } else {
-              // alert(`Key pressed ${keyName}`);
-            }
           }, false);
 
           document.addEventListener('keyup', (event) => {
             const keyName = event.key;
             var mainScriptArea = document.getElementById('main-script-area');
             var mainTextArea = document.getElementById('main-text-area');
-            // As the user release the Ctrl key, the key is no longer active.
-            // So event.ctrlKey is false.
-            if (keyName === 'Control' && ($scope.doffsetAnnotation.length > 0)) {
-              $scope.annotationMode = false;
-              // $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation });
-              // $scope.doffsetAnnotation = '';
-              // alert('Control key was released');
-            }
-            if (event.altKey && ( event.keyCode == 65)) {
-              // alert("Wow");
-              $scope.annotationMode = false;
+            if ($scope.isAltKey) {
+
+              $scope.annotationMode = true;
               if (mainScriptArea && mainTextArea) {
                 mainScriptArea.style.display="block";
                 mainTextArea.style.display="none";
-              }
 
-              // Even though event.key is not 'Control' (i.e. 'a' is pressed),
-              // event.ctrlKey may be true if Ctrl key is pressed at the time.
-              // alert(`Combination of ctrlKey + ${keyName}`);
-            } else {
-              // alert(`Key pressed ${keyName}`);
+                if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ')
+                && $scope.annotationMode) {
+
+                  $mdDialog.show({
+                     templateUrl: '/app/assets/partials/dialog/newAnnotation.html',
+                     parent: angular.element(document.body),
+                     clickOutsideToClose: false,
+                     fullscreen: $scope.customFullscreen // Only for -xs, -sm breakpoints.
+                   })
+                   .then(function(answer) {
+                     $scope.doffsetAnnotation = '';
+                     $scope.newAnnotations = [];
+                   }, function() {
+                     $scope.doffsetAnnotation = '';
+                     $scope.newAnnotations = [];
+                   });
+                 }
+              }
             }
+            $scope.isAltKey = false;
             $scope.doffsetsMode = false;
             $scope.annotationMode = false;
+            $scope.newAnnotations = [];
             if (mainScriptArea && mainTextArea) {
-              mainScriptArea.style.display="block";
-              mainTextArea.style.display="none";
+              mainScriptArea.style.display = "block";
+              mainTextArea.style.display = "none";
             }
           }, false);
 
