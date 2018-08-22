@@ -115,7 +115,7 @@ define([
                                     if (annotationSearch.local) {
                                       const context = $scope.context;
                                       EndPointService.annotationSearch(context, annotationSearch.ci).then(function(response) {
-                                        if ( response.data.length < 1) {
+                                        if ((response === undefined) || response.data.length < 1) {
                                           $mdToast.show(
                                                 $mdToast.simple()
                                                   .textContent('No results found for ' + response.context + ' in annotation search')
@@ -140,7 +140,7 @@ define([
                           if (annotationSearch.local) {
                             const context = $scope.context;
                             EndPointService.annotationSearch(context, annotationSearch.ci).then(function(response) {
-                              if ( response.data.length < 1) {
+                              if ((response === undefined) || response.data.length < 1 ) {
                                 $mdToast.show(
                                       $mdToast.simple()
                                         .textContent('No results found for ' + response.context + ' in local search')

@@ -160,6 +160,7 @@ define([
 
                           $rootScope.$emit('addEntity', { entity: annotationContainer, data: dataPath });
                         }
+                        return { data: response.data, context };
                         // $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
                       });
                     }
@@ -172,7 +173,6 @@ define([
                     //     }
                     //   });
                     // }
-                    return { data: response.data, context };
                   }
                 });
               },
