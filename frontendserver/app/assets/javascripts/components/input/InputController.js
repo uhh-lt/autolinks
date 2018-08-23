@@ -143,7 +143,7 @@ define([
                               if ((response === undefined) || response.data.length < 1 ) {
                                 $mdToast.show(
                                       $mdToast.simple()
-                                        .textContent('No results found for ' + response.context + ' in local search')
+                                        .textContent('No results found for ' + response.context + ' in annotation search')
                                         .position('top right')
                                         .theme("warn-toast")
                                         .hideDelay(3500)
