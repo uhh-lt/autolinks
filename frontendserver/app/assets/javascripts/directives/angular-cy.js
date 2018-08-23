@@ -210,12 +210,13 @@ define([
                                         var descs = target.descendants().jsons();
                                         var descEdges = target.descendants().connectedEdges().jsons();
 
-                                        const timestamp = new Date().getTime();;
-
+                                        const timestamp = new Date().getTime();
 
                                         _.forEach(_jsons, function(json) {
                                           if (json.group === 'nodes') {
-                                            json.data.id = (parentId === null ? 'null_' : parentId) + json.data.id + '_target_' + target.data().id;
+                                            // json.data.id = (parentId === null ? 'null_' : parentId) + json.data.id + '_target_' + target.data().id;
+                                            json.data.id = ((parentId ? parentId : scope.outermostId) + '__' +
+                                                  ((typeof json.data.value === "string") ? json.data.value.replace(/[^A-Za-z0-9\-_]/g, '-') : json.data.rid)).replace(/\s/g, ''), // NOTE: remove metacharacters, cytoscape rule
                                             json.data.parent = parentId === null ? undefined : parentId;
                                             json.position.x = (json.position.x + sourceNode.position().x) / 2;
                                             json.position.y = (json.position.y + sourceNode.position().y) / 2;
@@ -230,6 +231,7 @@ define([
 
                                         if (existingTarget === undefined || existingTarget.length === 0) {
                                           _.forEach(descs, function(desc) {
+                                            var ancestor = cy.filter('node[id = "' + desc.data.parent + '" ] ').data().parent;
                                             // var parentInRoot = _.find(_jsons, function(json) {return _.includes(json.data.id, desc.data.parent)});
                                             // var parentInDescs = _.find(descs, function(des) {return _.includes(des.data.id, desc.data.parent)});
                                             // var chosenParent = '';
@@ -239,8 +241,8 @@ define([
                                             //   chosenParent = parentInRoot.data.id;
                                             // }
                                             if (desc.group === 'nodes') {
-                                              desc.data.id = (parentId === null ? 'null_' : parentId) + desc.data.id + '_target_' + target.data().id;
-                                              desc.data.parent = (parentId === null ? 'null_' : parentId) + desc.data.parent +'_target_' + target.data().id;
+                                              desc.data.id = (parentId === null ? undefined : parentId) + desc.data.parent.replace(ancestor, "") + desc.data.id.replace(desc.data.parent, "");
+                                              desc.data.parent = (parentId === null ? undefined : parentId) + desc.data.parent.replace(ancestor, "");
                                               desc.position.x = (desc.position.x + sourceNode.position().x) / 2;
                                               desc.position.y = (desc.position.y + sourceNode.position().y) / 2;
                                             }
@@ -250,7 +252,8 @@ define([
                                             // var chosenSource =  _.find(descs, function(des) {return _.includes(des.data.id, descEdge.data.source)});
                                             // var chosenTarget = _.find(descs, function(des) {return _.includes(des.data.id, descEdge.data.target)});
                                             if (descEdge.group === 'edges') {
-                                              descEdge.data.id = (parentId === null ? 'null_' : parentId) + descEdge.data.id;
+                                              // descEdge.data.id = (parentId === null ? 'null_' : parentId) + descEdge.data.id;
+                                              descEdge.data.id = ( descEdge.data.source + '-' + descEdge.data.target + '-' + descEdge.data.rid ).replace(/\s/g, ''),
                                               descEdge.data.source = (parentId === null ? 'null_' : parentId) + descEdge.data.source + '_target_' + target.data().id;
                                               descEdge.data.target = (parentId === null ? 'null_' : parentId) + descEdge.data.target + '_target_' + target.data().id;
                                             }
@@ -279,7 +282,7 @@ define([
                                           //       cid: sourceNode.data().cid,
                                           //       rid: targetNode.data().rid,
                                           //       metadata: targetNode.data().metadata,
-                                          //       id: (parent + '__n-' + targetNode.data().name.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '') + '-' + targetNode.data().rid ).replace(/\s/g, ''),
+                                          //       id: (parent + '__' + targetNode.data().name.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '') + '-' + targetNode.data().rid ).replace(/\s/g, ''),
                                           //       name: targetNode.data().name + '',
                                           //       parent: parent
                                           //     },
@@ -416,82 +419,90 @@ define([
 
                           scope.$parent.$mdDialog.show(confirm).then(function() {
 
-                            if (!node.isParent()) {
-                              if (cy.$(':selected').length > 0) {
-                                scope.$parent.EntityService.openSideNav('createCompound');
-                              } else {
-                                $mdToast.show(
-                                      $mdToast.simple()
-                                        .textContent('Please select one or more nodes to be children')
-                                        .position('top right')
-                                        .theme("warn-toast")
-                                        .hideDelay(3500)
-                                    );
-                                console.log('Please select one or more nodes to be children');
-                              }
+                            const sourceData = scope.mergeToParentNodes.source;
+                            const targetData = scope.mergeToParentNodes.target;
+                            const hasChildren = scope.mergeToParentNodes.source.children().length > 0 ? true : false;
+
+                            if (sourceData.data('rid') === targetData.data('rid')) {
+                              scope.$parent.$mdToast.show(
+                                    scope.$parent.$mdToast.simple()
+                                      .textContent('Merging to the same node is not allowed')
+                                      .position('top right')
+                                      .theme("warn-toast")
+                                      .hideDelay(3500)
+                                  );
                             } else {
-                              const sourceData = scope.mergeToParentNodes.source;
-                              const targetData = scope.mergeToParentNodes.target;
-                              const hasChildren = scope.mergeToParentNodes.source.children().length > 0 ? true : false;
+                              if (!node.isParent()) {
+                                if (cy.$(':selected').length > 0) {
+                                  scope.$parent.EntityService.openSideNav('createCompound');
+                                } else {
+                                  scope.$parent.$mdToast.show(
+                                        scope.$parent.$mdToast.simple()
+                                          .textContent('Please select one or more nodes to be children')
+                                          .position('top right')
+                                          .theme("warn-toast")
+                                          .hideDelay(3500)
+                                      );
+                                }
+                              } else {
+                                const before = {
+                                  "rid": sourceData.data('rid'),
+                                  "cid": sourceData.data('cid'),
+                                  "metadata": sourceData.data('metadata'),
+                                  "value": sourceData.data('value'),
+                                };
 
-                              const before = {
-                                "rid": sourceData.data('rid'),
-                                "cid": sourceData.data('cid'),
-                                "metadata": sourceData.data('metadata'),
-                                "value": sourceData.data('value'),
-                              };
+                                const after = {
+                                  "rid": sourceData.data('rid'),
+                                  "cid": targetData.data('rid'),
+                                  "metadata": sourceData.data('metadata'),
+                                  "value": sourceData.data('value'),
+                                };
+                                const data = { before: before, after: after };
 
-                              const after = {
-                                "rid": sourceData.data('rid'),
-                                "cid": targetData.data('rid'),
-                                "metadata": sourceData.data('metadata'),
-                                "value": sourceData.data('value'),
-                              };
-                              const data = { before: before, after: after };
+                                scope.$parent.EndPointService.editResource(data).then(function(response) {
 
-                              scope.$parent.EndPointService.editResource(data).then(function(response) {
+                                  if (sourceData.connectedEdges().length > 0) {
+                                    var sourceJson = sourceData.json();
+                                    sourceJson.data.id = targetData.data('id') + (sourceJson.data.parent ? sourceJson.data.id.replace(sourceJson.data.parent, "") : sourceJson.data.id);
+                                    sourceJson.data.parent = targetData.data('id');
+                                    sourceJson.data.cid = targetData.data('rid');
+                                    sourceJson.position.x = (sourceJson.position.x + targetData.position().x) / 2;
+                                    sourceJson.position.y = (sourceJson.position.y + targetData.position().y) / 3;
+                                    var hasDuplicateInTarget = _.filter(targetData.children(), function(d) { return d.data().rid === sourceData.data().rid });
 
-                                if (sourceData.connectedEdges().length > 0) {
-                                  var sourceJson = sourceData.json();
-                                  sourceJson.data.id = targetData.data('id') + sourceJson.data.id;
-                                  sourceJson.data.parent = targetData.data('id');
-                                  sourceJson.data.cid = targetData.data('rid');
-                                  sourceJson.position.x = (sourceJson.position.x + targetData.position().x) / 2;
-                                  sourceJson.position.y = (sourceJson.position.y + targetData.position().y) / 3;
-                                  var hasDuplicateInTarget = _.filter(targetData.children(), function(d) { return d.data().rid === sourceData.data().rid });
+                                    if (!cy.hasElementWithId(sourceJson.data.id) && hasDuplicateInTarget.length < 1) {
+                                      const mvData = cy.add(sourceJson);
+                                      nodeTipExtension(mvData);
+                                      nodeTipExtension(mvData.descendants());
+                                      edgeTipExtension(mvData.connectedEdges());
+                                    } else {
+                                      scope.$parent.$mdToast.show(
+                                            scope.$parent.$mdToast.simple()
+                                              .textContent(((sourceData.data('metadata') && sourceData.data('metadata').label) ? sourceData.data('metadata').label : sourceData.data('name'))
+                                              + ' is already in ' + ((targetData.data('metadata') && targetData.data('metadata').label) ? targetData.data('metadata').label : targetData.data('name')))
+                                              .position('top right')
+                                              .theme("warn-toast")
+                                              .hideDelay(3500)
+                                          );
+                                    }
+                                  } else {
+                                    scope.selectedNodesToMerge.hide();
 
-                                  if (!cy.hasElementWithId(sourceJson.data.id) && hasDuplicateInTarget.length < 1) {
-                                    const mvData = cy.add(sourceJson);
+                                    // targetData.data().cid = newCompound.data('rid');
+                                    // const mvDataTarget = targetData.move({parent: newCompound.data('id')});
+                                    // nodeTipExtension(mvDataTarget);
+
+                                    sourceData.data().cid = targetData.data('rid');
+                                    const mvData = sourceData.move({parent: targetData.data('id')});
                                     nodeTipExtension(mvData);
                                     nodeTipExtension(mvData.descendants());
                                     edgeTipExtension(mvData.connectedEdges());
-                                  } else {
-                                    scope.$parent.$mdToast.show(
-                                          scope.$parent.$mdToast.simple()
-                                            .textContent(((sourceData.data('metadata') && sourceData.data('metadata').label) ? sourceData.data('metadata').label : sourceData.data('name'))
-                                            + ' is already in ' + ((targetData.data('metadata') && targetData.data('metadata').label) ? targetData.data('metadata').label : targetData.data('name')))
-                                            .position('top right')
-                                            .theme("warn-toast")
-                                            .hideDelay(3500)
-                                        );
                                   }
-                                } else {
-                                  scope.selectedNodesToMerge.hide();
-
-                                  // targetData.data().cid = newCompound.data('rid');
-                                  // const mvDataTarget = targetData.move({parent: newCompound.data('id')});
-                                  // nodeTipExtension(mvDataTarget);
-
-                                  sourceData.data().cid = targetData.data('rid');
-                                  const mvData = sourceData.move({parent: targetData.data('id')});
-                                  nodeTipExtension(mvData);
-                                  nodeTipExtension(mvData.descendants());
-                                  edgeTipExtension(mvData.connectedEdges());
-                                }
-                                scope.mergeMode = false;
-                              });
+                                  scope.mergeMode = false;
+                                });
+                              }
                             }
-
                             // addNewNode(data, targetData, hasChildren);
                           }, function() {
                             scope.mergeMode = false;
@@ -931,10 +942,9 @@ define([
                           cid: e.cid,
                           rid: e.rid,
                           metadata: e.metadata,
-                          id: ((parent ? parent.id : scope.outermostId) + '__n-' +
+                          id: ((parent ? parent.id : scope.outermostId) + '__' +
                               // e.value.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '')
-                              ((typeof e.value === "string") ? e.value.replace(/[^A-Za-z0-9\-_]/g, '-') : e.rid) // NOTE: remove metacharacters, cytoscape rules
-                              + '-' + e.rid ).replace(/\s/g, ''),
+                              ((typeof e.value === "string") ? e.value.replace(/[^A-Za-z0-9\-_]/g, '-') : e.rid)).replace(/\s/g, ''), // NOTE: remove metacharacters, cytoscape rules
                           name: ((typeof e.value === "string") ? e.value : e.rid) + '',
                           parent: parent ? parent.id : scope.outermostId,
                           path: scope.path,
@@ -1202,9 +1212,8 @@ define([
                                     rid: data.rid,
                                     metadata: data.metadata,
                                     // id: ( scope.newCompoundLabel + ( '_as_parent_' ) + data.rid + '-' + data.cid + '_' + scope.username + timestamp  ).replace(/\s/g, ''),
-                                    id: ((parentId ? parentId : scope.outermostId) + '__n-' +
-                                        ((typeof data.value === "string") ? data.value.replace(/[^A-Za-z0-9\-_]/g, '-') : data.rid) // NOTE: remove metacharacters, cytoscape rules
-                                        + '-' + data.rid ).replace(/\s/g, ''),
+                                    id: ((parentId ? parentId : scope.outermostId) + '__' +
+                                        ((typeof data.value === "string") ? data.value.replace(/[^A-Za-z0-9\-_]/g, '-') : data.rid)).replace(/\s/g, ''), // NOTE: remove metacharacters, cytoscape rules
                                     name: scope.newCompoundLabel + '_' + scope.username,
                                     value: data.value
                                   },

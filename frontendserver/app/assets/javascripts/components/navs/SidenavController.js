@@ -201,7 +201,6 @@ define([
           $scope.close = function () {
             $mdSidenav('right').close()
               .then(function () {
-                document.getElementById("propertify").innerHTML = '{}';
                 $log.debug("close RIGHT is done");
               });
           };
