@@ -241,8 +241,8 @@ define([
                                             //   chosenParent = parentInRoot.data.id;
                                             // }
                                             if (desc.group === 'nodes') {
-                                              desc.data.id = (parentId === null ? undefined : parentId) + desc.data.parent.replace(target.data().parent, "") + desc.data.id.replace(desc.data.parent, "");
-                                              desc.data.parent = (parentId === null ? undefined : parentId) + desc.data.parent.replace(target.data().parent, "");
+                                              desc.data.id = (parentId === null ? '' : parentId) + desc.data.parent.replace(target.data().parent, "") + desc.data.id.replace(desc.data.parent, "");
+                                              desc.data.parent = (parentId === null ? '' : parentId) + desc.data.parent.replace(target.data().parent, "");
                                               desc.position.x = (desc.position.x + sourceNode.position().x) / 2;
                                               desc.position.y = (desc.position.y + sourceNode.position().y) / 2;
                                             }
@@ -251,11 +251,18 @@ define([
                                           _.forEach(descEdges, function(descEdge) {
                                             // var chosenSource =  _.find(descs, function(des) {return _.includes(des.data.id, descEdge.data.source)});
                                             // var chosenTarget = _.find(descs, function(des) {return _.includes(des.data.id, descEdge.data.target)});
+                                            var chosenSource = cy.filter('node[id = "' + descEdge.data.source + '" ] ');
+                                            var chosenTarget = cy.filter('node[id = "' + descEdge.data.target + '" ] ');
+                                            var descEdgeSource = (parentId === null ? '' : parentId) + chosenSource.data('parent').replace(target.data().parent, "") + chosenSource.data('id').replace(chosenSource.data('parent'), "");
+                                            var descEdgeTarget = (parentId === null ? '' : parentId) + chosenTarget.data('parent').replace(target.data().parent, "") + chosenTarget.data('id').replace(chosenTarget.data('parent'), "");
+
                                             if (descEdge.group === 'edges') {
                                               // descEdge.data.id = (parentId === null ? 'null_' : parentId) + descEdge.data.id;
-                                              descEdge.data.id = ( descEdge.data.source + '-' + descEdge.data.target + '-' + descEdge.data.rid ).replace(/\s/g, ''),
-                                              descEdge.data.source = (parentId === null ? 'null_' : parentId) + descEdge.data.source + '_target_' + target.data().id;
-                                              descEdge.data.target = (parentId === null ? 'null_' : parentId) + descEdge.data.target + '_target_' + target.data().id;
+                                              descEdge.data.id = ( descEdgeSource + '-' + descEdgeTarget + '-' + descEdge.data.rid ).replace(/\s/g, '');
+                                              descEdge.data.source = descEdgeSource;
+                                              descEdge.data.target = descEdgeTarget;
+                                              // descEdge.data.source = (parentId === null ? 'null_' : parentId) + descEdge.data.source + '_target_' + target.data().id;
+                                              // descEdge.data.target = (parentId === null ? 'null_' : parentId) + descEdge.data.target + '_target_' + target.data().id;
                                             }
                                           });
 
@@ -1070,12 +1077,6 @@ define([
 
                       $rootScope.$on('addEntity', function(event, res) {
                         var entity = res.entity;
-
-                        var existingGraph = cy.filter('node[id = "' + entity.rid + '" ] ');
-
-                        if (existingGraph.length > 0) {
-                          existingGraph[0].remove();
-                        }
                         // var nodes = scope.data.nodes;
                         // var edges = scope.data.edges;
                         scope.path = res.data ? res.data.endpoint.path : [];
@@ -1083,6 +1084,12 @@ define([
                         scope.newEdge = [];
 
                         if (entity) {
+                          var existingGraph = cy.filter('node[id = "' + entity.rid + '" ] ');
+
+                          if (existingGraph.length > 0 && entity.rid !== "annotationContainer") {
+                            existingGraph[0].remove();
+                          }
+
                           if (_.isArray(entity.value)) {
                             scope.outermostId = entity.rid;
                             _.forEach(entity.value, function(n) {
