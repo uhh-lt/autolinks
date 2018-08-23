@@ -210,24 +210,28 @@ define([
                                         var descs = target.descendants().jsons();
                                         var descEdges = target.descendants().connectedEdges().jsons();
 
-                                        const timestamp = new Date().getTime();;
-
+                                        const timestamp = new Date().getTime();
 
                                         _.forEach(_jsons, function(json) {
                                           if (json.group === 'nodes') {
-                                            json.data.id = (parentId === null ? 'null_' : parentId) + json.data.id + '_target_' + target.data().id;
+                                            // json.data.id = (parentId === null ? 'null_' : parentId) + json.data.id + '_target_' + target.data().id;
+                                            json.data.id = ((parentId ? parentId : scope.outermostId) + '__' +
+                                                  ((typeof json.data.value === "string") ? json.data.value.replace(/[^A-Za-z0-9\-_]/g, '-') : json.data.rid)).replace(/\s/g, ''), // NOTE: remove metacharacters, cytoscape rule
                                             json.data.parent = parentId === null ? undefined : parentId;
                                             json.position.x = (json.position.x + sourceNode.position().x) / 2;
                                             json.position.y = (json.position.y + sourceNode.position().y) / 2;
                                           }
                                         });
 
-                                        var existingTarget = _.find(cy.nodes(), function(n) {
-                                          return _.includes(n.data().id, (parentId === null ? 'null_' : parentId) + target.data().id + '_target_' + target.data().id
-                                        )})
+                                        // var existingTarget = _.find(cy.nodes(), function(n) {
+                                        //   return _.includes(n.data().id, (parentId === null ? 'null_' : parentId) + target.data().id + '_target_' + target.data().id
+                                        // )});
 
-                                        if (existingTarget === undefined) {
+                                        var existingTarget = _.filter(cy.filter('node[id = "' + parentId + '" ] ').children(), function(d) { return d.data().rid === target.data().rid });
+
+                                        if (existingTarget === undefined || existingTarget.length === 0) {
                                           _.forEach(descs, function(desc) {
+                                            var ancestor = cy.filter('node[id = "' + desc.data.parent + '" ] ').data().parent;
                                             // var parentInRoot = _.find(_jsons, function(json) {return _.includes(json.data.id, desc.data.parent)});
                                             // var parentInDescs = _.find(descs, function(des) {return _.includes(des.data.id, desc.data.parent)});
                                             // var chosenParent = '';
@@ -237,8 +241,8 @@ define([
                                             //   chosenParent = parentInRoot.data.id;
                                             // }
                                             if (desc.group === 'nodes') {
-                                              desc.data.id = (parentId === null ? 'null_' : parentId) + desc.data.id + '_target_' + target.data().id;
-                                              desc.data.parent = (parentId === null ? 'null_' : parentId) + desc.data.parent +'_target_' + target.data().id;
+                                              desc.data.id = (parentId === null ? '' : parentId) + desc.data.parent.replace(target.data().parent, "") + desc.data.id.replace(desc.data.parent, "");
+                                              desc.data.parent = (parentId === null ? '' : parentId) + desc.data.parent.replace(target.data().parent, "");
                                               desc.position.x = (desc.position.x + sourceNode.position().x) / 2;
                                               desc.position.y = (desc.position.y + sourceNode.position().y) / 2;
                                             }
@@ -247,10 +251,18 @@ define([
                                           _.forEach(descEdges, function(descEdge) {
                                             // var chosenSource =  _.find(descs, function(des) {return _.includes(des.data.id, descEdge.data.source)});
                                             // var chosenTarget = _.find(descs, function(des) {return _.includes(des.data.id, descEdge.data.target)});
+                                            var chosenSource = cy.filter('node[id = "' + descEdge.data.source + '" ] ');
+                                            var chosenTarget = cy.filter('node[id = "' + descEdge.data.target + '" ] ');
+                                            var descEdgeSource = (parentId === null ? '' : parentId) + chosenSource.data('parent').replace(target.data().parent, "") + chosenSource.data('id').replace(chosenSource.data('parent'), "");
+                                            var descEdgeTarget = (parentId === null ? '' : parentId) + chosenTarget.data('parent').replace(target.data().parent, "") + chosenTarget.data('id').replace(chosenTarget.data('parent'), "");
+
                                             if (descEdge.group === 'edges') {
-                                              descEdge.data.id = (parentId === null ? 'null_' : parentId) + descEdge.data.id;
-                                              descEdge.data.source = (parentId === null ? 'null_' : parentId) + descEdge.data.source + '_target_' + target.data().id;
-                                              descEdge.data.target = (parentId === null ? 'null_' : parentId) + descEdge.data.target + '_target_' + target.data().id;
+                                              // descEdge.data.id = (parentId === null ? 'null_' : parentId) + descEdge.data.id;
+                                              descEdge.data.id = ( descEdgeSource + '-' + descEdgeTarget + '-' + descEdge.data.rid ).replace(/\s/g, '');
+                                              descEdge.data.source = descEdgeSource;
+                                              descEdge.data.target = descEdgeTarget;
+                                              // descEdge.data.source = (parentId === null ? 'null_' : parentId) + descEdge.data.source + '_target_' + target.data().id;
+                                              // descEdge.data.target = (parentId === null ? 'null_' : parentId) + descEdge.data.target + '_target_' + target.data().id;
                                             }
                                           });
 
@@ -277,7 +289,7 @@ define([
                                           //       cid: sourceNode.data().cid,
                                           //       rid: targetNode.data().rid,
                                           //       metadata: targetNode.data().metadata,
-                                          //       id: (parent + '__n-' + targetNode.data().name.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '') + '-' + targetNode.data().rid ).replace(/\s/g, ''),
+                                          //       id: (parent + '__' + targetNode.data().name.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '') + '-' + targetNode.data().rid ).replace(/\s/g, ''),
                                           //       name: targetNode.data().name + '',
                                           //       parent: parent
                                           //     },
@@ -288,6 +300,8 @@ define([
                                           // };
                                           // var n = cy.add(nodeObj);
                                           nodeTipExtension(n);
+                                          edgeTipExtension(n.connectedEdges());
+                                          // edgeTipExtension(mvData.connectedEdges());
                                           // var newTargetNode = targetNode.clone();
                                           // newTargetNode.data().id = newTargetNode.data('id') + '_' + cy.elements().length;
                                           // newTargetNode.data().parent = sourceNode.data('parent') ? sourceNode.data('parent') : null;
@@ -412,50 +426,91 @@ define([
 
                           scope.$parent.$mdDialog.show(confirm).then(function() {
 
-                            if (!node.isParent()) {
-                              if (cy.$(':selected').length > 0) {
-                                scope.$parent.EntityService.openSideNav('createCompound');
-                              } else {
-                                $mdToast.show(
-                                      $mdToast.simple()
-                                        .textContent('Please select one or more nodes to be children')
-                                        .position('top right')
-                                        .theme("warn-toast")
-                                        .hideDelay(3500)
-                                    );
-                                console.log('Please select one or more nodes to be children');
-                              }
+                            const sourceData = scope.mergeToParentNodes.source;
+                            const targetData = scope.mergeToParentNodes.target;
+                            const hasChildren = scope.mergeToParentNodes.source.children().length > 0 ? true : false;
+
+                            if (sourceData.data('rid') === targetData.data('rid')) {
+                              scope.$parent.$mdToast.show(
+                                    scope.$parent.$mdToast.simple()
+                                      .textContent('Merging to the same node is not allowed')
+                                      .position('top right')
+                                      .theme("warn-toast")
+                                      .hideDelay(3500)
+                                  );
                             } else {
-                              scope.selectedNodesToMerge.hide();
-                              scope.mergeMode = false;
+                              if (!node.isParent()) {
+                                if (cy.$(':selected').length > 0) {
+                                  scope.$parent.EntityService.openSideNav('createCompound');
+                                } else {
+                                  scope.$parent.$mdToast.show(
+                                        scope.$parent.$mdToast.simple()
+                                          .textContent('Please select one or more nodes to be children')
+                                          .position('top right')
+                                          .theme("warn-toast")
+                                          .hideDelay(3500)
+                                      );
+                                }
+                              } else {
+                                const before = {
+                                  "rid": sourceData.data('rid'),
+                                  "cid": sourceData.data('cid'),
+                                  "metadata": sourceData.data('metadata'),
+                                  "value": sourceData.data('value'),
+                                };
 
-                              const sourceData = scope.mergeToParentNodes.source;
-                              const targetData = scope.mergeToParentNodes.target;
-                              const hasChildren = scope.mergeToParentNodes.source.children().length > 0 ? true : false;
+                                const after = {
+                                  "rid": sourceData.data('rid'),
+                                  "cid": targetData.data('rid'),
+                                  "metadata": sourceData.data('metadata'),
+                                  "value": sourceData.data('value'),
+                                };
+                                const data = { before: before, after: after };
 
-                              const before = {
-                                "rid": sourceData.data('rid'),
-                                "cid": sourceData.data('cid'),
-                                "metadata": sourceData.data('metadata'),
-                                "value": sourceData.data('value'),
-                              };
+                                scope.$parent.EndPointService.editResource(data).then(function(response) {
 
-                              const after = {
-                                "rid": sourceData.data('rid'),
-                                "cid": targetData.data('rid'),
-                                "metadata": sourceData.data('metadata'),
-                                "value": sourceData.data('value'),
-                              };
-                              const data = { before: before, after: after };
+                                  var hasDuplicateInTarget = _.filter(targetData.children(), function(d) { return d.data().rid === sourceData.data().rid });
 
-                              scope.$parent.EndPointService.editResource(data).then(function(response) {
-                                sourceData.data().cid = targetData.data('rid');
-                                const mvData = sourceData.move({parent: targetData.data('id')});
-                                nodeTipExtension(mvData);
-                                nodeTipExtension(mvData.descendants());
-                              });
+                                  if (hasDuplicateInTarget.length < 1) {
+                                    if (sourceData.connectedEdges().length > 0) {
+                                      var sourceJson = sourceData.json();
+                                      sourceJson.data.id = targetData.data('id') + (sourceJson.data.parent ? sourceJson.data.id.replace(sourceJson.data.parent, "") : sourceJson.data.id);
+                                      sourceJson.data.parent = targetData.data('id');
+                                      sourceJson.data.cid = targetData.data('rid');
+                                      sourceJson.position.x = (sourceJson.position.x + targetData.position().x) / 2;
+                                      sourceJson.position.y = (sourceJson.position.y + targetData.position().y) / 3;
+
+                                      const mvData = cy.add(sourceJson);
+                                      nodeTipExtension(mvData);
+                                      nodeTipExtension(mvData.descendants());
+                                      edgeTipExtension(mvData.connectedEdges());
+                                    } else {
+                                      scope.selectedNodesToMerge.hide();
+
+                                      // targetData.data().cid = newCompound.data('rid');
+                                      // const mvDataTarget = targetData.move({parent: newCompound.data('id')});
+                                      // nodeTipExtension(mvDataTarget);
+
+                                      sourceData.data().cid = targetData.data('rid');
+                                      const mvData = sourceData.move({parent: targetData.data('id')});
+                                      nodeTipExtension(mvData);
+                                      nodeTipExtension(mvData.descendants());
+                                      edgeTipExtension(mvData.connectedEdges());
+                                    }
+                                  }  else {
+                                      scope.$parent.$mdToast.show(
+                                            scope.$parent.$mdToast.simple()
+                                              .textContent(((sourceData.data('metadata') && sourceData.data('metadata').label) ? sourceData.data('metadata').label : sourceData.data('name'))
+                                              + ' is already in ' + ((targetData.data('metadata') && targetData.data('metadata').label) ? targetData.data('metadata').label : targetData.data('name')))
+                                              .position('top right')
+                                              .theme("warn-toast")
+                                              .hideDelay(3500)
+                                          );
+                                    }
+                                  scope.mergeMode = false;
+                                });
+                              }
                             }
-
                             // addNewNode(data, targetData, hasChildren);
                           }, function() {
                             scope.mergeMode = false;
@@ -563,8 +618,8 @@ define([
                             cy.$('#'+ n.data('id')).qtip({
                               content: {
                                   text: function(event, api) {
-                                    event.preventDefault();
-                                    event.stopPropagation();
+                                    // event.preventDefault();
+                                    // event.stopPropagation();
                                     scope.selectedEntity = n;
                                     console.log(scope.selectedEntity.id());
 
@@ -895,10 +950,9 @@ define([
                           cid: e.cid,
                           rid: e.rid,
                           metadata: e.metadata,
-                          id: ((parent ? parent.id : scope.outermostId) + '__n-' +
+                          id: ((parent ? parent.id : scope.outermostId) + '__' +
                               // e.value.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '')
-                              ((typeof e.value === "string") ? e.value.replace(/[^A-Za-z0-9\-_]/g, '-') : e.rid) // NOTE: remove metacharacters, cytoscape rules
-                              + '-' + e.rid ).replace(/\s/g, ''),
+                              ((typeof e.value === "string") ? e.value.replace(/[^A-Za-z0-9\-_]/g, '-') : e.rid)).replace(/\s/g, ''), // NOTE: remove metacharacters, cytoscape rules
                           name: ((typeof e.value === "string") ? e.value : e.rid) + '',
                           parent: parent ? parent.id : scope.outermostId,
                           path: scope.path,
@@ -1025,12 +1079,17 @@ define([
                         var entity = res.entity;
                         // var nodes = scope.data.nodes;
                         // var edges = scope.data.edges;
-
                         scope.path = res.data ? res.data.endpoint.path : [];
                         scope.newNode = [];
                         scope.newEdge = [];
 
                         if (entity) {
+                          var existingGraph = cy.filter('node[id = "' + entity.rid + '" ] ');
+
+                          if (existingGraph.length > 0 && entity.rid !== "annotationContainer") {
+                            existingGraph[0].remove();
+                          }
+
                           if (_.isArray(entity.value)) {
                             scope.outermostId = entity.rid;
                             _.forEach(entity.value, function(n) {
@@ -1123,8 +1182,8 @@ define([
 
                         if (scope.mergeMode) {
 
-                          scope.selectedNodesToMerge.hide();
-                          scope.mergeMode = false;
+                          // scope.selectedNodesToMerge.hide();
+                          // scope.mergeMode = false;
 
                           const sourceData = scope.mergeToParentNodes.source;
                           const targetData = scope.mergeToParentNodes.target;
@@ -1155,6 +1214,8 @@ define([
                             const dataCompound = { before: beforeCompound, after: afterCompound };
 
                             scope.$parent.EndPointService.editResource(dataCompound).then(function(response) {
+                              var parentId = targetData.data().parent ? targetData.data().parent : null;
+
                               var x = scope.coordinate.x;
                               var y = scope.coordinate.y;
                               var data = response.data;
@@ -1163,7 +1224,9 @@ define([
                                     cid: data.cid,
                                     rid: data.rid,
                                     metadata: data.metadata,
-                                    id: ( scope.newCompoundLabel + ( '_as_parent_' ) + data.rid + '-' + data.cid + '_' + scope.username + timestamp  ).replace(/\s/g, ''),
+                                    // id: ( scope.newCompoundLabel + ( '_as_parent_' ) + data.rid + '-' + data.cid + '_' + scope.username + timestamp  ).replace(/\s/g, ''),
+                                    id: ((parentId ? parentId : scope.outermostId) + '__' +
+                                        ((typeof data.value === "string") ? data.value.replace(/[^A-Za-z0-9\-_]/g, '-') : data.rid)).replace(/\s/g, ''), // NOTE: remove metacharacters, cytoscape rules
                                     name: scope.newCompoundLabel + '_' + scope.username,
                                     value: data.value
                                   },
@@ -1173,70 +1236,105 @@ define([
                                   }
                               };
 
-                              var newCompound = cy.add(nodeObj);
 
-                              newCompound.data().cid = targetData.data('cid');
-                              const mvDataCompound = newCompound.move({parent: targetData.data('cid')});
-                              nodeTipExtension(mvDataCompound);
-                              // nodeTipExtension(mvData.descendants());
+                              var existingCompound = _.filter(cy.filter('node[id = "' + parentId + '" ] ').children(), function(d) { return d.data().rid === data.rid });
+                              if (existingCompound === undefined || existingCompound.length === 0) {
+                                var newCompound = cy.add(nodeObj);
 
-                              const beforeTarget = {
-                                "rid": targetData.data('rid'),
-                                "cid": targetData.data('cid'),
-                                "metadata": targetData.data('metadata'),
-                                "value": targetData.data('value')
-                              };
+                                newCompound.data().cid = targetData.data('cid');
+                                const mvDataCompound = newCompound.move({parent: targetData.data('parent')});
+                                nodeTipExtension(mvDataCompound);
+                                // nodeTipExtension(mvData.descendants());
 
-                              const afterTarget = {
-                                "rid": targetData.data('rid'),
-                                "cid": newCompound.data('rid'),
-                                "metadata": targetData.data('metadata'),
-                                "value": targetData.data('value')
-                              };
-                              const dataTarget = { before: beforeTarget, after: afterTarget };
-
-                              scope.$parent.EndPointService.editResource(dataTarget).then(function(response) {
-                                if (targetData.connectedEdges().length > 0) {
-                                  var targetJson = targetData.json();
-                                  targetJson.data.id = newCompound.data('id') + targetJson.data.id;
-                                  targetJson.data.parent = newCompound.data('id');
-                                  targetData.data().cid = newCompound.data('rid');
-                                  targetJson.position.x = (targetJson.position.x + sourceData.position().x) / 2;
-                                  targetJson.position.y = (targetJson.position.y + sourceData.position().y) / 2;
-                                  var newTarget = cy.add(targetJson);
-                                  nodeTipExtension(newTarget);
-                                } else {
-                                  targetData.data().cid = newCompound.data('rid');
-                                  const mvDataTarget = targetData.move({parent: newCompound.data('id')});
-                                  nodeTipExtension(mvDataTarget);
-                                }
-
-                                const beforeSource = {
-                                  "rid": sourceData.data('rid'),
-                                  "cid": sourceData.data('cid'),
-                                  "metadata": sourceData.data('metadata'),
-                                  "value": sourceData.data('value')
+                                const beforeTarget = {
+                                  "rid": targetData.data('rid'),
+                                  "cid": targetData.data('cid'),
+                                  "metadata": targetData.data('metadata'),
+                                  "value": targetData.data('value')
                                 };
 
-                                const afterSource = {
-                                  "rid": sourceData.data('rid'),
+                                const afterTarget = {
+                                  "rid": targetData.data('rid'),
                                   "cid": newCompound.data('rid'),
-                                  "metadata": sourceData.data('metadata'),
-                                  "value": sourceData.data('value')
+                                  "metadata": targetData.data('metadata'),
+                                  "value": targetData.data('value')
                                 };
-                                const dataSource = { before: beforeSource, after: afterSource };
+                                const dataTarget = { before: beforeTarget, after: afterTarget };
 
-                                scope.$parent.EndPointService.editResource(dataSource).then(function(response) {
-                                  sourceData.data().cid = newCompound.data('rid');
-                                  const mvDataSource = sourceData.move({parent: newCompound.data('id')});
-                                  nodeTipExtension(mvDataSource);
-                                  nodeTipExtension(mvDataSource.descendants());
+                                scope.$parent.EndPointService.editResource(dataTarget).then(function(response) {
+                                  if (targetData.connectedEdges().length > 0) {
+                                    var targetJson = targetData.json();
+                                    targetJson.data.id = newCompound.data('id') + (targetJson.data.parent ? targetJson.data.id.replace(targetJson.data.parent, "") : targetJson.data.id);
+                                    targetJson.data.parent = newCompound.data('id');
+                                    targetJson.data.cid = newCompound.data('rid');
+                                    // targetData.data().cid = newCompound.data('rid');
+                                    targetJson.position.x = ((targetJson.position.x * 2) + sourceData.position().x) / 2;
+                                    targetJson.position.y = ((targetJson.position.y * 2) + sourceData.position().y) / 3;
+                                    var newTarget = cy.add(targetJson);
+                                    nodeTipExtension(newTarget);
+                                  } else {
+                                    targetData.data().cid = newCompound.data('rid');
+                                    const mvDataTarget = targetData.move({parent: newCompound.data('id')});
+                                    nodeTipExtension(mvDataTarget);
+                                    nodeTipExtension(mvDataTarget.descendants());
+                                    edgeTipExtension(mvDataTarget.connectedEdges());
+                                  }
+
+                                  const beforeSource = {
+                                    "rid": sourceData.data('rid'),
+                                    "cid": sourceData.data('cid'),
+                                    "metadata": sourceData.data('metadata'),
+                                    "value": sourceData.data('value')
+                                  };
+
+                                  const afterSource = {
+                                    "rid": sourceData.data('rid'),
+                                    "cid": newCompound.data('rid'),
+                                    "metadata": sourceData.data('metadata'),
+                                    "value": sourceData.data('value')
+                                  };
+                                  const dataSource = { before: beforeSource, after: afterSource };
+
+                                  scope.$parent.EndPointService.editResource(dataSource).then(function(response) {
+
+                                    if (sourceData.connectedEdges().length > 0) {
+                                      var sourceJson = sourceData.json();
+                                      sourceJson.data.id = newCompound.data('id') + (sourceJson.data.parent ? sourceJson.data.id.replace(sourceJson.data.parent, "") : sourceJson.data.id);
+                                      sourceJson.data.parent = newCompound.data('id');
+                                      sourceJson.data.cid = newCompound.data('rid');
+                                      sourceJson.position.x = ((sourceJson.position.x * 2) + targetData.position().x) / 3;
+                                      sourceJson.position.y = ((sourceJson.position.y * 2)+ targetData.position().y) / 3;
+                                      var newTarget = cy.add(sourceJson);
+                                      nodeTipExtension(newTarget);
+                                      edgeTipExtension(newTarget.connectedEdges());
+                                    } else {
+                                      sourceData.data().cid = newCompound.data('rid');
+                                      const mvDataSource = sourceData.move({parent: newCompound.data('id')});
+                                      nodeTipExtension(mvDataSource);
+                                      nodeTipExtension(mvDataSource.descendants());
+                                      edgeTipExtension(mvDataSource.connectedEdges());
+                                    }
+                                  });
+
                                 });
 
-                              });
+                              } else {
+                                scope.$parent.$mdToast.show(
+                                      scope.$parent.$mdToast.simple()
+                                        .textContent('A compound with nodes '
+                                        + (targetData.data('metadata') && sourceData.data('metadata').label ? sourceData.data('metadata').label : sourceData.data('name')) + ' and '
+                                        + (targetData.data('metadata') && targetData.data('metadata').label ? targetData.data('metadata').label : targetData.data('name'))
+                                        + ' already exist')
+                                        .position('top right')
+                                        .theme("warn-toast")
+                                        .hideDelay(3500)
+                                    );
+                              }
 
                             });
                           });
+                          // scope.selectedNodesToMerge.hide();
+                          scope.mergeMode = false;
                         } else {
 
                           var ns = cy.$(':selected');

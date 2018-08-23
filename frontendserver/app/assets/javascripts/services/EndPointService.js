@@ -12,7 +12,7 @@ define([
             $rootScope.serviceName = "";
             $rootScope.serviceVersion = "";
             $rootScope.text = "";
-            $rootScope.localSearch = {local: true, ci: false};
+            $rootScope.annotationSearch = {local: true, ci: false};
 
             return {
               fetchService: function() {
@@ -140,15 +140,15 @@ define([
                 });
               },
 
-              localSearch: function(context, isCi) {
-                $rootScope.$emit('activateProgressBar', 'local search');
+              annotationSearch: function(context, isCi) {
+                $rootScope.$emit('activateProgressBar', 'annotation search');
                 return $http.post('/api/storage/searchResource', { data: {context: context, isCi: isCi} }).then(function(response) {
-                  if (response.data.length < 1) {
+                  var source = _.find(response.data, function(d) { return _.includes(d, "annotation::") });
+                  if (!source) {
                     $rootScope.$emit('deactivateProgressBar');
-                  }
-                  var selData = [_.find(response.data, function(d) { return _.includes(d, "annotation::") })];
-                  _.forEach(selData, function(source) {
-                    if (!_.includes(source, 'annotations::')) {
+                    return { data: [], context };
+                  } else {
+                    if (_.includes(source, 'annotation::')) {
                       return $http.post('/api/storage/getResource', { data: source }).then(function(response) {
                         const dataPath = { endpoint: { path: 'annotationNode' }};
 
@@ -160,11 +160,20 @@ define([
 
                           $rootScope.$emit('addEntity', { entity: annotationContainer, data: dataPath });
                         }
+                        return { data: response.data, context };
                         // $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
                       });
                     }
-                  });
-                  return { data: response.data, context };
+                    // else {
+                    //   return $http.post('/api/storage/getResource', { data: source }).then(function(response) {
+                    //     const dataPath = { endpoint: { path: 'annotationSearch' }};
+                    //
+                    //     if (response.data) {
+                    //       $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
+                    //     }
+                    //   });
+                    // }
+                  }
                 });
               },
 
