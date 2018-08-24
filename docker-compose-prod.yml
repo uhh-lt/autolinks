@@ -16,29 +16,29 @@ services:
   # Main components and their dependencies
   ##
   # BEGIN: frontend
-#  frontend:
-#    image: node:9.2.0
-#    volumes:
-#      - ${PWD}/frontendserver:/opt/project/frontendserver
-#    ports:
-#      - 20001:9090
-#    networks:
-#      - anet
-#    working_dir: /opt/project
-#    entrypoint:
-#      - /bin/sh
-#      - -c
-#      - |
-#        echo installing modules ...
-#        sh init-repo.sh
-#        echo starting server ...
-#        npm start
-#    environment:
-#      - NODE_ENV=production
-#      - COOKIE_SECRET=bsiusussg78
-#      - BROKER_URL=http://broker:10010
-#      - LOGLEVEL=debug
-#    restart: unless-stopped
+  frontend:
+    image: node:9.2.0
+    volumes:
+      - ${PWD}/frontendserver:/opt/project/frontendserver
+    ports:
+      - 20001:9090
+    networks:
+      - anet
+    working_dir: /opt/project/frontendserver
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        echo installing modules ...
+        npm install
+        echo starting server ...
+        npm start
+    environment:
+      - NODE_ENV=development
+      - COOKIE_SECRET=bsiusussg78
+      - BROKER_URL=http://broker:10010
+      - LOGLEVEL=debug
+    restart: unless-stopped
   # END: frontend
 
   # BEGIN: broker
@@ -48,7 +48,7 @@ services:
       - ${PWD}/broker:/opt/project/broker
       - ${PWD}/data:/opt/project/data
     ports:
-      - 10012:10010
+      - 20002:10010
     networks:
       - anet
     working_dir: /opt/project/broker

@@ -23,7 +23,7 @@ define([
           $scope.lockLeft = false;
           $scope.toggle = {};
           $scope.selectedDoc = {};
-          $scope.localSearch = $rootScope.localSearch;
+          $scope.annotationSearch = $rootScope.annotationSearch;
           $scope.documentLense = true;
           $scope.types = [];
           $scope.documents = [];
@@ -65,6 +65,7 @@ define([
           $scope.toggleTypeTo = function(typ) {
             EndPointService.toggleTypes(typ);
             $rootScope.$emit('switchNodesBasedOnTypes');
+            $rootScope.$emit('layoutReset');
           };
 
           $scope.loadDoc = function(doc) {
@@ -109,6 +110,8 @@ define([
             if (selectedType.length > 0 && !selectedType[0].enabled) {
               selectedType[0].enabled = true;
               EndPointService.toggleTypes(selectedType[0]);
+              $rootScope.$emit('switchNodesBasedOnTypes');
+              $rootScope.$emit('layoutReset');
             }
           });
 

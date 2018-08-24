@@ -60,7 +60,7 @@ define([
                   $scope.metadata_before = _.clone(entity._private.data.metadata);
                   $scope.metadata_keys = Object.keys($scope.metadata);
                 }
-                document.getElementById("propertify").innerHTML = JSON.stringify($scope.selectedEntity._private.data, undefined, 4);
+                //document.getElementById("propertify").innerHTML = JSON.stringify($scope.selectedEntity._private.data, undefined, 4);
               }
               console.log($scope.selectedEntity);
             // }, 1000);
@@ -107,6 +107,10 @@ define([
               // $mdSidenav('right').close();
           };
 
+          $scope.debugNode = function() {
+            console.log($scope.selectedEntity._private.data);
+          };
+
           $scope.navigateTo = function(pvc) {
             $scope.selectedPvc = pvc;
             if (_.includes(pvc.origin, 'service::')) {
@@ -126,10 +130,9 @@ define([
               var offsets = [pvc.start, pvc.end];
               EndPointService.setSelectedDoc(pvc);
               EndPointService.interpretOffset(pvc.did, offsets).then(function(response) {
-                var dataPath = { endpoint: { path: 'annotationNode' }}
-                $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
                 var annoType = _.split(_.split(pvc.origin, '::')[1], ':')[1];
                 $rootScope.$emit('addNewAnnoType', annoType);
+                $rootScope.$emit('switchNodesBasedOnTypes');
                 // EntityService.addEntity(response.data);
               });
             }
@@ -194,13 +197,8 @@ define([
           };
 
           $scope.close = function () {
-            // Component lookup should always be available since we are not using `ng-if`
-            // $route.reload();
-            EndPointService.fetchData();
-
             $mdSidenav('right').close()
               .then(function () {
-                document.getElementById("propertify").innerHTML = '{}';
                 $log.debug("close RIGHT is done");
               });
           };

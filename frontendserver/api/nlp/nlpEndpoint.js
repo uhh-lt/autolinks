@@ -15,26 +15,32 @@ module.exports = router;
 function analyze(req, res){
     const token = req.session.token;
     const data = req.body.data;
-    const options = nlpAnalyze(config().apiUrl, token, req.body.text);
-    request(options, function (error, response, body) {
-      res.send(body);
-    });
+    if (data) {
+      const options = nlpAnalyze(config().apiUrl, token, req.body.text);
+      request(options, function (error, response, body) {
+        res.send(body);
+      });
+    }
 }
 
 function analyzeDid(req, res){
     const token = req.session.token;
     const did = req.body.did;
-    const options = nlpAnalyzeDid(config().apiUrl, token, did);
-    request(options, function (error, response, body) {
-      res.send(body);
-    });
+    if (did) {
+      const options = nlpAnalyzeDid(config().apiUrl, token, did);
+      request(options, function (error, response, body) {
+        res.send(body);
+      });
+    }
 }
 
 function interpretDid(req, res){
     const token = req.session.token;
     const data = req.body;
-    const options = nlpInterpretDid(config().apiUrl, token, data);
-    request(options, function (error, response, body) {
-      res.send(body);
-    });
+    if (data) {
+      const options = nlpInterpretDid(config().apiUrl, token, data);
+      request(options, function (error, response, body) {
+        res.send(body);
+      });
+    }
 }

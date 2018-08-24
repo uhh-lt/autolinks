@@ -23,17 +23,21 @@ function list(req, res){
 function get(req, res){
     const token = req.session.token;
     let data = req.body.data;
-    const options = serviceGet(config().apiUrl, token, data);
-    request(options, function (error, response, body) {
-      res.send(body);
-    });
+    if (data) {
+      const options = serviceGet(config().apiUrl, token, data);
+      request(options, function (error, response, body) {
+        res.send(body);
+      });
+    }
 }
 
 function call(req, res) {
     const token = req.session.token;
     let data = req.body.data;
-    const options = serviceCall(config().apiUrl, token, data);
-    request(options, function (error, response, body) {
-      res.send(body);
-    });
+    if (data) {
+      const options = serviceCall(config().apiUrl, token, data);
+      request(options, function (error, response, body) {
+        res.send(body);
+      });
+    }
 }
