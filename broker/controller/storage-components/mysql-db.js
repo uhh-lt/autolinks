@@ -149,7 +149,9 @@ module.exports.promisedWrite = function (userid, storagekey, resourceList, skips
     return this.getStorageResourceId(userid, storagekey)
       .then(rid => {
         if (rid) {
-          logger.debug(`Resource for storagekey '${storagekey}' and user with id '${userid}' was already stored, skipping write action.`);
+          if (logger.isLevelEnabled('trace')) {
+            logger.trace(`Resource for storagekey '${storagekey}' and user with id '${userid}' was already stored, skipping write action.`);
+          }
           return this.getResource(rid)
             .then(r => {
               if(skipsources){
@@ -251,7 +253,9 @@ module.exports.saveTripleResource = function (tripleResource, uid) {
         tripleResource.value.predicate = resources[1];
         tripleResource.value.object = resources[2];
         const rids = resources.map(r => r.rid);
-        logger.trace(`Saving triple ${rids} for user with id '${uid}'.`);
+        if (logger.isLevelEnabled('trace')) {
+          logger.trace(`Saving triple ${rids} for user with id '${uid}'.`);
+        }
         return promisedQuery('select get_or_add_tripleResource(?,?,?,?) as rid;', rids.concat(uid))
           .then(res => {
             tripleResource.rid = res.rows[0].rid;
@@ -270,7 +274,9 @@ module.exports.saveListResource = function (listResource, uid) {
     .then(
       item_resources => {
         const item_rids = item_resources.map(r => r.rid);
-        logger.debug(`Saved resources ${item_rids}.`);
+        if (logger.isLevelEnabled('trace')) {
+          logger.trace(`Saved resources ${item_rids}.`);
+        }
         const listResourceDescriptor = computeListResourceDescriptor(item_rids);
         // propagate listResourceDescriptor AND item_rids AND items
         return { desc: listResourceDescriptor, items: item_resources, item_rids: item_rids };
@@ -282,7 +288,9 @@ module.exports.saveListResource = function (listResource, uid) {
           res => {
             if(res.rows.length){
               obj.rid = res.rows[0].rid;
-              logger.debug(`Listresource descriptor '${obj.desc}' for user '${uid}' already exists with id '${obj.rid}'.`);
+              if (logger.isLevelEnabled('trace')) {
+                logger.trace(`Listresource descriptor '${obj.desc}' for user '${uid}' already exists with id '${obj.rid}'.`);
+              }
             }
             return obj;
           }
@@ -332,7 +340,9 @@ function computeListResourceDescriptor(list_of_ints){
 
 module.exports.saveListResourceDescriptor = function (listResourceDescriptor, uid) {
   return new Promise((resolve, reject) => {
-    logger.trace(`Saving listResourceDesriptor '${listResourceDescriptor}' for user with id '${uid}'.`);
+    if (logger.isLevelEnabled('trace')) {
+      logger.trace(`Saving listResourceDesriptor '${listResourceDescriptor}' for user with id '${uid}'.`);
+    }
     promisedQuery('select get_or_add_listResource(?, ?) as rid;', [listResourceDescriptor, uid]).then(
       res => {
         const rid = res.rows[0].rid;
@@ -345,7 +355,9 @@ module.exports.saveListResourceDescriptor = function (listResourceDescriptor, ui
 
 module.exports.saveListResourceItem = function (desc_rid, item_rid) {
   return new Promise((resolve, reject) => {
-    logger.trace(`Saving list resource item (${desc_rid},${item_rid}).`);
+    if (logger.isLevelEnabled('trace')) {
+      logger.trace(`Saving list resource item (${desc_rid},${item_rid}).`);
+    }
     promisedQuery('SET @var = 0; call add_listResourceItem(?, ?, @var); SELECT @var as list_item_existed;', [desc_rid, item_rid]).then(
       res => {
         const existed = res.rows[2][0].list_item_existed;
@@ -358,7 +370,9 @@ module.exports.saveListResourceItem = function (desc_rid, item_rid) {
 
 module.exports.saveStringResource = function (stringResource, uid) {
   return new Promise((resolve, reject) => {
-    logger.trace(`Saving resource value '${stringResource.value}' for user with id '${uid}'.`);
+    if (logger.isLevelEnabled('trace')) {
+      logger.trace(`Saving resource value '${stringResource.value}' for user with id '${uid}'.`);
+    }
     promisedQuery('select get_or_add_stringResource(?, ?) as rid;', [stringResource.value, uid]).then(
       res => {
         const rid = res.rows[0].rid;
@@ -371,7 +385,9 @@ module.exports.saveStringResource = function (stringResource, uid) {
 };
 
 module.exports.saveStorageItem = function (userid, storagekey) {
-  logger.trace(`Saving storage '${storagekey}' for user with id '${userid}'.`);
+  if (logger.isLevelEnabled('trace')) {
+    logger.trace(`Saving storage '${storagekey}' for user with id '${userid}'.`);
+  }
   return promisedQuery('SET @var = 0; call get_or_add_storageItem(?,?, @var); SELECT @var as sid;', [userid, storagekey])
     .then(
       res => {
@@ -399,21 +415,29 @@ module.exports.getResource = function (rid, cid) {
   return promisedQuery('select * from resources where rid = ?', [rid])
     .then(res => {
       if (!res.rows.length) {
-        logger.debug(`Resource '${rid}' does not exist`);
+        if (logger.isLevelEnabled('trace')) {
+          logger.trace(`Resource '${rid}' does not exist`);
+        }
         return null;
       }
       const r = res.rows[0];
       const newresource = new Resource(rid, null, cid);
       if (r.istriple) {
-        logger.debug(`Requesting triple resource '${rid}'.`);
+        if (logger.isLevelEnabled('trace')) {
+          logger.trace(`Requesting triple resource '${rid}'.`);
+        }
         return this.fillTripleResource(newresource);
       }
       if (r.islist) {
-        logger.debug(`Requesting list resource '${rid}'.`);
+        if (logger.isLevelEnabled('trace')) {
+          logger.trace(`Requesting list resource '${rid}'.`);
+        }
         return this.fillListResource(newresource);
       }
       if (r.isstring) {
-        logger.debug(`Requesting string resource '${rid}'.`);
+        if (logger.isLevelEnabled('trace')) {
+          logger.trace(`Requesting string resource '${rid}'.`);
+        }
         return this.fillStringResource(newresource);
       }
       throw new Error('This is impossible, a resource has to be one of {list,triple,string}.');
@@ -425,7 +449,9 @@ module.exports.fillStringResource = function (resource) {
   return promisedQuery('select surfaceform from stringResources where rid = ?', [resource.rid])
     .then(res => {
       if (!res.rows.length) {
-        logger.debug(`String resource '${resource.rid}' does not exist`);
+        if (logger.isLevelEnabled('trace')) {
+          logger.trace(`String resource '${resource.rid}' does not exist`);
+        }
         return null;
       }
       resource.value = res.rows[0].surfaceform;
@@ -437,7 +463,9 @@ module.exports.fillTripleResource = function (resource) {
   return promisedQuery('select * from tripleResources where rid = ?;', [resource.rid])
     .then(res => {
       if (!res.rows.length) {
-        logger.debug(`Triple resource '${resource.rid}' does not exist`);
+        if (logger.isLevelEnabled('trace')) {
+          logger.trace(`Triple resource '${resource.rid}' does not exist`);
+        }
         return null;
       }
       return Promise.resolve(res.rows[0])
@@ -786,7 +814,7 @@ module.exports.getDocumentAnalysis = function(uid, did) {
       const row = res.rows[0];
       if(!row.analysis) {
         const ex = new Exception('IllegalState', `Document '${did}' for user '${uid}' has not yet been analyzed.`);
-        ex.log(logger, logger.info);
+        ex.log(logger, logger.warn);
         return reject(ex);
       }
       return resolve(new Analysis().deepAssign(JSON.parse(row.analysis)));
@@ -854,7 +882,11 @@ module.exports.promisedFindResources = function(uid, query, caseinsensitive, sou
           return this.getSourcesRecursive(uid, resource.rid, resource.sources, 1)
             .catch(e => Exception.fromError(e).log(logger, logger.warn))
             .then(_ => resource.sources = Array.from(resource.sources))
-            .then(_ => logger.debug(`Found ${resource.sources.length} source(s) for string resource ${resource.rid}: ${resource.sources}.`))
+            .then(_ => {
+              if (logger.isLevelEnabled('trace')) {
+                logger.trace(`Found ${resource.sources.length} source(s) for string resource ${resource.rid}: ${resource.sources}.`)
+              }
+            })
             .then(_ => resource);
         })
     )));
@@ -866,13 +898,17 @@ module.exports.getSimilarResources = function(uid, query, caseinsensitive) {
     return Promise.resolve([]);
   }
 
-  logger.debug(`Searching for similar resources to '${query}' for user ${uid}.`);
+  if (logger.isLevelEnabled('trace')) {
+    logger.trace(`Searching for similar resources to '${query}' for user ${uid}.`);
+  }
   // select only unique elements where a resource's label is the query or the resource's surfaceForm is the query
   const ci = caseinsensitive || false;
   return promisedQuery('call search_resource(?, ?, ?)', [ uid, query, ci ])
     .then(res => {
       const rids = res.rows[0].map(r => r.rid);
-      logger.debug(`Found ${rids.length} similar resources to '${query}' for user ${uid}: ${rids}.`);
+      if (logger.isLevelEnabled('trace')) {
+        logger.trace(`Found ${rids.length} similar resources to '${query}' for user ${uid}: ${rids}.`);
+      }
       return rids;
     });
 };
@@ -922,22 +958,34 @@ module.exports.fillSources = function(uid, resource) {
   resource.sources = new Set();
   // if resource is not a string resource, just get its parents and so on
   if(!resource.isStringResource()){
-    logger.debug(`Getting sources for non-string resource: ${resource.rid}.`);
+    if (logger.isLevelEnabled('trace')) {
+      logger.trace(`Getting sources for non-string resource: ${resource.rid}.`);
+    }
     return Promise.resolve(resource.rid)
       .then(rid => this.getSourcesRecursive(uid, [ rid ], resource.sources, 1))
-      .catch(e => Exception.fromError(e).log(logger, logger.info))
+      .catch(e => Exception.fromError(e).log(logger, logger.warn))
       .then(_ => resource.sources = Array.from(resource.sources))
-      .then(_ => logger.debug(`Found ${resource.sources.length} sources for non-string resource ${resource.rid}: ${resource.sources}.`))
+      .then(_ => {
+        if (logger.isLevelEnabled('trace')) {
+          logger.trace(`Found ${resource.sources.length} sources for non-string resource ${resource.rid}: ${resource.sources}.`);
+        }
+      })
       .then(_ => resource);
   }
   // otherwise find resources with a similar label or surfaceform and get sources from them
-  logger.debug(`Getting sources for string resource: ${resource.rid}.`);
+  if (logger.isLevelEnabled('trace')) {
+    logger.trace(`Getting sources for string resource: ${resource.rid}.`);
+  }
   return Promise.resolve(resource.metadata.label || resource.value)
     .then(label => this.getSimilarResources(uid, label))
     .then(rids => this.getSourcesRecursive(uid, rids, resource.sources, 1))
     .catch(e => Exception.fromError(e).log(logger, logger.warn))
     .then(_ => resource.sources = Array.from(resource.sources))
-    .then(_ => logger.trace(`Found ${resource.sources.length} sources for string resource ${resource.rid}.`))
+    .then(_ => {
+      if (logger.isLevelEnabled('trace')) {
+        logger.trace(`Found ${resource.sources.length} sources for string resource ${resource.rid}.`);
+      }
+    })
     .then(_ => resource);
 };
 
@@ -958,7 +1006,7 @@ module.exports.fillSourcesRecursive = function(uid, resource) {
       .then(_ => this.fillSources(uid, resource));
   }
   // else resource is a string resource
-  return this.fillSources(uid, resource).catch(e => Exception.fromError(e).log(logger, logger.info));
+  return this.fillSources(uid, resource).catch(e => Exception.fromError(e).log(logger, logger.warn));
 };
 
 module.exports.close = function (callback) {

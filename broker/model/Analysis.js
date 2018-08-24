@@ -135,7 +135,7 @@ Analysis.prototype.getAnnotationsWithinOffset = function(offset) {
  *
  * @param {DOffset}
  * @param strict
- * @return {Set<Annotation>}
+ * @return {[]<Annotation>}
  */
 Analysis.prototype.getAnnotationsWithinDOffset = function(doffset, strict = true) {
   const annotations = new Set();
@@ -153,7 +153,7 @@ Analysis.prototype.getAnnotationsWithinDOffset = function(doffset, strict = true
       }
     });
   }
-  return annotations;
+  return Array.from(annotations);
 };
 
 
