@@ -81,7 +81,6 @@ define([
                             .theme("warn-toast")
                             .hideDelay(3500)
                         );
-                    console.log('Please select one or more nodes to merge to parent');
                   }
                   break;
                 case 'Create new compound':
@@ -95,7 +94,6 @@ define([
                             .theme("warn-toast")
                             .hideDelay(3500)
                         );
-                    console.log('Please select one or more nodes to be children');
                   }
                   break;
                 default:

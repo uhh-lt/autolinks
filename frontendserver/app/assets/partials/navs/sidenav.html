@@ -7,7 +7,7 @@
      <form>
        <md-toolbar class="md-theme-light">
          <h1 class="md-toolbar-tools" style="word-break: break-word; cursor: default;" ng-click="debugNode()">
-           {{ selectedEntity.data().name }}
+           {{ selectedEntity.data().metadata && selectedEntity.data().metadata.label ? selectedEntity.data().metadata.label : selectedEntity.data().name }}
            <!-- <md-input-container class="example-full-width" ng-if="selectedEntity !== 'createCompound'">
              <input
               style="color: white"
@@ -52,6 +52,7 @@
                        value="{{ key ? key : '' }}"
                        style="font-weight: 700"
                        ng-model-options="{ getterSetter: true, updateOn: 'default' }"
+                       maxlength="64"
                      >
                    </textarea>
                  <!-- </md-input-container> -->

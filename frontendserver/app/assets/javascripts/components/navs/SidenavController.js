@@ -18,6 +18,7 @@ define([
 
           $scope.init = function() {
             // $timeout( function() {
+              $scope.provenances = [];
               $scope.selectedEntity = EntityService.getRootScopeEntity();
               const entity = $scope.selectedEntity;
               if (entity._private) {
@@ -62,7 +63,7 @@ define([
                 }
                 //document.getElementById("propertify").innerHTML = JSON.stringify($scope.selectedEntity._private.data, undefined, 4);
               }
-              console.log($scope.selectedEntity);
+              // console.log($scope.selectedEntity);
             // }, 1000);
             // return 'OK';
           };
