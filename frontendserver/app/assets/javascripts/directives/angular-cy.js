@@ -67,7 +67,6 @@ define([
 
                 // scope.$watch('data', function () { // Disable $watch for solving hidden graph bugs
                     var domContainer = document.getElementById('cy-network');
-                    console.log(scope.data);
                     // graph  build
                     scope.doCy = function() {
                       // will be triggered on an event broadcast
@@ -145,7 +144,7 @@ define([
                             elements: scope.data
                       });
 
-                      const timestamp = new Date().getTime();
+                      const timestamp = Date.now();
 
                       var initNode = {
                           data: {
@@ -210,7 +209,7 @@ define([
                                         var descs = target.descendants().jsons();
                                         var descEdges = target.descendants().connectedEdges().jsons();
 
-                                        const timestamp = new Date().getTime();
+                                        const timestamp = Date.now();
 
                                         _.forEach(_jsons, function(json) {
                                           if (json.group === 'nodes') {
@@ -517,7 +516,7 @@ define([
                           });
                           // $rootScope.$emit('mergeToParent');
                         } else {
-                          console.log( 'tapend ' + node.id() );
+                          // console.log( 'tapend ' + node.id() );
                           //console.log(x, y);
                         }
                         // evt.neighborhood('edge').style( { 'line-color' : 'black' });
@@ -621,7 +620,6 @@ define([
                                     // event.preventDefault();
                                     // event.stopPropagation();
                                     scope.selectedEntity = n;
-                                    console.log(scope.selectedEntity.id());
 
                                     //NOTE: annotation resources (container and nodes) are not editable and movable
                                     if (n.data('path') !== 'annotationNode') {
@@ -847,11 +845,12 @@ define([
                             {
                               content: '<span class="fa fa-plus-circle fa-2x"></span>',
                               select: function(e){
+                                const timestamp = Date.now();
                                 const after = {
                                   "rid": 0,
                                   "cid": 0,
                                   "metadata": { label: "new" },
-                                  "value": "new_no_" + cy.nodes().length,
+                                  "value": "new_no_" + timestamp + '_' + scope.username,
                                 };
                                 const data = { before: null, after: after };
                                 addNewNode(data, e);
@@ -876,11 +875,12 @@ define([
                           {
                             content: '<span class="fa fa-plus-circle fa-2x"></span>',
                             select: function(e){
+                              const timestamp = Date.now();
                               const after = {
                                 "rid": 0,
                                 "cid": 0,
                                 "metadata": { label: "new" },
-                                "value": "new_value_no_" + cy.nodes().length + '_' + scope.username,
+                                "value": "new_value_no_" + timestamp + '_' + scope.username,
                               };
                               const data = { before: null, after: after };
                               scope.$parent.EndPointService.editResource(data).then(function(response) {
@@ -1083,8 +1083,9 @@ define([
                         scope.newNode = [];
                         scope.newEdge = [];
 
+                        var existingGraph = cy.filter('node[id = "' + entity.rid + '" ] ');
+
                         if (entity) {
-                          var existingGraph = cy.filter('node[id = "' + entity.rid + '" ] ');
 
                           if (existingGraph.length > 0 && entity.rid !== "annotationContainer") {
                             existingGraph[0].remove();
@@ -1144,7 +1145,6 @@ define([
                             eh.enabled = true;
                             // eh.active = true;
                             var nodeId = scope.selectedEntity.data('id');
-                            console.log(nodeId);
                             // debugger;
                             // console.log(eh.listeners);
                             // console.log(cy.$('#' + nodeId));
@@ -1172,7 +1172,7 @@ define([
 
                       $rootScope.$on('createCompound', function() {
                         scope.newCompoundLabel = angular.element('#newCompound').val();
-                        const timestamp = new Date().getTime();
+                        const timestamp = Date.now();
                         const after = {
                           "rid": 0,
                           "cid": 0,
@@ -1382,7 +1382,7 @@ define([
                                   var descs = n.descendants().jsons();
                                   var descEdges = n.descendants().connectedEdges().jsons();
 
-                                  const timestamp = new Date().getTime();;
+                                  const timestamp = Date.now();
 
                                   _.forEach(_jsons, function(json) {
                                     if (json.group === 'nodes') {
