@@ -43,7 +43,7 @@ services:
 
   # BEGIN: broker
   broker:
-    image: node:10.5
+    image: node:10.9
     volumes:
       - ${PWD}/broker:/opt/project/broker
       - ${PWD}/data:/opt/project/data
@@ -120,7 +120,7 @@ services:
   ##
   # BEGIN: demo service
   demo:
-    image: node:10.5
+    image: node:10.9
     volumes:
       - ${PWD}/services/demo:/opt/project/services/demo
       - ${PWD}/broker:/opt/project/broker
@@ -148,7 +148,7 @@ services:
 
   # BEGIN: wikiservice
   wiki:
-    image: node:10.5
+    image: node:10.9
     volumes:
       - ${PWD}/services/wikiservice/wikiservice-node:/opt/project/services/wikiservice/wikiservice-node
       - ${PWD}/broker:/opt/project/broker
