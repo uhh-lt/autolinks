@@ -32,7 +32,7 @@ function getFileLocation(userid, basename) {
 const MAX_FILESIZE = process.env.MAX_FILESIZE || 5e7; // 5 MB by default
 
 /* connection string: mysql://user:pass@host:port/database?optionkey=optionvalue&optionkey=optionvalue&... */
-const connectionString = process.env.MYSQL || 'mysql://autolinks:autolinks1@mysql:3306/autolinks?debug=false&connectionLimit=150&multipleStatements=true';
+const connectionString = process.env.MYSQL || 'mysql://autolinks:autolinks1@mysql8:3306/autolinks?debug=false&connectionLimit=150&multipleStatements=true';
 const pool = mysql.createPool(connectionString);
 logger.info(`Using mysql connection string: '${connectionString}'`);
 logger.info(`Using ${pool.config.connectionLimit} connections.`);
@@ -87,7 +87,12 @@ function promisedQuery(query, values) {
 module.exports.init = function (callback, resetdata) {
 
   // init database read the mysql script
-  fs.readFile('config/storagedb-schema.mysql.sql', 'utf8', function (err, data) {
+  let initscript = 'config/storagedb-schema.mysql8.sql';
+  if(connectionString.includes('@mysql5:')){
+    initscript = 'config/storagedb-schema.mysql5.sql';
+  }
+
+  fs.readFile(initscript, 'utf8', function (err, data) {
     if (err) {
       return callback(err);
     }
