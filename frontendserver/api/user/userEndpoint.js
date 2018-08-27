@@ -10,5 +10,5 @@ module.exports = router;
 
 function getUsername(req, res){
     const username = req.session.username;
-    res.send(username);
+    res.send(typeof(username) === "number" ? username.toString() : username);
 }
