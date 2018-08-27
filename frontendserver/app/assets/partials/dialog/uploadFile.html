@@ -18,14 +18,14 @@
          name="file"
          ngf-pattern="'.txt'"
          accept=".txt"
-         ngf-max-size="20MB"
+         ngf-max-size="10KB"
          class="uploadFile"
          id="docFile"
        />
        <span flex></span>
        <i ng-show="up.upload_form.file.$error.required">*required</i><br>
-       <i ng-show="up.upload_form.file.$error.maxSize">File too large
-       {{up.file.size / 1000000|number:1}}MB: max 20M</i>
+       <i ng-show="up.upload_form.file.$error.maxSize" style="color: red;">File too large
+       {{up.upload_form.file.size / 1000000|number:1}}: max 10 kB</i>
 
         <md-input-container style="margin-right: 10px;">
            <label>Overwrite file?</label>
@@ -35,7 +35,7 @@
            </md-select>
          </md-input-container>
 
-       <md-button type="submit" ng-click="up.submit()">
+       <md-button type="submit" ng-click="up.submit()" ng-disabled="up.upload_form.file.$error.maxSize">
         Upload
        </md-button>
       <md-button ng-click="close()">
