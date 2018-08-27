@@ -214,7 +214,7 @@ define([
                                         _.forEach(_jsons, function(json) {
                                           if (json.group === 'nodes') {
                                             // json.data.id = (parentId === null ? 'null_' : parentId) + json.data.id + '_target_' + target.data().id;
-                                            json.data.id = ((parentId ? parentId : '0') + '__' +
+                                            json.data.id = ((parentId ? parentId : '') + '__' +
                                                   ((typeof json.data.value === "string") ? json.data.value.replace(/[^A-Za-z0-9\-_]/g, '-') : json.data.rid)).replace(/\s/g, ''), // NOTE: remove metacharacters, cytoscape rule
                                             json.data.parent = parentId === null ? undefined : parentId;
                                             json.position.x = (json.position.x + sourceNode.position().x) / 2;
@@ -788,28 +788,29 @@ define([
                                       // scope.data.nodes.push(nodeObj);
                                       nodeTipExtension(n);
 
-                                      scope.mergeToParentNodes.target = n;
-                                      if (scope.hasChildren) {
-                                        const childrenData = scope.mergeToParentNodes.node.children();
-                                        _.forEach(childrenData, function(child) {
-                                          scope.mergeToParentNodes.source = child;
-                                          const hasChildren = child.children().length > 0 ? true : false;
-                                          const after = {
-                                            "rid": 0,
-                                            "cid": 0,
-                                            "metadata": { label: child.data('metadata') && child.data('metadata').label ? child.data('metadata').label : child.data('name') },
-                                            "value": child.data('name'),
-                                          };
-                                          const data = { before: null, after: after };
-                                          if (hasChildren) {
-                                            addNewNode(data, scope.mergeToParentNodes.target, hasChildren);
-                                          } else {
-                                            addNewNode(data, scope.mergeToParentNodes.target);
-                                          }
-                                        });
-                                      } else {
-                                        scope.hasChildren = false;
-                                      }
+                                      // scope.mergeToParentNodes.target = n; //TODO: introduces bug
+                                      // if (scope.hasChildren) {
+                                      //   const childrenData = scope.mergeToParentNodes.node.children();
+                                      //   _.forEach(childrenData, function(child) {
+                                      //     scope.mergeToParentNodes.source = child;
+                                      //     const hasChildren = child.children().length > 0 ? true : false;
+                                      //     const after = {
+                                      //       "rid": 0,
+                                      //       "cid": 0,
+                                      //       "metadata": { label: child.data('metadata') && child.data('metadata').label ? child.data('metadata').label : child.data('name') },
+                                      //       "value": child.data('name'),
+                                      //     };
+                                      //     const data = { before: null, after: after };
+                                      //     if (hasChildren) {
+                                      //       addNewNode(data, scope.mergeToParentNodes.target, hasChildren);
+                                      //     } else {
+                                      //       addNewNode(data, scope.mergeToParentNodes.target);
+                                      //     }
+                                      //   });
+                                      // } else {
+                                      //   scope.hasChildren = false;
+                                      // }
+                                      scope.hasChildren = false;
                                     }
                                   });
                               });
@@ -1225,7 +1226,7 @@ define([
                                     rid: data.rid,
                                     metadata: data.metadata,
                                     // id: ( scope.newCompoundLabel + ( '_as_parent_' ) + data.rid + '-' + data.cid + '_' + scope.username + timestamp  ).replace(/\s/g, ''),
-                                    id: ((parentId ? parentId : '0') + '__' +
+                                    id: ((parentId ? parentId : '') + '__' +
                                         ((typeof data.value === "string") ? data.value.replace(/[^A-Za-z0-9\-_]/g, '-') : data.rid)).replace(/\s/g, ''), // NOTE: remove metacharacters, cytoscape rules
                                     name: scope.newCompoundLabel + '_' + scope.username,
                                     value: data.value
