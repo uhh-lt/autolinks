@@ -214,7 +214,7 @@ define([
                                         _.forEach(_jsons, function(json) {
                                           if (json.group === 'nodes') {
                                             // json.data.id = (parentId === null ? 'null_' : parentId) + json.data.id + '_target_' + target.data().id;
-                                            json.data.id = ((parentId ? parentId : scope.outermostId) + '__' +
+                                            json.data.id = ((parentId ? parentId : '0') + '__' +
                                                   ((typeof json.data.value === "string") ? json.data.value.replace(/[^A-Za-z0-9\-_]/g, '-') : json.data.rid)).replace(/\s/g, ''), // NOTE: remove metacharacters, cytoscape rule
                                             json.data.parent = parentId === null ? undefined : parentId;
                                             json.position.x = (json.position.x + sourceNode.position().x) / 2;
@@ -1225,7 +1225,7 @@ define([
                                     rid: data.rid,
                                     metadata: data.metadata,
                                     // id: ( scope.newCompoundLabel + ( '_as_parent_' ) + data.rid + '-' + data.cid + '_' + scope.username + timestamp  ).replace(/\s/g, ''),
-                                    id: ((parentId ? parentId : scope.outermostId) + '__' +
+                                    id: ((parentId ? parentId : '0') + '__' +
                                         ((typeof data.value === "string") ? data.value.replace(/[^A-Za-z0-9\-_]/g, '-') : data.rid)).replace(/\s/g, ''), // NOTE: remove metacharacters, cytoscape rules
                                     name: scope.newCompoundLabel + '_' + scope.username,
                                     value: data.value
