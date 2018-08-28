@@ -166,7 +166,7 @@ define([
 
                             var hasAncestors = _.filter(sourceNode.ancestors(), function(a) { return a.data().id === targetNode.data().id });
 
-                            if (hasAncestors.length < 1) {
+                            if (hasAncestors.length < 1 && targetNode.data().id !== 'annotationContainer') {
                               const after = {
                                 "rid": 0,
                                 "cid": 0,
@@ -338,13 +338,23 @@ define([
                                   });
                               });
                             } else {
-                              scope.$parent.$mdToast.show(
-                                    scope.$parent.$mdToast.simple()
-                                      .textContent('Creating edges to its own parents is not allowed')
-                                      .position('top right')
-                                      .theme("warn-toast")
-                                      .hideDelay(3500)
-                                  );
+                              if (targetNode.data().id === 'annotationContainer') {
+                                scope.$parent.$mdToast.show(
+                                      scope.$parent.$mdToast.simple()
+                                        .textContent('Creating edges to special container is not allowed')
+                                        .position('top right')
+                                        .theme("warn-toast")
+                                        .hideDelay(3500)
+                                    );
+                              } else {
+                                scope.$parent.$mdToast.show(
+                                      scope.$parent.$mdToast.simple()
+                                        .textContent('Creating edges to its own parents is not allowed')
+                                        .position('top right')
+                                        .theme("warn-toast")
+                                        .hideDelay(3500)
+                                    );
+                              }
                               addedEles.remove();
                             }
                           }

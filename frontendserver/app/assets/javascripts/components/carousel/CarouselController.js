@@ -455,18 +455,7 @@ define([
               var offsets = splittedId[splittedId.length - 1];
               offsets = _.split(offsets, '-');
 
-              EndPointService.interpretOffset(selectedDoc.did, offsets).then(function(response) {
-                // var dataPath = { endpoint: { path: 'annotationNode' }};
-                //
-                // if (response.data) {
-                //   var containerId = ('annotationContainer').replace(/[^A-Za-z0-9\-_]/g, '-');
-                //   _.forEach(response.data, function(data) { data.cid = containerId});
-                //   var annotationContainer = { rid: containerId, value: response.data, metadata: { label: 'Annotations', type: 'annotationContainer' }, cid: 0 };
-                //
-                //   $rootScope.$emit('addEntity', { entity: annotationContainer, data: dataPath });
-                // }
-                // EntityService.addEntity(response.data);
-              });
+              EndPointService.interpretOffset(selectedDoc.did, offsets).then(function(response) {});
               console.log($scope.text);
               e.preventDefault();
           });
