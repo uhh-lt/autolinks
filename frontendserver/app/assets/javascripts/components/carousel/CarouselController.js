@@ -284,7 +284,7 @@ define([
                 mainScriptArea.style.display="block";
                 mainTextArea.style.display="none";
 
-                if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ')
+                if (($scope.selectedEntity && $scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity && $scope.selectedEntity.text !== ' ')
                 && $scope.annotationMode) {
 
                   $mdDialog.show({
