@@ -62,7 +62,7 @@
 <header class="w3-container w3-red w3-center" style="padding:128px 16px;position: relative;">
     <h1 class="w3-margin w3-jumbo">Autolinks</h1>
     <p class="w3-xlarge">Information Management with compound graphs</p>
-    <button class="w3-button w3-black w3-padding-large w3-large w3-margin-top">Get Started</button>
+    <button class="w3-button w3-black w3-padding-large w3-large w3-margin-top" onclick="location.href='#about';">Get Started</button>
     <div class="bg-img">
     </div>
 </header>
@@ -72,11 +72,21 @@
   <div class="w3-content">
     <div class="w3-twothird">
       <h1>About Autolinks</h1>
-      <h5 class="w3-padding-32">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h5>
+      <h5 class="w3-padding-32">Automatic proactive researching - a bottom-up interactive information management</h5>
 
-      <p class="w3-text-grey">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Excepteur sint
-        occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-        laboris nisi ut aliquip ex ea commodo consequat.</p>
+      <p class="w3-text-grey">autolinks is a tool that provides a quick researching
+          platform based on a text or a sentence by visualizing the results together with their semantic
+          relations. autolinks optimizes these concerns and is intended to make the learning process faster
+          and more efficient. Instead of reading papers, websites, and other resources to understand a
+          specific term, this machine will do it for us. From a text or a sentence given by the user, it will
+          read and learn from multiple resources and digests the core related information by visualizing
+          the information in the most convenient way. The information is visualized by a force-directed
+          graph, a graph which contains nodes for the information and edges for the semantic relation
+          so that it will ease the reader to understand how pieces of information correlate each other
+          with compound graph concept, where nodes and edges are possible to be inside of a recursive
+          parent graph for the sake of categorization in order to improve and accelerate users’ cognitive
+          process.
+      </p>
     </div>
 
     <div class="w3-third w3-center">
@@ -87,18 +97,134 @@
 
 <!-- Second Grid -->
 <div id="frontend" class="w3-row-padding w3-light-grey w3-padding-64 w3-container">
+  <div class="w3-content" style="margin:auto; text-align:center">
+    <h1>Biomedical Information Management</h1>
+  </div>
   <div class="w3-content">
-    <div class="w3-third w3-center">
-      <i class="fa fa-coffee w3-padding-64 w3-text-red w3-margin-right"></i>
+    <div class="w3-half">
+      <div>
+        <button class="w3-button dots" onclick="currentDiv(1)">1</button>
+        <button class="w3-button dots" onclick="currentDiv(2)">2</button>
+        <button class="w3-button dots" onclick="currentDiv(3)">3</button>
+        <button class="w3-button dots" onclick="currentDiv(4)">4</button>
+        <button class="w3-button dots" onclick="currentDiv(5)">5</button>
+        <br />
+        <button class="w3-button" onclick="plusDivs(-1)">&#10094; Prev</button>
+        <button class="w3-button" onclick="plusDivs(1)">Next &#10095;</button>
+      </div>
+      <br />
+      <div style="max-width: 500px;margin: auto">
+        <img class="screenshots" style="width:100%" src="assets/fig1.png"></img>
+        <img class="screenshots" style="width:100%" src="assets/fig2.png"></img>
+        <img class="screenshots" style="width:100%" src="assets/fig3.png"></img>
+        <img class="screenshots" style="width:100%" src="assets/fig4.png"></img>
+        <img class="screenshots" style="width:100%" src="assets/fig5.png"></img>
+      </div>
+      <p class="w3-text-grey">With Information Management (IM), users can manage their research findings to reduce
+        complexity and organize information. Derived from ontologies concept, we provide knowledge
+        graphs for knowledge representations with nodes to represent concepts and edges to represent
+        relations between the concepts. The management enables users to edit, delete, or add new
+        concepts and relations so that users can create their own concepts and environments.
+        One of the novelties in our information management is that we implement compound graphs
+        for adding another abstraction layer to model concepts with generalized hierarchies, in order to
+        reduce the cognitive load of the user. So the user could get better and faster understanding of the
+        concepts.
+      </p>
+      <h5 class="w3-padding-12">Autolinks prototype can be tested here: <a href="http://ltdemos.informatik.uni-hamburg.de:8093" target="_blank">http://ltdemos.informatik.uni-hamburg.de:8093</a></h5>
+      <p style="color: red">Note that the server is not secure and we do not take responsibility for your data, this server is for research and demo purposes only!</p>
     </div>
 
-    <div class="w3-twothird">
-      <h1>Lorem Ipsum</h1>
-      <h5 class="w3-padding-32">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h5>
+    <div class="w3-half">
 
-      <p class="w3-text-grey">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Excepteur sint
-        occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-        laboris nisi ut aliquip ex ea commodo consequat.</p>
+
+      <h3 class="w3-padding-12" style="color: red;">User Manual:</h3>
+      <ul>
+        <li>
+          Create a user and log in to the Autolinks server
+        </li>
+        <li>
+          Building a knowledge graph:
+          <ul>
+            <li>
+              Tap hold and click add icon to create a new node
+            </li>
+            <li>
+              click a node to show a qTip, click link icon to draw a relational edge to other nodes.
+            </li>
+            <li>
+              click a node to show a qTip, click arrows icon to move to a parent node or merge to other single nodes.
+            </li>
+            <li>
+              click a node / an edge to show a qTip, click edit icon to open node details, editable metadata and sources.
+            </li>
+          </ul>
+        </li>
+        <li>
+          Query Exploration:
+          <ul>
+            <li>
+              Enable active semantic services in the main navigation.
+            </li>
+            <li>
+              Enable annotation search and case insensitive (OPTIONAL).
+            </li>
+            <li>
+              Type a query or queries in the search bar. Enter or click the search icon.
+            </li>
+            <li>
+              Knowledge graphs related to the queries are generated.
+            </li>
+          </ul>
+        </li>
+        <li>
+          Document Exploration:
+          <ul>
+            <li>
+              Click the circle navigation in the lower-right side, and select upload icon.
+            </li>
+            <li>
+              Select a text document, select overwrite (OPTIONAL), then upload. <b style="color: red">Note:</b> At the moment, we limit a file extention to (.TXT) only with 10 kB of size (1 - 10 paragraphs).
+            </li>
+            <li>
+              The document then will be uploaded, analyzed, and interpreted.
+            </li>
+            <li>
+              A new document will be shown in the document lists, the annotation types of the document will be extracted, and the document lense will be enabled.
+            </li>
+            <li>
+              Choose whatever annotation types that you want to show annotations in the document lense.
+            </li>
+          </ul>
+        </li>
+        <li>
+          Annotation Exploration and New Annotation:
+          <ul>
+            <li>
+              Once we have annotations in the document lense, we can start to explore annotation resource based on offsets.
+            </li>
+            <li>
+              Click one of annotation, and annotation resources node related to the offsets will be shown inside the annotation graph.
+            </li>
+            <li>
+              The annotation resource node will highlight the annotation offsets in the document lense if we hover it.
+            </li>
+            <li>
+              Hold Alt key to enable new annotation mode, and we can select texts to be a new annotation with a new / existing types. (Autolinks supports discontinuous annotation where we can annotate different offsets in the document lense)
+            </li>
+          </ul>
+        </li>
+        <li>
+          Provenances:
+          <ul>
+            <li>
+              Autolinks supports provenance where it acts like an external
+brain for users for the reason that users can remember what they have read and go back to it. It
+also enables the users to associate what they have created or edited with the original source of
+information.
+            </li>
+          </ul>
+        </li>
+      </ul>
     </div>
   </div>
 </div>
@@ -106,17 +232,46 @@
 <!-- First Grid -->
 <div id="backend" class="w3-row-padding w3-padding-64 w3-container">
   <div class="w3-content">
-    <div class="w3-twothird">
+    <div class="w3-half">
       <h1>Backend</h1>
-      <h5 class="w3-padding-32">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h5>
+      <p class="w3-text-grey">Backend services provide results of triples, generated by each semantic service. A broker component acts as a bridge to coordinate communication between
+          frontend, for forwarding requests, and backend, for transmitting results and exceptions via
+          socket communication. With broker component, service-oriented architeture could be enabled
+          in autolinks so that we can plug many semantic services and other services for NLP module,
+          data extraction, and data management.
+      </p>
+      <h4 class="w3-padding-32">Set up your own Backend</h4>
+      <h5>Requirements:</h5>
+            <ul class="w3-text-grey">
+              <li>
+                  <a href ="https://store.docker.com/search?type=edition&offering=community">Docker (>= Version 17.09.0)</a>
+              </li>
+              <li>
+                  <a href="https://docs.docker.com/compose/install/">Docker Compose (>= Version 1.16.1)</a>
+              </li>
+            </ul>
 
-      <p class="w3-text-grey">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Excepteur sint
-        occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-        laboris nisi ut aliquip ex ea commodo consequat.</p>
+            <div>
+              <h5>Run server stack with Docker and Docker-Compose:</h5>
+              <ul class="w3-text-grey">
+                <li>
+                  Download the latest <code>docker-compose.yml</code> file <a href="https://github.com/uhh-lt/autolinks/releases">here</a>.
+                </li>
+                <li>
+                  Run &nbsp;&nbsp;<code>'docker-compose -f &lt;filename&gt; -p mysql5 broker demo wiki ctakes-nlp frontend up'</code>&nbsp;&nbsp; and wait until the server stack is started. (Note: internet connection is required in order to download resources. Data directories for images and database will be created in the current directory.)
+                </li>
+                <li>
+                  You can now access the autolinks web page at <a href="http://localhost:11001">http://localhost:11001</a>
+                </li>
+                <li>
+                  Type &nbsp;&nbsp;<code>'docker-compose -f &lt;filename&gt; down'</code>&nbsp;&nbsp; to stop all the server stacks
+                </li>
+              </ul>
+            </div>
     </div>
 
-    <div class="w3-third w3-center">
-      <img src="assets/autolinks.png" width="80%" style="box-shadow: 5px 5px 5px #999999;"/>
+    <div class="w3-half w3-center">
+      <img src="assets/autolinks_architecture.png" width="100%" style="box-shadow: 5px 5px 5px #999999;"/>
     </div>
   </div>
 </div>
@@ -125,8 +280,12 @@
 <div id="feedback" class="w3-row-padding w3-light-grey w3-padding-64 w3-container">
   <div class="w3-content">
     <h1>Feedbacks</h1>
-    <div class="w3-panel w3-padding-32">
-      <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScVsNuDxpY3zp3z0aAFMDakTyVvuhmcFyKL1t4HlsNeDN8-Cw/viewform?embedded=true" width="100%" height="1200" frameborder="0" marginheight="0" marginwidth="0">Loading...</iframe>
+    <div class="w3-panel w3-padding-12">
+      <h3 style="color: red">We need your feedbacks! <3</h3>
+      <p>After testing autolinks, please go to this link and fill the questionnaire. :)</p>
+      <h5><a href="https://docs.google.com/forms/d/e/1FAIpQLScVsNuDxpY3zp3z0aAFMDakTyVvuhmcFyKL1t4HlsNeDN8-Cw/viewform" style="color: green;">Feedbacks <b>FORM</b></a></h5>
+      <!-- <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScVsNuDxpY3zp3z0aAFMDakTyVvuhmcFyKL1t4HlsNeDN8-Cw/viewform?embedded=true" width="100%" height="1200" frameborder="0" marginheight="0" marginwidth="0">Loading...</iframe> -->
+      Your feedback is highly appreciated and will help us to improve autolinks. ^_^
     </div>
   </div>
 </div>
@@ -142,7 +301,7 @@
         <h5>People:</h5>
         <p class="w3-text-grey">Maintainers:
           <ul>
-            <li><a href="https://www.inf.uni-hamburg.de/en/inst/ab/lt/people/steffen-remus.html">Steffen Remus</a> (<a href="https://github.com/remstef">@remstef</a>)</li>
+            <li><a href="https://www.inf.uni-hamburg.de/en/inst/ab/lt/people/steffen-remus.html" target="_blank">Steffen Remus</a> (<a href="https://github.com/remstef">@remstef</a>)</li>
             <li>Alvin Rindra (<a href="https://github.com/alvinrindra">@alvinrindra</a>)</li>
           </ul>
         </p>
@@ -168,7 +327,7 @@
     <i class="fa fa-twitter w3-hover-opacity"></i>
     <i class="fa fa-linkedin w3-hover-opacity"></i>
  </div>
- <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
+ <p><i class="fa fa-copyright"></i> <script>document.write(new Date().getFullYear())</script></p>
 </footer>
 
 <script>
@@ -180,6 +339,33 @@ function toggleMenu() {
     } else {
         x.className = x.className.replace(" w3-show", "");
     }
+}
+
+var slideIndex = 1;
+showDivs(slideIndex);
+
+function plusDivs(n) {
+  showDivs(slideIndex += n);
+}
+
+function currentDiv(n) {
+  showDivs(slideIndex = n);
+}
+
+function showDivs(n) {
+  var i;
+  var x = document.getElementsByClassName("screenshots");
+  var dots = document.getElementsByClassName("dots");
+  if (n > x.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = x.length}
+  for (i = 0; i < x.length; i++) {
+     x[i].style.display = "none";
+  }
+  for (i = 0; i < dots.length; i++) {
+     dots[i].className = dots[i].className.replace(" w3-red", "");
+  }
+  x[slideIndex-1].style.display = "block";
+  dots[slideIndex-1].className += " w3-red";
 }
 </script>
 
