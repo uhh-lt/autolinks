@@ -410,6 +410,20 @@
             <li>
               <b style="color: red">Note:</b> For now, creating edges is only possible in one level of hierarchies. If the target node is in the different level of hierarchies, it will be duplicated to the same level of the source node.
             </li>
+            <li>
+              <b style="color: red">Merging scenarios:</b>
+              <ul>
+                <li>
+                  1. single node / compound without edges to target compound -> move to target compound.
+                </li>
+                <li>
+                  2. single node without relation to single node without relation -> create new compound.
+                </li>
+                <li>
+                  3. single node with relation to single node with relation -> create new compound and duplicate nodes.
+                </li>
+              </ul>
+            </li>
           </ul>
         </li>
         <li>
