@@ -143,11 +143,13 @@ define([
                               if ((response === undefined) || response.data.length < 1 ) {
                                 $mdToast.show(
                                       $mdToast.simple()
-                                        .textContent('No results found for ' + response.context + ' in annotation search')
+                                        .textContent('No results found for ' + response.context + ' in annotation search, select any service endpoint')
                                         .position('top right')
                                         .theme("warn-toast")
                                         .hideDelay(3500)
                                     );
+                                  $mdSidenav('left').toggle();
+                                  $rootScope.$emit('openService');
                               }
                                 // const dataPath = { endpoint: { path: 'annotationSearch' }};
                                 // $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
@@ -159,12 +161,13 @@ define([
                   } else {
                     $mdToast.show(
                           $mdToast.simple()
-                            .textContent('Please select a service path first')
+                            .textContent('Please select any service endpoint first')
                             .position('top right')
                             .theme("warn-toast")
                             .hideDelay(3500)
                         );
                     $mdSidenav('left').toggle();
+                    $rootScope.$emit('openService');
                   }
               // });
             });
