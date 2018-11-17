@@ -79,9 +79,8 @@ GROUP BY ?item ?itemLabel ?itemDescription ?article`, fullUrl = endpointUrl + en
           // ?types
           // ?classes
 
-        const aka = Resource.fromValue( safeget(['aka', 'value'], result, []).split('|').map(Resource.fromValue));
-
-        const itemresource = Resource.fromValue(aka, { label:safeget(['itemLabel', 'value'], result, item), description:safeget(['item','itemDescription'], result) });
+        const itemresource = Resource.fromValue( safeget(['aka', 'value'], result, []).split('|').map(s => Resource.fromValue(s)));
+        itemresource.metadata = { label:safeget(['itemLabel', 'value'], result, item), description:safeget(['item','itemDescription'], result, '') };
 
         const classes = safeget(['classes', 'value'], result, []).split('|');
         const classlabels = safeget(['classlabels', 'value'], result, []).split('|');
