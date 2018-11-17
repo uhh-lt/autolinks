@@ -34,7 +34,7 @@ function editResource(req, res) {
     if (data) {
       const options = resourceEdit(config().apiUrl, token, data);
       request(options, function (error, response, body) {
-        res.send(body);
+        res.send(typeof(body) === "number" ? body.toString() : body);
       });
     }
 }
@@ -44,7 +44,7 @@ function getResource(req, res) {
     const data = req.body.data;
     const options = resourceGet(config().apiUrl, token, data);
     request(options, function (error, response, body) {
-      res.send(body);
+      res.send(typeof(body) === "number" ? body.toString() : body);
     });
 }
 
@@ -54,7 +54,7 @@ function searchResource(req, res) {
     if (data) {
       const options = resourceSearch(config().apiUrl, token, data);
       request(options, function (error, response, body) {
-        res.send(body);
+        res.send(typeof(body) === "number" ? body.toString() : body);
       });
     }
 }
@@ -63,7 +63,7 @@ function getDocuments(req, res) {
     const token = req.session.token;
     const options = documentLists(config().apiUrl, token);
     request(options, function (error, response, body) {
-      res.send(body);
+      res.send(typeof(body) === "number" ? body.toString() : body);
     });
 }
 
@@ -77,7 +77,7 @@ function postAnnotationDid(req, res) {
       // for (anno in annotations) {
       const options = annotationDid(config().apiUrl, data, token, username, annotations);
       request(options, function (error, response, body) {
-        res.send(body);
+        res.send(typeof(body) === "number" ? body.toString() : body);
       });
       // }
     }
@@ -100,7 +100,7 @@ function postDocuments(req, res) {
         const options = documentUpload(config().apiUrl, token, file, dir, overwrite);
         request(options, function (error, response, body) {
           fs.unlinkSync(dir + file.name)
-          res.send(body);
+          res.send(typeof(body) === "number" ? body.toString() : body);
         });
       });
     }
@@ -112,7 +112,7 @@ function deleteDocument(req, res) {
     if (docId) {
       const options = documentDelete(config().apiUrl, token, docId);
       request(options, function (error, response, body) {
-        res.send(body);
+        res.send(typeof(body) === "number" ? body.toString() : body);
       });
     }
 }

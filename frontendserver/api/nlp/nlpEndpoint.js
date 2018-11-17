@@ -18,7 +18,7 @@ function analyze(req, res){
     if (data) {
       const options = nlpAnalyze(config().apiUrl, token, req.body.text);
       request(options, function (error, response, body) {
-        res.send(body);
+        res.send(typeof(body) === "number" ? body.toString() : body);
       });
     }
 }
@@ -29,7 +29,7 @@ function analyzeDid(req, res){
     if (did) {
       const options = nlpAnalyzeDid(config().apiUrl, token, did);
       request(options, function (error, response, body) {
-        res.send(body);
+        res.send(typeof(body) === "number" ? body.toString() : body);
       });
     }
 }
@@ -40,7 +40,7 @@ function interpretDid(req, res){
     if (data) {
       const options = nlpInterpretDid(config().apiUrl, token, data);
       request(options, function (error, response, body) {
-        res.send(body);
+        res.send(typeof(body) === "number" ? body.toString() : body);
       });
     }
 }

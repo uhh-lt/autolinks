@@ -16,7 +16,7 @@ module.exports = router;
 function list(req, res){
     const options = serviceList(config().apiUrl);
     request(options, function (error, response, body) {
-      res.send(body);
+      res.send(typeof(body) === "number" ? body.toString() : body);
     });
 }
 
@@ -26,7 +26,7 @@ function get(req, res){
     if (data) {
       const options = serviceGet(config().apiUrl, token, data);
       request(options, function (error, response, body) {
-        res.send(body);
+        res.send(typeof(body) === "number" ? body.toString() : body);
       });
     }
 }
@@ -37,7 +37,7 @@ function call(req, res) {
     if (data) {
       const options = serviceCall(config().apiUrl, token, data);
       request(options, function (error, response, body) {
-        res.send(body);
+        res.send(typeof(body) === "number" ? body.toString() : body);
       });
     }
 }

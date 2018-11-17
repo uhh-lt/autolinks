@@ -123,6 +123,10 @@ define([
             $scope.selectedDoc = doc;
           });
 
+          $rootScope.$on('openService', function(event) {
+            $scope.toggle.service = true;
+          });
+
           $rootScope.$on('addDocument', function(event, newDoc, overwrite = false) {
             $scope.selectedDoc = { did: newDoc.did, name: newDoc.name };
             $scope.loadNewDoc(newDoc);
@@ -131,7 +135,7 @@ define([
               $scope.documents.push(newDoc);
             }
             $mdSidenav('left').toggle();
-            $scope.toggle.doc;
+            $scope.toggle.doc = true;
           });
         }
       ]);
