@@ -192,6 +192,28 @@ services:
       - ELASTICSEARCH_INDICES=enwiki,wikidata,enwiktionary
   # END: wikiservice
 
+  # BEGIN: sparql service
+  sparql:
+    image: remstef/node-swagger:10.5
+    volumes:
+    - ${PWD}/services/sparql:/opt/project/services/sparql
+    - ${PWD}/broker:/opt/project/broker
+    - ${PWD}/data:/opt/project/data
+    ports:
+    - 11012:10010
+    - 3012:3001
+    networks:
+    - anet
+    stdin_open: true
+    tty: true
+    working_dir: /opt/project/services/sparql
+    entrypoint: bash
+    environment:
+    - NODE_ENV=development
+    - COOKIE_SECRET=YOUR_COOKIE_SECRET
+    - BROKER_URL=http://broker:10010
+  # END: dummy service
+
   # BEGIN: cooc service
   cooc:
     image: remstef/node-swagger:9.5
