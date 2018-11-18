@@ -212,7 +212,7 @@ services:
     - NODE_ENV=development
     - COOKIE_SECRET=YOUR_COOKIE_SECRET
     - BROKER_URL=http://broker:10010
-  # END: dummy service
+  # END: sparql service
 
   # BEGIN: cooc service
   cooc:

@@ -84,26 +84,6 @@ services:
         condition: service_healthy
   # END: broker
 
-  # BEGIN: mysql
-  mysql8:
-    image: mysql:8.0
-    environment:
-      - MYSQL_RANDOM_ROOT_PASSWORD=yes
-      - MYSQL_DATABASE=autolinks
-      - MYSQL_USER=autolinks
-      - MYSQL_PORT=3306
-      - MYSQL_PASSWORD=autolinks1
-    volumes:
-      - ${PWD}/data/mysql8:/var/lib/mysql
-    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_bin", "--default-authentication-plugin=mysql_native_password", "--log_bin_trust_function_creators=1",  "--key-buffer-size=4294967296", "--max-connections=250" ]
-    healthcheck:
-      test: "/usr/bin/mysql -hlocalhost -pautolinks1 -uautolinks -Dautolinks -e'SELECT 1;'"
-      interval: 20s
-      timeout: 10s
-      retries: 3
-    networks:
-      - anet
-
   mysql5:
     image: mysql:5.7
     environment:
@@ -197,6 +177,33 @@ services:
       broker:
         condition: service_healthy
   # END: wikiservice
+
+  # BEGIN: sparql service
+  sparql:
+    image: node:10.9
+    volumes:
+      - ${PWD}/services/sparql:/opt/project/services/sparql
+      - ${PWD}/broker:/opt/project/broker
+      - ${PWD}/data:/opt/project/data
+    networks:
+      - anet
+    working_dir: /opt/project/services/sparql
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        echo installing modules ...
+        npm install
+        echo starting server ...
+        npm start
+    environment:
+      - NODE_ENV=development
+      - COOKIE_SECRET=YOUR_COOKIE_SECRET
+      - BROKER_URL=http://broker:10010
+    depends_on:
+      broker:
+        condition: service_healthy
+  # END: sparql service
 
   # BEGIN: elasticsearch index
 #  es:
