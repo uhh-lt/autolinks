@@ -262,7 +262,7 @@ BEGIN
   declare list_item_existed boolean default false;
   select count(*) > 0 into list_item_existed from listResourceItems where rid = rid_ and itemrid = itemrid_ limit 1 FOR UPDATE;
   if not list_item_existed then
-    insert into listResourceItems set rid = rid_, itemrid = itemrid_;
+    insert ignore into listResourceItems set rid = rid_, itemrid = itemrid_;
   end if;
   return list_item_existed;
 END //
