@@ -274,7 +274,7 @@ BEGIN
   START TRANSACTION READ WRITE;
     select count(*) > 0 into list_item_existed from listResourceItems where rid = rid_ and itemrid = itemrid_ limit 1;
     if not list_item_existed then
-      insert into listResourceItems set rid = rid_, itemrid = itemrid_;
+      insert ignore into listResourceItems set rid = rid_, itemrid = itemrid_;
     end if;
   COMMIT ;
 END //

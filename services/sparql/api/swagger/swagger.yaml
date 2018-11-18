@@ -278,6 +278,62 @@ paths:
           schema:
             $ref: "#/definitions/Exception"
 
+  /wikidataPlainExact:
+    x-swagger-router-controller: wikidata
+    post:
+      operationId: wikidataPlainExact
+      tags:
+      - Wikidata
+      description: query wikidata sparql api for any triples there might be (requires exact match)
+      parameters:
+      - name: data
+        in: body
+        description: The service parameter
+        schema:
+          $ref: '#/definitions/ServiceParameter'
+      - name: getkey
+        in: query
+        description: Compute and only return storagekey based on the ServiceParameter
+        type: boolean
+        allowEmptyValue: true
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/Resource'
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Exception"
+
+  /wikidataPlainExactLimit20:
+    x-swagger-router-controller: wikidata
+    post:
+      operationId: wikidataPlainExactLimit20
+      tags:
+      - Wikidata
+      description: query wikidata sparql api for any triples there might be (requires exact match; limit to 20 random results)
+      parameters:
+      - name: data
+        in: body
+        description: The service parameter
+        schema:
+          $ref: '#/definitions/ServiceParameter'
+      - name: getkey
+        in: query
+        description: Compute and only return storagekey based on the ServiceParameter
+        type: boolean
+        allowEmptyValue: true
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/Resource'
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Exception"
+
   # here are service related endpoints
   /ping:
     x-swagger-router-controller: maintenance
