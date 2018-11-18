@@ -64,7 +64,7 @@ services:
       - NLP=ctakes
       - CTAKESURL=http://ctakes-nlp:8080
       - MYSQL=mysql://autolinks:autolinks1@mysql5:3306/autolinks?debug=false&connectionLimit=150&multipleStatements=true
-      - LOGLEVEL=debug
+      - LOGLEVEL=trace
       - LOGBUFFER=false
   # END: broker
 
@@ -162,6 +162,8 @@ services:
       - NODE_ENV=development
       - COOKIE_SECRET=YOUR_COOKIE_SECRET
       - BROKER_URL=http://broker:10010
+      - LOGLEVEL=trace
+      - LOGBUFFER=false
   # END: demo service
 
   # BEGIN: wikiservice
@@ -196,22 +198,24 @@ services:
   sparql:
     image: remstef/node-swagger:10.5
     volumes:
-    - ${PWD}/services/sparql:/opt/project/services/sparql
-    - ${PWD}/broker:/opt/project/broker
-    - ${PWD}/data:/opt/project/data
+      - ${PWD}/services/sparql:/opt/project/services/sparql
+      - ${PWD}/broker:/opt/project/broker
+      - ${PWD}/data:/opt/project/data
     ports:
-    - 11012:10010
-    - 3012:3001
+      - 11012:10010
+      - 3012:3001
     networks:
-    - anet
+      - anet
     stdin_open: true
     tty: true
     working_dir: /opt/project/services/sparql
     entrypoint: bash
     environment:
-    - NODE_ENV=development
-    - COOKIE_SECRET=YOUR_COOKIE_SECRET
-    - BROKER_URL=http://broker:10010
+      - NODE_ENV=development
+      - COOKIE_SECRET=YOUR_COOKIE_SECRET
+      - BROKER_URL=http://broker:10010
+      - LOGLEVEL=trace
+      - LOGBUFFER=false
   # END: sparql service
 
   # BEGIN: cooc service
@@ -234,6 +238,8 @@ services:
       - NODE_ENV=development
       - COOKIE_SECRET=YOUR_COOKIE_SECRET
       - BROKER_URL=http://broker:10010
+      - LOGLEVEL=trace
+      - LOGBUFFER=false
   # END: cooc service
 
   # BEGIN: elasticsearch index

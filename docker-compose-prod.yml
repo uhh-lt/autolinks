@@ -37,7 +37,7 @@ services:
       - NODE_ENV=development
       - COOKIE_SECRET=bsiusussg78
       - BROKER_URL=http://broker:10010
-      - LOGLEVEL=debug
+      - LOGLEVEL=info
     restart: unless-stopped
   # END: frontend
 
@@ -139,6 +139,8 @@ services:
       - NODE_ENV=production
       - COOKIE_SECRET=ksuhfiuawhiufgb
       - BROKER_URL=http://broker:10010
+      - LOGLEVEL=info
+      - LOGBUFFER=false
     restart: unless-stopped
     depends_on:
       broker:
@@ -173,6 +175,8 @@ services:
       - ELASTICSEARCH_VERSION=5.5
 ##      - ELASTICSEARCH_INDICES=simplewiki
       - ELASTICSEARCH_INDICES=enwiki,wikidata,enwiktionary
+      - LOGLEVEL=info
+      - LOGBUFFER=false
     depends_on:
       broker:
         condition: service_healthy
@@ -200,6 +204,8 @@ services:
       - NODE_ENV=development
       - COOKIE_SECRET=YOUR_COOKIE_SECRET
       - BROKER_URL=http://broker:10010
+      - LOGLEVEL=info
+      - LOGBUFFER=false
     depends_on:
       broker:
         condition: service_healthy
