@@ -80,8 +80,6 @@ services:
     depends_on:
       mysql5:
         condition: service_healthy
-      mysql8:
-        condition: service_healthy
   # END: broker
 
   mysql5:
