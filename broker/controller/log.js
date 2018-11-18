@@ -2,7 +2,7 @@
 
 const pino = require('pino');
 
-const loglevel = process.env.LOGLEVEL || 'info';
+const loglevel = process.env.LOGLEVEL || 'trace';
 
 function getLabel(callingModule) {
   const parts = callingModule.filename.split('/');
