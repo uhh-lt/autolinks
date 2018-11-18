@@ -212,3 +212,44 @@ WHERE {
       return Resource.fromValue([]);
     });
 };
+
+
+module.exports.query_sparql_exact = function(query, limit=10000) {
+  return Promise.resolve(query)
+    .then(() => {
+      const endpointUrl = 'https://query.wikidata.org/sparql?query=',
+        sparqlQuery = `
+SELECT DISTINCT
+  ?item ?s ?p ?o
+WHERE { 
+  BIND( "${query}"@en as ?itemLabel ) .
+  ?item rdfs:label ?itemLabel .
+  { ?item ?p ?o . BIND( ?item as ?s ) . }
+  UNION
+  { ?s ?p ?item . BIND( ?item as ?o ) . }
+}
+ORDER BY UUID() # random order
+LIMIT ${limit}
+`, fullUrl = endpointUrl + encodeURIComponent( sparqlQuery );
+      return fetcher( fullUrl, { headers: { 'Accept': 'application/sparql-results+json' } } );
+    })
+    .then( body => body.json() )
+    .then( json => {
+      const { head: { vars }, results } = json;
+      // prepare results
+      const resourcelist =  results.bindings.map((result, i) => {
+        const item = safeget(['item','value'], result);
+        log.debug(`${i} -- ${item}`);
+        const subjresource = Resource.fromValue( safeget(['s','value'], result) );
+        const predresource = Resource.fromValue( safeget(['p','value'], result) );
+        const objresource = Resource.fromValue( safeget(['o','value'], result) );
+        const tripleresource = Resource.fromValue(new Triple(subjresource, predresource, objresource));
+        return tripleresource;
+      });
+      return Resource.fromValue(resourcelist);
+    })
+    .catch(e => {
+      log.error(e);
+      return Resource.fromValue([]);
+    });
+};

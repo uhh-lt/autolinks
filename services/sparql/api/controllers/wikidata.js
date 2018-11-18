@@ -57,4 +57,14 @@ module.exports.wikidataSubjectsLimit10 = function(req, res, next) {
   return run(req, res, next, (text) => wd.search(text, 1).then(h => wd.subjects(h, 10)).then(r => {r.metadata.label = `Wikidata subjects '${text}' (limit 1|10)`; return r; }));
 };
 
+module.exports.wikidataPlainExact = function(req, res, next) {
+  return run(req, res, next, (text) => wd.query_sparql_exact(text).then(r => {r.metadata.label = `Wikidata triples '${text}'`; return r; }));
+};
+
+module.exports.wikidataPlainExactLimit20 = function(req, res, next) {
+  return run(req, res, next, (text) => wd.query_sparql_exact(text, 20).then(r => {r.metadata.label = `Wikidata triples '${text}' (limit 20)`; return r; }));
+};
+
+
+
 
