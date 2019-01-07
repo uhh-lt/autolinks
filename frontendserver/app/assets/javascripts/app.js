@@ -8,7 +8,6 @@ define([
     './components/navs/SidenavController',
     './components/navs/MainnavController',
     './components/input/InputController',
-    './components/viewer/ViewerController',
     './components/graph/GraphController',
     './components/graph/GraphConfig',
     './services/EntityService',
@@ -26,7 +25,7 @@ define([
 
     var app = angular.module('autolinks', [
             'ui.layout', 'ui.router', 'ui.bootstrap', 'lodash', 'autolinks.graphConfig', 'autolinks.bottom', 'autolinks.upload', 'autolinks.carousel', 'autolinks.graph',
-            'autolinks.input', 'autolinks.viewer', 'ngMaterial', 'ngTouch', 'autolinks.entityservice', 'autolinks.circlenav', 'autolinks.sidenav', 'autolinks.annotation',
+            'autolinks.input', 'ngMaterial', 'ngTouch', 'autolinks.entityservice', 'autolinks.circlenav', 'autolinks.sidenav', 'autolinks.annotation',
             'autolinks.mainnav', 'autolinks.endpointservice'
           ]);
 
@@ -53,10 +52,6 @@ define([
                 'input': {
                   templateUrl: 'assets/partials/input.html',
                   controller: 'InputController'
-                },
-                'viewer': {
-                  templateUrl: 'assets/partials/viewer.html',
-                  controller: 'ViewerController'
                 },
                 'sidenav': {
                   templateUrl: 'assets/partials/navs/sidenav.html',
