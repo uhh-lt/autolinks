@@ -989,7 +989,7 @@ define([
                         };
                       }
 
-                      function extractTripleResources(n, parent = null) {
+                      function extractTriples(n, parent = null) {
                         let s = n.value.subject;
                         let p = n.value.predicate;
                         let o = n.value.object;
@@ -1048,22 +1048,22 @@ define([
 
                         if (_.isArray(s.value)) {
                           _.forEach(s.value, function(n) {
-                            extractEntity(n, subject);
+                            extractResources(n, subject);
                           });
                         } else if (_.isObject(s.value)) {
-                          extractEntity(s, subject);
+                          extractResources(s, subject);
                         };
 
                         if (_.isArray(o.value)) {
                           _.forEach(o.value, function(n) {
-                            extractEntity(n, object);
+                            extractResources(n, object);
                           });
                         } else if (_.isObject(o.value)) {
-                          extractEntity(o, object);
+                          extractResources(o, object);
                         };
                       }
 
-                      function extractEntity(n, parent = null) {
+                      function extractResources(n, parent = null) {
                         if (_.isArray(n.value)) {
                           if (n.value.length > 0) {
                             _.forEach(n.value, function(e) {
@@ -1071,7 +1071,7 @@ define([
                               n.value = n.rid + '';
                               var subject = assignEntity(n, parent);
                               scope.newNode.push(subject);
-                              extractEntity(e, subject);
+                              extractResources(e, subject);
                             });
                           } else {
                             n.value = 'empty';
@@ -1079,7 +1079,7 @@ define([
                             scope.newNode.push(subject);
                           }
                         } else if (_.isObject(n.value)) {
-                          extractTripleResources(n, parent);
+                          extractTriples(n, parent);
                         } else {
                           var subject = assignEntity(n, parent, true);
                           scope.newNode.push(subject);
@@ -1105,12 +1105,12 @@ define([
                           if (_.isArray(entity.value)) {
                             scope.outermostId = entity.rid;
                             _.forEach(entity.value, function(n) {
-                              extractEntity(n);
+                              extractResources(n);
                             });
                             var outermostEntity = assignEntity(entity, 'outermostParentEntity');
                           } else if (_.isObject(entity.value)) {
                             scope.outermostId = entity.rid;
-                            extractEntity(entity);
+                            extractResources(entity);
                             var outermostEntity = assignEntity(entity, 'outermostParentEntity');
                           } else if (typeof entity.value === "string") {
                             var outermostEntity = assignEntity(entity, 'outermostParentEntity');
