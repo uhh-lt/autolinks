@@ -1,38 +1,20 @@
 <div id="carousel-region" ng-if="isActive">
-  <!-- <div uib-carousel active="active" data-interval="false" no-wrap="noWrapSlides" ng-swipe-left="changeSlide('left')"
-      ng-swipe-right="changeSlide('right')" class="multi-item-carousel"> -->
   <div uib-carousel active="active" data-interval="false" no-wrap="noWrapSlides" class="multi-item-carousel" id="main-script-area">
     <div uib-slide ng-repeat="slide in slides track by slide.id" index="slide.id" class="carousel-card">
       <div id="text-card-div" ng-repeat="script in slide.scripts">
         <md-card id="text-card">
           <md-content-card>
             <div id="{{slide.id}}_script-area" ng-bind-html="script" ng-model="script" ng-mouseup="showSelectedEntity(slide.texts, script, slide.id)" ng-mousedown="mouseDown()"></div>
-            <!-- <div id="{{slide.id}}_script-area" class="text-mask" ng-mouseup="showSelectedEntity(slide.texts, script, slide.id)" ng-mousedown="mouseDown()">{{ slide.texts[0] }}</div> -->
           </md-content-card>
         </md-card>
       </div>
     </div>
-    <!-- <div class="row">
-     <div class="col col-xs-6">
-       <button type="button" class="btn btn-default btn-block" ng-click="goPrev()">Previous</button>
-     </div>
-     <div class="col col-xs-6">
-       <button type="button" class="btn btn-default btn-block" ng-click="goNext()">Next</button>
-     </div>
-     <div class="col col-xs-6">
-       <button type="button" class="btn btn-success btn-block" ng-click="setActiveSlide(3)">Go to 3rd slide</button>
-     </div>
-     <div class="col col-xs-6">
-       <button type="button" class="btn btn-info btn-block" ng-click="getActiveSlide(true)">Get Active Slide</button>
-     </div>
-   </div> -->
   </div>
   <div uib-carousel active="active" data-interval="false" no-wrap="noWrapSlides" class="multi-item-carousel" id="main-text-area">
     <div uib-slide ng-repeat="slide in slides track by slide.id" index="slide.id" class="carousel-card">
       <div id="text-card-div" ng-repeat="script in slide.scripts">
         <md-card id="text-card">
           <md-content-card>
-            <!-- <div id="{{slide.id}}_script-area" ng-bind-html="script" ng-model="script" ng-mouseup="showSelectedEntity(slide.texts, script, slide.id)" ng-mousedown="mouseDown()"></div> -->
             <div id="{{slide.id}}_text-area" class="text-mask" ng-mouseup="showSelectedEntity(slide.texts, script, slide.id)" ng-mousedown="mouseDown()">{{ slide.texts[0] }}</div>
           </md-content-card>
         </md-card>
@@ -49,10 +31,6 @@
        ng-keyup="$event.keyCode == 13 && setSlideNumber()"
      >
    </input> / <span> {{ slides.length }} </span>
-    <!-- <li ng-repeat="slide in slides | orderBy:indexOfSlide track by $index" ng-class="{ active: isSlideActive(slide) }" ng-click="selectSlide(slide)">
-        <img ng-src="{{slide.slide.actual.thumb}}">
-        <span class="sr-only">slide {{ $index + 1 }} of {{ slides.length }}<span ng-if="isSlideActive(slide)">, currently active</span></span>
-    </li> -->
  </ol>
   <a role="button" href class="left carousel-control custom-carousel" ng-click="isPrevDisabled() ? '' :goPrev()"
      ng-class="{ 'carousel-disabled': isPrevDisabled() }"
@@ -67,41 +45,3 @@
       <span class="sr-only">next</span>
   </a>
 </div>
-
-<!--
-<div id="carousel-region" ng-controller="CarouselController">
-    <div class="row">
-      <div class="col-md-12">
-        <div class="carousel slide multi-item-carousel" id="theCarousel">
-          <div class="carousel-inner">
-            <div class="item active">
-              <div class="col-xs-4"><a href="#1"><img src="http://placehold.it/300/f44336/000000" class="img-responsive"></a></div>
-            </div>
-            <div class="item">
-              <div class="col-xs-4"><a href="#1"><img src="http://placehold.it/300/e91e63/000000" class="img-responsive"></a></div>
-            </div>
-            <div class="item">
-              <div class="col-xs-4"><a href="#1"><img src="http://placehold.it/300/9c27b0/000000" class="img-responsive"></a></div>
-            </div>
-            <div class="item">
-              <div class="col-xs-4"><a href="#1"><img src="http://placehold.it/300/673ab7/000000" class="img-responsive"></a></div>
-            </div>
-            <div class="item">
-              <div class="col-xs-4"><a href="#1"><img src="http://placehold.it/300/4caf50/000000" class="img-responsive"></a></div>
-            </div>
-            <div class="item">
-              <div class="col-xs-4"><a href="#1"><img src="http://placehold.it/300/8bc34a/000000" class="img-responsive"></a></div>
-            </div>
-
-            <div class="item">
-              <div class="col-xs-4"><a href="#1"><img src="http://placehold.it/300/8bc34a/000000" class="img-responsive"></a></div>
-            </div>
-
-          </div>
-          <a class="left carousel-control" href="#theCarousel" data-slide="prev"><i class="glyphicon glyphicon-chevron-left"></i></a>
-          <a class="right carousel-control" href="#theCarousel" data-slide="next"><i class="glyphicon glyphicon-chevron-right"></i></a>
-        </div>
-      </div>
-    </div>
-</div>
--->
