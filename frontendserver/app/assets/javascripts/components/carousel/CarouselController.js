@@ -8,10 +8,9 @@ define([
 ], function(angular) {
     'use strict';
     /**
-     * viewer module:
+     * carousel module:
      */
     angular.module('autolinks.carousel', ['ngAnimate', 'ngSanitize', 'ui.bootstrap', 'ngTouch'])
-        // Viewer Controller
         .controller('CarouselController', ['$scope', '$rootScope', 'EntityService', 'EndPointService', '$mdDialog', '$timeout', '$sce', '_', '$mdToast', '$mdSidenav',
         function ($scope, $rootScope, EntityService, EndPointService, $mdDialog, $timeout, $sce, _, $mdToast, $mdSidenav) {
 
@@ -32,7 +31,6 @@ define([
           $scope.doffsetsMode = false;
 
           $scope.addSlide = function(sentence, entity) {
-            // var newWidth = 600 + $scope.slides.length + 1;
             $scope.sentenceFrom = sentence.doffset.offsets[0].from;
             $scope.sentenceTo = sentence.doffset.offsets[0].from + sentence.doffset.offsets[0].length;
 
@@ -47,8 +45,6 @@ define([
                 var to = (e.doffset.offsets[e.doffset.offsets.length - 1].from + e.doffset.offsets[e.doffset.offsets.length - 1].length) - $scope.sentenceFrom;
                 var fragments = text.slice(offset, from).split('\n');
                 var surface = text.substring(from, to);
-                // var eId = ($scope.currIndex) + '_' + surface.replace(/\s/g,'') + '_' + e.doffset.offsets[0].from + '-' +
-                // (e.doffset.offsets[e.doffset.offsets.length - 1].from + e.doffset.offsets[e.doffset.offsets.length - 1].length);
 
                 var eId = ($rootScope.selectedDoc.did) + '_anno_' + e.doffset.offsets[0].from + '-' +
                 (e.doffset.offsets[e.doffset.offsets.length - 1].from + e.doffset.offsets[e.doffset.offsets.length - 1].length);
@@ -62,10 +58,7 @@ define([
                   var highlightElement = undefined;
 
                   highlightElement = createNeHighlight(eId, surface);
-                  // Append marked element to DOM
-                  // var compiledElement = $compile(highlightElement)(scope);
                   compiledString = compiledString.concat(highlightElement);
-                  // Move the cursor
                   offset = _.has(e, 'nested') && e.nested.end > e.end ? e.nested.end : to;
 
                   $scope.entityInDoc.push(
@@ -118,13 +111,9 @@ define([
           }
 
           function createNeHighlight(id, name) {
-              // var color = graphProperties.options['groups'][typeId]['color']['background'];
               var color = 'blue';
               var addFilter = '<a id='+ id.replace(/\s/g,'') +' ng-click="addEntityFilter(' + id.replace(/\s/g,'') +')" context-menu="contextMenu" style="text-decoration: none; cursor: pointer" class="entityHighlight">' + name + '</a>';
               var innerElement = '<span style="padding: 0; margin: 0; text-decoration: none; border-bottom: 3px solid ' + color + ';">' + addFilter + '</span>';
-              // innerElement.className = 'highlight-general';
-              // addFilter.append(document.createTextNode(name));
-              // innerElement.append(addFilter);
               return innerElement;
           }
 
@@ -133,12 +122,6 @@ define([
             	+ input.slice(start, end).replace(search, replace)
               + input.slice(end);
         	}
-
-          // $scope.mouseDown = function() {
-          //   $rootScope.activeTypes = [];
-          //   $scope.activeTypes = [];
-          //   $rootScope.$emit('refreshCarouselBasedOnType');
-          // };
 
           // Enable to select Entity and activate whitelisting modal
           $scope.showSelectedEntity = function(text, script, id) {
@@ -150,15 +133,12 @@ define([
 
               if ($scope.selectedEntity) {
                 var ent = $scope.selectedEntity;
-                // var eId = ($scope.currIndex) + '_' + ent.text + '_' + actualProps.start + '-' + actualProps.end;
                 var eId = ($rootScope.selectedDoc.did) + '_anno_' + actualProps.start + '-' + actualProps.end;
                 var highlightElement = createNeHighlight(eId, ent.text);
 
                 var newScript = replaceAt(script, ent.text, highlightElement, ent.start, ent.end);
 
 
-                // var selectedDoc = $scope.tabs.find((t) => { return t.id === doc.id; });
-                // var isInDoc = isEntityInDoc(selectedDoc, $scope.selectedEntity);
                 // NOTE: doffsetAnnotations
                 if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ')
                 && $scope.annotationMode && $scope.doffsetsMode) {
@@ -183,80 +163,8 @@ define([
 
                 }
 
-                // if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ')
-                // && $scope.annotationMode && !$scope.doffsetsMode) {
-                //
-                //   $mdDialog.show({
-                //      templateUrl: '/app/assets/partials/dialog/newAnnotation.html',
-                //      parent: angular.element(document.body),
-                //      // targetEvent: ev,
-                //      clickOutsideToClose: false,
-                //      fullscreen: $scope.customFullscreen // Only for -xs, -sm breakpoints.
-                //    })
-                //    .then(function(answer) {
-                //      // $scope.status = 'You said the information was "' + answer + '".';
-                //      // $('#' + id + '_script-area').html(newScript);
-                //      // $scope.slides[id].scripts = [$sce.trustAsHtml(newScript)];
-                //      // if ($scope.doffsetAnnotation.length === 0) {
-                //      //   $scope.doffsetAnnotation = ent.text;
-                //      // } else {
-                //      //   var doffsetAnno = [' ', ent.text]
-                //      //   $scope.doffsetAnnotation = $scope.doffsetAnnotation.concat(...doffsetAnno);
-                //      // }
-                //      // Move the node creation inside prompt success
-                //      // $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation }); //TODO: create discontinuous annotation for api
-                //      $scope.doffsetAnnotation = '';
-                //      $scope.newAnnotations = [];
-                //    }, function() {
-                //      $scope.doffsetAnnotation = '';
-                //      $scope.status = 'You cancelled the dialog.';
-                //      $scope.newAnnotations = [];
-                //    });
-                //    $scope.newAnnotations = [];
-                //    $scope.isDoffsets = false;
-                  //
-                  // var confirm = $mdDialog.prompt()
-                  //    .title('Annotation Type?')
-                  //    .initialValue('AnatomicalSiteMention')
-                  //    // .targetEvent(ev)
-                  //    .required(true)
-                  //    .ok('Okay!')
-                  //    .cancel('Cancel');
-                  //
-                  //  $mdDialog.show(confirm).then(function(result) {
-                  //    // $scope.status = 'You decided to name your dog ' + result + '.';
-                  //    $('#' + id + '_script-area').html(newScript);
-                  //    $scope.slides[id].scripts = [$sce.trustAsHtml(newScript)];
-                  //    if ($scope.doffsetAnnotation.length === 0) {
-                  //      $scope.doffsetAnnotation = ent.text;
-                  //    } else {
-                  //      var doffsetAnno = [' ', ent.text]
-                  //      $scope.doffsetAnnotation = $scope.doffsetAnnotation.concat(...doffsetAnno);
-                  //    }
-                  //    // Move the node creation inside prompt success
-                  //    $rootScope.$emit('createNode', { name: $scope.doffsetAnnotation });
-                  //    $scope.doffsetAnnotation = '';
-                  //  }, function() {
-                  //    // $scope.status = 'You didn\'t name your dog.';
-                  //  });
-
-
-                   /////////////////7
-                  // $rootScope.$emit('createNode', { name: ent.text });
-
-                //   // $scope.isEntityInDoc = false;
-                //   $scope.open($scope, script, 'static');
-                // } else if (($scope.selectedEntity.text.length) > 0 && ($scope.selectedEntity.text !== ' ')){
-                //   // $scope.isEntityInDoc = true;
-                //   $scope.open($scope, script, 'true');
-                // }
               }
           };
-
-          // document.addEventListener("mouseup", function(event) {
-          //     $rootScope.activeTypes;
-          //     debugger;
-          // });
 
           document.addEventListener('keydown', (event) => {
             const keyName = event.key;
@@ -399,9 +307,6 @@ define([
                 $scope.listActive = EndPointService.getActiveService();
 
                 if ($scope.listActive.length > 0) {
-                  // _.forEach(annotations, function(anno) {
-
-                    // const offsets = anno.doffset.offsets;
                     _.forEach($scope.list, function(l) {
 
                       $scope.serviceName = l.name;
@@ -412,10 +317,8 @@ define([
                           $scope.data = {
                             offsets:
                             {
-                              // from: offsets[0].from ? offsets[0].from : 0,
                               from: 0,
                               length: inputLength
-                              // length: offsets[0].length
                             },
                             context: $scope.context,
                             name: $scope.serviceName,
@@ -430,19 +333,7 @@ define([
 
                       });
                     });
-                  // });
-                } else {
-                  // $mdToast.show(
-                  //       $mdToast.simple()
-                  //         .textContent('Please select a service path first')
-                  //         .position('top right')
-                  //         .theme("warn-toast")
-                  //         .hideDelay(3500)
-                  //     );
-                  // $mdSidenav('left').toggle();
-                }
-
-              // });
+                } else {}
             });
           };
 
@@ -517,10 +408,6 @@ define([
             $scope.doffsetAnnotation = '';
           }
 
-          // for (var i = 0; i < 4; i++) {
-          //   $scope.addSlide(sentence.properties.surface);
-          // }
-
           $rootScope.$on('activateCarousel', function() {
             if ($scope.slides.length > 0) {
                 $scope.isActive = true;
@@ -557,9 +444,7 @@ define([
           $rootScope.$on('activateCarouselFromUpload', function(event, data) {
               $scope.doc = data;
               EndPointService.annotateText(data).then(function(response) {
-                // $timeout( function(){
                 textAnnotations(response.data);
-                // }, 2000 );
                 var slideNumber = document.getElementById('slide-number');
                 if (slideNumber && slideNumber.value) {
                   slideNumber.value = $scope.active + 1;
@@ -598,12 +483,9 @@ define([
 
             $rootScope.$emit('addTypes', types);
             $rootScope.newAnnotationTypes = types;
-            // $scope.entity = anno.filter(a => a.type ==='NamedEntity')
-            // $scope.pages = sentences.length;
             _.forEach(sentences, function(sentence){
               var entity = [];
               var length = sentence.doffset.offsets[0].length;
-              // var surface = sentence.properties.surface;
 
               if (length) {
                 var from = sentence.doffset.offsets[0].from;
@@ -633,38 +515,6 @@ define([
             });
           }
 
-          // Instantiate the Bootstrap carousel
-          // $('.multi-item-carousel').carousel({
-          //   interval: false
-          // });
-          // $timeout(function() {
-          //   debugger;
-          //   $('.carousel-card').each(function() {
-          //     // debugger;$rootScope.selectedDoc
-          //     var next = $(this).next();
-          //     if (!next.length) {
-          //       debugger;$rootScope.selectedDoc
-          //       next = $(this).siblings(':first');
-          //     }
-          //     debugger;
-          //     next.children(':first-child').children().clone().appendTo($(this).children(':first-child'));
-          //     if (!next.next().length) {
-          //       debugger;
-          //       next = $(this).siblings(':first');
-          //     }
-          //     next.next().children(':first-child').children().clone().appendTo($(this).children(':first-child'));
-          //     // if (next.next().length > 0) {
-          //     //   next.next().children(':first-child').children().clone().appendTo($(this).children());
-          //     // } else {
-          //     //   $(this).siblings(':first').children(':first-child').children().clone().appendTo($(this).children());
-          //     // }
-          //   });
-          // });
-          // for every slide in carousel, copy the next slide's item in the slide.
-          // Do the same for the next, next item.
-
-          // Randomize logic below
-
           function assignNewIndexesToSlides(indexes) {
             for (var i = 0, l = slides.length; i < l; i++) {
               slides[i].id = indexes.pop();
@@ -679,7 +529,6 @@ define([
             return shuffle(indexes);
           }
 
-          // http://stackoverflow.com/questions/962802#962890
           function shuffle(array) {
             var tmp, current, top = array.length;
 
@@ -698,7 +547,6 @@ define([
 
          $scope.slidesViewed = [];
          $scope.slidesRemaining = [];
-         //var carouselScope = element.isolateScope();
 
          $scope.isSlideActive = function(slide) {
           return $scope.active === slide.id;
@@ -709,7 +557,6 @@ define([
          };
 
          $scope.goNext = function() {
-             //carouselScope.next();
              var index = $scope.active;
              $scope.active = (index >= ($scope.slides.length - 1) ? ($scope.slides.length - 1) : index + 1);
              document.getElementById('slide-number').value = '';
@@ -720,7 +567,6 @@ define([
            $scope.active = (index <= 0 ? 0 : index - 1);
            document.getElementById('slide-number').value = '';
            document.getElementById('slide-number').value = $scope.active + 1;
-             //carouselScope.prev();
          };
 
          $scope.isPrevDisabled = function() {
@@ -745,16 +591,6 @@ define([
                  return;
              }
              var direction = ($scope.getActiveSlide(false) > number) ? 'prev' : 'next';
-            // carouselScope.select(carouselScope.slides[number], direction);
-         }
-         $scope.getActiveSlide = function(showAlert) {
-            //  var activeSlideIndex = carouselScope.slides.map(function(s) {
-            //      return s.slide.active;
-            //  }).indexOf(true);
-            //  if(showAlert) {
-            //    alert("Your Active Slide is : " + activeSlideIndex);
-            //  }
-            //  return activeSlideIndex;
          }
 
         }

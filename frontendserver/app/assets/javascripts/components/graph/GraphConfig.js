@@ -68,27 +68,6 @@ define([
                 gravityRange: 3.8,
                 // // Initial cooling factor for incremental layout
                 initialEnergyOnIncremental: 0.5
-
-                // // edgeLengthVal: 10,
-                // // idealEdgeLength: function( edge ){ return 1; },
-                // // // animate: true,
-                // // avoidOverlap: true, // if true, prevents overlap of node bounding boxes
-                // // handleDisconnected: true, // if true, avoids disconnected components from overlapping
-                // // fit: true, // whether to fit the viewport to the graph
-                // // ready: undefined, // callback on layoutready
-                // // stop: undefined, // callback on layoutstop
-                // // padding: 5 // the padding on fit
-
-                // // webcola options
-                // // infinite: false // blocks all interaction
-                // randomize: false, // kose-bilkent will randomize node positions
-                // refresh: 4, // fast animation
-                // avoidOverlap: true,
-                // edgeLength: 250, // should be at least two times the diagonal of a block, blocks are 100x60, therefore around 2*116
-                // unconstrIter: 1, // unconstrained initial layout iterations
-                // userConstIter: 0, // initial layout iterations with user-specified constraints - we don't have any user constraints
-                // allConstIter: 1, // initial layout iterations with all constraints including non-overlap
-                // infinite: false,
             },
             style: [
                {
@@ -113,8 +92,6 @@ define([
                     'border-style': 'solid', // node border, can be 'solid', 'dotted', 'dashed' or 'double'.
                     'border-width': '1px',
                     'border-color': 'black',
-                    // 'text-outline-width': 2,
-                    // 'text-outline-color': 'data(typeColor)'
                   }
                 },
                 {
@@ -131,10 +108,7 @@ define([
                         return (e.data('name') ? e.data('name') : 'has relation');
                       },
                       'curve-style': 'bezier', /* options: bezier (curved) (default), unbundled-bezier (curved with manual control points), haystack (straight edges) */
-                      // 'control-point-step-size': '10px', // specifies the distance between successive bezier edges.
-                      // 'control-point-distance': '20px', /* overrides control-point-step-size to curves single edges as well, in addition to parallele edges */
                       'control-point-weight': 0.5, // '0': curve towards source node, '1': curve towards target node.
-                    // 'curve-style': 'bezier',
                     'target-arrow-shape': 'triangle',
                     'line-color': 'rgba(166, 166, 166, 0.58)',
                     'target-arrow-color': 'rgba(166, 166, 166, 0.58)',
@@ -147,7 +121,6 @@ define([
                     'text-valign': 'top',
                     'background-opacity': 0.333,
                     'background-color': 'rgba(230, 230, 230, 0.64)'
-                    // 'text-opacity': 0
                   }
                 },
                 {
@@ -165,25 +138,15 @@ define([
                     'border-color': 'blue',
                     'background-color': 'rgba(129, 227, 227, 0.84)',
                     'color': 'rgba(32, 32, 32, 0.98)',
-                    // 'background-color': 'blue',
-                    // 'line-color': 'black',
-                    // 'filter': 'grayscale(200%)',
-                    // 'target-arrow-color': 'black',
-                    // 'source-arrow-color': 'black',
                     'transition-property': 'background-color, line-color, target-arrow-color',
                     'transition-duration': '0.4s'
                   }
                 },
-                //highlight Element
                 {
                     selector: 'node.hoverNode',
                     style: {
-                        // 'border-color': 'gold',
-                        // 'border-width': '2px',
-                        // 'border-style': 'dashed',
                         'background-opacity': 0.65,
                         'color': 'rgba(32, 32, 32, 0.98)'
-                        // 'background-color': 'rgba(102, 127, 227, 1)',
                     }
                 },
                 {
@@ -197,7 +160,6 @@ define([
                 {
                     selector: 'node.semitransp',
                     style: {
-                      // 'opacity': '0.8'
                   }
                 },
                 {
@@ -217,20 +179,6 @@ define([
                     selector: 'edge.selected',
                     style: {  'line-color': 'blue', 'target-arrow-color': 'blue' }
                 },
-
-                // {
-                // selector: ':selected',
-                // css: {
-                //     'border-width': 5,
-                //     'background-color': 'rgba(129, 227, 0, 0.84)',
-                //     // 'line-color': 'black',
-                //     // 'filter': 'grayscale(200%)',
-                //     // 'target-arrow-color': 'black',
-                //     // 'source-arrow-color': 'black',
-                //     'transition-property': 'background-color, line-color, target-arrow-color',
-                //     'transition-duration': '0.4s'
-                //   }
-                // },
                 {
                 selector: '.faded',
                 css:
@@ -239,9 +187,6 @@ define([
                     'text-opacity': 0.65
                   }
                 },
-
-                // some style for the extension
-
                 {
                   selector: '.eh-handle',
                   style: {

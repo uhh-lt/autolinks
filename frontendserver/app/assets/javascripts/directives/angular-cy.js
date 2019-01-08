@@ -69,26 +69,15 @@ define([
                     var domContainer = document.getElementById('cy-network');
                     // graph  build
                     scope.doCy = function() {
-                      // will be triggered on an event broadcast
-                      // parse edges
-                      // you can build a complete object in the controller and pass it without rebuilding it in the directive.
-                      // doing it like that allows you to add options, design or what needed to the objects
-                      // doing it like that is also good if your data object/s has a different structure
 
                       // Sanity check
                       if (scope.data == null) {
                           return;
                       }
 
-                      // If we've actually changed the data set, then recreate the graph
-                      // We can always update the data by adding more data to the existing data set
                       if (cy != null) {
                           cy.destroy();
                           cy = null;
-                          // delete $rootScope.$$listeners['addEdge'];
-                          // $rootScope.$destroy();
-                          // debugger;
-                          // cy.edgehandles().destroy();
                       }
 
                       for (var i=0; i<scope.cyEdges.length; i++)
@@ -366,15 +355,6 @@ define([
                       }
                       var eh = cy.edgehandles(edgeHandleProps);
                       eh.enabled = false; //TODO: this line is for solving another bug which is expandCollapse bugs
-
-                      // if (scope.$parent.edgehandler) {
-                      //   eh.enabled = true;
-                      //   debugger;
-                      //   eh.start( cy.$('node:selected').remove() );
-                      // }
-
-                      // Event listeners
-                      // with sample calling to the controller function as passed as an attribute
 
                       scope.coordinate = {};
                       scope.selectedEntity = {};
@@ -1138,9 +1118,6 @@ define([
                           nodeTipExtension(n);
                           edgeTipExtension(e);
 
-                          //TODO: remove temporary variable
-                          // scope.data.nodes = _.union(nodes, filterNode);
-                          // scope.data.edges = _.union(edges, scope.newEdge);
                           cy.layout(scope.options.layout).run();
                         }
                         $rootScope.$emit('switchNodesBasedOnTypes');
@@ -1154,16 +1131,10 @@ define([
                         } else {
                           $rootScope.$on('addEdge', function(e) {
                             eh.enabled = true;
-                            // eh.active = true;
                             var nodeId = scope.selectedEntity.data('id');
-                            // debugger;
-                            // console.log(eh.listeners);
-                            // console.log(cy.$('#' + nodeId));
                             if (eh.listeners.length === 0) {
                               eh.addCytoscapeListeners();
-                              // eh.listeners = scope.ehListeners;
                             }
-                            // scope.ehListeners = eh.listeners;
                             eh.start( cy.$('#' + nodeId) );
                           });
                         }
