@@ -74,12 +74,10 @@ function postAnnotationDid(req, res) {
     const annotations = data.newAnnotations;
 
     if (annotations) {
-      // for (anno in annotations) {
       const options = annotationDid(config().apiUrl, data, token, username, annotations);
       request(options, function (error, response, body) {
         res.send(typeof(body) === "number" ? body.toString() : body);
       });
-      // }
     }
 }
 
