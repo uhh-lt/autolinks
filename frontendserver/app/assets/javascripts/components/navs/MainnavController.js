@@ -16,7 +16,6 @@ define([
           .iconSet('communication', 'img/icons/sets/communication-icons.svg', 24)
           .defaultIconSet('img/icons/setitems/core-icons.svg', 24);
         })
-        // Mainnav Controller
         .controller('MainnavController', ['$scope', '$rootScope', 'EndPointService', '$mdDialog', '$mdSidenav', '_',
         function ($scope, $rootScope, EndPointService, $mdDialog, $mdSidenav, _) {
 

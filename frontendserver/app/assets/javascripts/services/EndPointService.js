@@ -39,7 +39,6 @@ define([
                   _.pull($rootScope.activeServices, service.path);
                   $rootScope.$emit('disableEndpoint', service.path);
                 }
-                // return $rootScope.listServices;
               },
 
               toggleTypes: function(type) {
@@ -47,7 +46,6 @@ define([
                   $rootScope.activeTypes.push(type.name);
                 } else {
                   _.pull($rootScope.activeTypes, type.name);
-                  // $rootScope.$emit('disableEndpoint', service.path);
                 }
                 $rootScope.$emit('refreshCarouselBasedOnType');
               },
@@ -154,24 +152,13 @@ define([
 
                         if (response.data) {
                           var containerId = ('annotationContainer').replace(/[^A-Za-z0-9\-_]/g, '-');
-                          // _.forEach(response.data, function(data) { data.parent = containerId});
                           response.data.parent = containerId;
                           var annotationContainer = { rid: containerId, value: [response.data], metadata: { label: 'Annotations', type: 'annotationContainer' }, cid: 0 };
                           $rootScope.$emit('addEntity', { entity: annotationContainer, data: dataPath });
                         }
                         return { data: response.data, context };
-                        // $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
                       });
                     }
-                    // else {
-                    //   return $http.post('/api/storage/getResource', { data: source }).then(function(response) {
-                    //     const dataPath = { endpoint: { path: 'annotationSearch' }};
-                    //
-                    //     if (response.data) {
-                    //       $rootScope.$emit('addEntity', { entity: response.data, data: dataPath });
-                    //     }
-                    //   });
-                    // }
                   }
                 });
               },
@@ -179,21 +166,6 @@ define([
               fetchData: function(data) {
                 const promise = $q.defer();
                 $rootScope.$emit('activateProgressBar', 'Extracting knowledge graph');
-                // let data = [];
-                // let list = $rootScope.listServices;
-                // $rootScope.text = text;
-                // _.forEach(list, function(l) {
-                //   $rootScope.serviceName = l.name;
-                //   $rootScope.serviceVersion = l.version;
-                //   _.forEach(l.endpoints, function(e) {
-                //     data.push({
-                //       text: $rootScope.text,
-                //       name: $rootScope.serviceName,
-                //       version: $rootScope.serviceVersion,
-                //       endpoint: e
-                //     });
-                //   });
-                // });
                 return $http.post('/api/service/call', { data: data }).then(function(response) {
                   return data = response.data;
                 });

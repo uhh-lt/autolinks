@@ -3,11 +3,11 @@ define([
 ], function(angular) {
     'use strict';
     /**
-     * viewer module:
+     * sidenav module:
      */
     angular.module('autolinks.sidenav', []);
     angular.module('autolinks.sidenav')
-        // Viewer Controller
+        // Sidenav Controller
         .controller('SidenavController', ['$scope', '$rootScope', '$timeout', '$mdSidenav', '$mdDialog', '$log', 'EntityService', 'EndPointService', '_',
         function ($scope, $rootScope, $timeout, $mdSidenav, $mdDialog, $log, EntityService, EndPointService, _) {
 
@@ -17,7 +17,6 @@ define([
           $scope.provenances = [];
 
           $scope.init = function() {
-            // $timeout( function() {
               $scope.provenances = [];
               $scope.selectedEntity = EntityService.getRootScopeEntity();
               const entity = $scope.selectedEntity;
@@ -61,11 +60,7 @@ define([
                   $scope.metadata_before = _.clone(entity._private.data.metadata);
                   $scope.metadata_keys = Object.keys($scope.metadata);
                 }
-                //document.getElementById("propertify").innerHTML = JSON.stringify($scope.selectedEntity._private.data, undefined, 4);
               }
-              // console.log($scope.selectedEntity);
-            // }, 1000);
-            // return 'OK';
           };
 
           $rootScope.$on('sidenavReinit', function (event, args) {
@@ -74,10 +69,6 @@ define([
           });
 
           $scope.init();
-          // $scope.selectedEntity = EntityService.getRootScopeEntity();
-          // console.log(selectedEntity);
-
-          // // add Edges to the edges object, then broadcast the change event
           $scope.update = function() {
               const entity = $scope.selectedEntity;
               if (entity.data('rid')) {
@@ -85,13 +76,11 @@ define([
                   "rid": entity.data('rid'),
                   "cid": entity.data('cid'),
                   "metadata": $scope.metadata_before ? $scope.metadata_before : {}
-                  // "value": entity.data('name') ? entity.data('name') : {}
                 };
                 const after = {
                   "rid": entity.data('rid'),
                   "cid": entity.data('cid'),
                   "metadata": $scope.metadata ? $scope.metadata : {}
-                  // "value": entity.data('name') ? entity.data('name') : {}
                 };
                 const data = { before: before, after: after};
                 EndPointService.editResource(data);
@@ -100,12 +89,6 @@ define([
               }
               $mdSidenav('right').close();
               cy.$(":selected").data('metadata', $scope.metadata); //TODO: alternative to trigger('tap') but needs to do more testing
-              // cy.$(':selected').trigger('tap'); //TODO: change tap, since it triggers x undefined cueUtilities error
-
-              // $scope.selectedEntity = EntityService.updateRootScopeEntity($scope.selectedEntity);
-              // // broadcasting the event
-              // // $rootScope.$emit('appChanged');
-              // $mdSidenav('right').close();
           };
 
           $scope.debugNode = function() {
@@ -134,7 +117,6 @@ define([
                 var annoType = _.split(_.split(pvc.origin, '::')[1], ':')[1];
                 $rootScope.$emit('addNewAnnoType', annoType);
                 $rootScope.$emit('switchNodesBasedOnTypes');
-                // EntityService.addEntity(response.data);
               });
             }
           }

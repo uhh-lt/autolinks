@@ -8,8 +8,6 @@ define([
      * Circlenav module:
      */
     angular.module('autolinks.circlenav', ['ngMaterial'])
-    // angular.module('autolinks.circlenav')
-        // Circlenav Controller
         .controller('CirclenavController', ['$scope', '$rootScope', '$timeout', '$mdBottomSheet', '$mdToast', '$mdDialog', '$mdSidenav', 'EntityService',
         function ($scope, $rootScope, $$timeout, $mdBottomSheet, $mdToast, $mdDialog, mdSidenav, EntityService) {
 
@@ -42,7 +40,6 @@ define([
                      .hideDelay(1500)
                  );
            }).catch(function(error) {
-             // User clicked outside or hit escape
            });
          };
 
@@ -122,11 +119,6 @@ define([
 
           $scope.toggleSidenav = function() {
             $rootScope.$emit('toggleMainnav');
-            // if (window.innerWidth > 1280) {
-            //   $rootScope.$emit('toggleMainnav');
-            // } else {
-            //   $mdSidenav('left').toggle();
-            // }
           };
         }
       ]);
