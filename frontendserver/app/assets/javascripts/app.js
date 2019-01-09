@@ -2,7 +2,7 @@ define([
     'angular',
     './components/bottom/BottomSheetController',
     './components/carousel/CarouselController',
-      './components/dialog/NewAnnotationController',
+    './components/dialog/NewAnnotationController',
     './components/dialog/UploadFileController',
     './components/navs/CirclenavController',
     './components/navs/SidenavController',
