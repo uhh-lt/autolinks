@@ -7,4 +7,4 @@ Please see the main [website](https://uhh-lt.github.io/autolinks) for further in
 
 ---
 
-*This application has been implemented in the framework if the [BimDanube project](http://bimdanube.eu)*
+*This application has been implemented in the framework of the [BIMDANUBE project](http://bimdanube.eu)*
